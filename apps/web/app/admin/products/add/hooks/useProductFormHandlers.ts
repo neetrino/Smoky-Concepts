@@ -69,6 +69,7 @@ export function useProductFormHandlers({
   const { validateVariants } = useVariantValidation({
     productType,
     variants: formData.variants,
+    generatedVariants,
     simpleProductData,
     isClothingCategory,
     setLoading,

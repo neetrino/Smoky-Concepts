@@ -123,19 +123,9 @@ export function useProductEditMode({
     };
 
     loadProduct();
-  }, [
-    productId,
-    isLoggedIn,
-    isAdmin,
-    router,
-    defaultCurrency,
-    setLoadingProduct,
-    setFormData,
-    setUseNewCategory,
-    setNewCategoryName,
-    setHasVariantsToLoad,
-    setProductType,
-    setSimpleProductData,
-    setGeneratedVariants,
-  ]);
+    // Intentionally omit setter props from deps: they are either stable (useState) or
+    // wrapped inline in parent (new ref every render), which would cause infinite re-fetch.
+    // Omit defaultCurrency so we don't re-fetch when settings load (would run twice).
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when product or auth change
+  }, [productId, isLoggedIn, isAdmin, router]);
 }

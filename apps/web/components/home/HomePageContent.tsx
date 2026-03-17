@@ -1,10 +1,10 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { HomeActionButton } from './HomeActionButton';
 import { HomeProductCard } from './HomeProductCard';
 import { HomeSectionTitle } from './HomeSectionTitle';
 import {
-  COVER_COLLECTIONS,
   CULTURE_PRODUCTS,
   HOME_ASSET_PATHS,
   PACK_FIT_ITEMS,
@@ -13,6 +13,7 @@ import {
   UPCOMING_LINES,
   UPCOMING_PRODUCTS,
 } from './homePage.data';
+import type { HomeCoverCollectionItem } from './homePage.types';
 
 function PackFitCard({
   title,
@@ -33,20 +34,20 @@ function PackFitCard({
             sizes="144px"
           />
         ) : (
-          <div className={`relative overflow-hidden rounded-[0.35rem] bg-[#7d1818] ${heightClassName} ${widthClassName}`}>
-            <div className="h-[28%] border-b-2 border-white/80" />
+          <div className={`relative overflow-hidden rounded-b-[0.25rem] rounded-t-[0.25rem] bg-[#731818] ${heightClassName} ${widthClassName}`}>
+            <div className="h-[28%] rounded-t-[0.25rem] border-b-2 border-white/80 bg-[#731818]" />
             <img
               src={HOME_ASSET_PATHS.packMark}
               alt=""
-              className="absolute left-1/2 top-[58%] h-8 w-7 -translate-x-1/2 -translate-y-1/2 object-contain opacity-55"
+              className="absolute left-1/2 top-[58%] h-8 w-7 -translate-x-1/2 -translate-y-1/2 object-contain opacity-90"
               aria-hidden="true"
             />
           </div>
         )}
       </div>
       <div className="text-center">
-        <h3 className="text-2xl font-extrabold leading-none text-[#414141]">{title}</h3>
-        {subtitle ? <p className="mt-1 text-xs font-medium text-black">{subtitle}</p> : null}
+        <h3 className="text-sm font-extrabold leading-none text-[#414141]">{title}</h3>
+        {subtitle ? <p className="mt-1 text-[9px] font-medium text-black">{subtitle}</p> : null}
       </div>
     </div>
   );
@@ -66,10 +67,14 @@ function UpcomingLineCard({ title, imageSrc }: (typeof UPCOMING_LINES)[number]) 
 /**
  * Full static homepage assembled from Figma-derived assets.
  */
-export function HomePageContent() {
+interface HomePageContentProps {
+  coverCollections: HomeCoverCollectionItem[];
+}
+
+export function HomePageContent({ coverCollections }: HomePageContentProps) {
   return (
-    <div className="bg-[#f3f1ee] text-[#414141]">
-      <div className="mx-auto flex max-w-[120rem] flex-col gap-24 px-4 pb-24 pt-10 sm:px-8 lg:px-[7.5rem]">
+    <div className="overflow-visible bg-[#f3f1ee] text-[#414141]">
+      <div className="mx-auto flex max-w-[120rem] flex-col gap-24 overflow-visible px-4 pb-24 pt-10 sm:px-8 lg:px-[7.5rem]">
         <section className="flex flex-col gap-10">
           <HomeSectionTitle
             title="We Make Concepts Real"
@@ -107,23 +112,47 @@ export function HomePageContent() {
             ))}
           </div>
           <div className="flex justify-center">
-            <HomeActionButton href="/contact" label="Check Availability" className="min-w-[19rem]" />
+            <HomeActionButton href="/products" label="Check Availability" className="min-w-[19rem]" />
           </div>
         </section>
 
-        <section className="flex flex-col gap-10">
-          <HomeSectionTitle title="Cover Collections" />
-          <div className="grid gap-8 lg:grid-cols-4">
-            {COVER_COLLECTIONS.map((item) => (
-              <div key={item.title} className="rounded-[2.5rem] bg-white px-9 pb-7 pt-4">
-                <div className="relative h-[27.5rem]">
-                  <Image src={item.imageSrc} alt={item.title} fill className="object-contain" sizes="380px" />
-                </div>
-                <h3 className="text-[2.25rem] font-extrabold leading-none text-[#414141]">{item.title}</h3>
-              </div>
-            ))}
-          </div>
-        </section>
+        {coverCollections.length > 0 ? (
+          <section className="flex flex-col gap-10 overflow-visible pt-6">
+            <HomeSectionTitle title="Cover Collections" />
+            <div className="grid gap-8 lg:grid-cols-4 overflow-visible">
+              {coverCollections.map((item) => (
+                <Link
+                  key={item.slug}
+                  href={`/products?category=${item.slug}`}
+                  className="mt-10 block overflow-visible rounded-[2.5rem] bg-white px-6 pb-4 pt-0 shadow-[0_6px_24px_rgba(18,42,38,0.05)] transition-transform duration-200 hover:-translate-y-1"
+                >
+                  {/* Պատկերը բլոկից դուրս վեր — negative margin, բլոկի եզրից վեր */}
+                  <div className="relative -mt-24 h-[22rem] overflow-visible">
+                    {item.imageSrc ? (
+                      <img
+                        src={item.imageSrc}
+                        alt={item.title}
+                        className="h-full w-full object-contain object-top"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <img
+                          src={HOME_ASSET_PATHS.packMark}
+                          alt=""
+                          className="h-20 w-16 object-contain opacity-60"
+                          aria-hidden="true"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="text-[1.5rem] font-extrabold leading-none text-[#414141]">{item.title}</h3>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="flex flex-col gap-10">
           <HomeSectionTitle
@@ -160,8 +189,8 @@ export function HomePageContent() {
           </div>
           <div className="overflow-hidden">
             <div className="flex items-end justify-center gap-4 lg:gap-8">
-              {TRENDING_PRODUCTS.map((item) => (
-                <div key={`${item.name}-${item.badge}`} className={item.compact ? 'hidden xl:block' : ''}>
+              {TRENDING_PRODUCTS.map((item, index) => (
+                <div key={`trending-${index}-${item.name}-${item.badge}`} className={item.compact ? 'hidden xl:block' : ''}>
                   <HomeProductCard item={item} />
                 </div>
               ))}
@@ -195,8 +224,8 @@ export function HomePageContent() {
             <HomeActionButton href="/products" label="Shop" variant="outline" className="hidden sm:inline-flex" />
           </div>
           <div className="flex gap-4 overflow-x-auto pb-4">
-            {UPCOMING_PRODUCTS.map((item) => (
-              <div key={`${item.name}-${item.badge}-${item.actionLabel}`} className="shrink-0">
+            {UPCOMING_PRODUCTS.map((item, index) => (
+              <div key={`upcoming-${index}-${item.name}-${item.badge}`} className="shrink-0">
                 <HomeProductCard item={item} />
               </div>
             ))}
@@ -228,8 +257,8 @@ export function HomePageContent() {
             description="Culture moves when people take part. Your choice brings concepts to life, be part of the creation and get early access."
           />
           <div className="grid gap-6 lg:grid-cols-3">
-            {CULTURE_PRODUCTS.map((item) => (
-              <HomeProductCard key={`${item.name}-${item.actionLabel}`} item={item} />
+            {CULTURE_PRODUCTS.map((item, index) => (
+              <HomeProductCard key={`culture-${index}-${item.name}-${item.actionLabel}`} item={item} />
             ))}
           </div>
         </section>

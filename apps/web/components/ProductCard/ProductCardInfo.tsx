@@ -9,6 +9,7 @@ interface ProductCardInfoProps {
   slug: string;
   title: string;
   brandName?: string | null;
+  categoryName?: string | null;
   price: number;
   originalPrice?: number | null;
   compareAtPrice?: number | null;
@@ -24,6 +25,7 @@ export function ProductCardInfo({
   slug,
   title,
   brandName,
+  categoryName,
   price,
   originalPrice,
   compareAtPrice,
@@ -41,10 +43,17 @@ export function ProductCardInfo({
           {title}
         </h3>
         
-        {/* Category - Using brand name as category or default */}
+        {/* Category - prefer real product category over placeholder */}
         <p className={`${isCompact ? 'text-sm' : 'text-lg'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
-          {brandName || t('common.defaults.category')}
+          {categoryName || brandName || t('common.defaults.category')}
         </p>
+      </Link>
+
+      <Link
+        href={`/products/${slug}`}
+        className="inline-flex text-sm font-semibold text-gray-900 underline-offset-4 hover:underline"
+      >
+        {t('common.buttons.viewDetails')}
       </Link>
 
       {/* Price */}

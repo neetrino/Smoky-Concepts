@@ -5,6 +5,12 @@ export interface HomeSimpleCardItem {
   imageSrc: string;
 }
 
+export interface HomeCoverCollectionItem {
+  title: string;
+  slug: string;
+  imageSrc?: string;
+}
+
 export interface HomePackFitItem {
   title: string;
   subtitle?: string;
