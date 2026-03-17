@@ -13,6 +13,8 @@ interface ProductCardImageProps {
   imageError: boolean;
   onImageError: () => void;
   isCompact?: boolean;
+  /** When true, use h-full w-full instead of aspect-square (e.g. for trending-style grid) */
+  fillContainer?: boolean;
 }
 
 /**
@@ -26,9 +28,16 @@ export function ProductCardImage({
   imageError,
   onImageError,
   isCompact = false,
+  fillContainer = false,
 }: ProductCardImageProps) {
   return (
-    <div className="aspect-square bg-transparent relative overflow-hidden">
+    <div
+      className={
+        fillContainer
+          ? 'h-full w-full bg-transparent relative overflow-hidden'
+          : 'aspect-square bg-transparent relative overflow-hidden'
+      }
+    >
       <Link href={`/products/${slug}`} className="block w-full h-full">
         {image && !imageError ? (
           <Image

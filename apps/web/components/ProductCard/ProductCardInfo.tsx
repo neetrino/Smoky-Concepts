@@ -5,6 +5,8 @@ import { formatPrice } from '../../lib/currency';
 import { useTranslation } from '../../lib/i18n-client';
 import type { CurrencyCode } from '../../lib/currency';
 
+export type ProductCardInfoVariant = 'default' | 'trending';
+
 interface ProductCardInfoProps {
   slug: string;
   title: string;
@@ -16,6 +18,7 @@ interface ProductCardInfoProps {
   discountPercent?: number | null;
   currency: CurrencyCode;
   isCompact?: boolean;
+  variant?: ProductCardInfoVariant;
 }
 
 /**
@@ -32,20 +35,34 @@ export function ProductCardInfo({
   discountPercent,
   currency,
   isCompact = false,
+  variant = 'default',
 }: ProductCardInfoProps) {
   const { t } = useTranslation();
+  const categoryOrBrand = categoryName || brandName || t('common.defaults.category');
+
+  if (variant === 'trending') {
+    return (
+      <div className="mt-0">
+        <Link href={`/products/${slug}`} className="block">
+          <h3 className="text-[1.6rem] font-extrabold leading-none text-[#414141] line-clamp-2">
+            {title}
+          </h3>
+          <p className="mt-2 text-xs font-medium text-[#9d9d9d]">
+            {categoryOrBrand}
+          </p>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className={isCompact ? 'p-2.5' : 'p-4'}>
       <Link href={`/products/${slug}`} className="block">
-        {/* Product Title */}
         <h3 className={`${isCompact ? 'text-base' : 'text-xl'} font-medium text-gray-900 ${isCompact ? 'mb-0.5' : 'mb-1'} line-clamp-2`}>
           {title}
         </h3>
-        
-        {/* Category - prefer real product category over placeholder */}
         <p className={`${isCompact ? 'text-sm' : 'text-lg'} text-gray-500 ${isCompact ? 'mb-1' : 'mb-2'}`}>
-          {categoryName || brandName || t('common.defaults.category')}
+          {categoryOrBrand}
         </p>
       </Link>
 
@@ -56,7 +73,6 @@ export function ProductCardInfo({
         {t('common.buttons.viewDetails')}
       </Link>
 
-      {/* Price */}
       <div className={`mt-2 flex items-center justify-between ${isCompact ? 'gap-2' : 'gap-4'}`}>
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
@@ -69,13 +85,11 @@ export function ProductCardInfo({
               </span>
             ) : null}
           </div>
-          {(originalPrice && originalPrice > price) || 
+          {(originalPrice && originalPrice > price) ||
            (compareAtPrice && compareAtPrice > price) ? (
             <span className={`${isCompact ? 'text-sm' : 'text-lg'} text-gray-500 line-through`}>
               {formatPrice(
-                (originalPrice && originalPrice > price) 
-                  ? originalPrice 
-                  : (compareAtPrice || 0), 
+                originalPrice && originalPrice > price ? originalPrice : compareAtPrice ?? 0,
                 currency
               )}
             </span>
