@@ -9,10 +9,10 @@ import {
   HOME_ASSET_PATHS,
   PACK_FIT_ITEMS,
   RITUAL_STEPS,
-  TRENDING_PRODUCTS,
   UPCOMING_LINES,
   UPCOMING_PRODUCTS,
 } from './homePage.data';
+import { TrendingFeaturedSection } from './TrendingFeaturedSection';
 import type { HomeCoverCollectionItem } from './homePage.types';
 
 function PackFitCard({
@@ -182,22 +182,7 @@ export function HomePageContent({ coverCollections }: HomePageContentProps) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-8">
-          <div className="flex items-center justify-between gap-6">
-            <HomeSectionTitle title="Trending" centered={false} />
-            <HomeActionButton href="/products" label="Shop" variant="outline" className="hidden sm:inline-flex" />
-          </div>
-          <div className="overflow-hidden">
-            <div className="flex items-end justify-center gap-4 lg:gap-8">
-              {TRENDING_PRODUCTS.map((item, index) => (
-                <div key={`trending-${index}-${item.name}-${item.badge}`} className={item.compact ? 'hidden xl:block' : ''}>
-                  <HomeProductCard item={item} />
-                </div>
-              ))}
-            </div>
-          </div>
-          <p className="text-center text-[2rem] font-extrabold text-[#122a26]">Classic</p>
-        </section>
+        <TrendingFeaturedSection />
 
         <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(32rem,35.5rem)_minmax(0,1fr)]">
           <div className="relative min-h-[40rem] overflow-hidden rounded-[2rem]">

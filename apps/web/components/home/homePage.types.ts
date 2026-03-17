@@ -29,6 +29,8 @@ export interface HomeProductItem {
   actionLabel: string;
   compact?: boolean;
   faded?: boolean;
+  /** When set, card and action link to product page */
+  slug?: string;
 }
 
 export interface HomeRitualStep {
