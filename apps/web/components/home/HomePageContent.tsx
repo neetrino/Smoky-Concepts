@@ -10,9 +10,9 @@ import {
   PACK_FIT_ITEMS,
   RITUAL_STEPS,
   UPCOMING_LINES,
-  UPCOMING_PRODUCTS,
 } from './homePage.data';
 import { TrendingFeaturedSection } from './TrendingFeaturedSection';
+import { UpcomingProductsSection } from './UpcomingProductsSection';
 import type { HomeCoverCollectionItem } from './homePage.types';
 
 function PackFitCard({
@@ -203,19 +203,7 @@ export function HomePageContent({ coverCollections }: HomePageContentProps) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-8">
-          <div className="flex items-center justify-between gap-6">
-            <HomeSectionTitle title="Upcoming" centered={false} />
-            <HomeActionButton href="/products" label="Shop" variant="outline" className="hidden sm:inline-flex" />
-          </div>
-          <div className="flex gap-4 overflow-x-auto pb-4">
-            {UPCOMING_PRODUCTS.map((item, index) => (
-              <div key={`upcoming-${index}-${item.name}-${item.badge}`} className="shrink-0">
-                <HomeProductCard item={item} />
-              </div>
-            ))}
-          </div>
-        </section>
+        <UpcomingProductsSection />
 
         <section className="flex flex-col gap-10">
           <HomeSectionTitle
