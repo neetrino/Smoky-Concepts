@@ -111,6 +111,7 @@ model Product {
   media             Json[]               @default([])
   published         Boolean              @default(false)
   featured          Boolean              @default(false)
+  upcoming          Boolean              @default(false)
   publishedAt       DateTime?
   translations      ProductTranslation[]
   categoryIds        String[]
@@ -128,6 +129,7 @@ model Product {
 
   @@index([published, publishedAt])
   @@index([featured])
+  @@index([upcoming])
   @@index([deletedAt])
   @@map("products")
 }

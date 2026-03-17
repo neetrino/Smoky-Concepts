@@ -12,7 +12,7 @@ import {
   UPCOMING_LINES,
 } from './homePage.data';
 import { TrendingFeaturedSection } from './TrendingFeaturedSection';
-import { UpcomingProductsSection } from './UpcomingProductsSection';
+import { UpcomingProductsSection } from '@/components/home/UpcomingProductsSection';
 import type { HomeCoverCollectionItem } from './homePage.types';
 
 function PackFitCard({

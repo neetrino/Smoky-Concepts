@@ -174,7 +174,7 @@ export function TrendingFeaturedSection() {
         ))}
       </div>
 
-      <div className="relative z-10 mx-auto mt-10 hidden w-full max-w-[82rem] grid-cols-[minmax(0,18rem)_44.5rem_minmax(0,18rem)] items-center gap-4 xl:grid">
+      <div className="relative z-10 mx-auto mt-10 hidden w-full max-w-[82rem] grid-cols-[minmax(0,18rem)_43.5rem_minmax(0,18rem)] items-center gap-4 xl:grid">
         <div className="flex items-center justify-end gap-3 pt-32">
           {previousPreviewItems.map((item, index) => (
             <div key={`trending-prev-${item.slug ?? index}-${item.name}`} className="w-[10.75rem] opacity-50">
