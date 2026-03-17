@@ -45,7 +45,7 @@ function PackFitCard({
           </div>
         )}
       </div>
-      <div className="text-center">
+      <div className="flex min-h-[2.75rem] flex-col justify-end text-center">
         <h3 className="text-sm font-extrabold leading-none text-[#414141]">{title}</h3>
         {subtitle ? <p className="mt-1 text-[9px] font-medium text-black">{subtitle}</p> : null}
       </div>
@@ -101,17 +101,17 @@ export function HomePageContent({ coverCollections }: HomePageContentProps) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-10">
+        <section className="flex flex-col gap-10 pb-10">
           <HomeSectionTitle
             title="Will it fit mine?"
             description="Pack names are standard. Dimensions aren’t. We make precise versions that match yours"
           />
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-6">
+          <div className="flex flex-wrap items-end justify-center gap-x-8 gap-y-6">
             {PACK_FIT_ITEMS.map((item) => (
               <PackFitCard key={item.title} {...item} />
             ))}
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center pt-2">
             <HomeActionButton href="/products" label="Check Availability" className="min-w-[19rem]" />
           </div>
         </section>
