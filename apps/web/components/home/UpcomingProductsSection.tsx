@@ -152,11 +152,14 @@ export function UpcomingProductsSection() {
         <HomeActionButton href="/products" label="Shop" variant="outline" className="hidden sm:inline-flex" />
       </div>
       <div className="mt-28 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        {visibleItems.map((item, index) => (
-          <div key={`upcoming-${start + index}-${item.name}-${item.badge}`}>
-            <HomeProductCard item={item} />
-          </div>
-        ))}
+        {visibleItems.map((item, index) => {
+          const isStaggeredImage = index === 1 || index === 3;
+          return (
+            <div key={`upcoming-${start + index}-${item.name}-${item.badge}`}>
+              <HomeProductCard item={item} imageNudgeDown={isStaggeredImage} />
+            </div>
+          );
+        })}
       </div>
       {totalPages > 1 && (
         <div

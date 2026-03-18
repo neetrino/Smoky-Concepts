@@ -9,6 +9,8 @@ type HomeProductCardSize = 'default' | 'small';
 interface HomeProductCardProps {
   item: HomeProductItem;
   size?: HomeProductCardSize;
+  /** Slight vertical offset for staggered product rows (e.g. Upcoming 2nd / 4th card). */
+  imageNudgeDown?: boolean;
 }
 
 const BADGE_CLASS_NAMES: Record<HomeBadgeTone, string> = {
@@ -21,7 +23,7 @@ const BADGE_CLASS_NAMES: Record<HomeBadgeTone, string> = {
 /**
  * Product card reused across trending, upcoming, and culture sections.
  */
-export function HomeProductCard({ item, size = 'default' }: HomeProductCardProps) {
+export function HomeProductCard({ item, size = 'default', imageNudgeDown = false }: HomeProductCardProps) {
   const isSmall = size === 'small';
   const cardClassName = item.compact
     ? 'w-[10.75rem] rounded-[1.125rem] p-3'
@@ -37,8 +39,11 @@ export function HomeProductCard({ item, size = 'default' }: HomeProductCardProps
 
   const productHref = item.slug ? `/products/${item.slug}` : null;
   const imagePullUp = item.compact ? '-mt-16' : isSmall ? '-mt-20' : '-mt-24';
+  const imageNudgeClassName = imageNudgeDown && !item.compact ? 'translate-y-3' : '';
   const imageBlock = (
-    <div className={`relative z-10 mb-2 ${imagePullUp} ${imageWrapperClassName} overflow-visible`}>
+    <div
+      className={`relative z-10 mb-2 ${imagePullUp} ${imageWrapperClassName} overflow-visible ${imageNudgeClassName}`.trim()}
+    >
       {productHref ? (
         <Link href={productHref} className="block h-full w-full">
           <Image
