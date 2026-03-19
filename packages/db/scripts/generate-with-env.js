@@ -9,10 +9,17 @@ const path = require('path');
 
 const DUMMY_URL = 'postgresql://build:build@localhost:5432/build';
 
-if (!process.env.DATABASE_URL) {
+/** True if value looks like a real PostgreSQL URL (needed for Prisma 7 getConfig validation). */
+function isValidPostgresUrl(value) {
+  if (!value || typeof value !== 'string') return false;
+  const trimmed = value.trim();
+  return trimmed.length > 0 && (trimmed.startsWith('postgresql://') || trimmed.startsWith('postgres://'));
+}
+
+if (!isValidPostgresUrl(process.env.DATABASE_URL)) {
   process.env.DATABASE_URL = DUMMY_URL;
 }
-if (!process.env.DIRECT_URL) {
+if (!isValidPostgresUrl(process.env.DIRECT_URL)) {
   process.env.DIRECT_URL = process.env.DATABASE_URL;
 }
 
