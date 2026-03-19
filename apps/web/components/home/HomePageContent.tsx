@@ -72,8 +72,8 @@ interface HomePageContentProps {
 
 export function HomePageContent({ coverCollections }: HomePageContentProps) {
   return (
-    <div className="overflow-visible bg-[#f3f1ee] text-[#414141]">
-      <div className="mx-auto flex max-w-[120rem] flex-col gap-24 overflow-visible px-4 pb-24 pt-10 sm:px-8 lg:px-[7.5rem]">
+    <div className="overflow-x-hidden overflow-y-clip bg-[#f3f1ee] text-[#414141]">
+      <div className="mx-auto flex max-w-[120rem] flex-col gap-24 overflow-x-hidden overflow-y-clip px-4 pb-24 pt-10 sm:px-8 lg:px-[7.5rem]">
         <section className="flex flex-col gap-10">
           <HomeSectionTitle
             title="We Make Concepts Real"

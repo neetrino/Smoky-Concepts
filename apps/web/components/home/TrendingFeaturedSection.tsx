@@ -161,7 +161,7 @@ export function TrendingFeaturedSection() {
   }
 
   return (
-    <section className="flex flex-col gap-8 overflow-x-hidden">
+    <section className="flex flex-col gap-8 overflow-x-hidden overflow-y-hidden pb-6">
       <div className="relative flex min-h-[4rem] items-center justify-end">
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <HomeSectionTitle title="Trending" centered />
@@ -198,7 +198,7 @@ export function TrendingFeaturedSection() {
         </div>
 
         <div
-          className="-mt-28 shrink-0 overflow-x-clip overflow-y-visible"
+          className="-mt-28 shrink-0 overflow-x-clip overflow-y-clip"
           style={{ width: `${TRENDING_VIEWPORT_WIDTH_REM}rem` }}
         >
           <div

@@ -129,10 +129,12 @@ export function CultureVotingSection() {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="h-80 w-full max-w-[15rem] animate-pulse rounded-3xl bg-white/60" />
-          ))}
+        <div className="mx-auto w-full max-w-[80rem] translate-x-44 px-4">
+          <div className="grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:[grid-template-columns:repeat(5,minmax(15rem,1fr))]">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="h-80 w-full max-w-[15rem] animate-pulse rounded-3xl bg-white/60 lg:max-w-none" />
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -143,9 +145,9 @@ export function CultureVotingSection() {
   }
 
   return (
-    <section className="flex flex-col gap-8">
-      <div className="relative flex min-h-[4rem] items-center justify-end">
-        <div className="absolute left-1/2 top-1/2 w-full max-w-[52rem] -translate-x-1/2 -translate-y-1/2 px-4">
+    <section className="flex flex-col gap-8 overflow-hidden pb-6">
+      <div className="flex min-h-[4rem] items-center justify-center">
+        <div className="w-full max-w-[52rem] px-4 text-center">
           <HomeSectionTitle
             title="Your Voice Shapes Culture"
             description="Culture moves when people take part. Your choice brings concepts to life, be part of the creation and get early access."
@@ -153,19 +155,25 @@ export function CultureVotingSection() {
           />
         </div>
       </div>
-      <div className="grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        {items.map((item) => (
-          <CultureVotingCard
-            key={item.id}
-            id={item.id}
-            title={item.title}
-            imageUrl={item.imageUrl}
-            likeCount={item.likeCount}
-            likedByCurrentUser={item.likedByCurrentUser}
-            pending={pendingItemId === item.id}
-            onToggleLike={handleToggleLike}
-          />
-        ))}
+      <div className="mx-auto w-full max-w-[80rem] translate-x-64 px-4">
+        <div className="grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:[grid-template-columns:repeat(5,minmax(10rem,25fr))]">
+          {items.map((item, index) => {
+            const isMiddle = items.length >= 3 && index === Math.floor(items.length / 2);
+            return (
+              <CultureVotingCard
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                imageUrl={item.imageUrl}
+                likeCount={item.likeCount}
+                likedByCurrentUser={item.likedByCurrentUser}
+                pending={pendingItemId === item.id}
+                onToggleLike={handleToggleLike}
+                imageNudgeDown={isMiddle}
+              />
+            );
+          })}
+        </div>
       </div>
     </section>
   );

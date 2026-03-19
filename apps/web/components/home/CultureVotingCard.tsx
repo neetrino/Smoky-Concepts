@@ -8,6 +8,8 @@ interface CultureVotingCardProps {
   likedByCurrentUser: boolean;
   pending: boolean;
   onToggleLike: (itemId: string, likedByCurrentUser: boolean) => Promise<void>;
+  /** Slight downward offset for the image (e.g. middle card). */
+  imageNudgeDown?: boolean;
 }
 
 function HeartIcon({ filled }: { filled: boolean }) {
@@ -37,10 +39,12 @@ export function CultureVotingCard({
   likedByCurrentUser,
   pending,
   onToggleLike,
+  imageNudgeDown = false,
 }: CultureVotingCardProps) {
+  const imageNudgeClassName = imageNudgeDown ? 'translate-y-5' : '';
   return (
-    <article className="w-full max-w-[15rem] overflow-hidden rounded-3xl bg-white p-4 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
-      <div className="relative h-72 overflow-hidden rounded-2xl bg-[#f3f1ee]">
+    <article className="relative z-10 w-full max-w-[15rem] overflow-visible rounded-3xl bg-white p-4 lg:max-w-none">
+      <div className={`relative z-10 -mt-24 mb-2 h-72 overflow-visible rounded-2xl ${imageNudgeClassName}`.trim()}>
         <img src={imageUrl} alt={title} className="h-full w-full object-cover" loading="lazy" />
       </div>
 
@@ -56,16 +60,13 @@ export function CultureVotingCard({
           type="button"
           onClick={() => onToggleLike(id, likedByCurrentUser)}
           disabled={pending}
-          className={`shrink-0 inline-flex items-center gap-2 rounded-lg border-2 border-[#dcc090] px-3 py-1 text-xs font-extrabold uppercase tracking-[0.12em] transition-colors ${
-            likedByCurrentUser
-              ? 'bg-[#dcc090] text-white'
-              : 'text-[#dcc090] hover:bg-[#dcc090]/10'
+          className={`shrink-0 inline-flex items-center justify-center rounded-lg p-1.5 transition-colors ${
+            likedByCurrentUser ? 'text-red-500' : 'text-[#dcc090] hover:bg-[#dcc090]/10'
           } ${pending ? 'cursor-not-allowed opacity-60' : ''}`}
           aria-pressed={likedByCurrentUser}
           aria-label={likedByCurrentUser ? `Remove like from ${title}` : `Like ${title}`}
         >
           <HeartIcon filled={likedByCurrentUser} />
-          {likedByCurrentUser ? 'Liked' : 'Like'}
         </button>
       </div>
     </article>
