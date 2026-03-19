@@ -2,10 +2,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { HomeActionButton } from './HomeActionButton';
-import { HomeProductCard } from './HomeProductCard';
+import { CultureVotingSection } from './CultureVotingSection';
 import { HomeSectionTitle } from './HomeSectionTitle';
 import {
-  CULTURE_PRODUCTS,
   HOME_ASSET_PATHS,
   PACK_FIT_ITEMS,
   RITUAL_STEPS,
@@ -224,24 +223,7 @@ export function HomePageContent({ coverCollections }: HomePageContentProps) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-10">
-          <HomeSectionTitle
-            title="Your Voice Shapes Culture"
-            description="Culture moves when people take part. Your choice brings concepts to life, be part of the creation and get early access."
-          />
-          <div className="flex flex-wrap justify-center gap-x-2 gap-y-8 sm:gap-x-3 lg:gap-x-3">
-            {CULTURE_PRODUCTS.map((item, index) => (
-              <div key={`culture-${index}-${item.name}-${item.actionLabel}`} className="w-full max-w-[15rem] shrink-0 sm:w-[15rem]">
-                <HomeProductCard
-                  item={item}
-                  imageNudgeDown={index === 1}
-                  imageNudgeDeep={index === 1}
-                  trailingIcon="wishlist"
-                />
-              </div>
-            ))}
-          </div>
-        </section>
+        <CultureVotingSection />
 
         <section className="grid gap-10 xl:grid-cols-[minmax(0,32rem)_minmax(0,1fr)]">
           <div className="flex flex-col justify-center gap-8">
