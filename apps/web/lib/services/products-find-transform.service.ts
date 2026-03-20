@@ -53,7 +53,38 @@ class ProductsFindTransformService {
     
     const categoryDiscountsSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "categoryDiscounts");
     const categoryDiscounts = categoryDiscountsSetting ? (categoryDiscountsSetting.value as Record<string, number>) || {} : {};
-    
+
+    // When product.categories is empty but primaryCategoryId is set, fetch primary category for response
+    const primaryCategoryIds = [
+      ...new Set(
+        products
+          .filter(
+            (p) =>
+              p.primaryCategoryId &&
+              (!Array.isArray(p.categories) || p.categories.length === 0)
+          )
+          .map((p) => p.primaryCategoryId as string)
+      ),
+    ];
+    const primaryCategories =
+      primaryCategoryIds.length > 0
+        ? await db.category.findMany({
+            where: { id: { in: primaryCategoryIds } },
+            include: { translations: true },
+          })
+        : [];
+    type CategoryOutput = { id: string; slug: string; title: string };
+    const primaryCategoryById = new Map<string, CategoryOutput>(
+      primaryCategories.map((cat: { id: string; translations?: Array<{ locale: string; slug: string; title: string }> }) => {
+        const catTranslations = Array.isArray(cat.translations) ? cat.translations : [];
+        const catTranslation =
+          catTranslations.find((t: { locale: string }) => t.locale === lang) || catTranslations[0] || null;
+        return [
+          cat.id,
+          { id: cat.id, slug: catTranslation?.slug ?? "", title: catTranslation?.title ?? "" },
+        ];
+      })
+    );
 
     // Format response
     const data = products.map((product: ProductWithRelations) => {
@@ -191,16 +222,22 @@ class ProductsFindTransformService {
         finalPrice = originalPrice * (1 - appliedDiscount / 100);
       }
 
-      // Get categories with translations
-      const categories = Array.isArray(product.categories) ? product.categories.map((cat: { id: string; translations?: Array<{ locale: string; slug: string; title: string }> }) => {
-        const catTranslations = Array.isArray(cat.translations) ? cat.translations : [];
-        const catTranslation = catTranslations.find((t: { locale: string }) => t.locale === lang) || catTranslations[0] || null;
-        return {
-          id: cat.id,
-          slug: catTranslation?.slug || "",
-          title: catTranslation?.title || "",
-        };
-      }) : [];
+      // Get categories with translations (relation first; fallback to primary category when relation is empty)
+      let categories = Array.isArray(product.categories)
+        ? product.categories.map((cat: { id: string; translations?: Array<{ locale: string; slug: string; title: string }> }) => {
+            const catTranslations = Array.isArray(cat.translations) ? cat.translations : [];
+            const catTranslation = catTranslations.find((t: { locale: string }) => t.locale === lang) || catTranslations[0] || null;
+            return {
+              id: cat.id,
+              slug: catTranslation?.slug || "",
+              title: catTranslation?.title || "",
+            };
+          })
+        : [];
+      if (categories.length === 0 && product.primaryCategoryId) {
+        const primary: CategoryOutput | undefined = primaryCategoryById.get(product.primaryCategoryId);
+        if (primary) categories = [primary];
+      }
 
       return {
         id: product.id,
