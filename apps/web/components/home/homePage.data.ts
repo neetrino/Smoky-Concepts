@@ -7,7 +7,6 @@ import type {
 
 export const HOME_ASSET_PATHS = {
   bagIcon: '/assets/home/icons/bag.svg',
-  wishlistIcon: '/assets/home/icons/wishlist.svg',
   compactPack: '/assets/home/products/compact-figma.svg',
   craftTools: '/assets/home/concepts/craft-tools.png',
   heroBanner: '/assets/home/concepts/hero-banner.png',
@@ -201,7 +200,7 @@ export const CULTURE_PRODUCTS: HomeProductItem[] = [
     imageSrc: '/assets/home/packs/premium-red.png',
     badge: 'Classic',
     badgeTone: 'dark',
-    actionLabel: 'Wishlist',
+    actionLabel: 'Explore',
   },
   {
     name: 'Mystique Black',
@@ -210,7 +209,7 @@ export const CULTURE_PRODUCTS: HomeProductItem[] = [
     imageSrc: '/assets/home/packs/atelier-black.png',
     badge: 'Atelier',
     badgeTone: 'wine',
-    actionLabel: 'Wishlist',
+    actionLabel: 'Explore',
   },
 ];
 

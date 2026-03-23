@@ -9,8 +9,6 @@ import type { HomeBadgeTone, HomeProductItem } from './homePage.types';
 
 type HomeProductCardSize = 'default' | 'small';
 
-type TrailingActionIcon = 'bag' | 'wishlist';
-
 interface HomeProductCardProps {
   item: HomeProductItem;
   size?: HomeProductCardSize;
@@ -18,8 +16,6 @@ interface HomeProductCardProps {
   imageNudgeDown?: boolean;
   /** Stronger offset when imageNudgeDown (e.g. Culture center card). */
   imageNudgeDeep?: boolean;
-  /** Icon next to the action button (Culture section uses wishlist). */
-  trailingIcon?: TrailingActionIcon;
 }
 
 const BADGE_CLASS_NAMES: Record<HomeBadgeTone, string> = {
@@ -37,7 +33,6 @@ export function HomeProductCard({
   size = 'default',
   imageNudgeDown = false,
   imageNudgeDeep = false,
-  trailingIcon = 'bag',
 }: HomeProductCardProps) {
   const isSmall = size === 'small';
   const canAddToCart = Boolean(item.slug?.trim() && !item.slug.includes(' '));
@@ -136,7 +131,7 @@ export function HomeProductCard({
               {item.actionLabel}
             </button>
           )}
-          {trailingIcon === 'bag' && canAddToCart ? (
+          {canAddToCart ? (
             <button
               type="button"
               onClick={(e) => {
@@ -157,7 +152,7 @@ export function HomeProductCard({
             </button>
           ) : (
             <img
-              src={trailingIcon === 'wishlist' ? HOME_ASSET_PATHS.wishlistIcon : HOME_ASSET_PATHS.bagIcon}
+              src={HOME_ASSET_PATHS.bagIcon}
               alt=""
               className={`object-contain ${iconSizeClassName}`}
               aria-hidden="true"

@@ -6,7 +6,6 @@ import { Button } from '../ui/buttons';
 import Image from 'next/image';
 import { ProductCardImage } from './ProductCardImage';
 import { ProductCardInfo } from './ProductCardInfo';
-import { ProductCardActions } from './ProductCardActions';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import { useTranslation } from '../../lib/i18n-client';
 import { formatPrice } from '../../lib/currency';
@@ -35,14 +34,10 @@ interface ProductCardGridProps {
     discountPercent?: number | null;
   };
   currency: CurrencyCode;
-  isInWishlist: boolean;
-  isInCompare: boolean;
   isAddingToCart: boolean;
   imageError: boolean;
   isCompact?: boolean;
   onImageError: () => void;
-  onWishlistToggle: (e: MouseEvent) => void;
-  onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
 }
 
@@ -52,14 +47,10 @@ interface ProductCardGridProps {
 export function ProductCardGrid({
   product,
   currency,
-  isInWishlist,
-  isInCompare,
   isAddingToCart,
   imageError,
   isCompact = false,
   onImageError,
-  onWishlistToggle,
-  onCompareToggle,
   onAddToCart,
 }: ProductCardGridProps) {
   const { t } = useTranslation();
@@ -88,17 +79,6 @@ export function ProductCardGrid({
           onImageError={onImageError}
           isCompact={isCompact}
           fillContainer
-        />
-        <ProductCardActions
-          isInWishlist={isInWishlist}
-          isInCompare={isInCompare}
-          isAddingToCart={isAddingToCart}
-          inStock={product.inStock}
-          isCompact={isCompact}
-          onWishlistToggle={onWishlistToggle}
-          onCompareToggle={onCompareToggle}
-          onAddToCart={onAddToCart}
-          showOnHover
         />
       </div>
 

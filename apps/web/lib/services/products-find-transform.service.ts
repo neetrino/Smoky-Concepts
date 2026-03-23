@@ -1,6 +1,6 @@
 import { db } from "@white-shop/db";
 import { processImageUrl } from "./utils/image-utils";
-import { translations } from "../translations";
+import { t } from "../i18n";
 import { ProductWithRelations } from "./products-find-query.service";
 
 /** Option-like item from variant.attributes JSON (options relation removed from schema) */
@@ -24,9 +24,7 @@ function getVariantOptions(attributes: unknown): VariantOptionFromAttributes[] {
  * Get "Out of Stock" translation for a given language
  */
 const getOutOfStockLabel = (lang: string = "en"): string => {
-  const langKey = lang as keyof typeof translations;
-  const translation = translations[langKey] || translations.en;
-  return translation.stock.outOfStock;
+  return t(lang as "en" | "hy" | "ru", "common.stock.outOfStock");
 };
 
 class ProductsFindTransformService {
