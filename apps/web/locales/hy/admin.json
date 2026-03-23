@@ -8,7 +8,6 @@
     "attributes": "Ատրիբուտներ",
     "discounts": "Զեղչեր",
     "users": "Օգտատերեր",
-    "messages": "Հաղորդագրություններ",
     "analytics": "Վերլուծություն",
     "voting": "Voting",
     "filterByPrice": "Զտել ըստ գնի",
@@ -668,28 +667,6 @@
       "totalCol": "Ընդամենը",
       "noItemsFound": "Այս պատվերի համար ապրանքներ չեն գտնվել"
     }
-  },
-  "messages": {
-    "title": "Հաղորդագրություններ",
-    "backToAdmin": "Վերադառնալ ադմինիստրատորի վահան",
-    "loadingMessages": "Բեռնվում են հաղորդագրությունները...",
-    "noMessages": "Հաղորդագրություններ չեն գտնվել",
-    "name": "Անուն",
-    "email": "Էլ. փոստ",
-    "subject": "Թեմա",
-    "message": "Հաղորդագրություն",
-    "date": "Ամսաթիվ",
-    "selectAll": "Ընտրել բոլորը",
-    "selectMessage": "Ընտրել հաղորդագրություն {email}",
-    "selectedMessages": "Ընտրված {count} հաղորդագրություն",
-    "deleteSelected": "Ջնջել ընտրվածները",
-    "deleting": "Ջնջվում է...",
-    "deleteConfirm": "Ջնջե՞լ {count} ընտրված հաղորդագրություն:",
-    "deletedSuccess": "Հաղորդագրությունները հաջողությամբ ջնջվեցին",
-    "failedToDelete": "Չհաջողվեց ջնջել հաղորդագրությունները",
-    "showingPage": "Ցուցադրվում է {page} էջը {totalPages}-ից ({total} ընդամենը)",
-    "previous": "Նախորդ",
-    "next": "Հաջորդ"
   },
   "homeHero": {
     "title": "Գլխավոր էջի hero",
