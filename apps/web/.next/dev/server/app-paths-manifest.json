@@ -6,6 +6,7 @@
   "/admin/home-hero/page": "app/admin/home-hero/page.js",
   "/admin/messages/page": "app/admin/messages/page.js",
   "/admin/page": "app/admin/page.js",
+  "/admin/products/add/page": "app/admin/products/add/page.js",
   "/admin/products/page": "app/admin/products/page.js",
   "/api/v1/admin/activity/route": "app/api/v1/admin/activity/route.js",
   "/api/v1/admin/analytics/route": "app/api/v1/admin/analytics/route.js",

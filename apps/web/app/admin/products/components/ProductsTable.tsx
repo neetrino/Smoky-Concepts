@@ -17,6 +17,7 @@ interface ProductsTableProps {
   handleHeaderSort: (field: 'price' | 'createdAt' | 'title' | 'stock') => void;
   currency: CurrencyCode;
   handleDeleteProduct: (productId: string, productTitle: string) => void;
+  handleDuplicateProduct: (productId: string) => void;
   handleTogglePublished: (productId: string, currentStatus: boolean, productTitle: string) => void;
   handleToggleFeatured: (productId: string, currentStatus: boolean, productTitle: string) => void;
   handleToggleUpcoming: (productId: string, currentStatus: boolean, productTitle: string) => void;
@@ -49,6 +50,7 @@ export function ProductsTable({
   handleHeaderSort,
   currency,
   handleDeleteProduct,
+  handleDuplicateProduct,
   handleTogglePublished,
   handleToggleFeatured,
   handleToggleUpcoming,
@@ -379,6 +381,20 @@ export function ProductsTable({
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDuplicateProduct(product.id)}
+                          className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 px-2"
+                          title={t('admin.products.duplicate')}
+                          aria-label={t('admin.products.duplicate')}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect x="7" y="7" width="12" height="12" rx="2" strokeWidth={2} />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15H4a1 1 0 01-1-1V5a1 1 0 011-1h9a1 1 0 011 1v1" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10v6M10 13h6" />
                           </svg>
                         </Button>
                         <Button
