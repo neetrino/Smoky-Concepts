@@ -994,6 +994,10 @@ a {
   max-height: 100%;
 }
 
+.max-h-none {
+  max-height: none;
+}
+
 .min-h-11, .min-h-\[2\.75rem\] {
   min-height: 2.75rem;
 }
@@ -1012,6 +1016,14 @@ a {
 
 .min-h-screen {
   min-height: 100vh;
+}
+
+.min-h-\[4\.5rem\] {
+  min-height: 4.5rem;
+}
+
+.min-h-\[5rem\] {
+  min-height: 5rem;
 }
 
 .w-1 {
@@ -1202,6 +1214,14 @@ a {
   min-width: 100%;
 }
 
+.min-w-\[4\.5rem\] {
+  min-width: 4.5rem;
+}
+
+.min-w-\[5rem\] {
+  min-width: 5rem;
+}
+
 .max-w-2xl {
   max-width: 42rem;
 }
@@ -1242,6 +1262,10 @@ a {
   max-width: 15rem;
 }
 
+.max-w-\[180px\] {
+  max-width: 180px;
+}
+
 .max-w-\[20rem\] {
   max-width: 20rem;
 }
@@ -1274,8 +1298,8 @@ a {
   max-width: 28rem;
 }
 
-.max-w-\[180px\] {
-  max-width: 180px;
+.max-w-none {
+  max-width: none;
 }
 
 .flex-1 {
@@ -2449,6 +2473,11 @@ a {
   padding-right: .5rem;
 }
 
+.px-2\.5 {
+  padding-left: .625rem;
+  padding-right: .625rem;
+}
+
 .px-3 {
   padding-left: .75rem;
   padding-right: .75rem;
@@ -2532,11 +2561,6 @@ a {
 .py-8 {
   padding-top: 2rem;
   padding-bottom: 2rem;
-}
-
-.px-2\.5 {
-  padding-left: .625rem;
-  padding-right: .625rem;
 }
 
 .pb-1 {
@@ -3246,6 +3270,11 @@ a {
 
 .drop-shadow-sm {
   --tw-drop-shadow: drop-shadow(0 1px 1px #0000000d);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.drop-shadow-\[0_2px_12px_rgba\(0\,0\,0\,0\.55\)\] {
+  --tw-drop-shadow: drop-shadow(0 2px 12px #0000008c);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
@@ -4072,8 +4101,28 @@ a {
     height: 26rem;
   }
 
+  .sm\:h-11 {
+    height: 2.75rem;
+  }
+
+  .sm\:h-14 {
+    height: 3.5rem;
+  }
+
+  .sm\:h-16 {
+    height: 4rem;
+  }
+
   .sm\:min-h-\[32rem\] {
     min-height: 32rem;
+  }
+
+  .sm\:min-h-\[5\.5rem\] {
+    min-height: 5.5rem;
+  }
+
+  .sm\:min-h-\[6rem\] {
+    min-height: 6rem;
   }
 
   .sm\:w-12 {
@@ -4100,8 +4149,28 @@ a {
     width: auto;
   }
 
+  .sm\:w-11 {
+    width: 2.75rem;
+  }
+
+  .sm\:w-14 {
+    width: 3.5rem;
+  }
+
+  .sm\:w-16 {
+    width: 4rem;
+  }
+
   .sm\:min-w-\[100px\] {
     min-width: 100px;
+  }
+
+  .sm\:min-w-\[5\.5rem\] {
+    min-width: 5.5rem;
+  }
+
+  .sm\:min-w-\[6rem\] {
+    min-width: 6rem;
   }
 
   .sm\:grid-cols-2 {
@@ -4168,6 +4237,14 @@ a {
 
   .sm\:p-8 {
     padding: 2rem;
+  }
+
+  .sm\:p-3 {
+    padding: .75rem;
+  }
+
+  .sm\:p-4 {
+    padding: 1rem;
   }
 
   .sm\:px-3 {

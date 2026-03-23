@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import type { MouseEvent } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import { formatPrice } from '../../lib/currency';
 import { useTranslation } from '../../lib/i18n-client';
 import { Button } from '../ui/buttons';
@@ -17,6 +17,7 @@ interface ProductCardListProps {
     title: string;
     price: number;
     image: string | null;
+    images?: string[];
     inStock: boolean;
     categories: Array<{
       id: string;
@@ -31,8 +32,6 @@ interface ProductCardListProps {
   };
   currency: CurrencyCode;
   isAddingToCart: boolean;
-  imageError: boolean;
-  onImageError: () => void;
   onAddToCart: (e: MouseEvent) => void;
 }
 
@@ -43,11 +42,15 @@ export function ProductCardList({
   product,
   currency,
   isAddingToCart,
-  imageError,
-  onImageError,
   onAddToCart,
 }: ProductCardListProps) {
   const { t } = useTranslation();
+  const [imageError, setImageError] = useState(false);
+  const primaryImage = product.images?.[0] || product.image;
+
+  useEffect(() => {
+    setImageError(false);
+  }, [product.id, primaryImage]);
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors">
@@ -57,15 +60,15 @@ export function ProductCardList({
           href={`/products/${product.slug}`}
           className="w-20 h-20 bg-transparent rounded-lg flex-shrink-0 relative overflow-hidden self-start sm:self-center"
         >
-          {product.image && !imageError ? (
+          {primaryImage && !imageError ? (
             <Image
-              src={product.image}
+              src={primaryImage}
               alt={product.title}
               fill
               className="object-contain"
               sizes="80px"
               unoptimized
-              onError={onImageError}
+              onError={() => setImageError(true)}
             />
           ) : (
             <div className="w-full h-full bg-gray-200 flex items-center justify-center">

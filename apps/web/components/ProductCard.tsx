@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import type { MouseEvent } from 'react';
 import { useAddToCart } from './hooks/useAddToCart';
 import { useCurrency } from './hooks/useCurrency';
@@ -13,6 +12,7 @@ interface Product {
   title: string;
   price: number;
   image: string | null;
+  images?: string[];
   inStock: boolean;
   categories: Array<{
     id: string;
@@ -48,7 +48,6 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
     productSlug: product.slug,
     inStock: product.inStock,
   });
-  const [imageError, setImageError] = useState(false);
 
   const handleAddToCart = (e: MouseEvent) => {
     e.preventDefault();
@@ -63,8 +62,6 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
         product={product}
         currency={currency}
         isAddingToCart={isAddingToCart}
-        imageError={imageError}
-        onImageError={() => setImageError(true)}
         onAddToCart={handleAddToCart}
       />
     );
@@ -76,9 +73,7 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
       product={product}
       currency={currency}
       isAddingToCart={isAddingToCart}
-      imageError={imageError}
       isCompact={isCompact}
-      onImageError={() => setImageError(true)}
       onAddToCart={handleAddToCart}
     />
   );

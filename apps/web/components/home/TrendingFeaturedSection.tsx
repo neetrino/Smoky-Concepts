@@ -46,7 +46,7 @@ function mapApiProductToHomeItem(product: ApiProduct, priceFormatted: string): H
     imageSrc: product.image ?? PLACEHOLDER_IMAGE,
     badge: categoryTitle || 'Featured',
     badgeTone: 'dark',
-    actionLabel: 'Shop',
+    actionLabel: 'Buy',
     slug: product.slug,
   };
 }
@@ -180,7 +180,7 @@ export function TrendingFeaturedSection() {
       <section className="flex flex-col gap-8">
         <div className="flex items-center justify-between gap-6">
           <HomeSectionTitle title="Trending" centered={false} />
-          <HomeActionButton href="/products" label="Shop" variant="outline" className="hidden sm:inline-flex" />
+          <HomeActionButton href="/products" label="Buy" variant="outline" className="hidden sm:inline-flex" />
         </div>
         <p className="py-6 text-center text-[#9d9d9d]">No featured products yet.</p>
       </section>
@@ -193,7 +193,7 @@ export function TrendingFeaturedSection() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <HomeSectionTitle title="Trending" centered />
         </div>
-        <HomeActionButton href="/products" label="Shop" variant="outline" className="hidden sm:inline-flex" />
+        <HomeActionButton href="/products" label="Buy" variant="outline" className="hidden sm:inline-flex" />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:hidden">

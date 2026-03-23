@@ -27,6 +27,18 @@ const getOutOfStockLabel = (lang: string = "en"): string => {
   return t(lang as "en" | "hy" | "ru", "common.stock.outOfStock");
 };
 
+function extractProductImages(media: unknown): string[] {
+  if (!Array.isArray(media)) {
+    return [];
+  }
+
+  return media
+    .map((item) =>
+      processImageUrl(item as string | null | undefined | { url?: string; src?: string; value?: string })
+    )
+    .filter((url, index, urls): url is string => url !== null && urls.indexOf(url) === index);
+}
+
 class ProductsFindTransformService {
   /**
    * Transform products to response format
@@ -237,6 +249,8 @@ class ProductsFindTransformService {
         if (primary) categories = [primary];
       }
 
+      const productImages = extractProductImages(product.media);
+
       return {
         id: product.id,
         slug: translation?.slug || "",
@@ -250,16 +264,8 @@ class ProductsFindTransformService {
         originalPrice: appliedDiscount > 0 ? originalPrice : variant?.compareAtPrice || null,
         compareAtPrice: variant?.compareAtPrice || null,
         discountPercent: appliedDiscount > 0 ? appliedDiscount : null,
-        image: (() => {
-          // Use unified image utilities to get first valid main image
-          if (!Array.isArray(product.media) || product.media.length === 0) {
-            return null;
-          }
-          
-          // Process first image - cast JsonValue to ImageUrlInput
-          const firstImage = processImageUrl(product.media[0] as string | null | undefined | { url?: string; src?: string; value?: string });
-          return firstImage || null;
-        })(),
+        image: productImages[0] || null,
+        images: productImages,
         inStock: (variant?.stock || 0) > 0,
         labels: (() => {
           // Map existing labels

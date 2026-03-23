@@ -211,21 +211,29 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               description="Technology gives it form. Living materials give it soul. Crafted into something you carry daily."
               className="gap-3 [&_h2]:text-2xl [&_h2]:sm:text-3xl [&_p]:text-sm [&_p]:sm:text-base"
             />
-            <div className="relative mt-4 overflow-hidden rounded-2xl sm:mt-5 sm:rounded-[2rem]">
-              <div className="relative h-[22rem] sm:h-[26rem] lg:h-[28rem]">
-                <Image
-                  src="/assets/home/concepts/behind-creation.png"
-                  alt="Behind the creation"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 896px) 100vw, 896px"
-                />
-                <div className="absolute inset-0 bg-black/15" />
+            <div className="relative mt-4 sm:mt-5">
+              <div className="overflow-hidden rounded-2xl sm:rounded-[2rem]">
+                <div className="relative h-[22rem] sm:h-[26rem] lg:h-[28rem]">
+                  <Image
+                    src="/assets/home/concepts/behind-creation.png"
+                    alt="Behind the creation"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 896px) 100vw, 896px"
+                  />
+                  <div className="absolute inset-0 bg-black/15" />
+                </div>
+              </div>
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                 <button
                   type="button"
-                  className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#dcc090] transition-transform hover:scale-105 sm:h-20 sm:w-20"
+                  className="pointer-events-auto flex min-h-[5rem] min-w-[5rem] items-center justify-center rounded-full bg-transparent p-2.5 transition-transform hover:scale-105 sm:min-h-[6rem] sm:min-w-[6rem] sm:p-4"
                 >
-                  <img src={HOME_ASSET_PATHS.playIcon} alt="Play" className="h-16 w-16 object-contain sm:h-20 sm:w-20" />
+                  <img
+                    src={HOME_ASSET_PATHS.youtubeIcon}
+                    alt="YouTube"
+                    className="h-12 w-12 max-h-none max-w-none object-contain drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)] sm:h-16 sm:w-16"
+                  />
                 </button>
               </div>
             </div>
