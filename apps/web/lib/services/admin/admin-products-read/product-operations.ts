@@ -23,8 +23,36 @@ export async function getProducts(filters: ProductFilters) {
   logger.debug('Executing database queries...', { where: JSON.stringify(where, null, 2) });
 
   const { products, total } = await executeProductListQuery(where, orderBy, skip, limit);
+  const fallbackCategoryIds = [
+    ...new Set(
+      products.flatMap((product) => {
+        const relationCategories = Array.isArray(product.categories) ? product.categories : [];
+        if (relationCategories.length > 0) {
+          return [];
+        }
 
-  const data = products.map(formatProductForList);
+        const categoryIds = Array.isArray(product.categoryIds) ? product.categoryIds : [];
+        return [...categoryIds, product.primaryCategoryId || ""].filter((categoryId) => categoryId.length > 0);
+      })
+    ),
+  ];
+  const fallbackCategories =
+    fallbackCategoryIds.length > 0
+      ? await db.category.findMany({
+          where: { id: { in: fallbackCategoryIds } },
+          include: {
+            translations: {
+              where: { locale: "en" },
+              take: 1,
+            },
+          },
+        })
+      : [];
+  const fallbackCategoryTitlesById = new Map<string, string>(
+    fallbackCategories.map((category) => [category.id, category.translations[0]?.title || ""])
+  );
+
+  const data = products.map((product) => formatProductForList(product, fallbackCategoryTitlesById));
 
   const totalTime = Date.now() - startTime;
   logger.info(`getProducts completed in ${totalTime}ms. Returning ${data.length} products`);

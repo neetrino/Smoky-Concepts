@@ -1274,6 +1274,10 @@ a {
   max-width: 28rem;
 }
 
+.max-w-\[180px\] {
+  max-width: 180px;
+}
+
 .flex-1 {
   flex: 1;
 }
@@ -2528,6 +2532,11 @@ a {
 .py-8 {
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+
+.px-2\.5 {
+  padding-left: .625rem;
+  padding-right: .625rem;
 }
 
 .pb-1 {
