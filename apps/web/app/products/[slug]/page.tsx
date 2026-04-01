@@ -17,7 +17,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     setCurrentImageIndex,
     thumbnailStartIndex,
     setThumbnailStartIndex,
-    currency,
     language,
     isAddingToCart,
     setIsAddingToCart,
@@ -86,7 +85,6 @@ export default function ProductPage({ params }: ProductPageProps) {
             originalPrice={originalPrice}
             compareAtPrice={compareAtPrice}
             discountPercent={discountPercent}
-            currency={currency}
             language={language}
             isOutOfStock={isOutOfStock}
             canAddToCart={canAddToCart}

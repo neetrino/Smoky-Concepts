@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { getStoredCurrency } from '../../lib/currency';
 import { useTranslation } from '../../lib/i18n-client';
 import type { Cart } from './types';
 import { readGuestCartFromStorage } from './cart-fetcher';
@@ -14,17 +13,12 @@ export default function CartPage() {
   const { t } = useTranslation();
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currency, setCurrency] = useState(getStoredCurrency());
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
   // Track if we updated locally to prevent unnecessary re-fetch
   const isLocalUpdateRef = useRef(false);
 
   useEffect(() => {
     loadCart();
-
-    const handleCurrencyUpdate = () => {
-      setCurrency(getStoredCurrency());
-    };
 
     const handleCartUpdate = () => {
       // If we just updated locally, skip re-fetch to avoid page reload
@@ -41,12 +35,10 @@ export default function CartPage() {
       loadCart();
     };
 
-    window.addEventListener('currency-updated', handleCurrencyUpdate);
     window.addEventListener('cart-updated', handleCartUpdate);
     window.addEventListener('auth-updated', handleAuthUpdate);
 
     return () => {
-      window.removeEventListener('currency-updated', handleCurrencyUpdate);
       window.removeEventListener('cart-updated', handleCartUpdate);
       window.removeEventListener('auth-updated', handleAuthUpdate);
     };
@@ -97,13 +89,12 @@ export default function CartPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <CartTable
           cart={cart}
-          currency={currency}
           updatingItems={updatingItems}
           onRemove={onRemoveItem}
           onUpdateQuantity={onUpdateQuantity}
           t={t}
         />
-        <OrderSummary cart={cart} currency={currency} t={t} />
+        <OrderSummary cart={cart} t={t} />
       </div>
     </div>
   );

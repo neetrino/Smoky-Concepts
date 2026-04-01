@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
-import { getStoredCurrency, initializeCurrencyRates, type CurrencyCode } from '../../../lib/currency';
 import { ProductFilters } from './components/ProductFilters';
 import { ProductsTable } from './components/ProductsTable';
 import { useProductHandlers } from './hooks/useProductHandlers';
@@ -33,7 +32,6 @@ export default function ProductsPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [togglingAllFeatured, setTogglingAllFeatured] = useState(false);
-  const [currency, setCurrency] = useState<CurrencyCode>('USD');
 
   useEffect(() => {
     if (!isLoading) {
@@ -43,36 +41,6 @@ export default function ProductsPage() {
       }
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
-
-  // Initialize currency rates and listen for currency changes
-  useEffect(() => {
-    const updateCurrency = () => {
-      const newCurrency = getStoredCurrency();
-      console.log('💱 [ADMIN PRODUCTS] Currency updated to:', newCurrency);
-      setCurrency(newCurrency);
-    };
-    
-    // Initialize currency rates
-    initializeCurrencyRates().catch(console.error);
-    
-    // Load currency on mount
-    updateCurrency();
-    
-    // Listen for currency changes
-    if (typeof window !== 'undefined') {
-      window.addEventListener('currency-updated', updateCurrency);
-      const handleCurrencyRatesUpdate = () => {
-        console.log('💱 [ADMIN PRODUCTS] Currency rates updated, refreshing currency...');
-        updateCurrency();
-      };
-      window.addEventListener('currency-rates-updated', handleCurrencyRatesUpdate);
-      
-      return () => {
-        window.removeEventListener('currency-updated', updateCurrency);
-        window.removeEventListener('currency-rates-updated', handleCurrencyRatesUpdate);
-      };
-    }
-  }, []);
 
   // Fetch categories on mount
   useEffect(() => {
@@ -388,7 +356,6 @@ export default function ProductsPage() {
               toggleSelectAll={handlers.toggleSelectAll}
               sortBy={sortBy}
               handleHeaderSort={handleHeaderSort}
-              currency={currency}
               handleDeleteProduct={handlers.handleDeleteProduct}
               handleDuplicateProduct={handlers.handleDuplicateProduct}
               handleTogglePublished={handlers.handleTogglePublished}

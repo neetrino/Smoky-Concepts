@@ -28,7 +28,6 @@ export function OrdersPageContent() {
     setPaymentStatusFilter,
     setSearchQuery,
     setPage,
-    formatCurrency,
     handleViewOrderDetails,
     toggleSelect,
     toggleSelectAll,
@@ -92,7 +91,6 @@ export function OrdersPageContent() {
           onStatusChange={handleStatusChange}
           onPaymentStatusChange={handlePaymentStatusChange}
           onPageChange={(newPage) => setPage(newPage)}
-          formatCurrency={formatCurrency}
         />
       </div>
     </div>

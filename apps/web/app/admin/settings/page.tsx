@@ -6,8 +6,6 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
-import { clearCurrencyRatesCache } from '../../../lib/currency';
-
 interface Settings {
   defaultCurrency?: string;
   globalDiscount?: number;
@@ -78,19 +76,7 @@ export default function SettingsPage() {
         defaultCurrency: settings.defaultCurrency,
         currencyRates: currencyRatesToSave,
       });
-      
-      // Clear currency rates cache to force reload
-      console.log('🔄 [ADMIN] Clearing currency rates cache...');
-      clearCurrencyRatesCache();
-      
-      // Wait a bit to ensure cache is cleared, then dispatch event again
-      setTimeout(() => {
-        if (typeof window !== 'undefined') {
-          console.log('🔄 [ADMIN] Dispatching currency-rates-updated event...');
-          window.dispatchEvent(new Event('currency-rates-updated'));
-        }
-      }, 100);
-      
+
       alert(t('admin.settings.savedSuccess'));
       console.log('✅ [ADMIN] Settings saved, currency rates:', currencyRatesToSave);
     } catch (err: any) {

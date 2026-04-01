@@ -1,3 +1,4 @@
+import { catalogPriceToUsd } from '../../lib/currency';
 import { logger } from '../../lib/services/utils/logger';
 import type { Cart, CartItem, GuestCartItem } from './types';
 import { CART_KEY } from './constants';
@@ -15,7 +16,11 @@ function isGuestLineSnapshotComplete(item: GuestCartItem): boolean {
 
 function cartItemFromGuestSnapshot(item: GuestCartItem, index: number): CartItem {
   const variantId = item.variantId as string;
-  const price = item.price as number;
+  const priceUsd = catalogPriceToUsd(item.price as number);
+  const originalPriceUsd =
+    item.originalPrice != null && !Number.isNaN(item.originalPrice)
+      ? catalogPriceToUsd(item.originalPrice)
+      : null;
   return {
     id: `${item.productId}-${variantId}-${index}`,
     variant: {
@@ -32,9 +37,9 @@ function cartItemFromGuestSnapshot(item: GuestCartItem, index: number): CartItem
       },
     },
     quantity: item.quantity,
-    price,
-    originalPrice: item.originalPrice ?? null,
-    total: price * item.quantity,
+    price: priceUsd,
+    originalPrice: originalPriceUsd,
+    total: priceUsd * item.quantity,
   };
 }
 
