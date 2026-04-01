@@ -137,7 +137,7 @@ export default function AdminOrderDetailsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="text-center py-16">
             <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900" />
             <p className="text-gray-600">{t('admin.orders.orderDetails.loadingOrderDetails')}</p>
@@ -150,7 +150,7 @@ export default function AdminOrderDetailsPage() {
   if (error || !orderDetails) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <button
             onClick={() => router.push('/admin/orders')}
             className="mb-4 flex items-center text-gray-600 hover:text-gray-900"
@@ -168,7 +168,7 @@ export default function AdminOrderDetailsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <button
           onClick={() => router.push('/admin/orders')}
           className="mb-4 flex items-center text-gray-600 hover:text-gray-900"
