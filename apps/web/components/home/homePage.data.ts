@@ -17,6 +17,8 @@ export const HOME_ASSET_PATHS = {
   phone: '/assets/home/products/phone.png',
   playIcon: '/assets/home/icons/play.svg',
   ritualBanner: '/assets/home/concepts/ritual-banner.png',
+  /** Public path; filename contains spaces — keep percent-encoded for reliable loading */
+  neetrinoPartnerLogo: '/assets/home/concepts/Asset%201%20(1).svg',
   studioLogo: '/assets/home/icons/gazar-logo.svg',
   tiktokIcon: '/assets/home/icons/tiktok.svg',
   youtubeIcon: '/assets/home/icons/youtube.svg',
@@ -234,3 +236,5 @@ export const FOOTER_SOCIALS = [
   { label: 'TikTok', href: 'https://tiktok.com', iconSrc: '/assets/home/icons/tiktok.svg' },
   { label: 'YouTube', href: 'https://youtube.com', iconSrc: '/assets/home/icons/youtube.svg' },
 ] as const;
+
+export const NEETRINO_PARTNER_HREF = 'https://neetrino.com/' as const;
