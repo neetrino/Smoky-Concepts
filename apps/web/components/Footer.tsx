@@ -2,7 +2,12 @@
 
 import Link from 'next/link';
 
-import { FOOTER_LINKS, FOOTER_SOCIALS, HOME_ASSET_PATHS } from './home/homePage.data';
+import {
+  FOOTER_LINKS,
+  FOOTER_SOCIALS,
+  HOME_ASSET_PATHS,
+  NEETRINO_PARTNER_HREF,
+} from './home/homePage.data';
 import { useTranslation } from '@/lib/i18n-client';
 
 /**
@@ -52,12 +57,28 @@ export function Footer() {
           </div>
           <div className="flex flex-col items-center gap-4 lg:items-end lg:text-right">
             <p className="text-sm font-extrabold">{t('home.homepage.footer.designedBy')}</p>
-            <div className="relative h-12 w-24">
-              <img
-                src={HOME_ASSET_PATHS.studioLogo}
-                alt="Gazar Studio"
-                className="h-full w-full object-contain object-center lg:object-right"
-              />
+            <div className="flex w-full flex-col items-center gap-8 lg:items-end">
+              <div className="relative h-12 w-24">
+                <img
+                  src={HOME_ASSET_PATHS.studioLogo}
+                  alt="Gazar Studio"
+                  className="h-full w-full object-contain object-center lg:object-right"
+                />
+              </div>
+              <a
+                href={NEETRINO_PARTNER_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex max-w-[10rem] translate-x-3 self-end transition-opacity hover:opacity-80 sm:translate-x-4"
+                aria-label="Neetrino"
+              >
+                <img
+                  src={HOME_ASSET_PATHS.neetrinoPartnerLogo}
+                  alt=""
+                  className="h-6 w-full max-h-8 object-contain object-center lg:object-right"
+                  aria-hidden="true"
+                />
+              </a>
             </div>
           </div>
         </div>

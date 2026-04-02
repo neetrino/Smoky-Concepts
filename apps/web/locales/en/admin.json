@@ -704,7 +704,11 @@
     "removeSlide": "Remove",
     "resetDefaults": "Reset to built-in default",
     "slideLabel": "Slide {n}",
-    "imageUrl": "Image URL",
+    "expandSlide": "Expand slide details",
+    "collapseSlide": "Collapse slide details",
+    "image": "Image",
+    "imagePreviewAlt": "Slide {n} hero image preview",
+    "imagePlaceholder": "No image yet — upload a file",
     "uploadFile": "Upload image",
     "uploading": "Uploading…",
     "titleField": "Headline",
@@ -715,7 +719,7 @@
     "saved": "Homepage hero saved.",
     "loadError": "Could not load hero settings. Showing defaults in the form.",
     "saveError": "Could not save. Check the fields and try again.",
-    "uploadError": "Upload failed. Try another file or paste an image URL."
+    "uploadError": "Upload failed. Try another file."
   },
   "common": {
     "loading": "Loading...",

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Button, Card } from '@shop/ui';
 
 import { AdminSidebar } from '../components/AdminSidebar';
+import { HomeHeroSlideEditor } from './components/HomeHeroSlideEditor';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { apiClient } from '@/lib/api-client';
 import { HOME_HERO_DEFAULT_SLIDES } from '@/lib/constants/home-hero.constants';
@@ -44,6 +45,7 @@ export default function AdminHomeHeroPage() {
   const [saving, setSaving] = useState(false);
   const [slides, setSlides] = useState<HomeHeroSlide[]>([]);
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [expandedSlideIndex, setExpandedSlideIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -123,6 +125,21 @@ export default function AdminHomeHeroPage() {
 
   const resetToDefaults = () => {
     setSlides([...HOME_HERO_DEFAULT_SLIDES]);
+    setExpandedSlideIndex(null);
+  };
+
+  const removeSlideAt = (index: number) => {
+    setSlides((s) => s.filter((_, i) => i !== index));
+    setExpandedSlideIndex((prev) => {
+      if (prev === null) return null;
+      if (prev === index) return null;
+      if (prev > index) return prev - 1;
+      return prev;
+    });
+  };
+
+  const toggleSlideExpanded = (index: number) => {
+    setExpandedSlideIndex((prev) => (prev === index ? null : index));
   };
 
   if (isLoading || loading) {
@@ -141,7 +158,7 @@ export default function AdminHomeHeroPage() {
   }
 
   return (
-      <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <button
@@ -182,93 +199,20 @@ export default function AdminHomeHeroPage() {
                 </Button>
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-4">
                 {slides.map((slide, index) => (
-                  <div key={index} className="rounded-lg border border-gray-200 p-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <h2 className="text-lg font-semibold text-gray-900">
-                        {t('admin.homeHero.slideLabel').replace('{n}', String(index + 1))}
-                      </h2>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => setSlides((s) => s.filter((_, i) => i !== index))}
-                        disabled={slides.length <= 1}
-                      >
-                        {t('admin.homeHero.removeSlide')}
-                      </Button>
-                    </div>
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="sm:col-span-2">
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                          {t('admin.homeHero.imageUrl')}
-                        </label>
-                        <input
-                          type="text"
-                          value={slide.imageUrl}
-                          onChange={(e) => updateSlide(index, { imageUrl: e.target.value })}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        <div className="mt-2">
-                          <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) => void handleImageFile(index, e)}
-                              disabled={uploadingIndex === index}
-                            />
-                            {uploadingIndex === index ? t('admin.homeHero.uploading') : t('admin.homeHero.uploadFile')}
-                          </label>
-                        </div>
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                          {t('admin.homeHero.titleField')}
-                        </label>
-                        <input
-                          type="text"
-                          value={slide.title}
-                          onChange={(e) => updateSlide(index, { title: e.target.value })}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                          {t('admin.homeHero.description')}
-                        </label>
-                        <textarea
-                          value={slide.description}
-                          onChange={(e) => updateSlide(index, { description: e.target.value })}
-                          rows={3}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                          {t('admin.homeHero.ctaLabel')}
-                        </label>
-                        <input
-                          type="text"
-                          value={slide.ctaLabel}
-                          onChange={(e) => updateSlide(index, { ctaLabel: e.target.value })}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                          {t('admin.homeHero.ctaHref')}
-                        </label>
-                        <input
-                          type="text"
-                          value={slide.ctaHref}
-                          onChange={(e) => updateSlide(index, { ctaHref: e.target.value })}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <HomeHeroSlideEditor
+                    key={index}
+                    slide={slide}
+                    index={index}
+                    isExpanded={expandedSlideIndex === index}
+                    slidesCount={slides.length}
+                    isUploading={uploadingIndex === index}
+                    onToggle={() => toggleSlideExpanded(index)}
+                    onRemove={() => removeSlideAt(index)}
+                    onUpdate={(patch) => updateSlide(index, patch)}
+                    onImageFile={(e) => void handleImageFile(index, e)}
+                  />
                 ))}
               </div>
 
