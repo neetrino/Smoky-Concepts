@@ -5,6 +5,7 @@
     },
     "hero": {
       "title": "We Make Concepts Real",
+      "titleMobile": "We Make\nConcepts Real",
       "description": "Premium accessories that redefine your rituals.",
       "imageAlt": "Hero",
       "slideAriaPrefix": "Slide"

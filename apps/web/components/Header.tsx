@@ -71,10 +71,6 @@ export function Header() {
             <LanguageSwitcherHeader />
           </div>
         </div>
-        {renderNavLinks(
-          'flex flex-wrap items-center justify-center gap-x-3 gap-y-2 border-t border-white/10 py-3 text-xs tracking-[0.12em] md:hidden',
-          NAVIGATION_ITEMS
-        )}
       </div>
     </header>
   );
