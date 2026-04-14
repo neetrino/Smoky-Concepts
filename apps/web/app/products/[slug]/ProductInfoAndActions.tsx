@@ -12,7 +12,9 @@ import { normalizeHexPalette, parseHexFromText } from './utils/swatch-color-util
 
 const CATALOG_BAG_ICON_PATH = '/assets/home/icons/bag-catalog.svg';
 
-type ProductTabKey = 'description' | 'details' | 'shipping';
+const CUSTOMIZE_TEXT_MAX_LENGTH = 18;
+
+type ProductTabKey = 'description' | 'details' | 'shipping' | 'customize';
 
 interface ProductOptionValue extends AttributeGroupValue {
   colors?: string[] | string | null;
@@ -92,6 +94,17 @@ function getShippingCopy(language: LanguageCode): string {
   }
 }
 
+function getCustomizeCopy(language: LanguageCode): string {
+  switch (language) {
+    case 'hy':
+      return 'Ընտրեք գույնը և չափը այս էջում՝ պատվերը անհատականացնելու համար։ Հատուկ ցանկությունների դեպքում կարող եք կապվել մեզ հետ պատվերը ձևակերպելուց հետո։';
+    case 'ru':
+      return 'Выберите цвет и размер на этой странице, чтобы персонализировать заказ. Для особых пожеланий свяжитесь с нами после оформления.';
+    default:
+      return 'Pick color and size on this page to personalize your order. For special requests, contact us after checkout.';
+  }
+}
+
 export function ProductInfoAndActions({
   product,
   price,
@@ -115,6 +128,7 @@ export function ProductInfoAndActions({
 }: ProductInfoAndActionsProps) {
   const [activeTab, setActiveTab] = useState<ProductTabKey>('description');
   const [isSizeMenuOpen, setIsSizeMenuOpen] = useState(false);
+  const [customizeText, setCustomizeText] = useState('');
   const productTitle = getProductText(language, product.id, 'title') || product.title;
   const productDescription =
     getProductText(language, product.id, 'longDescription') || product.description || '';
@@ -166,6 +180,41 @@ export function ProductInfoAndActions({
       );
     }
 
+    if (activeTab === 'customize') {
+      return (
+        <div className="flex max-w-[763px] flex-col gap-[13px]">
+          <p className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">
+            {getCustomizeCopy(language)}
+          </p>
+          <div>
+            <p className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">
+              {t(language, 'product.customize_text_label')}
+            </p>
+            <div className="mt-4 flex max-w-[763px] flex-col gap-4 sm:flex-row sm:items-end sm:gap-20 sm:pb-5">
+              <input
+                type="text"
+                value={customizeText}
+                maxLength={CUSTOMIZE_TEXT_MAX_LENGTH}
+                onChange={(e) => setCustomizeText(e.target.value)}
+                className="w-full max-w-[291px] border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090]"
+                aria-label={t(language, 'product.customize_text_label')}
+                autoComplete="off"
+              />
+              <button
+                type="button"
+                className="h-10 w-full max-w-[168px] shrink-0 rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] sm:translate-y-5 sm:w-[168px]"
+              >
+                {t(language, 'product.customize_apply')}
+              </button>
+            </div>
+            <p className="mt-[9px] max-w-[291px] text-right font-montserrat text-[10px] font-medium leading-[30px] text-[#898989]">
+              {customizeText.length}/ {CUSTOMIZE_TEXT_MAX_LENGTH}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-2">
         {productDetails.map((item) => (
@@ -175,7 +224,7 @@ export function ProductInfoAndActions({
         ))}
       </div>
     );
-  }, [activeTab, language, productDescription, productDetails]);
+  }, [activeTab, language, productDescription, productDetails, customizeText]);
 
   return (
     <div className="max-w-[763px] pt-1 xl:pt-36 2xl:pt-40">
@@ -308,6 +357,18 @@ export function ProductInfoAndActions({
             {t(language, 'product.shipping_title')}
             {activeTab === 'shipping' && (
               <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('customize')}
+            className={`relative pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:text-[19px] ${
+              activeTab === 'customize' ? 'text-[#414141]' : 'text-[#414141]/70'
+            }`}
+          >
+            {t(language, 'product.customize_title')}
+            {activeTab === 'customize' && (
+              <span className="absolute bottom-0 left-0 h-1 w-[87px] rounded-[2px] bg-[#122a26]" />
             )}
           </button>
         </div>
