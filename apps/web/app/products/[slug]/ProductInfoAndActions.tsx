@@ -9,6 +9,7 @@ import type { LanguageCode } from '../../../lib/language';
 import { Button } from '../../../components/ui/buttons';
 import type { AttributeGroupValue, Product, ProductVariant } from './types';
 import { normalizeHexPalette, parseHexFromText } from './utils/swatch-color-utils';
+import { CustomizeSizeModal } from './CustomizeSizeModal';
 
 const CATALOG_BAG_ICON_PATH = '/assets/home/icons/bag-catalog.svg';
 
@@ -129,6 +130,7 @@ export function ProductInfoAndActions({
   const [activeTab, setActiveTab] = useState<ProductTabKey>('description');
   const [isSizeMenuOpen, setIsSizeMenuOpen] = useState(false);
   const [customizeText, setCustomizeText] = useState('');
+  const [isCustomizeSizeModalOpen, setIsCustomizeSizeModalOpen] = useState(false);
   const productTitle = getProductText(language, product.id, 'title') || product.title;
   const productDescription =
     getProductText(language, product.id, 'longDescription') || product.description || '';
@@ -198,6 +200,7 @@ export function ProductInfoAndActions({
             />
             <button
               type="button"
+              onClick={() => setIsCustomizeSizeModalOpen(true)}
               className="h-10 w-full max-w-[168px] shrink-0 rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] sm:translate-y-5 sm:w-[168px]"
             >
               {t(language, 'product.customize_apply')}
@@ -222,6 +225,7 @@ export function ProductInfoAndActions({
   }, [activeTab, language, productDescription, productDetails, customizeText]);
 
   return (
+    <>
     <div className="max-w-[763px] pt-1 xl:pt-36 2xl:pt-40">
       <h1 className="font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
         {productTitle}
@@ -448,6 +452,13 @@ export function ProductInfoAndActions({
         </div>
       )}
     </div>
+    <CustomizeSizeModal
+      isOpen={isCustomizeSizeModalOpen}
+      onClose={() => setIsCustomizeSizeModalOpen(false)}
+      language={language}
+      searchDisplayText={customizeText}
+    />
+    </>
   );
 }
 
