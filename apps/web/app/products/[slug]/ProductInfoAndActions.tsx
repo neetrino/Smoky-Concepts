@@ -186,31 +186,26 @@ export function ProductInfoAndActions({
           <p className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">
             {getCustomizeCopy(language)}
           </p>
-          <div>
-            <p className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">
-              {t(language, 'product.customize_text_label')}
-            </p>
-            <div className="mt-4 flex max-w-[763px] flex-col gap-4 sm:flex-row sm:items-end sm:gap-20 sm:pb-5">
-              <input
-                type="text"
-                value={customizeText}
-                maxLength={CUSTOMIZE_TEXT_MAX_LENGTH}
-                onChange={(e) => setCustomizeText(e.target.value)}
-                className="w-full max-w-[291px] border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090]"
-                aria-label={t(language, 'product.customize_text_label')}
-                autoComplete="off"
-              />
-              <button
-                type="button"
-                className="h-10 w-full max-w-[168px] shrink-0 rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] sm:translate-y-5 sm:w-[168px]"
-              >
-                {t(language, 'product.customize_apply')}
-              </button>
-            </div>
-            <p className="mt-[9px] max-w-[291px] text-right font-montserrat text-[10px] font-medium leading-[30px] text-[#898989]">
-              {customizeText.length}/ {CUSTOMIZE_TEXT_MAX_LENGTH}
-            </p>
+          <div className="flex max-w-[763px] flex-col gap-4 sm:flex-row sm:items-end sm:gap-20 sm:pb-5">
+            <input
+              type="text"
+              value={customizeText}
+              maxLength={CUSTOMIZE_TEXT_MAX_LENGTH}
+              onChange={(e) => setCustomizeText(e.target.value)}
+              className="w-full max-w-[291px] border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090]"
+              aria-label={t(language, 'product.customize_title')}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              className="h-10 w-full max-w-[168px] shrink-0 rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] sm:translate-y-5 sm:w-[168px]"
+            >
+              {t(language, 'product.customize_apply')}
+            </button>
           </div>
+          <p className="max-w-[291px] text-right font-montserrat text-[10px] font-medium leading-[30px] text-[#898989]">
+            {customizeText.length}/ {CUSTOMIZE_TEXT_MAX_LENGTH}
+          </p>
         </div>
       );
     }
