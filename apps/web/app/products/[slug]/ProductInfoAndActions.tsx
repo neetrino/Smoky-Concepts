@@ -51,6 +51,8 @@ interface ProductInfoAndActionsProps {
   onAddToCart: () => Promise<void>;
   /** Primary CTA — add line then continue to checkout. */
   onBuyNow: () => Promise<void>;
+  /** Sync size-catalog selection to parent for cart / checkout snapshot */
+  onSelectedCatalogSizeChange?: (item: SizeCatalogItemDto | null) => void;
 }
 
 const COLOR_SWATCH_FALLBACKS: Record<string, string[]> = {
@@ -141,6 +143,7 @@ export function ProductInfoAndActions({
   onSizeSelect,
   onAddToCart,
   onBuyNow,
+  onSelectedCatalogSizeChange,
 }: ProductInfoAndActionsProps) {
   const [activeTab, setActiveTab] = useState<ProductTabKey>('description');
   const [customizeText, setCustomizeText] = useState('');
@@ -191,6 +194,14 @@ export function ProductInfoAndActions({
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    setSelectedCatalogSize(null);
+  }, [product.id]);
+
+  useEffect(() => {
+    onSelectedCatalogSizeChange?.(selectedCatalogSize);
+  }, [selectedCatalogSize, onSelectedCatalogSizeChange]);
 
   const sizeButtonLabel =
     selectedCatalogSize?.title ?? activeSizeOption?.label ?? t(language, 'product.choose_size');

@@ -27,6 +27,8 @@ function cartItemFromGuestSnapshot(item: GuestCartItem, index: number): CartItem
       id: variantId,
       sku: item.sku ?? '',
       sizeLabel: item.sizeLabel ?? null,
+      sizeCatalogTitle: item.sizeCatalogTitle ?? null,
+      sizeCatalogImageUrl: item.sizeCatalogImageUrl ?? null,
       stock: item.stock !== undefined ? item.stock : undefined,
       product: {
         id: item.productId,

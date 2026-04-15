@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { t, getProductText } from '../../../lib/i18n';
+import type { SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { RelatedProducts } from '../../../components/RelatedProducts';
 import { ProductImageGallery } from './ProductImageGallery';
 import { ProductInfoAndActions } from './ProductInfoAndActions';
@@ -38,6 +40,12 @@ export default function ProductPage({ params }: ProductPageProps) {
     handleSizeSelect,
   } = useProductPage(params);
 
+  const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
+
+  useEffect(() => {
+    setSelectedCatalogSize(null);
+  }, [product?.id]);
+
   const productDisplayTitle = product
     ? getProductText(language, product.id, 'title') || product.title
     : '';
@@ -51,6 +59,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     language,
     canAddToCart,
     productDisplayTitle,
+    selectedCatalogSize,
     setIsAddingToCart,
     setShowMessage,
   });
@@ -105,6 +114,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             onSizeSelect={handleSizeSelect}
             onAddToCart={handleAddToCart}
             onBuyNow={handleBuyNow}
+            onSelectedCatalogSizeChange={setSelectedCatalogSize}
           />
         </div>
 

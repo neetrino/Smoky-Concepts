@@ -1,6 +1,10 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@prisma/client";
 import type { CheckoutData } from "../types/checkout";
+import {
+  mergeSizeCatalogIntoVariantOptions,
+  sanitizeCheckoutImageUrl,
+} from "../orders/merge-size-catalog-into-variant-options";
 import { logger } from "./utils/logger";
 
 type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
@@ -119,12 +123,21 @@ class OrdersService {
         variantTitle?: string;
         sku: string;
         imageUrl?: string;
+        sizeCatalogTitle?: string;
+        sizeCatalogImageUrl?: string;
       }> = [];
 
       if (guestItems && Array.isArray(guestItems) && guestItems.length > 0) {
         // Get items from checkout request (localStorage cart)
         cartItems = await Promise.all(
-          guestItems.map(async (item: { productId: string; variantId: string; quantity: number }) => {
+          guestItems.map(
+            async (item: {
+              productId: string;
+              variantId: string;
+              quantity: number;
+              sizeCatalogTitle?: string;
+              sizeCatalogImageUrl?: string;
+            }) => {
             const { productId, variantId, quantity } = item;
 
             if (!productId || !variantId || !quantity) {
@@ -194,6 +207,18 @@ class OrdersService {
               }
             }
 
+            const SIZE_CATALOG_TITLE_MAX = 200;
+            const rawCatalogTitle =
+              typeof item.sizeCatalogTitle === 'string' ? item.sizeCatalogTitle.trim() : '';
+            const sizeCatalogTitle =
+              rawCatalogTitle.length > 0 && rawCatalogTitle.length <= SIZE_CATALOG_TITLE_MAX
+                ? rawCatalogTitle
+                : undefined;
+            const sizeCatalogImageUrl =
+              sizeCatalogTitle !== undefined
+                ? sanitizeCheckoutImageUrl(item.sizeCatalogImageUrl)
+                : undefined;
+
             return {
               variantId: variant.id,
               productId: variant.product.id,
@@ -203,6 +228,8 @@ class OrdersService {
               variantTitle,
               sku: variant.sku || '',
               imageUrl,
+              sizeCatalogTitle,
+              sizeCatalogImageUrl,
             };
           })
         );
@@ -279,6 +306,8 @@ class OrdersService {
                 price: item.price,
                 total: item.price * item.quantity,
                 imageUrl: item.imageUrl,
+                sizeCatalogTitle: item.sizeCatalogTitle ?? null,
+                sizeCatalogImageUrl: item.sizeCatalogImageUrl ?? null,
               })),
             },
             events: {
@@ -586,7 +615,7 @@ class OrdersService {
       fulfillmentStatus: order.fulfillmentStatus,
       items: order.items.map((item: OrderItemWithVariant) => {
         const rawOpts = getVariantOptions(item.variant?.attributes ?? null);
-        const variantOptions = rawOpts.map((opt: VariantOptionFromAttributes) => {
+        const variantOptionsBase = rawOpts.map((opt: VariantOptionFromAttributes) => {
           logger.debug('Processing option', {
             attributeKey: opt.attributeKey,
             value: opt.value,
@@ -616,6 +645,12 @@ class OrdersService {
             value: opt.value ?? undefined,
           };
         });
+
+        const variantOptions = mergeSizeCatalogIntoVariantOptions(
+          variantOptionsBase,
+          item.sizeCatalogTitle,
+          item.sizeCatalogImageUrl
+        );
 
         logger.debug('Item mapping', {
           productTitle: item.productTitle,

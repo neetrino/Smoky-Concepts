@@ -101,8 +101,11 @@ export function buildGuestCartLineSnapshot(
   quantity: number,
   displayPrice: number,
   originalPrice: number | null,
-  productTitle: string
+  productTitle: string,
+  sizeCatalog?: { title: string; imageUrl: string } | null
 ): GuestCartItem {
+  const trimmedTitle = sizeCatalog?.title?.trim() ?? '';
+  const trimmedImg = sizeCatalog?.imageUrl?.trim() ?? '';
   return {
     productId: product.id,
     productSlug: product.slug.trim(),
@@ -116,6 +119,8 @@ export function buildGuestCartLineSnapshot(
     sku: variant.sku,
     sizeLabel: resolveSizeLabel(variant),
     categoryLabel: product.categories?.[0]?.title?.trim() ?? null,
+    sizeCatalogTitle: trimmedTitle !== '' ? trimmedTitle : null,
+    sizeCatalogImageUrl: trimmedTitle !== '' && trimmedImg !== '' ? trimmedImg : null,
   };
 }
 
