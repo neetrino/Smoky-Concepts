@@ -12,6 +12,7 @@ import { adminCategoriesService } from "./admin/admin-categories.service";
 import { adminGlobalAttributesService } from "./admin/admin-global-attributes.service";
 import { adminProductsService } from "./admin/admin-products.service";
 import { adminVotingService } from "./admin/admin-voting.service";
+import { adminSizeCatalogService } from "./admin/admin-size-catalog.service";
 
 class AdminService {
   // Delegate to specialized services
@@ -75,6 +76,15 @@ class AdminService {
   createVotingItem = adminVotingService.createVotingItem.bind(adminVotingService);
   updateVotingItem = adminVotingService.updateVotingItem.bind(adminVotingService);
   deleteVotingItem = adminVotingService.deleteVotingItem.bind(adminVotingService);
+
+  // Size catalog (PDP + admin)
+  getStorefrontSizeCatalog = adminSizeCatalogService.getPublicCatalog.bind(adminSizeCatalogService);
+  createSizeCatalogCategory = adminSizeCatalogService.createCategory.bind(adminSizeCatalogService);
+  updateSizeCatalogCategory = adminSizeCatalogService.updateCategory.bind(adminSizeCatalogService);
+  deleteSizeCatalogCategory = adminSizeCatalogService.deleteCategory.bind(adminSizeCatalogService);
+  createSizeCatalogItem = adminSizeCatalogService.createItem.bind(adminSizeCatalogService);
+  updateSizeCatalogItem = adminSizeCatalogService.updateItem.bind(adminSizeCatalogService);
+  deleteSizeCatalogItem = adminSizeCatalogService.deleteItem.bind(adminSizeCatalogService);
 }
 
 export const adminService = new AdminService();

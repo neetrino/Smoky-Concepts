@@ -65,6 +65,7 @@ const R2_OBJECT_PREFIX = {
   products: "products",
   voting: "voting",
   homeHero: "home-hero",
+  sizeCatalog: "size-catalog",
 } as const;
 
 export type R2ImageObjectPrefix = keyof typeof R2_OBJECT_PREFIX;
@@ -130,6 +131,14 @@ export async function uploadHomeHeroImageToR2(
   contentType: string
 ): Promise<string> {
   return uploadImageToR2(body, contentType, "homeHero");
+}
+
+/** Key format: size-catalog/YYYY/MM/uuid.ext */
+export async function uploadSizeCatalogImageToR2(
+  body: Buffer,
+  contentType: string
+): Promise<string> {
+  return uploadImageToR2(body, contentType, "sizeCatalog");
 }
 
 export function isR2Configured(): boolean {

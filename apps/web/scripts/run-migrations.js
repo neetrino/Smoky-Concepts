@@ -15,19 +15,22 @@ const fs = require('fs');
 const root = path.join(__dirname, '../../..');
 const dbPath = path.join(root, 'packages/db');
 
-// Load .env from root so Prisma sees DATABASE_URL and DIRECT_URL
-const envPaths = [path.join(root, '.env.local'), path.join(root, '.env')];
+// Load .env so Prisma sees DATABASE_URL and DIRECT_URL (root first, then apps/web like Next.js)
+const envPaths = [
+  path.join(root, '.env.local'),
+  path.join(root, '.env'),
+  path.join(root, 'apps', 'web', '.env.local'),
+  path.join(root, 'apps', 'web', '.env'),
+];
 for (const p of envPaths) {
-  if (fs.existsSync(p)) {
-    const content = fs.readFileSync(p, 'utf8');
-    for (const line of content.split('\n')) {
-      const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
-      if (match && process.env[match[1]] === undefined) {
-        const value = match[2].replace(/^["']|["']$/g, '').trim();
-        process.env[match[1]] = value;
-      }
+  if (!fs.existsSync(p)) continue;
+  const content = fs.readFileSync(p, 'utf8');
+  for (const line of content.split('\n')) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+    if (match && process.env[match[1]] === undefined) {
+      const value = match[2].replace(/^["']|["']$/g, '').trim();
+      process.env[match[1]] = value;
     }
-    break;
   }
 }
 

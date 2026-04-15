@@ -368,3 +368,33 @@ model VotingLike {
   @@index([createdAt(sort: Desc)])
   @@map("voting_likes")
 }
+
+// ============================================
+// SIZE CATALOG (PDP "Choose Size" + admin)
+// ============================================
+model SizeCatalogCategory {
+  id        String            @id @default(cuid())
+  title     String
+  position  Int               @default(0)
+  items     SizeCatalogItem[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([position])
+  @@map("size_catalog_categories")
+}
+
+model SizeCatalogItem {
+  id         String              @id @default(cuid())
+  categoryId String
+  title      String
+  imageUrl   String
+  position   Int                 @default(0)
+  category   SizeCatalogCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  @@index([categoryId])
+  @@index([categoryId, position])
+  @@map("size_catalog_items")
+}

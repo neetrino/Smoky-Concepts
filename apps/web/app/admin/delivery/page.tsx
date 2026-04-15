@@ -8,6 +8,7 @@ import { apiClient } from '../../../lib/api-client';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
 import { useTranslation } from '../../../lib/i18n-client';
 import { getAdminMenuTABS } from '../admin-menu.config';
+import { getAdminSidebarNavIndentClass } from '../utils/adminMenuIndent';
 
 interface DeliveryLocation {
   id?: string;
@@ -134,9 +135,9 @@ export default function DeliveryPage() {
                     onClick={() => {
                       router.push(tab.path);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
-                      tab.isSubCategory ? 'pl-12' : ''
-                    } ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${getAdminSidebarNavIndentClass(
+                      tab
+                    )} ${
                       isActive
                         ? 'bg-gray-900 text-white'
                         : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'

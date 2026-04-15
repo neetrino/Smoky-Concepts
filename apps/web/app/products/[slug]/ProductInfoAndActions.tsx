@@ -1,14 +1,16 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { ChevronDown } from 'lucide-react';
 import { formatCatalogPrice } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
+import { apiClient } from '../../../lib/api-client';
+import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { Button } from '../../../components/ui/buttons';
 import type { AttributeGroupValue, Product, ProductVariant } from './types';
 import { normalizeHexPalette, parseHexFromText } from './utils/swatch-color-utils';
+import { CustomizeApplyPreview } from './CustomizeApplyPreview';
 import { CustomizeSizeModal } from './CustomizeSizeModal';
 
 const CATALOG_BAG_ICON_PATH = '/assets/home/icons/bag-catalog.svg';
@@ -27,6 +29,8 @@ interface ProductOptionValue extends AttributeGroupValue {
  */
 interface ProductInfoAndActionsProps {
   product: Product;
+  /** Hero image URL aligned with the gallery’s current slide (for customize preview). */
+  heroImageUrl: string | null;
   price: number;
   originalPrice: number | null;
   compareAtPrice: number | null;
@@ -95,6 +99,16 @@ function getShippingCopy(language: LanguageCode): string {
   }
 }
 
+function matchVariantSizeFromCatalogTitle(title: string, options: ProductOptionValue[]): string | null {
+  const normalized = title.trim().toLowerCase();
+  const byLabel = options.find((o) => o.label.toLowerCase() === normalized);
+  if (byLabel) {
+    return byLabel.value;
+  }
+  const byValue = options.find((o) => o.value.toLowerCase() === normalized);
+  return byValue?.value ?? null;
+}
+
 function getCustomizeCopy(language: LanguageCode): string {
   switch (language) {
     case 'hy':
@@ -108,6 +122,7 @@ function getCustomizeCopy(language: LanguageCode): string {
 
 export function ProductInfoAndActions({
   product,
+  heroImageUrl,
   price,
   originalPrice,
   compareAtPrice,
@@ -128,9 +143,11 @@ export function ProductInfoAndActions({
   onBuyNow,
 }: ProductInfoAndActionsProps) {
   const [activeTab, setActiveTab] = useState<ProductTabKey>('description');
-  const [isSizeMenuOpen, setIsSizeMenuOpen] = useState(false);
   const [customizeText, setCustomizeText] = useState('');
+  const [isCustomizeApplyPreviewOpen, setIsCustomizeApplyPreviewOpen] = useState(false);
   const [isCustomizeSizeModalOpen, setIsCustomizeSizeModalOpen] = useState(false);
+  const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
+  const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
   const productTitle = getProductText(language, product.id, 'title') || product.title;
   const productDescription =
     getProductText(language, product.id, 'longDescription') || product.description || '';
@@ -148,11 +165,58 @@ export function ProductInfoAndActions({
       ) ?? null,
     [selectedSize, sizeOptions]
   );
+
+  const hasSizeCatalogItems = useMemo(
+    () => sizeCatalogCategories.some((c) => c.items.length > 0),
+    [sizeCatalogCategories]
+  );
+
+  const showSizeSection = sizeOptions.length > 0 || hasSizeCatalogItems;
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await apiClient.get<{ data: SizeCatalogCategoryDto[] }>('/api/v1/size-catalog');
+        if (!cancelled) {
+          setSizeCatalogCategories(res.data ?? []);
+        }
+      } catch {
+        if (!cancelled) {
+          setSizeCatalogCategories([]);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const sizeButtonLabel =
+    selectedCatalogSize?.title ?? activeSizeOption?.label ?? t(language, 'product.choose_size');
+
+  const handleSelectCatalogSizeItem = (item: SizeCatalogItemDto) => {
+    setSelectedCatalogSize(item);
+    if (sizeOptions.length > 0) {
+      const matched = matchVariantSizeFromCatalogTitle(item.title, sizeOptions);
+      if (matched) {
+        onSizeSelect(matched);
+      }
+    }
+  };
+
+  const openSizeCatalogModal = () => {
+    setIsCustomizeSizeModalOpen(true);
+  };
   const productBadge = product.labels?.[0]?.value || product.categories?.[0]?.title || null;
   const productDetails = [
     product.brand?.name ?? null,
     activeColorOption ? `${t(language, 'product.color')}: ${activeColorOption.label}` : null,
-    activeSizeOption ? `${t(language, 'product.size')}: ${activeSizeOption.label}` : null,
+    activeSizeOption
+      ? `${t(language, 'product.size')}: ${activeSizeOption.label}`
+      : selectedCatalogSize
+        ? `${t(language, 'product.size')}: ${selectedCatalogSize.title}`
+        : null,
     currentVariant?.sku ? `SKU: ${currentVariant.sku}` : null,
   ].filter(Boolean) as string[];
 
@@ -200,7 +264,7 @@ export function ProductInfoAndActions({
             />
             <button
               type="button"
-              onClick={() => setIsCustomizeSizeModalOpen(true)}
+              onClick={() => setIsCustomizeApplyPreviewOpen(true)}
               className="h-10 w-full max-w-[168px] shrink-0 rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] sm:translate-y-5 sm:w-[168px]"
             >
               {t(language, 'product.customize_apply')}
@@ -222,7 +286,7 @@ export function ProductInfoAndActions({
         ))}
       </div>
     );
-  }, [activeTab, language, productDescription, productDetails, customizeText]);
+  }, [activeTab, language, productDescription, productDetails, customizeText, selectedCatalogSize]);
 
   return (
     <>
@@ -276,47 +340,18 @@ export function ProductInfoAndActions({
         </div>
       )}
 
-      {sizeOptions.length > 0 && (
+      {showSizeSection && (
         <div className="relative mt-6">
           <p className="font-montserrat text-[18px] font-extrabold leading-none text-[#414141]">
             {t(language, 'product.size')}
           </p>
           <button
             type="button"
-            onClick={() => setIsSizeMenuOpen((prev) => !prev)}
-            className="mt-3 inline-flex min-h-9 min-w-[140px] max-w-full items-center justify-between gap-2 rounded-[6px] bg-[#dcc090] px-3 py-2 text-left text-[16px] font-medium uppercase tracking-[0.08em] text-[#122a26] sm:min-w-[160px]"
+            onClick={openSizeCatalogModal}
+            className="mt-3 inline-flex min-h-9 min-w-[140px] max-w-full items-center justify-center gap-2 rounded-[6px] bg-[#dcc090] px-3 py-2 text-center text-[16px] font-medium uppercase tracking-[0.08em] text-[#122a26] sm:min-w-[160px]"
           >
-            <span>{activeSizeOption?.label || t(language, 'product.choose_size')}</span>
-            <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${isSizeMenuOpen ? 'rotate-180' : ''}`} />
+            <span className="truncate">{sizeButtonLabel}</span>
           </button>
-
-          {isSizeMenuOpen && (
-            <div className="absolute left-0 top-full z-10 mt-2 min-w-[140px] max-w-[min(100vw-2rem,220px)] rounded-[8px] bg-white p-1.5 shadow-[0_12px_28px_rgba(18,42,38,0.12)] sm:min-w-[160px]">
-              {sizeOptions.map((option) => {
-                const isActive =
-                  option.value === selectedSize || option.label.toLowerCase() === selectedSize;
-
-                return (
-                  <button
-                    key={option.valueId || option.value}
-                    type="button"
-                    onClick={() => {
-                      onSizeSelect(option.value);
-                      setIsSizeMenuOpen(false);
-                    }}
-                    className={`flex w-full items-center justify-between rounded-[6px] px-2.5 py-1.5 text-left text-[14px] font-medium ${
-                      isActive ? 'bg-[#122a26] text-white' : 'text-[#414141] hover:bg-[#f4f1e8]'
-                    }`}
-                  >
-                    <span>{option.label}</span>
-                    {option.stock <= 0 && (
-                      <span className="text-[12px] uppercase">{t(language, 'product.outOfStockLabel')}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </div>
       )}
 
@@ -452,11 +487,20 @@ export function ProductInfoAndActions({
         </div>
       )}
     </div>
+    <CustomizeApplyPreview
+      isOpen={isCustomizeApplyPreviewOpen}
+      onClose={() => setIsCustomizeApplyPreviewOpen(false)}
+      language={language}
+      imageUrl={heroImageUrl}
+      text={customizeText}
+    />
     <CustomizeSizeModal
       isOpen={isCustomizeSizeModalOpen}
       onClose={() => setIsCustomizeSizeModalOpen(false)}
       language={language}
-      searchDisplayText={customizeText}
+      sizeCategories={sizeCatalogCategories}
+      selectedSizeItemId={selectedCatalogSize?.id ?? null}
+      onSelectSizeCatalogItem={handleSelectCatalogSizeItem}
     />
     </>
   );

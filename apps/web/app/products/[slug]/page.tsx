@@ -63,6 +63,11 @@ export default function ProductPage({ params }: ProductPageProps) {
     );
   }
 
+  const heroImageUrl =
+    images.length === 0
+      ? null
+      : (images[Math.min(currentImageIndex, images.length - 1)] ?? images[0]) ?? null;
+
   return (
     <div className="overflow-visible bg-[#efefef]">
       <div className="mx-auto max-w-[1920px] overflow-visible px-4 pb-16 pt-6 sm:px-6 lg:px-[120px] lg:pb-24 lg:pt-16">
@@ -81,6 +86,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
           <ProductInfoAndActions
             product={product}
+            heroImageUrl={heroImageUrl}
             price={price}
             originalPrice={originalPrice}
             compareAtPrice={compareAtPrice}

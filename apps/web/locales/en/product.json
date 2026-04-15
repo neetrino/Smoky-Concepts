@@ -23,6 +23,7 @@
   "addToCart": "Add to Cart",
   "buy_now": "Buy",
   "choose_size": "Choose Size",
+  "size_catalog_empty": "No sizes are configured in the admin yet.",
   "outOfStock": "Out of Stock",
   "selectColor": "Please select a color",
   "selectSize": "Please select a size",

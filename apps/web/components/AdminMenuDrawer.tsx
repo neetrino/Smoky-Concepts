@@ -17,6 +17,7 @@ import {
   adminDrawerTriggerClass,
 } from '@/app/admin/constants/adminMenuThemeClasses';
 import { useAdminTheme } from '@/app/admin/context/AdminThemeContext';
+import { getAdminDrawerNavIndentClass } from '@/app/admin/utils/adminMenuIndent';
 
 export interface AdminMenuItem {
   id: string;
@@ -24,6 +25,8 @@ export interface AdminMenuItem {
   path: string;
   icon: ReactNode;
   isSubCategory?: boolean;
+  /** Indented further under a sub-category (e.g. Sizes under Attributes). */
+  isNestedSubCategory?: boolean;
 }
 
 interface AdminMenuDrawerProps {
@@ -120,9 +123,9 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
                     key={tab.id}
                     type="button"
                     onClick={() => handleNavigate(tab.path)}
-                    className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium ${
-                      tab.isSubCategory ? 'pl-8' : ''
-                    } ${isActive ? adminDrawerRowActiveClass(theme) : adminDrawerRowInactiveClass(theme)}`}
+                    className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium ${getAdminDrawerNavIndentClass(
+                      tab
+                    )} ${isActive ? adminDrawerRowActiveClass(theme) : adminDrawerRowInactiveClass(theme)}`}
                   >
                     <span className="flex items-center gap-3">
                       <span className={adminDrawerRowIconClass(isActive, theme)}>{tab.icon}</span>

@@ -12,6 +12,7 @@ import {
 } from '../../constants/adminMenuThemeClasses';
 import { useAdminTheme } from '../../context/AdminThemeContext';
 import { AdminThemeToggleButton } from '../../components/AdminThemeToggleButton';
+import { getAdminSidebarNavIndentClass } from '../../utils/adminMenuIndent';
 
 interface AdminSidebarProps {
   currentPath: string;
@@ -42,9 +43,9 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
                 onClick={() => {
                   router.push(tab.path);
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
-                  tab.isSubCategory ? 'pl-12' : ''
-                } ${isActive ? adminNavItemActiveClass(theme) : adminNavItemInactiveClass(theme)}`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${getAdminSidebarNavIndentClass(
+                  tab
+                )} ${isActive ? adminNavItemActiveClass(theme) : adminNavItemInactiveClass(theme)}`}
               >
                 <span className={adminNavIconClass(isActive, theme)}>{tab.icon}</span>
                 <span className="text-left">{tab.label}</span>
