@@ -57,6 +57,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   } | null>(null);
   const [customizeDraftText, setCustomizeDraftText] = useState('');
   const [customizeFormat, setCustomizeFormat] = useState<CustomizeFormatState>(() => getDefaultCustomizeFormat());
+  const [isCustomizeTabActive, setIsCustomizeTabActive] = useState(false);
 
   useEffect(() => {
     setSelectedCatalogSize(null);
@@ -81,7 +82,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     setCustomizeDraftText(value);
   }, []);
 
-  useCustomizeGoogleFontLinks(true);
+  useCustomizeGoogleFontLinks(isCustomizeTabActive);
 
   const getCustomizeSanitizedHtml = useCallback(() => {
     if (typeof document === 'undefined') {
@@ -131,16 +132,18 @@ export default function ProductPage({ params }: ProductPageProps) {
               onImageIndexChange={setCurrentImageIndex}
               thumbnailStartIndex={thumbnailStartIndex}
               onThumbnailStartIndexChange={setThumbnailStartIndex}
-              customizeOverlayHtml={liveOverlayHtml}
+              customizeOverlayHtml={isCustomizeTabActive ? liveOverlayHtml : null}
             />
-            <CustomizeFormatToolbar
-              key={product.id}
-              language={language}
-              plainText={customizeDraftText}
-              maxPlainLength={CUSTOMIZE_TEXT_MAX_LENGTH}
-              format={customizeFormat}
-              onFormatChange={setCustomizeFormat}
-            />
+            {isCustomizeTabActive ? (
+              <CustomizeFormatToolbar
+                key={product.id}
+                language={language}
+                plainText={customizeDraftText}
+                maxPlainLength={CUSTOMIZE_TEXT_MAX_LENGTH}
+                format={customizeFormat}
+                onFormatChange={setCustomizeFormat}
+              />
+            ) : null}
           </div>
 
           <ProductInfoAndActions
@@ -170,6 +173,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             onAddToCart={handleAddToCart}
             onBuyNow={handleBuyNow}
             onSelectedCatalogSizeChange={setSelectedCatalogSize}
+            onCustomizeTabActiveChange={setIsCustomizeTabActive}
           />
         </div>
 

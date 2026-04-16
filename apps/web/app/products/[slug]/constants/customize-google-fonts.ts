@@ -138,6 +138,28 @@ export const CUSTOMIZE_GOOGLE_FONT_OPTIONS: readonly CustomizeGoogleFontOption[]
 ] as const;
 
 /**
+ * Human-readable font name for order/admin UI from persisted CSS `font-family` stack.
+ */
+export function getCustomizeFontLabelForCssStack(stack: string | null | undefined): string {
+  if (!stack?.trim()) {
+    return '';
+  }
+  const normalized = stack.trim().replace(/\s+/g, ' ');
+  const found = CUSTOMIZE_GOOGLE_FONT_OPTIONS.find(
+    (opt) => opt.stack.replace(/\s+/g, ' ').toLowerCase() === normalized.toLowerCase()
+  );
+  if (found) {
+    return found.label;
+  }
+  const quoted = normalized.match(/'([^']+)'/);
+  if (quoted) {
+    return quoted[1];
+  }
+  const first = normalized.split(',')[0]?.trim();
+  return first || normalized;
+}
+
+/**
  * One or more stylesheet URLs (batched) so the full catalog loads reliably.
  */
 export function getCustomizeGoogleFontStylesheetHrefs(): string[] {

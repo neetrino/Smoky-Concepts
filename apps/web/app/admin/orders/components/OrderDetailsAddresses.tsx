@@ -1,5 +1,6 @@
 'use client';
 
+import { OrderCustomizeBlock } from '@/components/orders/OrderCustomizeBlock';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
 import type { OrderDetails } from '../useOrders';
@@ -11,8 +12,12 @@ interface OrderDetailsAddressesProps {
 export function OrderDetailsAddresses({ orderDetails }: OrderDetailsAddressesProps) {
   const { t } = useTranslation();
 
+  const itemsWithCustomize = orderDetails.items.filter(
+    (item) => item.customizeHtml?.trim() || item.customizePlain?.trim()
+  );
+
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <Card className="p-4 md:p-6">
         <h3 className="text-sm font-semibold text-gray-900 mb-2">{t('admin.orders.orderDetails.shippingAddress')}</h3>
         {orderDetails.shippingMethod === 'pickup' ? (
@@ -84,6 +89,32 @@ export function OrderDetailsAddresses({ orderDetails }: OrderDetailsAddressesPro
           )}
           {orderDetails.customerEmail && <div>{orderDetails.customerEmail}</div>}
         </div>
+      </Card>
+
+      <Card className="p-4 md:p-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">
+          {t('admin.orders.orderDetails.customize')}
+        </h3>
+        {itemsWithCustomize.length === 0 ? (
+          <p className="text-sm text-gray-500">{t('admin.orders.orderDetails.noCustomize')}</p>
+        ) : (
+          <div className="space-y-4">
+            {itemsWithCustomize.map((item) => (
+              <div key={item.id} className="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0">
+                <p className="mb-2 text-sm font-medium text-gray-600">
+                  {item.productTitle}
+                  <span className="text-gray-400"> × {item.quantity}</span>
+                </p>
+                <OrderCustomizeBlock
+                  compact
+                  hideHeading
+                  customizeHtml={item.customizeHtml}
+                  customizePlain={item.customizePlain}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
     </div>
   );

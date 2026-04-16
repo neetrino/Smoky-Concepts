@@ -1,5 +1,6 @@
 'use client';
 
+import { OrderCustomizeBlock } from '@/components/orders/OrderCustomizeBlock';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { amountToUsd, formatPriceInCurrency } from '../../../../lib/currency';
 import { getColorValue } from '../utils/color-helpers';
@@ -97,18 +98,11 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
         )}
 
         {(item.customizeHtml?.trim() || item.customizePlain?.trim()) && (
-          <div className="mt-3 rounded-md bg-gray-50 p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-              {t('orders.itemDetails.customization')}
-            </p>
-            {item.customizeHtml?.trim() ? (
-              <div
-                className="mt-1 max-w-md text-sm text-gray-900 [&_*]:text-inherit"
-                dangerouslySetInnerHTML={{ __html: item.customizeHtml }}
-              />
-            ) : (
-              <p className="mt-1 text-sm text-gray-900">{item.customizePlain}</p>
-            )}
+          <div className="mt-3">
+            <OrderCustomizeBlock
+              customizeHtml={item.customizeHtml}
+              customizePlain={item.customizePlain}
+            />
           </div>
         )}
 

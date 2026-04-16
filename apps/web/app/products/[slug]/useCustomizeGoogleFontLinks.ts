@@ -6,12 +6,27 @@ import { getCustomizeGoogleFontStylesheetHrefs } from './constants/customize-goo
 
 const LINK_ID_PREFIX = 'customize-google-fonts-batch-';
 
+function removeCustomizeGoogleFontLinks(): void {
+  if (typeof document === 'undefined') {
+    return;
+  }
+  const count = getCustomizeGoogleFontStylesheetHrefs().length;
+  for (let index = 0; index < count; index += 1) {
+    document.getElementById(`${LINK_ID_PREFIX}${index}`)?.remove();
+  }
+}
+
 /**
- * Injects Google Fonts stylesheets once for customize rich text (hero overlay + editor).
+ * Injects Google Fonts stylesheets for customize rich text (hero overlay + toolbar) while enabled;
+ * removes them when disabled to avoid loading fonts for the whole PDP session.
  */
 export function useCustomizeGoogleFontLinks(enabled: boolean): void {
   useEffect(() => {
-    if (!enabled || typeof document === 'undefined') {
+    if (typeof document === 'undefined') {
+      return;
+    }
+    if (!enabled) {
+      removeCustomizeGoogleFontLinks();
       return;
     }
     const hrefs = getCustomizeGoogleFontStylesheetHrefs();
@@ -26,5 +41,8 @@ export function useCustomizeGoogleFontLinks(enabled: boolean): void {
       link.href = href;
       document.head.appendChild(link);
     });
+    return () => {
+      removeCustomizeGoogleFontLinks();
+    };
   }, [enabled]);
 }

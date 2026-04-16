@@ -50,7 +50,6 @@ export function OrderDetailsItems({
               <th className="px-3 py-2 text-left font-medium text-gray-500">{t('admin.orders.orderDetails.product')}</th>
               <th className="px-3 py-2 text-left font-medium text-gray-500">{t('admin.orders.orderDetails.sku')}</th>
               <th className="px-3 py-2 text-left font-medium text-gray-500">{t('admin.orders.orderDetails.colorSize')}</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-500">{t('admin.orders.orderDetails.customize')}</th>
               <th className="px-3 py-2 text-right font-medium text-gray-500">{t('admin.orders.orderDetails.qty')}</th>
               <th className="px-3 py-2 text-right font-medium text-gray-500">{t('admin.orders.orderDetails.price')}</th>
               <th className="px-3 py-2 text-right font-medium text-gray-500">{t('admin.orders.orderDetails.totalCol')}</th>
@@ -59,6 +58,9 @@ export function OrderDetailsItems({
           <tbody className="divide-y divide-gray-100 bg-white">
             {orderDetails.items.map((item) => {
               const allOptions = item.variantOptions || [];
+              const quantity = Number(item.quantity ?? 0);
+              const unitPrice = Number(item.unitPrice ?? 0);
+              const lineTotal = Number(item.total ?? 0);
               return (
                 <tr key={item.id}>
                   <td className="px-3 py-2">{item.productTitle}</td>
@@ -101,24 +103,22 @@ export function OrderDetailsItems({
                       <span className="text-xs text-gray-400">—</span>
                     )}
                   </td>
-                  <td className="px-3 py-2 align-top text-xs text-gray-700">
-                    {item.customizeHtml?.trim() ? (
-                      <div
-                        className="max-w-[200px] [&_*]:text-inherit"
-                        dangerouslySetInnerHTML={{ __html: item.customizeHtml }}
-                      />
-                    ) : item.customizePlain?.trim() ? (
-                      <span>{item.customizePlain}</span>
-                    ) : (
-                      <span className="text-gray-400">—</span>
+                  <td className="px-3 py-2 text-right">
+                    {Number.isFinite(quantity) ? quantity : '—'}
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    {formatCurrency(
+                      Number.isFinite(unitPrice) ? unitPrice : 0,
+                      ADMIN_PRICE_CURRENCY,
+                      orderDetails.currency
                     )}
                   </td>
-                  <td className="px-3 py-2 text-right">{item.quantity}</td>
                   <td className="px-3 py-2 text-right">
-                    {formatCurrency(item.unitPrice, ADMIN_PRICE_CURRENCY, orderDetails.currency)}
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    {formatCurrency(item.total, ADMIN_PRICE_CURRENCY, orderDetails.currency)}
+                    {formatCurrency(
+                      Number.isFinite(lineTotal) ? lineTotal : 0,
+                      ADMIN_PRICE_CURRENCY,
+                      orderDetails.currency
+                    )}
                   </td>
                 </tr>
               );

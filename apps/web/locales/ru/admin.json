@@ -732,9 +732,11 @@
       "sku": "SKU",
       "colorSize": "Цвет / Размер",
       "customize": "Персонализация",
+      "noCustomize": "В этом заказе нет персонализации текста.",
       "qty": "Кол-во",
       "price": "Цена",
       "totalCol": "Итого",
+      "placed": "Оформлен:",
       "noItemsFound": "Товары для этого заказа не найдены"
     },
     "showingPage": "Показана страница {page} из {totalPages} ({total} всего)",

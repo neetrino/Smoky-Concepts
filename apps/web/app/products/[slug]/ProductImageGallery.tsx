@@ -97,13 +97,15 @@ export function ProductImageGallery({
             }`}
           >
             {images.length > 0 ? (
-              <div className="relative inline-block max-w-full">
+              <div
+                className={`relative inline-block max-w-full origin-bottom transition-transform duration-300 ease-out ${HERO_IMAGE_SHIFT_UP} group-hover:scale-110 group-hover:drop-shadow-[0_12px_24px_rgba(18,42,38,0.18)]`}
+              >
                 <img
                   src={images[currentImageIndex]}
                   alt={product.title}
                   decoding="async"
                   draggable={false}
-                  className={`relative block h-auto w-auto max-w-full origin-bottom object-contain object-top transition-transform duration-300 ease-out ${HERO_IMAGE_SHIFT_UP} group-hover:scale-110 group-hover:drop-shadow-[0_12px_24px_rgba(18,42,38,0.18)] ${MAIN_IMAGE_MAX_HEIGHT_CLASSES}`}
+                  className={`relative block h-auto w-auto max-w-full object-contain object-top ${MAIN_IMAGE_MAX_HEIGHT_CLASSES}`}
                 />
                 {customizeOverlayHtml ? <CustomizeProductOverlay html={customizeOverlayHtml} /> : null}
               </div>

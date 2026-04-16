@@ -35,7 +35,7 @@ export function buildCustomizePreviewHtml(text: string, format: CustomizeFormatS
     inner = `<em>${inner}</em>`;
   }
   if (format.bold) {
-    inner = `<strong>${inner}</strong>`;
+    inner = `<strong style="font-weight: 800;">${inner}</strong>`;
   }
   return `<span style="font-family: ${format.fontStack}">${inner}</span>`;
 }

@@ -733,9 +733,11 @@
       "sku": "SKU",
       "colorSize": "Color / Size",
       "customize": "Customize",
+      "noCustomize": "No text customization on this order.",
       "qty": "Qty",
       "price": "Price",
       "totalCol": "Total",
+      "placed": "Placed:",
       "noItemsFound": "No items found for this order"
     },
     "showingPage": "Showing page {page} of {totalPages} ({total} total)",

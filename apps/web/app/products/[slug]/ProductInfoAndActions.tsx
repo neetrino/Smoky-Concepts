@@ -61,6 +61,8 @@ interface ProductInfoAndActionsProps {
   onBuyNow: () => Promise<void>;
   /** Sync size-catalog selection to parent for cart / checkout snapshot */
   onSelectedCatalogSizeChange?: (item: SizeCatalogItemDto | null) => void;
+  /** Fires when the Customize tab is selected — parent loads fonts / toolbar only then. */
+  onCustomizeTabActiveChange?: (active: boolean) => void;
 }
 
 const COLOR_SWATCH_FALLBACKS: Record<string, string[]> = {
@@ -153,6 +155,7 @@ export function ProductInfoAndActions({
   onAddToCart,
   onBuyNow,
   onSelectedCatalogSizeChange,
+  onCustomizeTabActiveChange,
   getCustomizeSanitizedHtml,
   customizeDraftText,
   onCustomizeDraftTextChange,
@@ -208,11 +211,16 @@ export function ProductInfoAndActions({
 
   useEffect(() => {
     setSelectedCatalogSize(null);
+    setActiveTab('description');
   }, [product.id]);
 
   useEffect(() => {
     onSelectedCatalogSizeChange?.(selectedCatalogSize);
   }, [selectedCatalogSize, onSelectedCatalogSizeChange]);
+
+  useEffect(() => {
+    onCustomizeTabActiveChange?.(activeTab === 'customize');
+  }, [activeTab, onCustomizeTabActiveChange]);
 
   const sizeButtonLabel =
     selectedCatalogSize?.title ?? activeSizeOption?.label ?? t(language, 'product.choose_size');
