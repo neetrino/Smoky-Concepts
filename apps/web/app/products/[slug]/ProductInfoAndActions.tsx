@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { formatCatalogPrice } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
@@ -17,6 +17,9 @@ import {
 } from './utils/sanitize-customize-html';
 
 const CATALOG_BAG_ICON_PATH = '/assets/home/icons/bag-catalog.svg';
+
+/** How long the “applied text” confirmation stays visible under Apply (ms). */
+const CUSTOMIZE_APPLIED_PREVIEW_MS = 1000;
 
 type ProductTabKey = 'description' | 'details' | 'shipping' | 'customize';
 
@@ -165,6 +168,16 @@ export function ProductInfoAndActions({
   const [isCustomizeSizeModalOpen, setIsCustomizeSizeModalOpen] = useState(false);
   const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
   const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
+  const [appliedPreviewPlain, setAppliedPreviewPlain] = useState<string | null>(null);
+  const appliedPreviewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearAppliedPreviewTimer = useCallback(() => {
+    if (appliedPreviewTimeoutRef.current !== null) {
+      clearTimeout(appliedPreviewTimeoutRef.current);
+      appliedPreviewTimeoutRef.current = null;
+    }
+  }, []);
+
   const productTitle = getProductText(language, product.id, 'title') || product.title;
   const productDescription =
     getProductText(language, product.id, 'longDescription') || product.description || '';
@@ -212,7 +225,15 @@ export function ProductInfoAndActions({
   useEffect(() => {
     setSelectedCatalogSize(null);
     setActiveTab('description');
-  }, [product.id]);
+    clearAppliedPreviewTimer();
+    setAppliedPreviewPlain(null);
+  }, [product.id, clearAppliedPreviewTimer]);
+
+  useEffect(() => {
+    return () => {
+      clearAppliedPreviewTimer();
+    };
+  }, [clearAppliedPreviewTimer]);
 
   useEffect(() => {
     onSelectedCatalogSizeChange?.(selectedCatalogSize);
@@ -243,15 +264,29 @@ export function ProductInfoAndActions({
     const rawHtml = getCustomizeSanitizedHtml();
     const sanitized = sanitizeCustomizeHtml(rawHtml);
     const plain = getPlainTextFromHtml(sanitized).trim();
+    clearAppliedPreviewTimer();
     if (!plain) {
       onCustomizeApplied(null);
+      setAppliedPreviewPlain(null);
       return;
     }
     onCustomizeApplied({
       plain,
       html: sanitized.trim().length > 0 ? sanitized : null,
     });
-  }, [getCustomizeSanitizedHtml, onCustomizeApplied]);
+    setAppliedPreviewPlain(plain);
+    appliedPreviewTimeoutRef.current = setTimeout(() => {
+      setAppliedPreviewPlain(null);
+      appliedPreviewTimeoutRef.current = null;
+    }, CUSTOMIZE_APPLIED_PREVIEW_MS);
+  }, [clearAppliedPreviewTimer, getCustomizeSanitizedHtml, onCustomizeApplied]);
+
+  const handleCustomizeClearApplied = useCallback(() => {
+    clearAppliedPreviewTimer();
+    setAppliedPreviewPlain(null);
+    onCustomizeApplied(null);
+  }, [clearAppliedPreviewTimer, onCustomizeApplied]);
+
   const productBadge = product.labels?.[0]?.value || product.categories?.[0]?.title || null;
   const productDetails = [
     product.brand?.name ?? null,
@@ -311,11 +346,36 @@ export function ProductInfoAndActions({
             <button
               type="button"
               onClick={handleCustomizeApplyClick}
-              className="h-10 w-full max-w-[168px] shrink-0 rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] sm:translate-y-5 sm:w-[168px]"
+              className="h-10 w-full max-w-[168px] shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:translate-y-5 sm:w-[168px]"
             >
               {t(language, 'product.customize_apply')}
             </button>
           </div>
+          {appliedCustomize?.plain ? (
+            <button
+              type="button"
+              onClick={handleCustomizeClearApplied}
+              className="w-fit font-montserrat text-[13px] font-medium text-[#898989] underline decoration-[#898989] underline-offset-2 transition-colors hover:text-[#414141] hover:decoration-[#414141] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090]"
+            >
+              {t(language, 'product.customize_clear_applied')}
+            </button>
+          ) : null}
+          {appliedPreviewPlain ? (
+            <div
+              className="max-w-[763px] rounded-md border border-[#dcc090]/60 bg-[#faf8f4] px-3 py-2.5 sm:px-4"
+              aria-live="polite"
+            >
+              <p className="font-montserrat text-[11px] font-semibold uppercase tracking-[0.08em] text-[#898989]">
+                {t(language, 'product.customize_applied_text_label')}
+              </p>
+              <p className="mt-1 whitespace-pre-wrap break-words font-montserrat text-[15px] font-medium leading-relaxed text-[#414141] sm:text-[16px]">
+                {appliedPreviewPlain}
+              </p>
+            </div>
+          ) : null}
+          <p className="max-w-[763px] font-montserrat text-[12px] font-medium leading-snug text-[#898989] sm:text-[13px]">
+            {t(language, 'product.customize_apply_cart_hint')}
+          </p>
           <p className="max-w-[291px] text-right font-montserrat text-[10px] font-medium leading-[30px] text-[#898989]">
             {customizeDraftText.length}/ {customizeTextMaxLength}
           </p>
@@ -338,10 +398,13 @@ export function ProductInfoAndActions({
     productDescription,
     productDetails,
     selectedCatalogSize,
+    appliedCustomize,
+    appliedPreviewPlain,
     customizeDraftText,
     customizeTextMaxLength,
     onCustomizeDraftTextChange,
     handleCustomizeApplyClick,
+    handleCustomizeClearApplied,
   ]);
 
   return (

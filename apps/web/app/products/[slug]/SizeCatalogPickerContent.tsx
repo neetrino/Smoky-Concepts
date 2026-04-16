@@ -67,7 +67,7 @@ export function SizeCatalogPickerContent({
             <h3 className="font-montserrat text-[22px] font-extrabold leading-none text-[#414141] sm:text-[24px]">
               {category.title}
             </h3>
-            <div className="mt-[36px] grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+            <div className="mt-[36px] grid grid-cols-3 gap-x-2 gap-y-5 sm:gap-x-4 sm:gap-y-6 md:grid-cols-4 lg:grid-cols-7">
               {category.items.map((item) => (
                 <CatalogSizeCard
                   key={item.id}

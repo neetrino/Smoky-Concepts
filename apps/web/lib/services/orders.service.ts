@@ -52,6 +52,8 @@ type MediaItem = string | { url?: string; src?: string } | unknown;
 
 const ORDER_NUMBER_START = 100;
 const ORDER_NUMBER_RETRY_LIMIT = 5;
+/** Prisma default interactive tx timeout is 5s; checkout can exceed that on slow DB or many line items. */
+const CHECKOUT_TRANSACTION_TIMEOUT_MS = 30_000;
 
 function isP2002Error(error: unknown): error is { code: string; meta?: { target?: string[] } } {
   if (!error || typeof error !== "object" || !("code" in error)) {
@@ -320,7 +322,8 @@ class OrdersService {
       for (let attempt = 0; attempt < ORDER_NUMBER_RETRY_LIMIT; attempt += 1) {
         try {
           // Create order with items in a transaction
-          order = await db.$transaction(async (tx: Prisma.TransactionClient) => {
+          order = await db.$transaction(
+            async (tx: Prisma.TransactionClient) => {
             const orderNumber = await getNextSequentialOrderNumber(tx);
             // Create order
             const newOrder = await tx.order.create({
@@ -469,7 +472,11 @@ class OrdersService {
         });
 
             return { order: newOrder, payment };
-          });
+          },
+            {
+              timeout: CHECKOUT_TRANSACTION_TIMEOUT_MS,
+            }
+          );
           break;
         } catch (transactionError: unknown) {
           if (isP2002Error(transactionError) && attempt < ORDER_NUMBER_RETRY_LIMIT - 1) {

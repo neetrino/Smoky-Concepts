@@ -1,11 +1,27 @@
 'use client';
 
-import { useCallback, useEffect, useId } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { SizeCatalogPickerContent } from './SizeCatalogPickerContent';
+
+function filterSizeCatalogByTitle(
+  categories: SizeCatalogCategoryDto[],
+  query: string
+): SizeCatalogCategoryDto[] {
+  const q = query.trim().toLowerCase();
+  if (!q) {
+    return categories;
+  }
+  return categories
+    .map((cat) => ({
+      ...cat,
+      items: cat.items.filter((item) => item.title.toLowerCase().includes(q)),
+    }))
+    .filter((cat) => cat.items.length > 0);
+}
 
 interface CustomizeSizeModalProps {
   isOpen: boolean;
@@ -25,6 +41,29 @@ export function CustomizeSizeModal({
   onSelectSizeCatalogItem,
 }: CustomizeSizeModalProps) {
   const titleId = useId();
+  const searchInputId = useId();
+  const [sizeSearchQuery, setSizeSearchQuery] = useState('');
+
+  const filteredSizeCategories = useMemo(
+    () => filterSizeCatalogByTitle(sizeCategories, sizeSearchQuery),
+    [sizeCategories, sizeSearchQuery]
+  );
+
+  const hasAnyCatalogItems = useMemo(
+    () => sizeCategories.some((c) => c.items.length > 0),
+    [sizeCategories]
+  );
+
+  const hasFilteredItems = useMemo(
+    () => filteredSizeCategories.some((c) => c.items.length > 0),
+    [filteredSizeCategories]
+  );
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSizeSearchQuery('');
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -98,13 +137,36 @@ export function CustomizeSizeModal({
             </button>
           </div>
 
-          <div className="mt-[40px]">
-            <SizeCatalogPickerContent
-              categories={sizeCategories}
-              selectedItemId={selectedSizeItemId}
-              language={language}
-              onSelectItem={handlePickSizeItem}
-            />
+          {hasAnyCatalogItems ? (
+            <div className="mt-6 w-full">
+              <label htmlFor={searchInputId} className="sr-only">
+                {t(language, 'product.size_catalog_search_placeholder')}
+              </label>
+              <input
+                id={searchInputId}
+                type="search"
+                value={sizeSearchQuery}
+                onChange={(e) => setSizeSearchQuery(e.target.value)}
+                placeholder={t(language, 'product.size_catalog_search_placeholder')}
+                autoComplete="off"
+                className="w-full rounded-lg border-0 bg-white px-4 py-3 font-montserrat text-[16px] font-medium text-[#414141] shadow-[0px_2px_8px_rgba(0,0,0,0.08)] outline-none placeholder:text-[#898989] focus-visible:ring-2 focus-visible:ring-[#dcc090]/40"
+              />
+            </div>
+          ) : null}
+
+          <div className="mt-8">
+            {hasAnyCatalogItems && !hasFilteredItems && sizeSearchQuery.trim().length > 0 ? (
+              <p className="font-montserrat text-[16px] font-medium text-[#414141]">
+                {t(language, 'product.size_catalog_search_no_results')}
+              </p>
+            ) : (
+              <SizeCatalogPickerContent
+                categories={filteredSizeCategories}
+                selectedItemId={selectedSizeItemId}
+                language={language}
+                onSelectItem={handlePickSizeItem}
+              />
+            )}
           </div>
         </div>
       </div>

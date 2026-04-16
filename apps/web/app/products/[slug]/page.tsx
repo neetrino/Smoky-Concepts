@@ -69,6 +69,9 @@ export default function ProductPage({ params }: ProductPageProps) {
   const onCustomizeApplied = useCallback((value: { plain: string; html: string | null } | null) => {
     setCustomizeApplied(value);
     setCustomizeDraftText(value?.plain ?? '');
+    if (value === null) {
+      setCustomizeFormat(getDefaultCustomizeFormat());
+    }
   }, []);
 
   const liveOverlayHtml = useMemo(() => {
@@ -78,11 +81,43 @@ export default function ProductPage({ params }: ProductPageProps) {
     return buildCustomizePreviewHtml(customizeDraftText, customizeFormat);
   }, [customizeDraftText, customizeFormat]);
 
+  /** Live preview while on Customize tab; after Apply, keep showing applied HTML when user switches tabs. */
+  const heroCustomizeOverlayHtml = useMemo(() => {
+    const appliedHtml = customizeApplied?.html?.trim();
+    const appliedPlain = customizeApplied?.plain?.trim();
+
+    if (isCustomizeTabActive) {
+      if (liveOverlayHtml) {
+        return liveOverlayHtml;
+      }
+      if (appliedHtml) {
+        return appliedHtml;
+      }
+      if (appliedPlain) {
+        return buildCustomizePreviewHtml(appliedPlain, getDefaultCustomizeFormat());
+      }
+      return null;
+    }
+
+    if (appliedHtml) {
+      return appliedHtml;
+    }
+    if (appliedPlain) {
+      return buildCustomizePreviewHtml(appliedPlain, getDefaultCustomizeFormat());
+    }
+    return null;
+  }, [isCustomizeTabActive, liveOverlayHtml, customizeApplied]);
+
+  const shouldLoadCustomizeFonts =
+    isCustomizeTabActive ||
+    Boolean(customizeApplied?.plain?.trim()) ||
+    Boolean(customizeApplied?.html?.trim());
+
   const onCustomizeDraftTextChange = useCallback((value: string) => {
     setCustomizeDraftText(value);
   }, []);
 
-  useCustomizeGoogleFontLinks(isCustomizeTabActive);
+  useCustomizeGoogleFontLinks(shouldLoadCustomizeFonts);
 
   const getCustomizeSanitizedHtml = useCallback(() => {
     if (typeof document === 'undefined') {
@@ -132,7 +167,7 @@ export default function ProductPage({ params }: ProductPageProps) {
               onImageIndexChange={setCurrentImageIndex}
               thumbnailStartIndex={thumbnailStartIndex}
               onThumbnailStartIndexChange={setThumbnailStartIndex}
-              customizeOverlayHtml={isCustomizeTabActive ? liveOverlayHtml : null}
+              customizeOverlayHtml={heroCustomizeOverlayHtml}
             />
             {isCustomizeTabActive ? (
               <CustomizeFormatToolbar
