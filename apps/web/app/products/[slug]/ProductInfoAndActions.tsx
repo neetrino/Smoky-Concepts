@@ -147,6 +147,11 @@ export function ProductInfoAndActions({
 }: ProductInfoAndActionsProps) {
   const [activeTab, setActiveTab] = useState<ProductTabKey>('description');
   const [customizeText, setCustomizeText] = useState('');
+  const [customizeHtml, setCustomizeHtml] = useState<string | null>(null);
+  const [customizePreviewSeed, setCustomizePreviewSeed] = useState<{
+    plain: string;
+    rich: string | null;
+  }>({ plain: '', rich: null });
   const [isCustomizeApplyPreviewOpen, setIsCustomizeApplyPreviewOpen] = useState(false);
   const [isCustomizeSizeModalOpen, setIsCustomizeSizeModalOpen] = useState(false);
   const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
@@ -219,6 +224,16 @@ export function ProductInfoAndActions({
   const openSizeCatalogModal = () => {
     setIsCustomizeSizeModalOpen(true);
   };
+
+  const openCustomizePreview = () => {
+    setCustomizePreviewSeed({ plain: customizeText, rich: customizeHtml });
+    setIsCustomizeApplyPreviewOpen(true);
+  };
+
+  const handleCustomizeApplyResult = (html: string, plain: string) => {
+    setCustomizeText(plain);
+    setCustomizeHtml(html.trim().length > 0 ? html : null);
+  };
   const productBadge = product.labels?.[0]?.value || product.categories?.[0]?.title || null;
   const productDetails = [
     product.brand?.name ?? null,
@@ -268,14 +283,17 @@ export function ProductInfoAndActions({
               type="text"
               value={customizeText}
               maxLength={CUSTOMIZE_TEXT_MAX_LENGTH}
-              onChange={(e) => setCustomizeText(e.target.value)}
+              onChange={(e) => {
+                setCustomizeText(e.target.value);
+                setCustomizeHtml(null);
+              }}
               className="w-full max-w-[291px] border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090]"
               aria-label={t(language, 'product.customize_title')}
               autoComplete="off"
             />
             <button
               type="button"
-              onClick={() => setIsCustomizeApplyPreviewOpen(true)}
+              onClick={openCustomizePreview}
               className="h-10 w-full max-w-[168px] shrink-0 rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] sm:translate-y-5 sm:w-[168px]"
             >
               {t(language, 'product.customize_apply')}
@@ -501,9 +519,11 @@ export function ProductInfoAndActions({
     <CustomizeApplyPreview
       isOpen={isCustomizeApplyPreviewOpen}
       onClose={() => setIsCustomizeApplyPreviewOpen(false)}
+      onApplyResult={handleCustomizeApplyResult}
       language={language}
       imageUrl={heroImageUrl}
-      text={customizeText}
+      previewSeed={customizePreviewSeed}
+      maxPlainLength={CUSTOMIZE_TEXT_MAX_LENGTH}
     />
     <CustomizeSizeModal
       isOpen={isCustomizeSizeModalOpen}
