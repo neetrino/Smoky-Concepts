@@ -339,14 +339,14 @@ export function ProductInfoAndActions({
               onChange={(e) => {
                 onCustomizeDraftTextChange(e.target.value);
               }}
-              className="w-full max-w-[291px] border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090]"
+              className="w-full border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090] sm:max-w-[291px]"
               aria-label={t(language, 'product.customize_title')}
               autoComplete="off"
             />
             <button
               type="button"
               onClick={handleCustomizeApplyClick}
-              className="h-10 w-full max-w-[168px] shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:translate-y-5 sm:w-[168px]"
+              className="h-10 w-full shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:w-[168px] sm:translate-y-5"
             >
               {t(language, 'product.customize_apply')}
             </button>
@@ -376,7 +376,7 @@ export function ProductInfoAndActions({
           <p className="max-w-[763px] font-montserrat text-[12px] font-medium leading-snug text-[#898989] sm:text-[13px]">
             {t(language, 'product.customize_apply_cart_hint')}
           </p>
-          <p className="max-w-[291px] text-right font-montserrat text-[10px] font-medium leading-[30px] text-[#898989]">
+          <p className="w-full text-right font-montserrat text-[10px] font-medium leading-[30px] text-[#898989] sm:max-w-[291px]">
             {customizeDraftText.length}/ {customizeTextMaxLength}
           </p>
         </div>
@@ -409,7 +409,7 @@ export function ProductInfoAndActions({
 
   return (
     <>
-    <div className="max-w-[763px] pt-1 xl:pt-36 2xl:pt-40">
+    <div className="max-w-[763px] min-w-0 w-full pt-1 xl:pt-36 2xl:pt-40">
       <h1 className="font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
         {productTitle}
       </h1>
@@ -467,70 +467,83 @@ export function ProductInfoAndActions({
           <button
             type="button"
             onClick={openSizeCatalogModal}
-            className="mt-3 inline-flex min-h-9 min-w-[140px] max-w-full items-center justify-center gap-2 rounded-[6px] bg-[#dcc090] px-3 py-2 text-center text-[16px] font-medium uppercase tracking-[0.08em] text-[#122a26] sm:min-w-[160px]"
+            className="mt-3 flex w-full min-h-9 items-center justify-center gap-2 rounded-[6px] bg-[#dcc090] px-3 py-2 text-center text-[16px] font-medium uppercase tracking-[0.08em] text-[#122a26] sm:inline-flex sm:w-auto sm:min-w-[160px]"
           >
             <span className="truncate">{sizeButtonLabel}</span>
           </button>
         </div>
       )}
 
-      <div className="mt-12">
-        <div className="flex flex-wrap items-end gap-6 sm:gap-8">
-          <button
-            type="button"
-            onClick={() => setActiveTab('description')}
-            className={`relative pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:text-[19px] ${
-              activeTab === 'description' ? 'text-[#414141]' : 'text-[#414141]/70'
-            }`}
+      <div className="mt-12 min-w-0 w-full">
+        <div className="w-full min-w-0 touch-pan-x overflow-x-auto pb-2 scrollbar-hide sm:touch-auto sm:overflow-visible sm:pb-0">
+          <div
+            className="flex min-w-max snap-x snap-mandatory flex-nowrap items-end gap-6 sm:min-w-0 sm:w-full sm:snap-none sm:flex-wrap sm:gap-8"
+            role="tablist"
           >
-            {t(language, 'product.description_title')}
-            {activeTab === 'description' && (
-              <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('details')}
-            className={`relative pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:text-[19px] ${
-              activeTab === 'details' ? 'text-[#414141]' : 'text-[#414141]/70'
-            }`}
-          >
-            {t(language, 'product.details_title')}
-            {activeTab === 'details' && (
-              <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('shipping')}
-            className={`relative pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:text-[19px] ${
-              activeTab === 'shipping' ? 'text-[#414141]' : 'text-[#414141]/70'
-            }`}
-          >
-            {t(language, 'product.shipping_title')}
-            {activeTab === 'shipping' && (
-              <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('customize')}
-            className={`relative pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:text-[19px] ${
-              activeTab === 'customize' ? 'text-[#414141]' : 'text-[#414141]/70'
-            }`}
-          >
-            {t(language, 'product.customize_title')}
-            {activeTab === 'customize' && (
-              <span className="absolute bottom-0 left-0 h-1 w-[87px] rounded-[2px] bg-[#122a26]" />
-            )}
-          </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'description'}
+              onClick={() => setActiveTab('description')}
+              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+                activeTab === 'description' ? 'text-[#414141]' : 'text-[#414141]/70'
+              }`}
+            >
+              {t(language, 'product.description_title')}
+              {activeTab === 'description' && (
+                <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
+              )}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'details'}
+              onClick={() => setActiveTab('details')}
+              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+                activeTab === 'details' ? 'text-[#414141]' : 'text-[#414141]/70'
+              }`}
+            >
+              {t(language, 'product.details_title')}
+              {activeTab === 'details' && (
+                <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
+              )}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'shipping'}
+              onClick={() => setActiveTab('shipping')}
+              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+                activeTab === 'shipping' ? 'text-[#414141]' : 'text-[#414141]/70'
+              }`}
+            >
+              {t(language, 'product.shipping_title')}
+              {activeTab === 'shipping' && (
+                <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
+              )}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'customize'}
+              onClick={() => setActiveTab('customize')}
+              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+                activeTab === 'customize' ? 'text-[#414141]' : 'text-[#414141]/70'
+              }`}
+            >
+              {t(language, 'product.customize_title')}
+              {activeTab === 'customize' && (
+                <span className="absolute bottom-0 left-0 h-1 w-[87px] rounded-[2px] bg-[#122a26]" />
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="pt-6 sm:pt-7">{renderedTabContent}</div>
       </div>
 
-      <div className="mt-[48px] flex flex-wrap items-center gap-4">
-        <div className="flex items-end gap-3">
+      <div className="mt-[48px] flex w-full min-w-0 items-center justify-between gap-2 sm:gap-4">
+        <div className="flex min-w-0 flex-1 flex-wrap items-end gap-2 sm:gap-3">
           <p className="font-montserrat text-[30px] font-extrabold leading-none text-black sm:text-[32px]">
             {formatCatalogPrice(price)}
           </p>
@@ -546,7 +559,7 @@ export function ProductInfoAndActions({
           )}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-4">
           <Button
             type="button"
             disabled={!canAddToCart || isAddingToCart}
