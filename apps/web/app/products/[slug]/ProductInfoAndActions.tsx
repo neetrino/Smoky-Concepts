@@ -11,11 +11,12 @@ import { Button } from '../../../components/ui/buttons';
 import type { AttributeGroupValue, Product, ProductVariant } from './types';
 import { normalizeHexPalette, parseHexFromText } from './utils/swatch-color-utils';
 import { CustomizeSizeModal } from './CustomizeSizeModal';
-import { escapePlainTextForHtml, sanitizeCustomizeHtml } from './utils/sanitize-customize-html';
+import {
+  getPlainTextFromHtml,
+  sanitizeCustomizeHtml,
+} from './utils/sanitize-customize-html';
 
 const CATALOG_BAG_ICON_PATH = '/assets/home/icons/bag-catalog.svg';
-
-const CUSTOMIZE_TEXT_MAX_LENGTH = 18;
 
 type ProductTabKey = 'description' | 'details' | 'shipping' | 'customize';
 
@@ -32,6 +33,12 @@ interface ProductInfoAndActionsProps {
   /** Last applied customize (hero overlay + cart). */
   appliedCustomize: { plain: string; html: string | null } | null;
   onCustomizeApplied: (value: { plain: string; html: string | null } | null) => void;
+  /** Rich editor lives under the hero image; Apply reads its HTML from the parent ref. */
+  getCustomizeSanitizedHtml: () => string;
+  /** Plain line next to Apply — drives editor seed when it does not match applied rich HTML. */
+  customizeDraftText: string;
+  onCustomizeDraftTextChange: (value: string) => void;
+  customizeTextMaxLength: number;
   price: number;
   originalPrice: number | null;
   compareAtPrice: number | null;
@@ -146,9 +153,12 @@ export function ProductInfoAndActions({
   onAddToCart,
   onBuyNow,
   onSelectedCatalogSizeChange,
+  getCustomizeSanitizedHtml,
+  customizeDraftText,
+  onCustomizeDraftTextChange,
+  customizeTextMaxLength,
 }: ProductInfoAndActionsProps) {
   const [activeTab, setActiveTab] = useState<ProductTabKey>('description');
-  const [customizeDraftText, setCustomizeDraftText] = useState('');
   const [isCustomizeSizeModalOpen, setIsCustomizeSizeModalOpen] = useState(false);
   const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
   const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
@@ -221,22 +231,19 @@ export function ProductInfoAndActions({
     setIsCustomizeSizeModalOpen(true);
   };
 
-  useEffect(() => {
-    setCustomizeDraftText(appliedCustomize?.plain ?? '');
-  }, [appliedCustomize?.plain, product.id]);
-
   const handleCustomizeApplyClick = useCallback(() => {
-    const plain = customizeDraftText.trim();
+    const rawHtml = getCustomizeSanitizedHtml();
+    const sanitized = sanitizeCustomizeHtml(rawHtml);
+    const plain = getPlainTextFromHtml(sanitized).trim();
     if (!plain) {
       onCustomizeApplied(null);
       return;
     }
-    const sanitized = sanitizeCustomizeHtml(escapePlainTextForHtml(plain));
     onCustomizeApplied({
       plain,
       html: sanitized.trim().length > 0 ? sanitized : null,
     });
-  }, [customizeDraftText, onCustomizeApplied]);
+  }, [getCustomizeSanitizedHtml, onCustomizeApplied]);
   const productBadge = product.labels?.[0]?.value || product.categories?.[0]?.title || null;
   const productDetails = [
     product.brand?.name ?? null,
@@ -285,8 +292,10 @@ export function ProductInfoAndActions({
             <input
               type="text"
               value={customizeDraftText}
-              maxLength={CUSTOMIZE_TEXT_MAX_LENGTH}
-              onChange={(e) => setCustomizeDraftText(e.target.value)}
+              maxLength={customizeTextMaxLength}
+              onChange={(e) => {
+                onCustomizeDraftTextChange(e.target.value);
+              }}
               className="w-full max-w-[291px] border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090]"
               aria-label={t(language, 'product.customize_title')}
               autoComplete="off"
@@ -300,7 +309,7 @@ export function ProductInfoAndActions({
             </button>
           </div>
           <p className="max-w-[291px] text-right font-montserrat text-[10px] font-medium leading-[30px] text-[#898989]">
-            {customizeDraftText.length}/ {CUSTOMIZE_TEXT_MAX_LENGTH}
+            {customizeDraftText.length}/ {customizeTextMaxLength}
           </p>
         </div>
       );
@@ -322,6 +331,8 @@ export function ProductInfoAndActions({
     productDetails,
     selectedCatalogSize,
     customizeDraftText,
+    customizeTextMaxLength,
+    onCustomizeDraftTextChange,
     handleCustomizeApplyClick,
   ]);
 

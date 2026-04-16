@@ -3,7 +3,7 @@
 export const CUSTOMIZE_TEXT_ON_IMAGE_MAX_WIDTH_CLASS = 'max-w-[min(92%,220px)] sm:max-w-[280px]';
 
 export const CUSTOMIZE_OVERLAY_IMAGE_ANCHOR_CLASS =
-  'pointer-events-none absolute inset-x-0 bottom-[16%] z-10 flex justify-center px-2 sm:bottom-[20%]';
+  'pointer-events-none absolute inset-x-0 bottom-[22%] z-10 flex justify-center px-2 sm:bottom-[26%]';
 
 /** No upward (-y) shadow — it reads as a thin black line above glyphs. */
 const CUSTOMIZE_ON_IMAGE_GLASS_TEXT_SHADOW_CLASS =
