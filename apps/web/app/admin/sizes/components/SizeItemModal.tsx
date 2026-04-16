@@ -31,7 +31,7 @@ async function uploadSizeImage(imageBase64: string): Promise<string | null> {
 export interface SizeItemModalState {
   open: boolean;
   categoryId: string;
-  mode: 'create' | 'edit';
+  mode: 'create' | 'edit' | 'duplicate';
   itemId: string | null;
   title: string;
   imageUrl: string;
@@ -113,10 +113,11 @@ export function SizeItemModal({ modal, onClose, onSaved }: SizeItemModalProps) {
     }
     setSaving(true);
     try {
-      if (modal.mode === 'create') {
+      if (modal.mode === 'create' || modal.mode === 'duplicate') {
         await apiClient.post(`/api/v1/admin/size-catalog/categories/${modal.categoryId}/items`, {
           title: trimmedTitle,
           imageUrl: trimmedUrl,
+          published: modal.mode === 'duplicate' ? false : true,
         });
       } else if (modal.itemId) {
         await apiClient.patch(`/api/v1/admin/size-catalog/items/${modal.itemId}`, {
@@ -142,8 +143,15 @@ export function SizeItemModal({ modal, onClose, onSaved }: SizeItemModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white p-6 shadow-xl">
         <h3 className="text-lg font-semibold text-gray-900">
-          {modal.mode === 'create' ? t('admin.sizes.addItem') : t('admin.sizes.editItem')}
+          {modal.mode === 'edit'
+            ? t('admin.sizes.editItem')
+            : modal.mode === 'duplicate'
+              ? t('admin.sizes.duplicateItem')
+              : t('admin.sizes.addItem')}
         </h3>
+        {modal.mode === 'duplicate' ? (
+          <p className="mt-1 text-sm text-gray-600">{t('admin.sizes.duplicateItemHint')}</p>
+        ) : null}
         <div className="mt-4 space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">{t('admin.sizes.itemTitle')}</label>

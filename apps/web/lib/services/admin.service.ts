@@ -78,7 +78,8 @@ class AdminService {
   deleteVotingItem = adminVotingService.deleteVotingItem.bind(adminVotingService);
 
   // Size catalog (PDP + admin)
-  getStorefrontSizeCatalog = adminSizeCatalogService.getPublicCatalog.bind(adminSizeCatalogService);
+  getStorefrontSizeCatalog = adminSizeCatalogService.getStorefrontCatalog.bind(adminSizeCatalogService);
+  getAdminSizeCatalog = adminSizeCatalogService.getAdminCatalog.bind(adminSizeCatalogService);
   createSizeCatalogCategory = adminSizeCatalogService.createCategory.bind(adminSizeCatalogService);
   updateSizeCatalogCategory = adminSizeCatalogService.updateCategory.bind(adminSizeCatalogService);
   deleteSizeCatalogCategory = adminSizeCatalogService.deleteCategory.bind(adminSizeCatalogService);

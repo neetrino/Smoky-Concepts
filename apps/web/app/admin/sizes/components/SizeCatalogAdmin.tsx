@@ -105,6 +105,27 @@ export function SizeCatalogAdmin() {
     });
   };
 
+  const openDuplicateModal = (categoryId: string, item: SizeCatalogItemDto) => {
+    setItemModal({
+      open: true,
+      categoryId,
+      mode: 'duplicate',
+      itemId: null,
+      title: item.title,
+      imageUrl: item.imageUrl,
+    });
+  };
+
+  const publishDraftItem = async (itemId: string) => {
+    try {
+      await apiClient.patch(`/api/v1/admin/size-catalog/items/${itemId}`, { published: true });
+      showToast(t('admin.sizes.itemPublished'), 'success');
+      await fetchCatalog();
+    } catch {
+      showToast(t('admin.sizes.errorSave'), 'error');
+    }
+  };
+
   const deleteItem = async (itemId: string) => {
     if (!window.confirm(t('admin.sizes.deleteItemConfirm'))) {
       return;
@@ -197,14 +218,23 @@ export function SizeCatalogAdmin() {
                   cat.items.map((item) => (
                     <div
                       key={item.id}
-                      className="flex gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
+                      className={`flex gap-3 rounded-lg border bg-white p-3 shadow-sm ${
+                        item.published ? 'border-gray-200' : 'border-amber-300 bg-amber-50/40'
+                      }`}
                     >
                       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-gray-100">
                         <img src={item.imageUrl} alt="" className="h-full w-full object-contain" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-gray-900">{item.title}</p>
-                        <div className="mt-2 flex flex-wrap gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium text-gray-900">{item.title}</p>
+                          {!item.published ? (
+                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                              {t('admin.sizes.draftLabel')}
+                            </span>
+                          ) : null}
+                        </div>
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
                           <Button
                             type="button"
                             variant="secondary"
@@ -213,6 +243,36 @@ export function SizeCatalogAdmin() {
                           >
                             {t('admin.sizes.editItem')}
                           </Button>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            title={t('admin.sizes.duplicateItem')}
+                            aria-label={t('admin.sizes.duplicateItem')}
+                            onClick={() => openDuplicateModal(cat.id, item)}
+                            className="px-2"
+                          >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                              <rect x="7" y="7" width="12" height="12" rx="2" strokeWidth={2} />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 15H4a1 1 0 01-1-1V5a1 1 0 011-1h9a1 1 0 011 1v1"
+                              />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10v6M10 13h6" />
+                            </svg>
+                          </Button>
+                          {!item.published ? (
+                            <Button
+                              type="button"
+                              variant="primary"
+                              size="sm"
+                              onClick={() => void publishDraftItem(item.id)}
+                            >
+                              {t('admin.sizes.activateItem')}
+                            </Button>
+                          ) : null}
                           <Button type="button" variant="secondary" size="sm" onClick={() => void deleteItem(item.id)}>
                             {t('admin.sizes.deleteItem')}
                           </Button>

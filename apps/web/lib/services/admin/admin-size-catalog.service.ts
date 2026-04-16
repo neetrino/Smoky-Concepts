@@ -2,21 +2,41 @@ import { db } from "@white-shop/db";
 
 import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from "@/lib/types/size-catalog";
 
-function mapItem(row: { id: string; title: string; imageUrl: string; position: number }): SizeCatalogItemDto {
+function mapItem(row: {
+  id: string;
+  title: string;
+  imageUrl: string;
+  position: number;
+  published?: boolean | null;
+}): SizeCatalogItemDto {
   return {
     id: row.id,
     title: row.title,
     imageUrl: row.imageUrl,
     position: row.position,
+    published: row.published ?? true,
   };
 }
 
-function mapCategory(row: {
+type SizeCategoryRow = {
   id: string;
   title: string;
   position: number;
-  items: Array<{ id: string; title: string; imageUrl: string; position: number }>;
-}): SizeCatalogCategoryDto {
+  items: Array<{
+    id: string;
+    title: string;
+    imageUrl: string;
+    position: number;
+    published?: boolean | null;
+  }>;
+};
+
+/** Storefront: hide drafts (published === false). Missing field = legacy row, treat as published. */
+function isStorefrontSizeItem(item: { published?: boolean | null }): boolean {
+  return item.published !== false;
+}
+
+function mapCategory(row: SizeCategoryRow): SizeCatalogCategoryDto {
   return {
     id: row.id,
     title: row.title,
@@ -26,7 +46,29 @@ function mapCategory(row: {
 }
 
 class AdminSizeCatalogService {
-  async getPublicCatalog(): Promise<{ data: SizeCatalogCategoryDto[] }> {
+  /** Storefront + public API: only published size items. */
+  async getStorefrontCatalog(): Promise<{ data: SizeCatalogCategoryDto[] }> {
+    const rows = await db.sizeCatalogCategory.findMany({
+      orderBy: { position: "asc" },
+      include: {
+        items: {
+          orderBy: { position: "asc" },
+        },
+      },
+    });
+
+    const forStorefront: SizeCategoryRow[] = (rows as SizeCategoryRow[]).map((cat) => ({
+      ...cat,
+      items: cat.items.filter(isStorefrontSizeItem),
+    }));
+
+    return {
+      data: forStorefront.map(mapCategory),
+    };
+  }
+
+  /** Admin list: all items including drafts. */
+  async getAdminCatalog(): Promise<{ data: SizeCatalogCategoryDto[] }> {
     const rows = await db.sizeCatalogCategory.findMany({
       orderBy: { position: "asc" },
       include: {
@@ -37,7 +79,7 @@ class AdminSizeCatalogService {
     });
 
     return {
-      data: rows.map((c) => mapCategory(c)),
+      data: (rows as SizeCategoryRow[]).map(mapCategory),
     };
   }
 
@@ -126,7 +168,7 @@ class AdminSizeCatalogService {
 
   async createItem(
     categoryId: string,
-    data: { title: string; imageUrl: string }
+    data: { title: string; imageUrl: string; published?: boolean }
   ): Promise<{ data: SizeCatalogItemDto }> {
     const category = await db.sizeCatalogCategory.findUnique({
       where: { id: categoryId },
@@ -159,11 +201,14 @@ class AdminSizeCatalogService {
       select: { position: true },
     });
 
+    const published = data.published ?? true;
+
     const created = await db.sizeCatalogItem.create({
       data: {
         categoryId,
         title,
         imageUrl,
+        published,
         position: (last?.position ?? -1) + 1,
       },
     });
@@ -173,7 +218,7 @@ class AdminSizeCatalogService {
 
   async updateItem(
     itemId: string,
-    data: { title?: string; imageUrl?: string }
+    data: { title?: string; imageUrl?: string; published?: boolean }
   ): Promise<{ data: SizeCatalogItemDto }> {
     const existing = await db.sizeCatalogItem.findUnique({
       where: { id: itemId },
@@ -190,6 +235,7 @@ class AdminSizeCatalogService {
 
     const title = data.title !== undefined ? data.title.trim() : existing.title;
     const imageUrl = data.imageUrl !== undefined ? data.imageUrl.trim() : existing.imageUrl;
+    const published = data.published !== undefined ? data.published : existing.published;
 
     if (!title || !imageUrl) {
       throw {
@@ -202,7 +248,7 @@ class AdminSizeCatalogService {
 
     const updated = await db.sizeCatalogItem.update({
       where: { id: itemId },
-      data: { title, imageUrl },
+      data: { title, imageUrl, published },
     });
 
     return { data: mapItem(updated) };

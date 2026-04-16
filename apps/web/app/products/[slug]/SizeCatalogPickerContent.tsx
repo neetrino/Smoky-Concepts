@@ -24,7 +24,7 @@ function CatalogSizeCard({
     <button
       type="button"
       onClick={onSelect}
-      className={`flex h-[129px] w-[126px] shrink-0 flex-col items-center rounded-[14px] bg-white pt-2 transition-shadow ${
+      className={`flex h-[129px] w-full max-w-[126px] shrink-0 flex-col items-center justify-self-center rounded-[14px] bg-white pt-2 transition-shadow ${
         selected
           ? 'border-[3px] border-solid border-[#dcc090] shadow-none'
           : 'border border-transparent shadow-[0px_2px_8px_rgba(0,0,0,0.06)]'
@@ -67,7 +67,7 @@ export function SizeCatalogPickerContent({
             <h3 className="font-montserrat text-[22px] font-extrabold leading-none text-[#414141] sm:text-[24px]">
               {category.title}
             </h3>
-            <div className="mt-[36px] flex flex-wrap gap-x-4 gap-y-6">
+            <div className="mt-[36px] grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
               {category.items.map((item) => (
                 <CatalogSizeCard
                   key={item.id}

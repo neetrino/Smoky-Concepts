@@ -3,6 +3,7 @@ export interface SizeCatalogItemDto {
   title: string;
   imageUrl: string;
   position: number;
+  published: boolean;
 }
 
 export interface SizeCatalogCategoryDto {

@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const result = await adminService.getStorefrontSizeCatalog();
+    const result = await adminService.getAdminSizeCatalog();
     return NextResponse.json(result);
   } catch (error: unknown) {
     return createErrorResponse(error, req.url);
