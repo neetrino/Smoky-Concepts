@@ -37,6 +37,8 @@ export interface OrderItem {
   price: number;
   total: number;
   imageUrl?: string;
+  customizePlain?: string;
+  customizeHtml?: string;
   variantOptions?: Array<{
     attributeKey?: string;
     value?: string;

@@ -91,6 +91,8 @@ export interface OrderDetails {
       imageUrl?: string;
       colors?: string[] | any;
     }>;
+    customizePlain?: string | null;
+    customizeHtml?: string | null;
   }>;
   createdAt: string;
   updatedAt?: string;

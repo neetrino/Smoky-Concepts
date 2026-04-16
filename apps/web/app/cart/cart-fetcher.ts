@@ -29,6 +29,8 @@ function cartItemFromGuestSnapshot(item: GuestCartItem, index: number): CartItem
       sizeLabel: item.sizeLabel ?? null,
       sizeCatalogTitle: item.sizeCatalogTitle ?? null,
       sizeCatalogImageUrl: item.sizeCatalogImageUrl ?? null,
+      customizePlain: item.customizePlain ?? null,
+      customizeHtml: item.customizeHtml ?? null,
       stock: item.stock !== undefined ? item.stock : undefined,
       product: {
         id: item.productId,

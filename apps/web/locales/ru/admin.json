@@ -731,6 +731,7 @@
       "product": "Товар",
       "sku": "SKU",
       "colorSize": "Цвет / Размер",
+      "customize": "Персонализация",
       "qty": "Кол-во",
       "price": "Цена",
       "totalCol": "Итого",

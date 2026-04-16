@@ -113,6 +113,8 @@ export function formatOrderItem(item: {
   total: number | null;
   sizeCatalogTitle?: string | null;
   sizeCatalogImageUrl?: string | null;
+  customizePlain?: string | null;
+  customizeHtml?: string | null;
   variant?: {
     id: string;
     sku: string | null;
@@ -151,6 +153,8 @@ export function formatOrderItem(item: {
     total,
     unitPrice,
     variantOptions,
+    customizePlain: item.customizePlain?.trim() || null,
+    customizeHtml: item.customizeHtml?.trim() || null,
   };
 }
 
@@ -196,6 +200,8 @@ export function formatOrderForDetail(order: {
     total: number | null;
     sizeCatalogTitle?: string | null;
     sizeCatalogImageUrl?: string | null;
+    customizePlain?: string | null;
+    customizeHtml?: string | null;
     variant?: {
       id: string;
       sku: string | null;

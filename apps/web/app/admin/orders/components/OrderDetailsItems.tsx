@@ -50,6 +50,7 @@ export function OrderDetailsItems({
               <th className="px-3 py-2 text-left font-medium text-gray-500">{t('admin.orders.orderDetails.product')}</th>
               <th className="px-3 py-2 text-left font-medium text-gray-500">{t('admin.orders.orderDetails.sku')}</th>
               <th className="px-3 py-2 text-left font-medium text-gray-500">{t('admin.orders.orderDetails.colorSize')}</th>
+              <th className="px-3 py-2 text-left font-medium text-gray-500">{t('admin.orders.orderDetails.customize')}</th>
               <th className="px-3 py-2 text-right font-medium text-gray-500">{t('admin.orders.orderDetails.qty')}</th>
               <th className="px-3 py-2 text-right font-medium text-gray-500">{t('admin.orders.orderDetails.price')}</th>
               <th className="px-3 py-2 text-right font-medium text-gray-500">{t('admin.orders.orderDetails.totalCol')}</th>
@@ -98,6 +99,18 @@ export function OrderDetailsItems({
                       </div>
                     ) : (
                       <span className="text-xs text-gray-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 align-top text-xs text-gray-700">
+                    {item.customizeHtml?.trim() ? (
+                      <div
+                        className="max-w-[200px] [&_*]:text-inherit"
+                        dangerouslySetInnerHTML={{ __html: item.customizeHtml }}
+                      />
+                    ) : item.customizePlain?.trim() ? (
+                      <span>{item.customizePlain}</span>
+                    ) : (
+                      <span className="text-gray-400">—</span>
                     )}
                   </td>
                   <td className="px-3 py-2 text-right">{item.quantity}</td>

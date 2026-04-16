@@ -33,6 +33,7 @@
   "itemDetails": {
     "color": "Color:",
     "size": "Size:",
+    "customization": "Customization",
     "sku": "SKU: {sku}",
     "quantity": "Quantity: {qty} × {price} = {total}"
   }

@@ -33,6 +33,7 @@
   "itemDetails": {
     "color": "Цвет:",
     "size": "Размер:",
+    "customization": "Персонализация",
     "sku": "Артикул: {sku}",
     "quantity": "Количество: {qty} × {price} = {total}"
   }

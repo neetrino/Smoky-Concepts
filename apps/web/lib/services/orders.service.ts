@@ -5,6 +5,12 @@ import {
   mergeSizeCatalogIntoVariantOptions,
   sanitizeCheckoutImageUrl,
 } from "../orders/merge-size-catalog-into-variant-options";
+import {
+  CUSTOMIZE_PLAIN_MAX_LENGTH,
+  getPlainTextFromHtmlServer,
+  sanitizeCustomizeHtmlServer,
+  validateCustomizePlainLength,
+} from "../orders/sanitize-customize-html-server";
 import { logger } from "./utils/logger";
 
 type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
@@ -125,6 +131,8 @@ class OrdersService {
         imageUrl?: string;
         sizeCatalogTitle?: string;
         sizeCatalogImageUrl?: string;
+        customizePlain?: string | null;
+        customizeHtml?: string | null;
       }> = [];
 
       if (guestItems && Array.isArray(guestItems) && guestItems.length > 0) {
@@ -137,6 +145,8 @@ class OrdersService {
               quantity: number;
               sizeCatalogTitle?: string;
               sizeCatalogImageUrl?: string;
+              customizePlain?: string;
+              customizeHtml?: string;
             }) => {
             const { productId, variantId, quantity } = item;
 
@@ -219,6 +229,40 @@ class OrdersService {
                 ? sanitizeCheckoutImageUrl(item.sizeCatalogImageUrl)
                 : undefined;
 
+            const rawCustomizePlain =
+              typeof item.customizePlain === 'string' ? item.customizePlain.trim() : '';
+            const rawCustomizeHtml =
+              typeof item.customizeHtml === 'string' ? item.customizeHtml.trim() : '';
+
+            let customizePlain: string | undefined;
+            let customizeHtml: string | undefined;
+
+            if (rawCustomizePlain !== '' || rawCustomizeHtml !== '') {
+              const sanitizedHtml =
+                rawCustomizeHtml !== '' ? sanitizeCustomizeHtmlServer(rawCustomizeHtml) : '';
+              const plainFromHtml =
+                sanitizedHtml !== '' ? getPlainTextFromHtmlServer(sanitizedHtml) : '';
+              const resolvedPlain =
+                rawCustomizePlain !== '' ? rawCustomizePlain : plainFromHtml;
+
+              if (resolvedPlain !== '' && !validateCustomizePlainLength(resolvedPlain)) {
+                throw {
+                  status: 400,
+                  type: 'https://api.shop.am/problems/validation-error',
+                  title: 'Validation Error',
+                  detail: `Customize text must be at most ${CUSTOMIZE_PLAIN_MAX_LENGTH} characters`,
+                };
+              }
+
+              if (resolvedPlain === '' && sanitizedHtml === '') {
+                customizePlain = undefined;
+                customizeHtml = undefined;
+              } else {
+                customizePlain = resolvedPlain !== '' ? resolvedPlain : undefined;
+                customizeHtml = sanitizedHtml !== '' ? sanitizedHtml : undefined;
+              }
+            }
+
             return {
               variantId: variant.id,
               productId: variant.product.id,
@@ -230,6 +274,8 @@ class OrdersService {
               imageUrl,
               sizeCatalogTitle,
               sizeCatalogImageUrl,
+              customizePlain,
+              customizeHtml,
             };
           })
         );
@@ -308,6 +354,8 @@ class OrdersService {
                 imageUrl: item.imageUrl,
                 sizeCatalogTitle: item.sizeCatalogTitle ?? null,
                 sizeCatalogImageUrl: item.sizeCatalogImageUrl ?? null,
+                customizePlain: item.customizePlain ?? null,
+                customizeHtml: item.customizeHtml ?? null,
               })),
             },
             events: {
@@ -670,6 +718,8 @@ class OrdersService {
           total: Number(item.total),
           imageUrl: item.imageUrl || undefined,
           variantOptions,
+          customizePlain: item.customizePlain?.trim() || undefined,
+          customizeHtml: item.customizeHtml?.trim() || undefined,
         };
       }),
       totals: {

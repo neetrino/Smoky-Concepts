@@ -33,6 +33,7 @@
   "itemDetails": {
     "color": "Գույն:",
     "size": "Չափ:",
+    "customization": "Անհատականացում",
     "sku": "SKU: {sku}",
     "quantity": "Քանակ: {qty} × {price} = {total}"
   }

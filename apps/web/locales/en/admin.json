@@ -732,6 +732,7 @@
       "product": "Product",
       "sku": "SKU",
       "colorSize": "Color / Size",
+      "customize": "Customize",
       "qty": "Qty",
       "price": "Price",
       "totalCol": "Total",

@@ -96,6 +96,22 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
           </div>
         )}
 
+        {(item.customizeHtml?.trim() || item.customizePlain?.trim()) && (
+          <div className="mt-3 rounded-md bg-gray-50 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              {t('orders.itemDetails.customization')}
+            </p>
+            {item.customizeHtml?.trim() ? (
+              <div
+                className="mt-1 max-w-md text-sm text-gray-900 [&_*]:text-inherit"
+                dangerouslySetInnerHTML={{ __html: item.customizeHtml }}
+              />
+            ) : (
+              <p className="mt-1 text-sm text-gray-900">{item.customizePlain}</p>
+            )}
+          </div>
+        )}
+
         <p className="text-sm text-gray-600">{t('orders.itemDetails.sku').replace('{sku}', item.sku)}</p>
         <p className="text-sm text-gray-600 mt-2">
           {t('orders.itemDetails.quantity')

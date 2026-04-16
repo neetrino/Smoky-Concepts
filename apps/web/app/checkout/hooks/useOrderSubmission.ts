@@ -29,6 +29,8 @@ export function useOrderSubmission({
       const items = cart.items.map((item: CartItem) => {
         const title = item.variant.sizeCatalogTitle?.trim();
         const img = item.variant.sizeCatalogImageUrl?.trim();
+        const cPlain = item.variant.customizePlain?.trim();
+        const cHtml = item.variant.customizeHtml?.trim();
         return {
           productId: item.variant.product.id,
           variantId: item.variant.id,
@@ -37,6 +39,12 @@ export function useOrderSubmission({
             ? {
                 sizeCatalogTitle: title,
                 ...(img ? { sizeCatalogImageUrl: img } : {}),
+              }
+            : {}),
+          ...(cPlain || cHtml
+            ? {
+                ...(cPlain ? { customizePlain: cPlain } : {}),
+                ...(cHtml ? { customizeHtml: cHtml } : {}),
               }
             : {}),
         };

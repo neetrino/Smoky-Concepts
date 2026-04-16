@@ -23,6 +23,8 @@ interface UseProductCartActionsParams {
   productDisplayTitle: string;
   /** When user picked a row from the global size catalog modal */
   selectedCatalogSize: SizeCatalogItemDto | null;
+  /** Last applied PDP customize (Apply) — attached to guest cart lines */
+  customizeApplied: { plain: string; html: string | null } | null;
   setIsAddingToCart: (value: boolean) => void;
   setShowMessage: (value: string | null) => void;
 }
@@ -37,6 +39,7 @@ export function useProductCartActions({
   canAddToCart,
   productDisplayTitle,
   selectedCatalogSize,
+  customizeApplied,
   setIsAddingToCart,
   setShowMessage,
 }: UseProductCartActionsParams) {
@@ -59,6 +62,15 @@ export function useProductCartActions({
           selectedCatalogSize != null
             ? { title: selectedCatalogSize.title, imageUrl: selectedCatalogSize.imageUrl }
             : null;
+        const customizeForLine =
+          customizeApplied != null &&
+          (customizeApplied.plain.trim() !== '' ||
+            (customizeApplied.html != null && customizeApplied.html.trim() !== ''))
+            ? {
+                plain: customizeApplied.plain.trim(),
+                html: customizeApplied.html?.trim() ? customizeApplied.html.trim() : null,
+              }
+            : null;
         const snapshot = buildGuestCartLineSnapshot(
           product,
           currentVariant,
@@ -66,7 +78,8 @@ export function useProductCartActions({
           price,
           originalPrice,
           productDisplayTitle,
-          sizeCatalog
+          sizeCatalog,
+          customizeForLine
         );
         upsertGuestCartLineSnapshot(snapshot);
 
@@ -87,6 +100,7 @@ export function useProductCartActions({
       originalPrice,
       productDisplayTitle,
       selectedCatalogSize,
+      customizeApplied,
       language,
       setIsAddingToCart,
       setShowMessage,

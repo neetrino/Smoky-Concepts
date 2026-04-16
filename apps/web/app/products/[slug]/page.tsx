@@ -8,6 +8,7 @@ import { ProductImageGallery } from './ProductImageGallery';
 import { ProductInfoAndActions } from './ProductInfoAndActions';
 import { useProductPage } from './useProductPage';
 import { useProductCartActions } from './useProductCartActions';
+import { useCustomizeGoogleFontLinks } from './useCustomizeGoogleFontLinks';
 import type { ProductPageProps } from './types';
 
 export default function ProductPage({ params }: ProductPageProps) {
@@ -41,10 +42,17 @@ export default function ProductPage({ params }: ProductPageProps) {
   } = useProductPage(params);
 
   const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
+  const [customizeApplied, setCustomizeApplied] = useState<{
+    plain: string;
+    html: string | null;
+  } | null>(null);
 
   useEffect(() => {
     setSelectedCatalogSize(null);
+    setCustomizeApplied(null);
   }, [product?.id]);
+
+  useCustomizeGoogleFontLinks(Boolean(customizeApplied?.html?.trim()));
 
   const productDisplayTitle = product
     ? getProductText(language, product.id, 'title') || product.title
@@ -60,6 +68,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     canAddToCart,
     productDisplayTitle,
     selectedCatalogSize,
+    customizeApplied,
     setIsAddingToCart,
     setShowMessage,
   });
@@ -71,11 +80,6 @@ export default function ProductPage({ params }: ProductPageProps) {
       </div>
     );
   }
-
-  const heroImageUrl =
-    images.length === 0
-      ? null
-      : (images[Math.min(currentImageIndex, images.length - 1)] ?? images[0]) ?? null;
 
   return (
     <div className="overflow-visible bg-[#efefef]">
@@ -90,12 +94,14 @@ export default function ProductPage({ params }: ProductPageProps) {
             onImageIndexChange={setCurrentImageIndex}
             thumbnailStartIndex={thumbnailStartIndex}
             onThumbnailStartIndexChange={setThumbnailStartIndex}
+            customizeOverlayHtml={customizeApplied?.html?.trim() ? customizeApplied.html : null}
           />
           </div>
 
           <ProductInfoAndActions
             product={product}
-            heroImageUrl={heroImageUrl}
+            appliedCustomize={customizeApplied}
+            onCustomizeApplied={setCustomizeApplied}
             price={price}
             originalPrice={originalPrice}
             compareAtPrice={compareAtPrice}

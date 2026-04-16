@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { formatCatalogPrice } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
@@ -10,8 +10,8 @@ import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/siz
 import { Button } from '../../../components/ui/buttons';
 import type { AttributeGroupValue, Product, ProductVariant } from './types';
 import { normalizeHexPalette, parseHexFromText } from './utils/swatch-color-utils';
-import { CustomizeApplyPreview } from './CustomizeApplyPreview';
 import { CustomizeSizeModal } from './CustomizeSizeModal';
+import { escapePlainTextForHtml, sanitizeCustomizeHtml } from './utils/sanitize-customize-html';
 
 const CATALOG_BAG_ICON_PATH = '/assets/home/icons/bag-catalog.svg';
 
@@ -29,8 +29,9 @@ interface ProductOptionValue extends AttributeGroupValue {
  */
 interface ProductInfoAndActionsProps {
   product: Product;
-  /** Hero image URL aligned with the gallery’s current slide (for customize preview). */
-  heroImageUrl: string | null;
+  /** Last applied customize (hero overlay + cart). */
+  appliedCustomize: { plain: string; html: string | null } | null;
+  onCustomizeApplied: (value: { plain: string; html: string | null } | null) => void;
   price: number;
   originalPrice: number | null;
   compareAtPrice: number | null;
@@ -124,7 +125,8 @@ function getCustomizeCopy(language: LanguageCode): string {
 
 export function ProductInfoAndActions({
   product,
-  heroImageUrl,
+  appliedCustomize,
+  onCustomizeApplied,
   price,
   originalPrice,
   compareAtPrice,
@@ -146,13 +148,7 @@ export function ProductInfoAndActions({
   onSelectedCatalogSizeChange,
 }: ProductInfoAndActionsProps) {
   const [activeTab, setActiveTab] = useState<ProductTabKey>('description');
-  const [customizeText, setCustomizeText] = useState('');
-  const [customizeHtml, setCustomizeHtml] = useState<string | null>(null);
-  const [customizePreviewSeed, setCustomizePreviewSeed] = useState<{
-    plain: string;
-    rich: string | null;
-  }>({ plain: '', rich: null });
-  const [isCustomizeApplyPreviewOpen, setIsCustomizeApplyPreviewOpen] = useState(false);
+  const [customizeDraftText, setCustomizeDraftText] = useState('');
   const [isCustomizeSizeModalOpen, setIsCustomizeSizeModalOpen] = useState(false);
   const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
   const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
@@ -225,15 +221,22 @@ export function ProductInfoAndActions({
     setIsCustomizeSizeModalOpen(true);
   };
 
-  const openCustomizePreview = () => {
-    setCustomizePreviewSeed({ plain: customizeText, rich: customizeHtml });
-    setIsCustomizeApplyPreviewOpen(true);
-  };
+  useEffect(() => {
+    setCustomizeDraftText(appliedCustomize?.plain ?? '');
+  }, [appliedCustomize?.plain, product.id]);
 
-  const handleCustomizeApplyResult = (html: string, plain: string) => {
-    setCustomizeText(plain);
-    setCustomizeHtml(html.trim().length > 0 ? html : null);
-  };
+  const handleCustomizeApplyClick = useCallback(() => {
+    const plain = customizeDraftText.trim();
+    if (!plain) {
+      onCustomizeApplied(null);
+      return;
+    }
+    const sanitized = sanitizeCustomizeHtml(escapePlainTextForHtml(plain));
+    onCustomizeApplied({
+      plain,
+      html: sanitized.trim().length > 0 ? sanitized : null,
+    });
+  }, [customizeDraftText, onCustomizeApplied]);
   const productBadge = product.labels?.[0]?.value || product.categories?.[0]?.title || null;
   const productDetails = [
     product.brand?.name ?? null,
@@ -281,26 +284,23 @@ export function ProductInfoAndActions({
           <div className="flex max-w-[763px] flex-col gap-4 sm:flex-row sm:items-end sm:gap-20 sm:pb-5">
             <input
               type="text"
-              value={customizeText}
+              value={customizeDraftText}
               maxLength={CUSTOMIZE_TEXT_MAX_LENGTH}
-              onChange={(e) => {
-                setCustomizeText(e.target.value);
-                setCustomizeHtml(null);
-              }}
+              onChange={(e) => setCustomizeDraftText(e.target.value)}
               className="w-full max-w-[291px] border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090]"
               aria-label={t(language, 'product.customize_title')}
               autoComplete="off"
             />
             <button
               type="button"
-              onClick={openCustomizePreview}
+              onClick={handleCustomizeApplyClick}
               className="h-10 w-full max-w-[168px] shrink-0 rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] sm:translate-y-5 sm:w-[168px]"
             >
               {t(language, 'product.customize_apply')}
             </button>
           </div>
           <p className="max-w-[291px] text-right font-montserrat text-[10px] font-medium leading-[30px] text-[#898989]">
-            {customizeText.length}/ {CUSTOMIZE_TEXT_MAX_LENGTH}
+            {customizeDraftText.length}/ {CUSTOMIZE_TEXT_MAX_LENGTH}
           </p>
         </div>
       );
@@ -315,7 +315,15 @@ export function ProductInfoAndActions({
         ))}
       </div>
     );
-  }, [activeTab, language, productDescription, productDetails, customizeText, selectedCatalogSize]);
+  }, [
+    activeTab,
+    language,
+    productDescription,
+    productDetails,
+    selectedCatalogSize,
+    customizeDraftText,
+    handleCustomizeApplyClick,
+  ]);
 
   return (
     <>
@@ -516,15 +524,6 @@ export function ProductInfoAndActions({
         </div>
       )}
     </div>
-    <CustomizeApplyPreview
-      isOpen={isCustomizeApplyPreviewOpen}
-      onClose={() => setIsCustomizeApplyPreviewOpen(false)}
-      onApplyResult={handleCustomizeApplyResult}
-      language={language}
-      imageUrl={heroImageUrl}
-      previewSeed={customizePreviewSeed}
-      maxPlainLength={CUSTOMIZE_TEXT_MAX_LENGTH}
-    />
     <CustomizeSizeModal
       isOpen={isCustomizeSizeModalOpen}
       onClose={() => setIsCustomizeSizeModalOpen(false)}
