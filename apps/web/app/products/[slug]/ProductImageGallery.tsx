@@ -87,7 +87,7 @@ export function ProductImageGallery({
 
   return (
     <div className="overflow-visible pt-28 sm:pt-32 lg:pt-36">
-      <div className="relative z-0 overflow-visible rounded-[20px] bg-white px-3 pb-2 pt-0 shadow-[0_1px_0_rgba(18,42,38,0.04)] transition-shadow duration-200 has-[.product-hero:hover]:z-10 has-[.product-hero:hover]:shadow-[0_12px_32px_rgba(18,42,38,0.12)] sm:rounded-[24px] sm:px-5 sm:pb-3">
+      <div className="relative z-0 mx-auto w-full max-w-[520px] overflow-visible rounded-[20px] bg-white px-3 pb-2 pt-0 shadow-[0_1px_0_rgba(18,42,38,0.04)] transition-shadow duration-200 has-[.product-hero:hover]:z-10 has-[.product-hero:hover]:shadow-[0_12px_32px_rgba(18,42,38,0.12)] sm:max-w-[540px] sm:rounded-[24px] sm:px-5 sm:pb-3 lg:max-w-[580px]">
         <div className="flex flex-col items-center overflow-visible">
           <div
             className={`flex w-full justify-center overflow-visible ${
