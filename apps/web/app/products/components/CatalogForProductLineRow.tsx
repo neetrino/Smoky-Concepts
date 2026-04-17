@@ -6,31 +6,36 @@ const CATALOG_FOR_CIGARETTE_MARK_IMAGE = '/assets/products/catalog-for/cigarette
 const CATALOG_FOR_MONEY_IMAGE = '/assets/products/catalog-for/money-wallet.png';
 const CATALOG_FOR_PHONE_CASE_IMAGE = '/assets/products/catalog-for/phone-case.png';
 
+const CARD_SHELL =
+  'flex h-[112px] min-w-0 flex-1 basis-0 max-w-[110px] flex-col items-center overflow-hidden lg:h-[129px] lg:w-[126px] lg:max-w-none lg:flex-none lg:shrink-0';
+
 function CatalogForCigarettePacksCard() {
   return (
-    <div className="flex h-[129px] w-[126px] shrink-0 flex-col items-center rounded-[14px] border-[3px] border-solid border-[#dcc090] bg-white px-1 pt-[10px]">
-      <div className="relative h-[74px] w-[38.542px] shrink-0">
+    <div
+      className={`${CARD_SHELL} rounded-xl border-2 border-solid border-[#dcc090] bg-white px-1 pt-2 lg:rounded-[14px] lg:border-[3px] lg:pt-[10px]`}
+    >
+      <div className="relative h-[64px] w-[34px] shrink-0 lg:h-[74px] lg:w-[38.542px]">
         <Image
           src={CATALOG_FOR_CIGARETTE_PACK_IMAGE}
           alt=""
           width={39}
           height={74}
-          className="h-[74px] w-[39px] object-contain"
+          className="h-[64px] w-[34px] object-contain lg:h-[74px] lg:w-[39px]"
           unoptimized
         />
-        <div className="pointer-events-none absolute left-[14px] top-[43px] h-[12px] w-[11px]">
+        <div className="pointer-events-none absolute left-3 top-[37px] h-[10px] w-[10px] lg:left-[14px] lg:top-[43px] lg:h-[12px] lg:w-[11px]">
           <Image
             src={CATALOG_FOR_CIGARETTE_MARK_IMAGE}
             alt=""
             width={11}
             height={12}
-            className="h-[12px] w-[11px] object-contain"
+            className="h-[10px] w-[10px] object-contain lg:h-[12px] lg:w-[11px]"
             unoptimized
             aria-hidden
           />
         </div>
       </div>
-      <p className="mt-auto mb-3 w-[86px] text-center text-[12px] font-medium leading-tight text-[#414141]">
+      <p className="mt-auto mb-2 w-[76px] text-center text-[11px] font-medium leading-tight text-[#414141] lg:mb-3 lg:w-[86px] lg:text-[12px]">
         For Cigarette
         <br />
         Packs
@@ -41,10 +46,10 @@ function CatalogForCigarettePacksCard() {
 
 function CatalogForMoneyCard() {
   return (
-    <div className="flex h-[129px] w-[126px] shrink-0 flex-col items-center rounded-[14px] bg-white/50 px-1 pt-[17px]">
-      <div className="flex h-[61px] w-[90px] shrink-0 items-center justify-center">
+    <div className={`${CARD_SHELL} rounded-xl bg-white/50 px-1 pt-3 lg:rounded-[14px] lg:pt-[17px]`}>
+      <div className="flex h-[53px] w-[78px] shrink-0 items-center justify-center lg:h-[61px] lg:w-[90px]">
         <div className="flex-none [transform:scaleY(-1)]">
-          <div className="relative h-[61px] w-[90px] overflow-hidden blur-[2px] opacity-50">
+          <div className="relative h-[53px] w-[78px] overflow-hidden blur-[2px] opacity-50 lg:h-[61px] lg:w-[90px]">
             {/* eslint-disable-next-line @next/next/no-img-element -- Figma crop + blur match */}
             <img
               alt=""
@@ -55,7 +60,7 @@ function CatalogForMoneyCard() {
           </div>
         </div>
       </div>
-      <p className="mt-auto mb-3 w-[86px] text-center text-[12px] font-medium leading-none text-[#414141] opacity-50">
+      <p className="mt-auto mb-2 w-[76px] text-center text-[11px] font-medium leading-none text-[#414141] opacity-50 lg:mb-3 lg:w-[86px] lg:text-[12px]">
         Money
       </p>
     </div>
@@ -64,8 +69,8 @@ function CatalogForMoneyCard() {
 
 function CatalogForPhoneCasesCard() {
   return (
-    <div className="flex h-[129px] w-[126px] shrink-0 flex-col items-center rounded-[14px] bg-white/50 px-1 pt-[10px]">
-      <div className="relative h-[74px] w-[58px] shrink-0 overflow-hidden blur-[2px] opacity-50">
+    <div className={`${CARD_SHELL} rounded-xl bg-white/50 px-1 pt-2 lg:rounded-[14px] lg:pt-[10px]`}>
+      <div className="relative h-[64px] w-[50px] shrink-0 overflow-hidden blur-[2px] opacity-50 lg:h-[74px] lg:w-[58px]">
         {/* eslint-disable-next-line @next/next/no-img-element -- Figma crop + blur match */}
         <img
           alt=""
@@ -74,7 +79,7 @@ function CatalogForPhoneCasesCard() {
           draggable={false}
         />
       </div>
-      <p className="mt-auto mb-3 w-[86px] text-center text-[12px] font-medium leading-none text-[#414141] opacity-50">
+      <p className="mt-auto mb-2 w-[76px] text-center text-[11px] font-medium leading-none text-[#414141] opacity-50 lg:mb-3 lg:w-[86px] lg:text-[12px]">
         Phone Cases
       </p>
     </div>
@@ -83,7 +88,10 @@ function CatalogForPhoneCasesCard() {
 
 export function CatalogForProductLineRow() {
   return (
-    <div className="flex flex-wrap items-start gap-4" aria-label="Product line for">
+    <div
+      className="flex w-full flex-nowrap items-start justify-center gap-3 sm:gap-4 lg:flex-wrap lg:justify-start lg:gap-5"
+      aria-label="Product line for"
+    >
       <CatalogForCigarettePacksCard />
       <CatalogForMoneyCard />
       <CatalogForPhoneCasesCard />

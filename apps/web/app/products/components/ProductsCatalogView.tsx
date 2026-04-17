@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { CatalogForProductLineRow } from './CatalogForProductLineRow';
+import { ProductsCatalogMobileFilterSheet } from './ProductsCatalogMobileFilterSheet';
 import { ProductsCatalogCard } from './ProductsCatalogCard';
 import {
   type CatalogProduct,
@@ -67,6 +68,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   const sizeMenuRef = useRef<HTMLDivElement>(null);
   const sectionScrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [showSizeMenu, setShowSizeMenu] = useState(false);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState(searchParams.get('size') ?? 'all');
   const [sectionPages, setSectionPages] = useState<Record<string, number>>({});
 
@@ -204,6 +206,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   const clearFilters = () => {
     setSelectedSize('all');
     setShowSizeMenu(false);
+    setMobileFilterOpen(false);
     router.replace('/products', { scroll: false });
   };
 
@@ -264,18 +267,49 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
 
   return (
     <div className="min-h-full bg-[#f5f4f1]">
+      <ProductsCatalogMobileFilterSheet
+        open={mobileFilterOpen}
+        onClose={() => setMobileFilterOpen(false)}
+        selectedCollection={selectedCollection}
+        selectedColor={selectedColor}
+        selectedSort={selectedSort}
+        selectedSize={selectedSize}
+        collectionOptions={collectionOptions}
+        colorOptions={colorOptions}
+        sizeOptions={sizeOptions}
+        sortOptions={SORT_OPTIONS}
+        onCollectionChange={(value) => updateQuery({ category: value })}
+        onColorChange={(value) => updateQuery({ color: value })}
+        onSortChange={(value) => updateQuery({ sort: value })}
+        onSizeChange={(value) => {
+          setSelectedSize(value === 'all' ? 'all' : value);
+          updateQuery({ size: value });
+        }}
+        onClearAll={clearFilters}
+      />
+
       <div className="mx-auto max-w-[120rem] px-4 pb-20 pt-12 sm:px-8 lg:pl-[7.5rem] lg:pr-0 lg:pt-[5.25rem]">
         <div className="font-montserrat">
           <div className="flex flex-col gap-8">
-            <div>
+            <div className="flex items-start justify-between gap-4">
               <h1 className="text-[1.75rem] font-medium leading-none text-[#414141] sm:text-[2rem]">
-                Product Line: <span className="font-extrabold">Smoky Covers</span>
+                <span className="hidden lg:inline">Product Line: </span>
+                <span className="font-extrabold">Smoky Covers</span>
               </h1>
+              <button
+                type="button"
+                onClick={() => setMobileFilterOpen(true)}
+                className="mt-0.5 min-h-[2.5rem] shrink-0 rounded-md bg-[#DBC097] px-7 py-2 text-sm font-black uppercase leading-none tracking-[0.14em] text-[#1A1D1C] transition-colors hover:bg-[#d2b68c] active:bg-[#c9ac82] lg:hidden"
+              >
+                Filter
+              </button>
             </div>
 
-            <CatalogForProductLineRow />
+            <div className="hidden lg:block">
+              <CatalogForProductLineRow />
+            </div>
 
-            <div className="grid gap-3 lg:grid-cols-[12.5rem_11rem_11.75rem_4.75rem_1fr_11rem] lg:items-center lg:pr-[7.5rem]">
+            <div className="hidden gap-3 lg:grid lg:grid-cols-[12.5rem_11rem_11.75rem_4.75rem_1fr_11rem] lg:items-center lg:pr-[7.5rem]">
               <label className="relative block">
                 <select
                   value={selectedCollection}
