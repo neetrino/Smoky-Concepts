@@ -184,19 +184,19 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               title={t('home.homepage.coverCollections.title')}
               className="-translate-y-6 sm:-translate-y-8"
             />
-            <div className="grid grid-cols-2 items-start gap-x-5 gap-y-8 overflow-visible sm:grid-cols-4 sm:gap-8">
+            <div className="mt-12 grid grid-cols-2 items-start gap-x-2 gap-y-20 overflow-visible sm:mt-0 sm:grid-cols-4 sm:gap-8">
               {coverCollections.map((item) => (
                 <Link
                   key={item.slug}
                   href={`/products?category=${item.slug}`}
-                  className="group relative z-0 mt-5 flex min-h-0 w-full min-w-0 flex-col overflow-visible rounded-[1.5rem] bg-white px-4 pb-3 pt-0 shadow-[0_6px_24px_rgba(18,42,38,0.05)] transition-shadow duration-200 hover:z-10 hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)] focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:rounded-[2.5rem] sm:px-6 sm:pb-4"
+                  className="group relative z-0 mt-5 -translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1.1rem] bg-transparent px-2.5 pb-2 pt-0 shadow-[0_6px_24px_rgba(18,42,38,0.05)] transition-shadow duration-200 hover:z-10 hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)] focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2.5rem] sm:bg-white sm:px-6 sm:pb-4"
                 >
-                  <div className="relative -mt-16 h-44 w-full shrink-0 overflow-visible sm:-mt-24 sm:h-[22rem]">
+                  <div className="relative -mt-16 translate-y-2 h-44 w-[94%] self-center shrink-0 overflow-visible sm:-mt-24 sm:translate-y-0 sm:h-[22rem] sm:w-full">
                     {item.imageSrc ? (
                       <img
                         src={item.imageSrc}
                         alt={item.title}
-                        className="h-full w-full origin-bottom object-contain object-top transition-transform duration-300 ease-out translate-y-4 group-hover:translate-y-2 group-hover:scale-110 group-hover:drop-shadow-[0_12px_24px_rgba(18,42,38,0.18)] sm:translate-y-[6rem] sm:scale-x-[1.45] sm:scale-y-[1.42] sm:group-hover:translate-y-[5.5rem] sm:group-hover:scale-x-[1.55] sm:group-hover:scale-y-[1.52]"
+                        className="h-full w-full origin-bottom object-contain object-top transition-transform duration-300 ease-out translate-y-10 scale-x-[1.92] scale-y-[1.72] sm:translate-y-[6rem] sm:scale-x-[1.45] sm:scale-y-[1.42] sm:group-hover:translate-y-[5.5rem] sm:group-hover:scale-x-[1.55] sm:group-hover:scale-y-[1.52]"
                         loading="lazy"
                         decoding="async"
                       />
@@ -205,13 +205,17 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                         <img
                           src={HOME_ASSET_PATHS.packMark}
                           alt=""
-                          className="h-20 w-16 origin-bottom object-contain opacity-60 transition-transform duration-300 ease-out group-hover:-translate-y-1 group-hover:scale-110 sm:h-24 sm:w-[4.5rem] sm:group-hover:-translate-y-2 sm:group-hover:scale-[1.3]"
+                          className="h-20 w-16 origin-bottom object-contain opacity-60 transition-transform duration-300 ease-out scale-x-[1.34] scale-y-[1.2] sm:h-24 sm:w-[4.5rem] sm:group-hover:-translate-y-2 sm:group-hover:scale-[1.3]"
                           aria-hidden="true"
                         />
                       </div>
                     )}
                   </div>
-                  <h3 className="line-clamp-2 text-base font-black leading-tight text-[#414141] sm:text-xl lg:text-2xl">
+                  <h3
+                    className={`text-base font-black leading-tight text-[#414141] sm:text-xl lg:text-2xl ${
+                      item.slug === 'special-edition' ? 'line-clamp-1 whitespace-nowrap' : 'line-clamp-2'
+                    }`}
+                  >
                     {item.title}
                   </h3>
                 </Link>
