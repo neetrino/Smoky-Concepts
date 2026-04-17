@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { dispatchCartDrawerOpen } from '../app/cart/constants';
 import { getCartCount } from '../lib/storageCounts';
 import { LanguageSwitcherHeader } from './LanguageSwitcherHeader';
 import { HOME_ASSET_PATHS } from './home/homePage.data';
@@ -126,14 +127,19 @@ export function Header() {
           </Link>
           {renderNavLinks('hidden items-center gap-10 text-sm md:flex', NAVIGATION_ITEMS)}
           <div className="flex items-center gap-5 md:gap-6">
-            <Link href="/cart" className="relative inline-flex h-6 w-6 items-center justify-center">
-              <img src={HOME_ASSET_PATHS.bagIcon} alt="Cart" className="h-6 w-5 object-contain" />
+            <button
+              type="button"
+              onClick={() => dispatchCartDrawerOpen()}
+              className="relative inline-flex h-6 w-6 items-center justify-center"
+              aria-label="Open cart"
+            >
+              <img src={HOME_ASSET_PATHS.bagIcon} alt="" className="h-6 w-5 object-contain" aria-hidden />
               {cartReady && cartCount > 0 ? (
                 <span className="absolute -right-2 -top-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dcc090] px-1 text-[0.55rem] font-bold text-[#122a26]">
                   {cartCount > 99 ? '99+' : cartCount}
                 </span>
               ) : null}
-            </Link>
+            </button>
             <div className="hidden md:block">
               <LanguageSwitcherHeader />
             </div>
