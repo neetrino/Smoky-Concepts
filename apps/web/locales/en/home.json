@@ -27,8 +27,12 @@
       "title": "Cover Collections"
     },
     "ritual": {
-      "title": "Your Ritual\nYour Signature",
-      "description": "Personalize your Smoky Cover. A small detail. A clear message.",
+      "title": "Your Ritual.\nYour Signature",
+      "description": {
+        "line1Bold": "Personalize",
+        "line1Rest": "your Smoky Cover",
+        "line2": "A small detail. A clear message."
+      },
       "bannerAlt": "Crafting ritual",
       "cta": "Personalize",
       "steps": {

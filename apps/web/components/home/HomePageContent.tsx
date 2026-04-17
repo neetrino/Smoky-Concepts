@@ -223,15 +223,19 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
         <section className="flex flex-col gap-8 sm:gap-10">
           <HomeSectionTitle
             title={t('home.homepage.ritual.title')}
-            description={t('home.homepage.ritual.description')}
-            titleClassName="sm:whitespace-normal"
+            descriptionTwoLine={{
+              line1Bold: t('home.homepage.ritual.description.line1Bold'),
+              line1Rest: t('home.homepage.ritual.description.line1Rest'),
+              line2: t('home.homepage.ritual.description.line2'),
+            }}
+            titleClassName="sm:whitespace-normal !font-black"
           />
           <div className="overflow-hidden rounded-[1.5rem] sm:rounded-[2.25rem]">
             <div className="relative h-[24rem] sm:h-[30rem]">
               <Image src={HOME_ASSET_PATHS.ritualBanner} alt={t('home.homepage.ritual.bannerAlt')} fill className="object-cover" sizes="1680px" />
             </div>
           </div>
-          <div className="rounded-[1.5rem] rounded-t-xl bg-white px-5 pb-6 pt-5 font-montserrat shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:rounded-[2.25rem] sm:px-8 sm:pb-7 sm:pt-6">
+          <div className="-mt-3 rounded-[1.5rem] rounded-t-xl bg-white px-5 pb-6 pt-5 font-montserrat shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:-mt-5 sm:rounded-[2.25rem] sm:px-8 sm:pb-7 sm:pt-6">
             <div className="grid gap-6 xl:grid-cols-4">
               {RITUAL_STEPS.map((step, index) => (
                 <div

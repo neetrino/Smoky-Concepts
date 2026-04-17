@@ -28,7 +28,11 @@
     },
     "ritual": {
       "title": "Քո ռիտուալը\nՔո ոճը",
-      "description": "Անհատականացրու քո Smoky Cover-ը։ Փոքր դետալ։ Հստակ ուղերձ։",
+      "description": {
+        "line1Bold": "Անհատականացրու",
+        "line1Rest": "քո Smoky Cover-ը։",
+        "line2": "Փոքր դետալ։ Հստակ ուղերձ։"
+      },
       "bannerAlt": "Ստեղծման ռիտուալ",
       "cta": "Անհատականացնել",
       "steps": {

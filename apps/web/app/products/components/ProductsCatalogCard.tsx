@@ -54,6 +54,8 @@ interface ProductsCatalogCardProps {
   legacyHomeCartIcon?: boolean;
   /** When true (e.g. carousel drag), product links do not navigate. */
   shouldBlockProductNavigation?: () => boolean;
+  /** Omit default card drop shadow (e.g. trending carousel center hero card). */
+  suppressShadow?: boolean;
 }
 
 /**
@@ -72,6 +74,7 @@ export function ProductsCatalogCard({
   widerCompactCard = false,
   legacyHomeCartIcon = false,
   shouldBlockProductNavigation,
+  suppressShadow = false,
 }: ProductsCatalogCardProps) {
   const router = useRouter();
   const { isAddingToCart, addToCart } = useAddToCart({
@@ -118,9 +121,12 @@ export function ProductsCatalogCard({
     SECTION_BADGE_CLASS_NAMES[sectionLabel] ?? SECTION_BADGE_CLASS_NAMES.Classic;
   const isCompactSize = sizeLabel === 'Compact';
   const compactArticleWidth = widerCompactCard ? 'w-[12rem]' : 'w-[11rem]';
+  const cardShadowClass = suppressShadow
+    ? 'shadow-none'
+    : 'shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]';
   const articleClassName = compactLayout
-    ? `relative ${compactArticleWidth} shrink-0 overflow-visible rounded-[1.125rem] bg-white px-3 pb-3 pt-2.5 shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]`
-    : 'relative w-[14.25rem] shrink-0 overflow-visible rounded-[1.375rem] bg-white px-3.5 pb-3.5 pt-3 shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]';
+    ? `relative ${compactArticleWidth} shrink-0 overflow-visible rounded-[1.125rem] bg-white px-3 pb-3 pt-2.5 ${cardShadowClass}`.trim()
+    : `relative w-[14.25rem] shrink-0 overflow-visible rounded-[1.375rem] bg-white px-3.5 pb-3.5 pt-3 ${cardShadowClass}`.trim();
   const imageWrapperClassName = compactLayout
     ? widerCompactCard
       ? 'h-[18.5rem]'
@@ -148,8 +154,8 @@ export function ProductsCatalogCard({
     ? 'text-[0.875rem] sm:text-[1.0625rem]'
     : 'text-[1rem] sm:text-[1.125rem]';
   const buyButtonClassName = compactLayout
-    ? 'inline-flex h-6 min-w-[3.25rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-2 text-[0.75rem] font-extrabold uppercase leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10'
-    : 'inline-flex h-[1.625rem] min-w-[3.75rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-3 text-[0.875rem] font-extrabold uppercase leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10';
+    ? 'inline-flex h-6 min-w-[3.25rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-2 text-[0.75rem] font-extrabold leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10'
+    : 'inline-flex h-[1.625rem] min-w-[3.75rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-3 text-[0.875rem] font-extrabold leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10';
   const iconClassName = compactLayout ? 'h-4 w-4 object-contain' : 'h-5 w-5 object-contain';
   const catalogBagIconClassName = compactLayout
     ? 'h-6 w-[28px] object-contain'

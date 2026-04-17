@@ -21,7 +21,7 @@ const TRENDING_ITEMS_PER_PAGE = 3;
 const TRENDING_CARD_WIDTH_REM = 13;
 const TRENDING_CARD_GAP_REM = 0.75;
 const TRENDING_TRACK_STEP_REM = TRENDING_CARD_WIDTH_REM + TRENDING_CARD_GAP_REM;
-/** Viewport for three cards (3×width + 2×gap) + small buffer so right card/shadow is not clipped */
+/** Viewport for three cards (3×width + 2×gap) + small buffer so the right card is not clipped */
 const TRENDING_VIEWPORT_WIDTH_REM =
   TRENDING_CARD_WIDTH_REM * 3 + TRENDING_CARD_GAP_REM * 2 + 0.25;
 
@@ -328,6 +328,7 @@ export function TrendingFeaturedSection() {
                 imageScaleBoost={0.08}
                 imageNudgeDown={isMiddleOfThree}
                 compactLayout
+                suppressShadow
               />
             </div>
           );
@@ -349,6 +350,7 @@ export function TrendingFeaturedSection() {
                     className="w-[11.25rem]"
                     imageScaleBoost={index === 1 ? -0.07 : 0.02}
                     compactLayout
+                    suppressShadow
                   />
                 </div>
               );
@@ -363,7 +365,7 @@ export function TrendingFeaturedSection() {
 
         <div
           ref={desktopViewportRef}
-          className="-mt-24 mx-auto shrink-0 overflow-x-clip overflow-y-clip"
+          className="-mt-24 mx-auto shrink-0 overflow-x-clip"
           style={{ width: `${TRENDING_VIEWPORT_WIDTH_REM}rem` }}
         >
           <div
@@ -390,6 +392,7 @@ export function TrendingFeaturedSection() {
                       className="w-[13rem]"
                       imageNudgeDown={isMiddle}
                       compactLayout
+                      suppressShadow
                     />
                   </div>
                 );
@@ -411,6 +414,7 @@ export function TrendingFeaturedSection() {
                     className="w-[11.25rem]"
                     imageScaleBoost={index === 1 ? -0.07 : 0.02}
                     compactLayout
+                    suppressShadow
                   />
                 </div>
               );

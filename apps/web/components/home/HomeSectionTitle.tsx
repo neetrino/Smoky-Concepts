@@ -1,8 +1,16 @@
+interface HomeSectionTitleDescriptionTwoLine {
+  line1Bold: string;
+  line1Rest: string;
+  line2: string;
+}
+
 interface HomeSectionTitleProps {
   title: string;
   /** When set, shown below `sm` with `whitespace-pre-line`; `title` is used from `sm` up (natural wrap). */
   titleMobile?: string;
   description?: string;
+  /** Two-line description: first word bold, rest of line 1 + line 2 regular. Takes precedence over `description`. */
+  descriptionTwoLine?: HomeSectionTitleDescriptionTwoLine;
   centered?: boolean;
   className?: string;
   titleClassName?: string;
@@ -15,6 +23,7 @@ export function HomeSectionTitle({
   title,
   titleMobile,
   description,
+  descriptionTwoLine,
   centered = true,
   className = '',
   titleClassName = '',
@@ -34,7 +43,19 @@ export function HomeSectionTitle({
           title
         )}
       </h2>
-      {description ? (
+      {descriptionTwoLine ? (
+        <p className="max-w-[52rem] text-base font-normal leading-[1.375] text-[#414141] sm:leading-relaxed">
+          <span className="font-bold">{descriptionTwoLine.line1Bold}</span>
+          {descriptionTwoLine.line1Rest ? (
+            <>
+              {' '}
+              {descriptionTwoLine.line1Rest}
+            </>
+          ) : null}
+          <br />
+          {descriptionTwoLine.line2}
+        </p>
+      ) : description ? (
         <p className="max-w-[52rem] whitespace-pre-line text-base font-medium leading-[1.375] text-[#414141] sm:leading-relaxed">
           {description}
         </p>
