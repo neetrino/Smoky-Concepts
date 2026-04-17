@@ -114,8 +114,8 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
     Knifes: 'knifes',
     Phones: 'phones',
     Wallets: 'wallets',
-    Documents: 'documents',
-    Keys: 'keys',
+    Documents: 'keys',
+    Keys: 'documents',
   };
 
   return (

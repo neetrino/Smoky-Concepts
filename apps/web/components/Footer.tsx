@@ -65,20 +65,23 @@ export function Footer() {
                   className="h-full w-full object-contain object-center lg:object-right"
                 />
               </div>
-              <a
-                href={NEETRINO_PARTNER_HREF}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex max-w-[10rem] translate-x-3 self-end transition-opacity hover:opacity-80 sm:translate-x-4"
-                aria-label="Neetrino"
-              >
-                <img
-                  src={HOME_ASSET_PATHS.neetrinoPartnerLogo}
-                  alt=""
-                  className="h-6 w-full max-h-8 object-contain object-center lg:object-right"
-                  aria-hidden="true"
-                />
-              </a>
+              <div className="mt-2 flex max-w-[10rem] translate-x-1 flex-col items-center self-end sm:translate-x-2 lg:items-end">
+                <p className="mb-2 text-sm font-extrabold lg:-translate-x-6">{t('home.homepage.footer.createdBy')}</p>
+                <a
+                  href={NEETRINO_PARTNER_HREF}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex w-full transition-opacity hover:opacity-80"
+                  aria-label="Neetrino"
+                >
+                  <img
+                    src={HOME_ASSET_PATHS.neetrinoPartnerLogo}
+                    alt=""
+                    className="h-6 w-full max-h-8 object-contain object-center lg:object-right"
+                    aria-hidden="true"
+                  />
+                </a>
+              </div>
             </div>
           </div>
         </div>
