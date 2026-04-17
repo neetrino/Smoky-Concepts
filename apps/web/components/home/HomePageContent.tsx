@@ -180,7 +180,10 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
 
         {coverCollections.length > 0 ? (
           <section className="flex flex-col gap-8 overflow-visible pt-3 sm:gap-10 sm:pt-6">
-            <HomeSectionTitle title={t('home.homepage.coverCollections.title')} />
+            <HomeSectionTitle
+              title={t('home.homepage.coverCollections.title')}
+              className="-translate-y-4 sm:-translate-y-5"
+            />
             <div className="grid grid-cols-2 gap-x-5 gap-y-8 overflow-visible sm:gap-8 lg:grid-cols-4">
               {coverCollections.map((item) => (
                 <Link
@@ -193,7 +196,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                       <img
                         src={item.imageSrc}
                         alt={item.title}
-                        className="h-full w-full origin-bottom object-contain object-top transition-transform duration-300 ease-out group-hover:scale-110 group-hover:drop-shadow-[0_12px_24px_rgba(18,42,38,0.18)]"
+                        className="h-full w-full origin-bottom object-contain object-top transition-transform duration-300 ease-out group-hover:scale-110 group-hover:drop-shadow-[0_12px_24px_rgba(18,42,38,0.18)] lg:translate-y-20 lg:scale-x-[1.45] lg:scale-y-[1.42] lg:group-hover:translate-y-24 lg:group-hover:scale-x-[1.55] lg:group-hover:scale-y-[1.52]"
                         loading="lazy"
                         decoding="async"
                       />
@@ -202,13 +205,13 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                         <img
                           src={HOME_ASSET_PATHS.packMark}
                           alt=""
-                          className="h-20 w-16 origin-bottom object-contain opacity-60 transition-transform duration-300 ease-out group-hover:scale-110"
+                          className="h-20 w-16 origin-bottom object-contain opacity-60 transition-transform duration-300 ease-out group-hover:scale-110 lg:h-24 lg:w-[4.5rem] lg:group-hover:scale-[1.3]"
                           aria-hidden="true"
                         />
                       </div>
                     )}
                   </div>
-                  <h3 className="text-base font-extrabold leading-none text-[#414141] sm:text-xl">{item.title}</h3>
+                  <h3 className="text-lg font-black leading-none text-[#414141] sm:text-2xl lg:text-3xl">{item.title}</h3>
                 </Link>
               ))}
             </div>
