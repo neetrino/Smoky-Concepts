@@ -45,6 +45,8 @@ interface ProductsCatalogCardProps {
   imageScaleBoost?: number;
   imageNudgeDown?: boolean;
   compactLayout?: boolean;
+  /** Slightly wider compact card (e.g. PDP related strip) without affecting home/catalog compact rows. */
+  widerCompactCard?: boolean;
   /**
    * Home-only: keep the legacy outline bag asset.
    * Everywhere else uses the filled catalog cart icon (`bag-catalog.svg`).
@@ -67,6 +69,7 @@ export function ProductsCatalogCard({
   imageScaleBoost = 0,
   imageNudgeDown = false,
   compactLayout = false,
+  widerCompactCard = false,
   legacyHomeCartIcon = false,
   shouldBlockProductNavigation,
 }: ProductsCatalogCardProps) {
@@ -114,20 +117,24 @@ export function ProductsCatalogCard({
   const badgeClassName =
     SECTION_BADGE_CLASS_NAMES[sectionLabel] ?? SECTION_BADGE_CLASS_NAMES.Classic;
   const isCompactSize = sizeLabel === 'Compact';
+  const compactArticleWidth = widerCompactCard ? 'w-[12rem]' : 'w-[11rem]';
   const articleClassName = compactLayout
-    ? 'relative w-[11rem] shrink-0 overflow-visible rounded-[1.125rem] bg-white px-3 pb-3 pt-2.5 shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]'
+    ? `relative ${compactArticleWidth} shrink-0 overflow-visible rounded-[1.125rem] bg-white px-3 pb-3 pt-2.5 shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]`
     : 'relative w-[14.25rem] shrink-0 overflow-visible rounded-[1.375rem] bg-white px-3.5 pb-3.5 pt-3 shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]';
   const imageWrapperClassName = compactLayout
-    ? 'h-[17.75rem]'
-    : (isCompactSize ? 'h-60' : 'h-72');
+    ? widerCompactCard
+      ? 'h-[18.5rem]'
+      : 'h-[17.75rem]'
+    : isCompactSize
+      ? 'h-60'
+      : 'h-72';
   const baseImagePullUpClassName = compactLayout
     ? '-mt-[6.25rem]'
     : (isCompactSize ? '-mt-16' : '-mt-24');
   const imagePullUpClassName = baseImagePullUpClassName;
+  const compactInnerImageHeight = widerCompactCard ? 'h-[17.25rem]' : 'h-[16.5rem]';
   const imageInnerClassName = compactLayout
-    ? imageNudgeDown
-      ? 'h-[16.5rem] w-full'
-      : 'h-[16.5rem] w-full'
+    ? `${compactInnerImageHeight} w-full`
     : 'h-full w-full';
   const compactBaseScale = imageNudgeDown ? 1.05 : 1.12;
   const compactImageScale = compactBaseScale + imageScaleBoost;

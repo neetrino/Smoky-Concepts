@@ -22,7 +22,7 @@ export function CustomizeFormatToolbar({
 
   return (
     <div className="w-full max-w-[640px]">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-1.5">
         <button
           type="button"
           aria-pressed={format.bold}

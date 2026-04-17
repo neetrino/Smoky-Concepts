@@ -156,8 +156,8 @@ export default function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="overflow-visible bg-[#efefef]">
       <div className="mx-auto max-w-[1920px] overflow-visible px-4 pb-16 pt-6 sm:px-6 lg:px-[120px] lg:pb-24 lg:pt-16">
-        <div className="grid items-start gap-10 overflow-visible xl:grid-cols-[minmax(0,640px)_minmax(0,1fr)] xl:gap-[52px]">
-          <div className="flex min-w-0 flex-col gap-6 overflow-visible sm:gap-8">
+        <div className="grid items-start gap-8 overflow-visible xl:grid-cols-[minmax(0,640px)_minmax(0,1fr)] xl:gap-11">
+          <div className="flex min-w-0 flex-col gap-5 overflow-visible sm:gap-6">
             <ProductImageGallery
               images={images}
               product={product}

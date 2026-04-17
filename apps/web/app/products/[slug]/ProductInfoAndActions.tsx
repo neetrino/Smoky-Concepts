@@ -333,11 +333,11 @@ export function ProductInfoAndActions({
 
     if (activeTab === 'customize') {
       return (
-        <div className="flex max-w-[763px] flex-col gap-[13px]">
+        <div className="flex max-w-[763px] flex-col gap-2.5">
           <p className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">
             {getCustomizeCopy(language)}
           </p>
-          <div className="flex max-w-[763px] flex-col gap-4 sm:flex-row sm:items-start sm:gap-20 sm:pb-5">
+          <div className="flex max-w-[763px] flex-col gap-3 sm:flex-row sm:items-start sm:gap-12 sm:pb-4">
             <div className="w-full min-w-0 sm:max-w-[291px]">
               <input
                 type="text"
@@ -497,7 +497,7 @@ export function ProductInfoAndActions({
       <div className="mt-12 min-w-0 w-full">
         <div className="w-full min-w-0 touch-pan-x overflow-x-auto pb-2 scrollbar-hide sm:touch-auto sm:overflow-visible sm:pb-0">
           <div
-            className="flex min-w-max snap-x snap-mandatory flex-nowrap items-end gap-6 sm:min-w-0 sm:w-full sm:snap-none sm:flex-wrap sm:gap-8"
+            className="flex min-w-max snap-x snap-mandatory flex-nowrap items-end gap-5 sm:min-w-0 sm:w-full sm:snap-none sm:flex-wrap sm:gap-6"
             role="tablist"
           >
             <button
@@ -559,7 +559,7 @@ export function ProductInfoAndActions({
           </div>
         </div>
 
-        <div className="pt-6 sm:pt-7">{renderedTabContent}</div>
+        <div className="pt-5 sm:pt-6">{renderedTabContent}</div>
       </div>
 
       <div className="mt-[48px] flex w-full min-w-0 items-center justify-between gap-2 sm:gap-4">
