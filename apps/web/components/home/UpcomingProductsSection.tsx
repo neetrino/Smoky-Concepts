@@ -207,6 +207,7 @@ export function UpcomingProductsSection() {
               skus: item.skus,
             });
             const section = getSectionLabel(catalogProduct);
+            const isDarkCollection = section === 'Premium' || section === 'Atelier';
             return (
               <ProductsCatalogCard
                 key={`upcoming-${index}-${item.id}`}
@@ -216,7 +217,7 @@ export function UpcomingProductsSection() {
                 categoryLabel={getCategoryLabel(catalogProduct, section)}
                 buyButtonLabel={t('home.homepage.upcoming.orderCta')}
                 imageNudgeDown={shouldNudgeCatalogProductImage(index)}
-                imageScaleBoost={0.04}
+                imageScaleBoost={isDarkCollection ? 0.2 : 0.04}
                 className="group lg:w-[12.75rem] xl:w-[13rem]"
                 compactLayout
               />

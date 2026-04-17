@@ -361,7 +361,11 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             title={t('home.homepage.sayHi.title')}
             description={t('home.homepage.sayHi.description')}
           />
-          <HomeActionButton href="/contact" label={t('home.homepage.sayHi.cta')} className="min-w-[13.75rem]" />
+          <HomeActionButton
+            href="/contact"
+            label={t('home.homepage.sayHi.cta')}
+            className="min-w-[13.75rem] !min-h-11 sm:!min-h-12 font-semibold"
+          />
         </section>
       </div>
     </div>
