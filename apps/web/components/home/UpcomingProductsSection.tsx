@@ -39,6 +39,31 @@ interface ProductsResponse {
 const UPCOMING_LIMIT = 12;
 const CARDS_PER_PAGE = 6;
 
+/** Matches `TrendingFeaturedSection` shop CTA sizing and xl placement. */
+const UPCOMING_SHOP_BUTTON_CLASS_NAME =
+  '!w-fit !min-h-8 !-translate-y-1 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-none !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!-translate-y-2 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-none sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:!-translate-y-3';
+
+function UpcomingSectionHeader() {
+  const { t } = useTranslation();
+  return (
+    <div className="relative flex min-h-[4rem] w-full items-center justify-between gap-3 sm:justify-end">
+      <div className="min-w-0 flex-1 sm:absolute sm:left-1/2 sm:top-1/2 sm:w-max sm:max-w-[min(100%,calc(100%-7rem))] sm:-translate-x-1/2 sm:-translate-y-1/2">
+        <HomeSectionTitle
+          title={t('home.homepage.upcoming.title')}
+          centered={false}
+          className="items-start text-left sm:items-center sm:text-center [&_h2]:text-left sm:[&_h2]:text-center"
+        />
+      </div>
+      <HomeActionButton
+        href="/products"
+        label={t('home.homepage.upcoming.shopCta')}
+        variant="outline"
+        className={UPCOMING_SHOP_BUTTON_CLASS_NAME}
+      />
+    </div>
+  );
+}
+
 /**
  * Home page "Upcoming" section: shows products marked as upcoming from the API.
  */
@@ -80,11 +105,7 @@ export function UpcomingProductsSection() {
   if (error) {
     return (
       <section className="flex flex-col gap-8">
-        <div className="relative flex min-h-[4rem] items-center justify-end">
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <HomeSectionTitle title={t('home.homepage.upcoming.title')} centered />
-          </div>
-        </div>
+        <UpcomingSectionHeader />
         <div className="flex items-center justify-center gap-4 py-8">
           <p className="text-[#414141]">{error === 'load_error' ? t('home.homepage.upcoming.loadError') : error}</p>
           <button
@@ -102,11 +123,7 @@ export function UpcomingProductsSection() {
   if (loading) {
     return (
       <section className="flex flex-col gap-8">
-        <div className="relative flex min-h-[4rem] items-center justify-end">
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <HomeSectionTitle title={t('home.homepage.upcoming.title')} centered />
-          </div>
-        </div>
+        <UpcomingSectionHeader />
         <div className="grid grid-cols-2 gap-4 pb-4 sm:grid-cols-3 lg:grid-cols-5">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="h-80 animate-pulse rounded-3xl bg-white/60" />
@@ -119,17 +136,7 @@ export function UpcomingProductsSection() {
   if (items.length === 0) {
     return (
       <section className="flex flex-col gap-8">
-        <div className="relative flex min-h-[4rem] items-center justify-end">
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <HomeSectionTitle title={t('home.homepage.upcoming.title')} centered />
-          </div>
-          <HomeActionButton
-            href="/products"
-            label={t('home.homepage.upcoming.shopCta')}
-            variant="outline"
-            className="hidden sm:inline-flex min-h-6 rounded-[0.5rem] border-[2.5px] px-2.5 text-[0.625rem] font-black uppercase tracking-[0.07em] sm:min-h-9 sm:px-5 sm:text-[0.6875rem] sm:font-black sm:tracking-[0.14em]"
-          />
-        </div>
+        <UpcomingSectionHeader />
         <p className="py-6 text-center text-[#9d9d9d]">{t('home.homepage.upcoming.noUpcoming')}</p>
       </section>
     );
@@ -176,17 +183,7 @@ export function UpcomingProductsSection() {
 
   return (
     <section className="relative isolate flex flex-col gap-4 overflow-hidden sm:gap-5 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2 xl:overflow-x-clip xl:pl-[7.5rem]">
-      <div className="relative flex min-h-[4rem] items-center justify-end">
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <HomeSectionTitle title={t('home.homepage.upcoming.title')} centered />
-        </div>
-        <HomeActionButton
-          href="/products"
-          label={t('home.homepage.upcoming.shopCta')}
-          variant="outline"
-          className="hidden sm:inline-flex min-h-6 rounded-[0.5rem] border-[2.5px] px-2.5 text-[0.625rem] font-black uppercase tracking-[0.07em] sm:min-h-9 sm:px-5 sm:text-[0.6875rem] sm:font-black sm:tracking-[0.14em] xl:mr-[7.5rem]"
-        />
-      </div>
+      <UpcomingSectionHeader />
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}

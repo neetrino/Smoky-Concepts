@@ -154,7 +154,7 @@ export function CartDrawer() {
         onClick={() => setIsOpen(false)}
       />
 
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-[28rem] flex-col overflow-hidden bg-[#efefef] shadow-[-12px_0_32px_rgba(18,42,38,0.16)]">
+      <aside className="absolute right-0 top-0 flex h-full w-full max-w-[30rem] flex-col overflow-hidden bg-[#efefef] shadow-[-12px_0_32px_rgba(18,42,38,0.16)]">
         <button
           type="button"
           onClick={() => setIsOpen(false)}

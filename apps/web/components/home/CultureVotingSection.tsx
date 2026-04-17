@@ -235,7 +235,7 @@ export function CultureVotingSection() {
         </div>
       </div>
       <div className="mx-auto w-full max-w-[24rem] px-4 sm:max-w-[80rem]">
-        <div className="mx-auto grid grid-cols-2 justify-items-center gap-x-3 gap-y-10 sm:grid-cols-3 sm:gap-x-4 sm:gap-y-10 lg:max-w-[52rem] lg:grid-cols-3 lg:[grid-template-columns:repeat(3,minmax(10rem,1fr))]">
+        <div className="mx-auto grid grid-cols-2 items-stretch justify-items-center gap-x-3 gap-y-10 sm:grid-cols-3 sm:gap-x-4 sm:gap-y-10 lg:max-w-[52rem] lg:grid-cols-3 lg:[grid-template-columns:repeat(3,minmax(10rem,1fr))]">
           {items.map((item, index) => {
             const sizeLabel =
               index === 0 || index === 2
@@ -251,12 +251,12 @@ export function CultureVotingSection() {
                   : index === 2
                     ? t('home.homepage.culture.labels.atelier')
                     : undefined;
-            const showEarlyAccess = item.id === earlyAccessItemId;
+            const showEarlyAccess = item.likedByCurrentUser;
             return (
               <div
                 key={item.id}
-                className={`w-full ${index === 1 ? 'lg:mt-8' : ''} ${
-                  index % 3 === 2 ? 'col-span-2 flex justify-center sm:col-span-1 sm:block' : ''
+                className={`flex h-full w-full min-h-0 ${
+                  index % 3 === 2 ? 'col-span-2 justify-center sm:col-span-1' : ''
                 }`}
               >
                 <CultureVotingCard
@@ -267,7 +267,7 @@ export function CultureVotingSection() {
                   likedByCurrentUser={item.likedByCurrentUser}
                   pending={pendingItemId === item.id}
                   onToggleLike={handleToggleLike}
-                  mobileLikeInside={item.likedByCurrentUser}
+                  imageNudgeDown={index === 1}
                   mobileCompactBack={index === 1}
                   sizeLabel={sizeLabel}
                   variantLabel={variantLabel}

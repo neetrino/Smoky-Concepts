@@ -585,7 +585,7 @@ export function ProductInfoAndActions({
           )}
         </div>
 
-        <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto sm:gap-3">
+        <div className="flex w-full shrink-0 items-center gap-0.5 sm:w-auto sm:gap-1.5">
           <Button
             type="button"
             disabled={!canAddToCart || isAddingToCart}
@@ -612,7 +612,7 @@ export function ProductInfoAndActions({
           >
             {isAddingToCart ? (
               <svg
-                className="h-7 w-7 animate-spin text-[#dcc090]"
+                className="h-6 w-6 animate-spin text-[#dcc090]"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -629,9 +629,9 @@ export function ProductInfoAndActions({
               <Image
                 src={CATALOG_BAG_ICON_PATH}
                 alt=""
-                width={40}
-                height={40}
-                className="h-8 w-[40px] object-contain"
+                width={32}
+                height={32}
+                className="h-7 w-9 object-contain"
                 aria-hidden
               />
             )}

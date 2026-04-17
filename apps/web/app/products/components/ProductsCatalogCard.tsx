@@ -144,14 +144,16 @@ export function ProductsCatalogCard({
   const badgeClassNames = compactLayout
     ? `rounded-[0.375rem] px-[0.375rem] py-[0.125rem] text-[0.625rem] font-medium leading-none ${badgeClassName}`
     : `rounded-[0.375rem] px-[0.4375rem] py-[0.1875rem] text-[0.75rem] font-medium leading-none ${badgeClassName}`;
-  const priceClassName = compactLayout ? 'text-[1.0625rem]' : 'text-[1.125rem]';
+  const priceClassName = compactLayout
+    ? 'text-[0.875rem] sm:text-[1.0625rem]'
+    : 'text-[1rem] sm:text-[1.125rem]';
   const buyButtonClassName = compactLayout
     ? 'inline-flex h-6 min-w-[3.25rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-2 text-[0.75rem] font-extrabold uppercase leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10'
     : 'inline-flex h-[1.625rem] min-w-[3.75rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-3 text-[0.875rem] font-extrabold uppercase leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10';
-  const iconClassName = compactLayout ? 'h-5 w-5 object-contain' : 'h-6 w-6 object-contain';
+  const iconClassName = compactLayout ? 'h-4 w-4 object-contain' : 'h-5 w-5 object-contain';
   const catalogBagIconClassName = compactLayout
-    ? 'h-7 w-[32px] object-contain'
-    : 'h-8 w-[40px] object-contain';
+    ? 'h-6 w-[28px] object-contain'
+    : 'h-7 w-9 object-contain';
   const detailsOffsetClassName = compactLayout
     ? tightenDetailsUnderImage
       ? '-mt-[5rem]'
@@ -262,7 +264,7 @@ export function ProductsCatalogCard({
             {formatCatalogPrice(product.price ?? 0)}
           </span>
 
-          <div className="flex items-center gap-[0.625rem]">
+          <div className="flex items-center gap-0.5">
             <button
               type="button"
               onClick={handleBuyNow}
@@ -281,7 +283,7 @@ export function ProductsCatalogCard({
               title={product.inStock ? 'Add to cart' : 'Out of stock'}
             >
               {isAddingToCart ? (
-                <svg className="h-7 w-7 animate-spin text-[#dcc090]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden>
+                <svg className="h-6 w-6 animate-spin text-[#dcc090]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden>
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
@@ -289,8 +291,8 @@ export function ProductsCatalogCard({
                 <Image
                   src={legacyHomeCartIcon ? BAG_ICON_PATH : CATALOG_BAG_ICON_PATH}
                   alt=""
-                  width={legacyHomeCartIcon ? 24 : 40}
-                  height={legacyHomeCartIcon ? 24 : 40}
+                  width={legacyHomeCartIcon ? 20 : 32}
+                  height={legacyHomeCartIcon ? 20 : 32}
                   aria-hidden
                   className={legacyHomeCartIcon ? iconClassName : catalogBagIconClassName}
                 />
