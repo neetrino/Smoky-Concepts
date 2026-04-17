@@ -454,7 +454,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                           categoryLabel={getCategoryLabel(product, section.title)}
                           imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                           imageScaleBoost={0.04}
-                          className="lg:w-[12.75rem] xl:w-[13rem]"
+                          className="group lg:w-[12.75rem] xl:w-[13rem]"
                           compactLayout
                         />
                       ))}

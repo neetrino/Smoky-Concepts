@@ -93,11 +93,13 @@ function groupCatalogByCategory(products: CatalogProduct[]): CatalogProduct[] {
  */
 export function TrendingFeaturedSection() {
   const { t } = useTranslation();
-  const desktopViewportRef = useRef<HTMLDivElement | null>(null);
+  const leftPreviewRef = useRef<HTMLDivElement | null>(null);
+  const rightPreviewRef = useRef<HTMLDivElement | null>(null);
   const [items, setItems] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const [suppressTrackTransition, setSuppressTrackTransition] = useState(false);
 
   const pageStartIndices = Array.from({ length: Math.max(1, Math.ceil(items.length / TRENDING_ITEMS_PER_PAGE)) }, (_, index) =>
     Math.min(index * TRENDING_ITEMS_PER_PAGE, Math.max(0, items.length - TRENDING_ITEMS_PER_PAGE))
@@ -129,36 +131,85 @@ export function TrendingFeaturedSection() {
   const previousPreviewItems = prevIndices.map((i) => items[i]).filter(Boolean);
   const nextPreviewItems = nextIndices.map((i) => items[i]).filter(Boolean);
 
+  /**
+   * Spin / orbit animation for the side preview groups.
+   * Focal (high-opacity) cards in the central viewport stay pristine — only the
+   * faded preview clusters on either side rotate around the carousel's center,
+   * which produces the perceived "spin" without disturbing the main row.
+   */
   const playCircularTransition = useCallback((direction: 'prev' | 'next') => {
-    const viewport = desktopViewportRef.current;
-    if (!viewport || typeof viewport.animate !== 'function') {
-      return;
+    const left = leftPreviewRef.current;
+    const right = rightPreviewRef.current;
+    const supportsAnimate = (el: HTMLDivElement | null): el is HTMLDivElement =>
+      Boolean(el && typeof el.animate === 'function');
+
+    if (!supportsAnimate(left) && !supportsAnimate(right)) return;
+
+    const sign = direction === 'next' ? 1 : -1;
+    const easing = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    const duration = 560;
+
+    if (supportsAnimate(left)) {
+      left.animate(
+        [
+          { transform: 'translate3d(0, 0, 0) rotateY(0deg) scale(1)', opacity: 1, offset: 0 },
+          {
+            transform: `translate3d(${sign * 36}px, -8px, 0) rotateY(${sign * -14}deg) scale(0.94)`,
+            opacity: 0.25,
+            offset: 0.45,
+          },
+          { transform: 'translate3d(0, 0, 0) rotateY(0deg) scale(1)', opacity: 1, offset: 1 },
+        ],
+        { duration, easing, fill: 'none' }
+      );
     }
 
-    const moveX = direction === 'next' ? -16 : 16;
-    const tilt = direction === 'next' ? -2.5 : 2.5;
-
-    viewport.animate(
-      [
-        { transform: 'translate3d(0, 0, 0) rotate(0deg) scale(1)' },
-        { transform: `translate3d(${moveX}px, -14px, 0) rotate(${tilt}deg) scale(0.992)`, offset: 0.45 },
-        { transform: 'translate3d(0, 0, 0) rotate(0deg) scale(1)' },
-      ],
-      {
-        duration: 460,
-        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-      }
-    );
+    if (supportsAnimate(right)) {
+      right.animate(
+        [
+          { transform: 'translate3d(0, 0, 0) rotateY(0deg) scale(1)', opacity: 1, offset: 0 },
+          {
+            transform: `translate3d(${sign * 36}px, -8px, 0) rotateY(${sign * -14}deg) scale(0.94)`,
+            opacity: 0.25,
+            offset: 0.45,
+          },
+          { transform: 'translate3d(0, 0, 0) rotateY(0deg) scale(1)', opacity: 1, offset: 1 },
+        ],
+        { duration, easing, fill: 'none' }
+      );
+    }
   }, []);
 
   const goPrev = useCallback(() => {
     playCircularTransition('prev');
+    const shouldWrapToEnd = currentPage === 0;
+    if (shouldWrapToEnd) {
+      setSuppressTrackTransition(true);
+    }
     setCurrentPage((p) => (p === 0 ? maxPage : p - 1));
-  }, [maxPage, playCircularTransition]);
+    if (shouldWrapToEnd) {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          setSuppressTrackTransition(false);
+        });
+      });
+    }
+  }, [currentPage, maxPage, playCircularTransition]);
   const goNext = useCallback(() => {
     playCircularTransition('next');
+    const shouldWrapToStart = currentPage >= maxPage;
+    if (shouldWrapToStart) {
+      setSuppressTrackTransition(true);
+    }
     setCurrentPage((p) => (p >= maxPage ? 0 : p + 1));
-  }, [maxPage, playCircularTransition]);
+    if (shouldWrapToStart) {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          setSuppressTrackTransition(false);
+        });
+      });
+    }
+  }, [currentPage, maxPage, playCircularTransition]);
 
   const fetchFeatured = useCallback(async () => {
     try {
@@ -335,41 +386,51 @@ export function TrendingFeaturedSection() {
         })}
       </div>
 
-      <div className="relative z-0 mt-2 hidden min-w-0 xl:block xl:w-full">
+      <div
+        className="relative z-0 mt-2 hidden min-w-0 xl:block xl:w-full"
+        style={{ perspective: '1800px', transformStyle: 'preserve-3d' }}
+      >
         <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-[calc(150%+11.75rem)]">
-          <div className="flex items-end gap-3">
-            {previousPreviewItems.map((product, index) => {
-              const section = getSectionLabel(product);
-              return (
-                <div key={`trending-prev-${product.id}-${index}`} className="pointer-events-auto w-[11.25rem] opacity-50 -mt-6">
-                  <ProductsCatalogCard
-                    product={product}
-                    sectionLabel={section}
-                    sizeLabel={getSizeLabel(product)}
-                    categoryLabel={getCategoryLabel(product, section)}
-                    className="w-[11.25rem]"
-                    imageScaleBoost={index === 1 ? -0.07 : 0.02}
-                    compactLayout
-                    suppressShadow
-                  />
-                </div>
-              );
-            })}
+          <div
+            ref={leftPreviewRef}
+            className="will-change-transform"
+            style={{ transformOrigin: '100% 50%', transformStyle: 'preserve-3d', backfaceVisibility: 'hidden' }}
+          >
+            <div className="flex items-end gap-3">
+              {previousPreviewItems.map((product, index) => {
+                const section = getSectionLabel(product);
+                return (
+                  <div key={`trending-prev-${product.id}-${index}`} className="pointer-events-auto w-[11.25rem] opacity-50 -mt-6">
+                    <ProductsCatalogCard
+                      product={product}
+                      sectionLabel={section}
+                      sizeLabel={getSizeLabel(product)}
+                      categoryLabel={getCategoryLabel(product, section)}
+                      className="w-[11.25rem]"
+                      imageScaleBoost={index === 1 ? -0.07 : 0.02}
+                      compactLayout
+                      suppressShadow
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            <p className="mt-5 whitespace-nowrap text-center text-[1.5rem] font-extrabold leading-none text-[#122a26]/60">
+              {leftPreviewCategoryLabel && leftPreviewCategoryLabel !== 'Featured'
+                ? leftPreviewCategoryLabel
+                : '—'}
+            </p>
           </div>
-          <p className="mt-5 whitespace-nowrap text-center text-[1.5rem] font-extrabold leading-none text-[#122a26]/60">
-            {leftPreviewCategoryLabel && leftPreviewCategoryLabel !== 'Featured'
-              ? leftPreviewCategoryLabel
-              : '—'}
-          </p>
         </div>
 
         <div
-          ref={desktopViewportRef}
           className="-mt-24 mx-auto shrink-0 overflow-x-clip"
           style={{ width: `${TRENDING_VIEWPORT_WIDTH_REM}rem` }}
         >
           <div
-            className="flex touch-pan-y items-end justify-start gap-3 transition-transform duration-300 ease-out"
+            className={`flex touch-pan-y items-end justify-start gap-3 ${
+              suppressTrackTransition ? '' : 'transition-transform duration-300 ease-out'
+            }`}
             style={{
               transform: `translateX(-${startIndex * TRENDING_TRACK_STEP_REM}rem)`,
               width: desktopTrackWidthRem !== undefined ? `${desktopTrackWidthRem}rem` : undefined,
@@ -401,30 +462,36 @@ export function TrendingFeaturedSection() {
         </div>
 
         <div className="pointer-events-none absolute right-1/2 top-0 translate-x-[calc(150%+11.75rem)]">
-          <div className="flex items-end gap-3">
-            {nextPreviewItems.map((product, index) => {
-              const section = getSectionLabel(product);
-              return (
-                <div key={`trending-next-${product.id}-${index}`} className="pointer-events-auto w-[11.25rem] opacity-50 -mt-6">
-                  <ProductsCatalogCard
-                    product={product}
-                    sectionLabel={section}
-                    sizeLabel={getSizeLabel(product)}
-                    categoryLabel={getCategoryLabel(product, section)}
-                    className="w-[11.25rem]"
-                    imageScaleBoost={index === 1 ? -0.07 : 0.02}
-                    compactLayout
-                    suppressShadow
-                  />
-                </div>
-              );
-            })}
+          <div
+            ref={rightPreviewRef}
+            className="will-change-transform"
+            style={{ transformOrigin: '0% 50%', transformStyle: 'preserve-3d', backfaceVisibility: 'hidden' }}
+          >
+            <div className="flex items-end gap-3">
+              {nextPreviewItems.map((product, index) => {
+                const section = getSectionLabel(product);
+                return (
+                  <div key={`trending-next-${product.id}-${index}`} className="pointer-events-auto w-[11.25rem] opacity-50 -mt-6">
+                    <ProductsCatalogCard
+                      product={product}
+                      sectionLabel={section}
+                      sizeLabel={getSizeLabel(product)}
+                      categoryLabel={getCategoryLabel(product, section)}
+                      className="w-[11.25rem]"
+                      imageScaleBoost={index === 1 ? -0.07 : 0.02}
+                      compactLayout
+                      suppressShadow
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            <p className="mt-5 whitespace-nowrap text-center text-[1.5rem] font-extrabold leading-none text-[#122a26]/60">
+              {rightPreviewCategoryLabel && rightPreviewCategoryLabel !== 'Featured'
+                ? rightPreviewCategoryLabel
+                : '—'}
+            </p>
           </div>
-          <p className="mt-5 whitespace-nowrap text-center text-[1.5rem] font-extrabold leading-none text-[#122a26]/60">
-            {rightPreviewCategoryLabel && rightPreviewCategoryLabel !== 'Featured'
-              ? rightPreviewCategoryLabel
-              : '—'}
-          </p>
         </div>
       </div>
 

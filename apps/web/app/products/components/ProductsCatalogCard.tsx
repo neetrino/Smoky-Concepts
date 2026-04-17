@@ -192,7 +192,9 @@ export function ProductsCatalogCard({
       <div
         className={`relative z-10 mb-2 flex items-end justify-center ${imagePullUpClassName} ${imageWrapperClassName} overflow-visible`.trim()}
       >
-        <div className={`relative ${imageInnerClassName}`}>
+        <div
+          className={`relative ${imageInnerClassName} transition-transform duration-300 ease-out md:group-hover:-translate-y-1.5 md:group-hover:scale-[1.045]`}
+        >
           {activeImage && !imageError ? (
             <Link
               href={`/products/${product.slug}`}

@@ -41,13 +41,13 @@ const CARDS_PER_PAGE = 6;
 
 /** Matches `TrendingFeaturedSection` shop CTA sizing and xl placement. */
 const UPCOMING_SHOP_BUTTON_CLASS_NAME =
-  '!w-fit !min-h-8 !-translate-y-1 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-none !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!-translate-y-2 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-none sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:!-translate-y-3';
+  '!w-fit !min-h-8 !translate-y-0 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-none !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!translate-y-[-0.25rem] sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-none sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:!translate-y-[-0.5rem]';
 
 function UpcomingSectionHeader() {
   const { t } = useTranslation();
   return (
     <div className="relative flex min-h-[4rem] w-full items-center justify-between gap-3 sm:justify-end">
-      <div className="min-w-0 flex-1 sm:absolute sm:left-1/2 sm:top-1/2 sm:w-max sm:max-w-[min(100%,calc(100%-7rem))] sm:-translate-x-1/2 sm:-translate-y-1/2">
+      <div className="min-w-0 flex-1 translate-y-[2px] sm:absolute sm:left-1/2 sm:top-1/2 sm:w-max sm:max-w-[min(100%,calc(100%-7rem))] sm:-translate-x-1/2 sm:-translate-y-[46%]">
         <HomeSectionTitle
           title={t('home.homepage.upcoming.title')}
           centered={false}
@@ -187,7 +187,7 @@ export function UpcomingProductsSection() {
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="scrollbar-hide mt-8 overflow-x-auto pt-[7.5rem] pb-4 sm:mt-12"
+        className="scrollbar-hide mt-3 overflow-x-auto pt-[6rem] pb-4 sm:mt-6 sm:pt-[6.25rem]"
       >
         <div className="flex min-w-max items-start gap-6">
           {items.map((item, index) => {
@@ -216,7 +216,7 @@ export function UpcomingProductsSection() {
                 categoryLabel={getCategoryLabel(catalogProduct, section)}
                 imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                 imageScaleBoost={0.04}
-                className="lg:w-[12.75rem] xl:w-[13rem]"
+                className="group lg:w-[12.75rem] xl:w-[13rem]"
                 compactLayout
               />
             );
@@ -225,7 +225,7 @@ export function UpcomingProductsSection() {
       </div>
       {totalPages > 1 && (
         <div
-          className="mt-2 flex items-center justify-center gap-4 sm:mt-3"
+          className="mt-1 flex items-center justify-center gap-4 sm:mt-2"
           role="tablist"
           aria-label={t('home.homepage.upcoming.paginationAria')}
         >

@@ -264,13 +264,15 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
 
         <TrendingFeaturedSection />
 
-        <section className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(32rem,35.5rem)_minmax(0,1fr)]">
-          <div className="relative min-h-[23rem] overflow-hidden rounded-[1.5rem] sm:min-h-[32rem] sm:rounded-[2rem]">
+        <section className="grid gap-y-6 sm:gap-y-8 lg:gap-x-2 lg:grid-cols-[minmax(0,1.28fr)_minmax(30rem,33.5rem)_minmax(0,1.28fr)]">
+          <div className="relative min-h-[23rem] overflow-hidden rounded-[1.5rem] sm:min-h-[32rem] sm:rounded-[2rem] lg:rounded-r-[0.625rem]">
             <Image src={HOME_ASSET_PATHS.craftTools} alt={t('home.homepage.bringing.imageAltLeft')} fill className="object-cover object-left" sizes="472px" />
           </div>
-          <div className="flex h-full min-h-[23rem] flex-col rounded-[1.5rem] bg-white px-5 py-6 shadow-[0_10px_30px_rgba(18,42,38,0.05)] sm:min-h-[32rem] sm:rounded-[2rem] sm:px-8 sm:py-9">
-            <h2 className="text-[2rem] font-extrabold leading-[1.05] sm:text-4xl">{t('home.homepage.bringing.title')}</h2>
-            <div className="mt-4 space-y-3 text-sm font-medium leading-relaxed sm:mt-6 sm:space-y-4 sm:text-base">
+          <div className="flex h-full min-h-[23rem] flex-col rounded-[1.5rem] bg-[#f2f2f2] px-5 py-7 sm:min-h-[32rem] sm:rounded-[2rem] sm:px-8 sm:py-9 lg:px-9">
+            <h2 className="max-w-[20rem] whitespace-pre-line text-[1.82rem] font-black leading-[1.04] tracking-[-0.01em] text-[#434347] sm:text-[2.4rem]">
+              {t('home.homepage.bringing.title')}
+            </h2>
+            <div className="mt-5 space-y-4 text-[0.84rem] font-semibold leading-[1.48] text-[#434347] sm:mt-7 sm:space-y-5 sm:text-[0.95rem] sm:leading-[1.48] lg:text-[1rem]">
               <p>{t('home.homepage.bringing.paragraphs.first')}</p>
               <p>{t('home.homepage.bringing.paragraphs.second')}</p>
               <p>{t('home.homepage.bringing.paragraphs.third')}</p>
@@ -281,7 +283,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               <p>{t('home.homepage.bringing.paragraphs.fifth')}</p>
             </div>
           </div>
-          <div className="relative hidden min-h-[23rem] overflow-hidden rounded-[1.5rem] sm:min-h-[32rem] sm:rounded-[2rem] lg:block">
+          <div className="relative hidden min-h-[23rem] overflow-hidden rounded-[1.5rem] sm:min-h-[32rem] sm:rounded-[2rem] lg:block lg:rounded-l-[0.625rem]">
             <Image src={HOME_ASSET_PATHS.craftTools} alt={t('home.homepage.bringing.imageAltRight')} fill className="object-cover object-right" sizes="472px" />
           </div>
         </section>
