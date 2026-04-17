@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
 import { uploadProductImageToR2, isR2Configured } from "@/lib/services/r2.service";
+import { parseDataImageUrl } from "@/lib/services/utils/data-url-image";
 import { logger } from "@/lib/utils/logger";
 
 /**
@@ -109,15 +110,12 @@ export async function POST(req: NextRequest) {
 
     const uploadResults = await Promise.all(
       validImages.map(async (dataUrl, i) => {
-        const match = dataUrl.match(/^data:(image\/[a-z+]+);base64,(.+)$/s);
-        if (!match) {
+        const parsed = parseDataImageUrl(dataUrl);
+        if (!parsed) {
           logger.warn("Upload images: skip invalid data URL", { index: i });
           return null;
         }
-        const contentType = match[1];
-        const base64Data = match[2];
-        const buffer = Buffer.from(base64Data, "base64");
-        return uploadProductImageToR2(buffer, contentType);
+        return uploadProductImageToR2(parsed.buffer, parsed.contentType);
       })
     );
     const urls = uploadResults.filter((u): u is string => u !== null);

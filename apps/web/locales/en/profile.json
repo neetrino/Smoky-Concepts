@@ -158,6 +158,7 @@
     "size": "Size",
     "quantity": "Quantity",
     "sku": "SKU",
+    "customization": "Customization",
     "itemsAdded": "item(s) added to cart",
     "skipped": "skipped",
     "failedToAdd": "Failed to add items to cart. Please try again."

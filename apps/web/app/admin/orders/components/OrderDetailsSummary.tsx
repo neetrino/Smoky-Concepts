@@ -2,7 +2,7 @@
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
-import { amountToUsd, formatPriceInCurrency } from '../../../../lib/currency';
+import { ADMIN_PRICE_CURRENCY, amountToUsd, formatPriceInCurrency } from '../../../../lib/currency';
 import type { OrderDetails } from '../useOrders';
 
 interface OrderDetailsSummaryProps {
@@ -62,6 +62,10 @@ export function OrderDetailsSummary({
         ? 'bg-[#fee2e2] text-[#991b1b] ring-[#fca5a5] focus:ring-[#f87171]'
         : 'bg-[#fff4cc] text-[#7a5a00] ring-[#f0d98a] focus:ring-[#e1c259]';
 
+  /** Keeps summary column label rows the same height so values line up across the row. */
+  const summaryControlHeaderClass =
+    'mb-1 flex min-h-[2.75rem] flex-col justify-end';
+
   const summaryValue = orderDetails.totals
     ? (() => {
         const subtotalUsd = amountToUsd(orderDetails.totals.subtotal, orderDetails.totals.currency);
@@ -72,26 +76,30 @@ export function OrderDetailsSummary({
         );
         const taxUsd = amountToUsd(orderDetails.totals.tax, orderDetails.totals.currency);
         const totalUsd = subtotalUsd - discountUsd + shippingUsd + taxUsd;
-        return formatPriceInCurrency(totalUsd, 'USD');
+        return formatPriceInCurrency(totalUsd, ADMIN_PRICE_CURRENCY);
       })()
-    : formatCurrency(orderDetails.total, 'USD', orderDetails.currency || 'USD');
+    : formatCurrency(orderDetails.total, ADMIN_PRICE_CURRENCY, orderDetails.currency || 'USD');
 
   return (
     <Card className="p-4 md:p-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
         <div>
-          <p className="mb-1 text-xs font-medium uppercase tracking-[0.08em] text-gray-500">
-            {t('admin.orders.orderDetails.total')}
-          </p>
-          <div className="text-3xl font-extrabold leading-none text-[#001b4d]">{summaryValue}</div>
+          <div className={summaryControlHeaderClass}>
+            <p className="text-xs font-medium uppercase tracking-[0.08em] text-gray-500">
+              {t('admin.orders.orderDetails.total')}
+            </p>
+          </div>
+          <div className="mt-1 text-3xl font-extrabold leading-none text-[#001b4d]">{summaryValue}</div>
         </div>
 
         <div>
-          <p className="mb-1 text-xs font-medium uppercase tracking-[0.08em] text-gray-500">
-            {t('admin.orders.orderDetails.status')}
-          </p>
+          <div className={summaryControlHeaderClass}>
+            <p className="text-xs font-medium uppercase tracking-[0.08em] text-gray-500">
+              {t('admin.orders.orderDetails.status')}
+            </p>
+          </div>
           {updatingStatus ? (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="mt-1 flex items-center gap-2 text-sm text-gray-500">
               <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-gray-900" />
               {t('admin.orders.updating')}
             </div>
@@ -110,17 +118,19 @@ export function OrderDetailsSummary({
         </div>
 
         <div>
-          <p className="mb-1 text-xs font-medium uppercase tracking-[0.08em] text-gray-500">
-            {t('admin.orders.orderDetails.payment')}
-          </p>
-          <div className="mt-1 flex items-center gap-2">
-            {paymentMethodLogoPath ? (
-              <img src={paymentMethodLogoPath} alt="" className="h-6 w-auto" />
-            ) : null}
-            <span className="text-sm font-medium text-gray-900">{paymentMethodLabel}</span>
+          <div className={summaryControlHeaderClass}>
+            <div className="flex flex-row flex-wrap items-center gap-x-2 gap-y-1">
+              <p className="text-xs font-medium uppercase tracking-[0.08em] text-gray-500">
+                {t('admin.orders.orderDetails.payment')}
+              </p>
+              {paymentMethodLogoPath ? (
+                <img src={paymentMethodLogoPath} alt="" className="h-6 w-auto shrink-0" />
+              ) : null}
+              <span className="text-sm font-medium text-gray-900">{paymentMethodLabel}</span>
+            </div>
           </div>
           {updatingPaymentStatus ? (
-            <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
+            <div className="mt-1 flex items-center gap-2 text-sm text-gray-500">
               <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-gray-900" />
               {t('admin.orders.updating')}
             </div>
@@ -128,7 +138,7 @@ export function OrderDetailsSummary({
             <select
               value={orderDetails.paymentStatus}
               onChange={(e) => onPaymentStatusChange(e.target.value)}
-              className={`mt-2 w-full rounded-lg px-3 py-2 text-sm font-semibold ring-1 ring-inset focus:outline-none focus:ring-2 ${paymentSelectClassName}`}
+              className={`mt-1 w-full rounded-lg px-3 py-2 text-sm font-semibold ring-1 ring-inset focus:outline-none focus:ring-2 ${paymentSelectClassName}`}
             >
               <option value="paid">{t('admin.orders.paid')}</option>
               <option value="pending">{t('admin.orders.pendingPayment')}</option>
@@ -138,10 +148,12 @@ export function OrderDetailsSummary({
         </div>
 
         <div>
-          <p className="mb-1 text-xs font-medium uppercase tracking-[0.08em] text-gray-500">
-            {t('admin.orders.orderDetails.placed')}
-          </p>
-          <p className="text-sm font-medium text-gray-900">
+          <div className={summaryControlHeaderClass}>
+            <p className="text-xs font-medium uppercase tracking-[0.08em] text-gray-500">
+              {t('admin.orders.orderDetails.placed')}
+            </p>
+          </div>
+          <p className="mt-1 text-sm font-medium text-gray-900">
             {new Date(orderDetails.createdAt).toLocaleString()}
           </p>
         </div>

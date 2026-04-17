@@ -198,7 +198,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex w-full min-h-10 items-center justify-center rounded-lg bg-[#dcc090] px-5 text-[1.125rem] font-medium leading-none tracking-[0.05em] text-[#122a26] transition-colors enabled:hover:bg-[#d3b57c] disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-11 sm:px-7 sm:text-sm sm:font-extrabold sm:uppercase sm:tracking-[0.2em]"
+                className="inline-flex w-full min-h-10 items-center justify-center rounded-lg bg-[#dcc090] px-5 text-[1.125rem] font-medium leading-none tracking-[0.05em] text-[#122a26] transition-colors enabled:hover:bg-[#d3b57c] disabled:cursor-not-allowed disabled:opacity-60 uppercase sm:min-h-11 sm:px-7 sm:text-sm sm:font-extrabold sm:tracking-[0.2em]"
               >
                 {submitting ? (t('contact.form.submitting') || 'Ուղարկվում է...') : t('contact.form.submit')}
               </button>

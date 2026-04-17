@@ -1,5 +1,6 @@
 'use client';
 
+import { OrderCustomizeBlock } from '@/components/orders/OrderCustomizeBlock';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { amountToUsd, formatPriceInCurrency } from '../../../../lib/currency';
 import { getColorValue } from '../utils/color-helpers';
@@ -93,6 +94,15 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {(item.customizeHtml?.trim() || item.customizePlain?.trim()) && (
+          <div className="mt-3">
+            <OrderCustomizeBlock
+              customizeHtml={item.customizeHtml}
+              customizePlain={item.customizePlain}
+            />
           </div>
         )}
 

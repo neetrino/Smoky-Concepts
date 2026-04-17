@@ -7,6 +7,12 @@ export interface CartItem {
     id: string;
     sku: string;
     sizeLabel?: string | null;
+    /** Size catalog (PDP modal) — passed to checkout for order display */
+    sizeCatalogTitle?: string | null;
+    sizeCatalogImageUrl?: string | null;
+    /** PDP customize (optional) */
+    customizePlain?: string | null;
+    customizeHtml?: string | null;
     stock?: number;
     product: {
       id: string;
@@ -56,6 +62,10 @@ export interface GuestCartItem {
   sku?: string;
   sizeLabel?: string | null;
   categoryLabel?: string | null;
+  sizeCatalogTitle?: string | null;
+  sizeCatalogImageUrl?: string | null;
+  customizePlain?: string | null;
+  customizeHtml?: string | null;
 }
 
 

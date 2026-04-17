@@ -2,6 +2,7 @@
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
+import { ADMIN_PRICE_CURRENCY } from '../../../../lib/currency';
 import { getColorValue } from '../utils/orderUtils';
 import type { OrderDetails } from '../useOrders';
 
@@ -57,6 +58,9 @@ export function OrderDetailsItems({
           <tbody className="divide-y divide-gray-100 bg-white">
             {orderDetails.items.map((item) => {
               const allOptions = item.variantOptions || [];
+              const quantity = Number(item.quantity ?? 0);
+              const unitPrice = Number(item.unitPrice ?? 0);
+              const lineTotal = Number(item.total ?? 0);
               return (
                 <tr key={item.id}>
                   <td className="px-3 py-2">{item.productTitle}</td>
@@ -99,12 +103,22 @@ export function OrderDetailsItems({
                       <span className="text-xs text-gray-400">—</span>
                     )}
                   </td>
-                  <td className="px-3 py-2 text-right">{item.quantity}</td>
                   <td className="px-3 py-2 text-right">
-                    {formatCurrency(item.unitPrice, 'USD', orderDetails.currency)}
+                    {Number.isFinite(quantity) ? quantity : '—'}
                   </td>
                   <td className="px-3 py-2 text-right">
-                    {formatCurrency(item.total, 'USD', orderDetails.currency)}
+                    {formatCurrency(
+                      Number.isFinite(unitPrice) ? unitPrice : 0,
+                      ADMIN_PRICE_CURRENCY,
+                      orderDetails.currency
+                    )}
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    {formatCurrency(
+                      Number.isFinite(lineTotal) ? lineTotal : 0,
+                      ADMIN_PRICE_CURRENCY,
+                      orderDetails.currency
+                    )}
                   </td>
                 </tr>
               );

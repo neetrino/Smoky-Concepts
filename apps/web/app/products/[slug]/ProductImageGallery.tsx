@@ -5,6 +5,7 @@ import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { THUMBNAILS_PER_VIEW } from './constants';
 import type { Product } from './types';
+import { CustomizeProductOverlay } from './CustomizeProductOverlay';
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -14,6 +15,8 @@ interface ProductImageGalleryProps {
   onImageIndexChange: (index: number) => void;
   thumbnailStartIndex: number;
   onThumbnailStartIndexChange: (index: number) => void;
+  /** Sanitized customize HTML overlaid on the hero image after Apply */
+  customizeOverlayHtml: string | null;
 }
 
 /**
@@ -39,6 +42,7 @@ export function ProductImageGallery({
   onImageIndexChange,
   thumbnailStartIndex,
   onThumbnailStartIndexChange,
+  customizeOverlayHtml,
 }: ProductImageGalleryProps) {
   useEffect(() => {
     if (images.length > THUMBNAILS_PER_VIEW) {
@@ -93,13 +97,18 @@ export function ProductImageGallery({
             }`}
           >
             {images.length > 0 ? (
-              <img
-                src={images[currentImageIndex]}
-                alt={product.title}
-                decoding="async"
-                draggable={false}
-                className={`relative block h-auto w-auto max-w-full origin-bottom object-contain object-top transition-transform duration-300 ease-out ${HERO_IMAGE_SHIFT_UP} group-hover:scale-110 group-hover:drop-shadow-[0_12px_24px_rgba(18,42,38,0.18)] ${MAIN_IMAGE_MAX_HEIGHT_CLASSES}`}
-              />
+              <div
+                className={`relative inline-block max-w-full origin-bottom transition-transform duration-300 ease-out ${HERO_IMAGE_SHIFT_UP} group-hover:scale-110 group-hover:drop-shadow-[0_12px_24px_rgba(18,42,38,0.18)]`}
+              >
+                <img
+                  src={images[currentImageIndex]}
+                  alt={product.title}
+                  decoding="async"
+                  draggable={false}
+                  className={`relative block h-auto w-auto max-w-full object-contain object-top ${MAIN_IMAGE_MAX_HEIGHT_CLASSES}`}
+                />
+                {customizeOverlayHtml ? <CustomizeProductOverlay html={customizeOverlayHtml} /> : null}
+              </div>
             ) : (
               <div className="flex w-full items-center justify-center text-[#9d9d9d]">
                 {t(language, 'common.messages.noImage')}

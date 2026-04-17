@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { mergeSizeCatalogIntoVariantOptions } from "@/lib/orders/merge-size-catalog-into-variant-options";
 
 type VariantOptionFromAttributes = {
   attributeKey?: string | null;
@@ -110,6 +111,10 @@ export function formatOrderItem(item: {
   sku: string | null;
   quantity: number | null;
   total: number | null;
+  sizeCatalogTitle?: string | null;
+  sizeCatalogImageUrl?: string | null;
+  customizePlain?: string | null;
+  customizeHtml?: string | null;
   variant?: {
     id: string;
     sku: string | null;
@@ -131,8 +136,12 @@ export function formatOrderItem(item: {
   const total = item.total ?? 0;
   const unitPrice = quantity > 0 ? Number((total / quantity).toFixed(2)) : total;
 
-  // Extract variant options (color, size, etc.)
-  const variantOptions = getVariantOptions(variant?.attributes).map(formatVariantOption);
+  const variantOptionsBase = getVariantOptions(variant?.attributes).map(formatVariantOption);
+  const variantOptions = mergeSizeCatalogIntoVariantOptions(
+    variantOptionsBase,
+    item.sizeCatalogTitle,
+    item.sizeCatalogImageUrl
+  );
 
   return {
     id: item.id,
@@ -144,6 +153,8 @@ export function formatOrderItem(item: {
     total,
     unitPrice,
     variantOptions,
+    customizePlain: item.customizePlain?.trim() || null,
+    customizeHtml: item.customizeHtml?.trim() || null,
   };
 }
 
@@ -187,6 +198,10 @@ export function formatOrderForDetail(order: {
     sku: string | null;
     quantity: number | null;
     total: number | null;
+    sizeCatalogTitle?: string | null;
+    sizeCatalogImageUrl?: string | null;
+    customizePlain?: string | null;
+    customizeHtml?: string | null;
     variant?: {
       id: string;
       sku: string | null;

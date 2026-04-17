@@ -1,6 +1,16 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@prisma/client";
 import type { CheckoutData } from "../types/checkout";
+import {
+  mergeSizeCatalogIntoVariantOptions,
+  sanitizeCheckoutImageUrl,
+} from "../orders/merge-size-catalog-into-variant-options";
+import {
+  CUSTOMIZE_PLAIN_MAX_LENGTH,
+  getPlainTextFromHtmlServer,
+  sanitizeCustomizeHtmlServer,
+  validateCustomizePlainLength,
+} from "../orders/sanitize-customize-html-server";
 import { logger } from "./utils/logger";
 
 type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
@@ -42,6 +52,8 @@ type MediaItem = string | { url?: string; src?: string } | unknown;
 
 const ORDER_NUMBER_START = 100;
 const ORDER_NUMBER_RETRY_LIMIT = 5;
+/** Prisma default interactive tx timeout is 5s; checkout can exceed that on slow DB or many line items. */
+const CHECKOUT_TRANSACTION_TIMEOUT_MS = 30_000;
 
 function isP2002Error(error: unknown): error is { code: string; meta?: { target?: string[] } } {
   if (!error || typeof error !== "object" || !("code" in error)) {
@@ -119,12 +131,25 @@ class OrdersService {
         variantTitle?: string;
         sku: string;
         imageUrl?: string;
+        sizeCatalogTitle?: string;
+        sizeCatalogImageUrl?: string;
+        customizePlain?: string | null;
+        customizeHtml?: string | null;
       }> = [];
 
       if (guestItems && Array.isArray(guestItems) && guestItems.length > 0) {
         // Get items from checkout request (localStorage cart)
         cartItems = await Promise.all(
-          guestItems.map(async (item: { productId: string; variantId: string; quantity: number }) => {
+          guestItems.map(
+            async (item: {
+              productId: string;
+              variantId: string;
+              quantity: number;
+              sizeCatalogTitle?: string;
+              sizeCatalogImageUrl?: string;
+              customizePlain?: string;
+              customizeHtml?: string;
+            }) => {
             const { productId, variantId, quantity } = item;
 
             if (!productId || !variantId || !quantity) {
@@ -194,6 +219,52 @@ class OrdersService {
               }
             }
 
+            const SIZE_CATALOG_TITLE_MAX = 200;
+            const rawCatalogTitle =
+              typeof item.sizeCatalogTitle === 'string' ? item.sizeCatalogTitle.trim() : '';
+            const sizeCatalogTitle =
+              rawCatalogTitle.length > 0 && rawCatalogTitle.length <= SIZE_CATALOG_TITLE_MAX
+                ? rawCatalogTitle
+                : undefined;
+            const sizeCatalogImageUrl =
+              sizeCatalogTitle !== undefined
+                ? sanitizeCheckoutImageUrl(item.sizeCatalogImageUrl)
+                : undefined;
+
+            const rawCustomizePlain =
+              typeof item.customizePlain === 'string' ? item.customizePlain.trim() : '';
+            const rawCustomizeHtml =
+              typeof item.customizeHtml === 'string' ? item.customizeHtml.trim() : '';
+
+            let customizePlain: string | undefined;
+            let customizeHtml: string | undefined;
+
+            if (rawCustomizePlain !== '' || rawCustomizeHtml !== '') {
+              const sanitizedHtml =
+                rawCustomizeHtml !== '' ? sanitizeCustomizeHtmlServer(rawCustomizeHtml) : '';
+              const plainFromHtml =
+                sanitizedHtml !== '' ? getPlainTextFromHtmlServer(sanitizedHtml) : '';
+              const resolvedPlain =
+                rawCustomizePlain !== '' ? rawCustomizePlain : plainFromHtml;
+
+              if (resolvedPlain !== '' && !validateCustomizePlainLength(resolvedPlain)) {
+                throw {
+                  status: 400,
+                  type: 'https://api.shop.am/problems/validation-error',
+                  title: 'Validation Error',
+                  detail: `Customize text must be at most ${CUSTOMIZE_PLAIN_MAX_LENGTH} characters`,
+                };
+              }
+
+              if (resolvedPlain === '' && sanitizedHtml === '') {
+                customizePlain = undefined;
+                customizeHtml = undefined;
+              } else {
+                customizePlain = resolvedPlain !== '' ? resolvedPlain : undefined;
+                customizeHtml = sanitizedHtml !== '' ? sanitizedHtml : undefined;
+              }
+            }
+
             return {
               variantId: variant.id,
               productId: variant.product.id,
@@ -203,6 +274,10 @@ class OrdersService {
               variantTitle,
               sku: variant.sku || '',
               imageUrl,
+              sizeCatalogTitle,
+              sizeCatalogImageUrl,
+              customizePlain,
+              customizeHtml,
             };
           })
         );
@@ -247,7 +322,8 @@ class OrdersService {
       for (let attempt = 0; attempt < ORDER_NUMBER_RETRY_LIMIT; attempt += 1) {
         try {
           // Create order with items in a transaction
-          order = await db.$transaction(async (tx: Prisma.TransactionClient) => {
+          order = await db.$transaction(
+            async (tx: Prisma.TransactionClient) => {
             const orderNumber = await getNextSequentialOrderNumber(tx);
             // Create order
             const newOrder = await tx.order.create({
@@ -279,6 +355,10 @@ class OrdersService {
                 price: item.price,
                 total: item.price * item.quantity,
                 imageUrl: item.imageUrl,
+                sizeCatalogTitle: item.sizeCatalogTitle ?? null,
+                sizeCatalogImageUrl: item.sizeCatalogImageUrl ?? null,
+                customizePlain: item.customizePlain ?? null,
+                customizeHtml: item.customizeHtml ?? null,
               })),
             },
             events: {
@@ -392,7 +472,11 @@ class OrdersService {
         });
 
             return { order: newOrder, payment };
-          });
+          },
+            {
+              timeout: CHECKOUT_TRANSACTION_TIMEOUT_MS,
+            }
+          );
           break;
         } catch (transactionError: unknown) {
           if (isP2002Error(transactionError) && attempt < ORDER_NUMBER_RETRY_LIMIT - 1) {
@@ -586,7 +670,7 @@ class OrdersService {
       fulfillmentStatus: order.fulfillmentStatus,
       items: order.items.map((item: OrderItemWithVariant) => {
         const rawOpts = getVariantOptions(item.variant?.attributes ?? null);
-        const variantOptions = rawOpts.map((opt: VariantOptionFromAttributes) => {
+        const variantOptionsBase = rawOpts.map((opt: VariantOptionFromAttributes) => {
           logger.debug('Processing option', {
             attributeKey: opt.attributeKey,
             value: opt.value,
@@ -617,6 +701,12 @@ class OrdersService {
           };
         });
 
+        const variantOptions = mergeSizeCatalogIntoVariantOptions(
+          variantOptionsBase,
+          item.sizeCatalogTitle,
+          item.sizeCatalogImageUrl
+        );
+
         logger.debug('Item mapping', {
           productTitle: item.productTitle,
           variantId: item.variantId,
@@ -635,6 +725,8 @@ class OrdersService {
           total: Number(item.total),
           imageUrl: item.imageUrl || undefined,
           variantOptions,
+          customizePlain: item.customizePlain?.trim() || undefined,
+          customizeHtml: item.customizeHtml?.trim() || undefined,
         };
       }),
       totals: {

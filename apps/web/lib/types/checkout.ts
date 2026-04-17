@@ -7,6 +7,12 @@ export interface CheckoutData {
     variantId: string;
     productId: string;
     quantity: number;
+    /** Size catalog pick from PDP (optional) */
+    sizeCatalogTitle?: string;
+    sizeCatalogImageUrl?: string;
+    /** PDP text customize (optional; sanitized server-side) */
+    customizePlain?: string;
+    customizeHtml?: string;
   }>;
   email: string;
   phone: string;

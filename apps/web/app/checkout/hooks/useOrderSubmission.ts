@@ -26,11 +26,29 @@ export function useOrderSubmission({
         throw new Error(t('checkout.errors.cartEmpty'));
       }
 
-      const items = cart.items.map((item: CartItem) => ({
-        productId: item.variant.product.id,
-        variantId: item.variant.id,
-        quantity: item.quantity,
-      }));
+      const items = cart.items.map((item: CartItem) => {
+        const title = item.variant.sizeCatalogTitle?.trim();
+        const img = item.variant.sizeCatalogImageUrl?.trim();
+        const cPlain = item.variant.customizePlain?.trim();
+        const cHtml = item.variant.customizeHtml?.trim();
+        return {
+          productId: item.variant.product.id,
+          variantId: item.variant.id,
+          quantity: item.quantity,
+          ...(title
+            ? {
+                sizeCatalogTitle: title,
+                ...(img ? { sizeCatalogImageUrl: img } : {}),
+              }
+            : {}),
+          ...(cPlain || cHtml
+            ? {
+                ...(cPlain ? { customizePlain: cPlain } : {}),
+                ...(cHtml ? { customizeHtml: cHtml } : {}),
+              }
+            : {}),
+        };
+      });
 
       const shippingAddress = data.shippingMethod === 'delivery' && 
         data.shippingAddress && 

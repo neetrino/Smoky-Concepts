@@ -124,6 +124,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
         <section className="flex flex-col gap-8 sm:gap-10">
           <HomeSectionTitle
             title={t('home.homepage.hero.title')}
+            titleMobile={t('home.homepage.hero.titleMobile')}
             description={t('home.homepage.hero.description')}
           />
           <HomeHeroSection slides={heroSlides} />
@@ -136,7 +137,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           />
           <div className="sm:hidden">
             <div className="-mx-6 overflow-x-auto px-6 pb-2 scrollbar-hide">
-              <div className="flex min-w-max snap-x snap-mandatory items-end gap-5">
+              <div className="flex min-w-max snap-x snap-mandatory items-end gap-0">
                 {PACK_FIT_ITEMS.map((item, index) => (
                   <PackFitCard
                     key={item.title}
@@ -153,7 +154,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               </div>
             </div>
           </div>
-          <div className="hidden flex-wrap items-end justify-center gap-x-8 gap-y-6 sm:flex">
+          <div className="hidden flex-wrap items-end justify-center gap-x-0 gap-y-6 sm:flex">
             {PACK_FIT_ITEMS.map((item, index) => (
               <PackFitCard
                 key={item.title}
@@ -214,6 +215,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <HomeSectionTitle
             title={t('home.homepage.ritual.title')}
             description={t('home.homepage.ritual.description')}
+            titleClassName="sm:whitespace-normal"
           />
           <div className="overflow-hidden rounded-[1.5rem] sm:rounded-[2.25rem]">
             <div className="relative h-[24rem] sm:h-[30rem]">

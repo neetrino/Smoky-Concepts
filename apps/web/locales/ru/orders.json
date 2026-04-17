@@ -33,6 +33,11 @@
   "itemDetails": {
     "color": "Цвет:",
     "size": "Размер:",
+    "customization": "Персонализация",
+    "customize_text": "Текст",
+    "customize_font": "Шрифт",
+    "customize_style": "Стиль",
+    "customize_preview": "Предпросмотр",
     "sku": "Артикул: {sku}",
     "quantity": "Количество: {qty} × {price} = {total}"
   }

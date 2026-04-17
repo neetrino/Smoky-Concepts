@@ -1,4 +1,5 @@
 import { Button, Card } from '@shop/ui';
+import { OrderCustomizeBlock } from '@/components/orders/OrderCustomizeBlock';
 import { amountToUsd, formatPriceInCurrency, formatStoredMoney } from '../../lib/currency';
 import { getStatusColor, getPaymentStatusColor, getColorValue } from './utils';
 import type { OrderDetails } from './types';
@@ -178,7 +179,16 @@ export function OrderDetailsModal({
                                   })}
                                 </div>
                               )}
-                              
+
+                              {(item.customizeHtml?.trim() || item.customizePlain?.trim()) && (
+                                <div className="mt-3">
+                                  <OrderCustomizeBlock
+                                    customizeHtml={item.customizeHtml}
+                                    customizePlain={item.customizePlain}
+                                  />
+                                </div>
+                              )}
+
                               <p className="text-sm text-gray-600">{t('profile.orderDetails.sku')}: {item.sku}</p>
                               <p className="text-sm text-gray-600 mt-2">
                                 {t('profile.orderDetails.quantity')}: {item.quantity} ×{' '}

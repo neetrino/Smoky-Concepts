@@ -4,6 +4,13 @@ import type { Product, ProductVariant } from './types';
 
 const CART_UPDATED_EVENT = 'cart-updated';
 
+function guestLineKey(line: GuestCartItem): string {
+  const v = line.variantId ?? '';
+  const p = line.customizePlain?.trim() ?? '';
+  const h = line.customizeHtml?.trim() ?? '';
+  return `${v}::${p}::${h}`;
+}
+
 function readGuestCart(): GuestCartItem[] {
   if (typeof window === 'undefined') {
     return [];
@@ -101,8 +108,14 @@ export function buildGuestCartLineSnapshot(
   quantity: number,
   displayPrice: number,
   originalPrice: number | null,
-  productTitle: string
+  productTitle: string,
+  sizeCatalog?: { title: string; imageUrl: string } | null,
+  customize?: { plain: string; html: string | null } | null
 ): GuestCartItem {
+  const trimmedTitle = sizeCatalog?.title?.trim() ?? '';
+  const trimmedImg = sizeCatalog?.imageUrl?.trim() ?? '';
+  const plain = customize?.plain?.trim() ?? '';
+  const html = customize?.html?.trim() ?? '';
   return {
     productId: product.id,
     productSlug: product.slug.trim(),
@@ -116,6 +129,10 @@ export function buildGuestCartLineSnapshot(
     sku: variant.sku,
     sizeLabel: resolveSizeLabel(variant),
     categoryLabel: product.categories?.[0]?.title?.trim() ?? null,
+    sizeCatalogTitle: trimmedTitle !== '' ? trimmedTitle : null,
+    sizeCatalogImageUrl: trimmedTitle !== '' && trimmedImg !== '' ? trimmedImg : null,
+    customizePlain: plain !== '' ? plain : null,
+    customizeHtml: html !== '' ? html : null,
   };
 }
 
@@ -132,7 +149,7 @@ export function upsertGuestCartLineSnapshot(line: GuestCartItem): void {
   }
 
   const cart = readGuestCart();
-  const existing = cart.find((item) => item.variantId === variantId);
+  const existing = cart.find((item) => guestLineKey(item) === guestLineKey(line));
 
   if (existing) {
     existing.quantity += line.quantity;

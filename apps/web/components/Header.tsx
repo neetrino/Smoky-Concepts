@@ -14,6 +14,58 @@ const NAVIGATION_ITEMS = [
   { label: 'Story', href: '/about' },
 ] as const;
 
+const MOBILE_MENU_ID = 'header-mobile-menu';
+
+function MobileMenuButton({
+  open,
+  onToggle,
+}: {
+  open: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      id="header-mobile-menu-button"
+      aria-expanded={open}
+      aria-controls={MOBILE_MENU_ID}
+      onClick={onToggle}
+      className="inline-flex h-10 w-10 items-center justify-center md:hidden"
+      aria-label={open ? 'Close menu' : 'Open menu'}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={34}
+        height={34}
+        viewBox="0 0 34 34"
+        fill="none"
+        className="shrink-0"
+        aria-hidden="true"
+      >
+        <rect width="34" height="34" fill="#122A26" />
+        <path
+          d="M9.20312 8.5H31.8698"
+          stroke="#DCC090"
+          strokeWidth="3.4"
+          strokeLinecap="round"
+        />
+        <path
+          d="M16.2891 25.5L31.8724 25.5"
+          stroke="#DCC090"
+          strokeWidth="3.4"
+          strokeLinecap="round"
+        />
+        <path
+          d="M2.82812 17H31.8698"
+          stroke="#DCC090"
+          strokeWidth="3.4"
+          strokeLinecap="round"
+        />
+      </svg>
+    </button>
+  );
+}
+
 /**
  * Main site header aligned with the Figma homepage design.
  */
@@ -21,6 +73,7 @@ export function Header() {
   const pathname = usePathname();
   const [cartCount, setCartCount] = useState(0);
   const [cartReady, setCartReady] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setCartCount(getCartCount());
@@ -29,6 +82,19 @@ export function Header() {
     window.addEventListener('cart-updated', handleCartUpdate);
     return () => window.removeEventListener('cart-updated', handleCartUpdate);
   }, []);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mobileMenuOpen]);
 
   const renderNavLinks = (
     className: string,
@@ -59,7 +125,7 @@ export function Header() {
             <img src={HOME_ASSET_PATHS.logo} alt="Smoky Concepts" className="h-full w-full object-contain object-left" />
           </Link>
           {renderNavLinks('hidden items-center gap-10 text-sm md:flex', NAVIGATION_ITEMS)}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5 md:gap-6">
             <Link href="/cart" className="relative inline-flex h-6 w-6 items-center justify-center">
               <img src={HOME_ASSET_PATHS.bagIcon} alt="Cart" className="h-6 w-5 object-contain" />
               {cartReady && cartCount > 0 ? (
@@ -68,13 +134,34 @@ export function Header() {
                 </span>
               ) : null}
             </Link>
-            <LanguageSwitcherHeader />
+            <div className="hidden md:block">
+              <LanguageSwitcherHeader />
+            </div>
+            <MobileMenuButton open={mobileMenuOpen} onToggle={() => setMobileMenuOpen((v) => !v)} />
           </div>
         </div>
-        {renderNavLinks(
-          'flex flex-wrap items-center justify-center gap-x-3 gap-y-2 border-t border-white/10 py-3 text-xs tracking-[0.12em] md:hidden',
-          NAVIGATION_ITEMS
-        )}
+        {mobileMenuOpen ? (
+          <div id={MOBILE_MENU_ID} className="flex flex-col border-t border-white/10 pb-4 pt-1 md:hidden">
+            <nav className="flex flex-col" aria-label="Mobile primary">
+              {NAVIGATION_ITEMS.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`border-b border-white/10 py-3.5 text-xs font-extrabold uppercase tracking-[0.16em] transition-opacity last:border-b-0 ${
+                      isActive ? 'text-[#dcc090]' : 'text-[#dcc090]/80 hover:text-[#dcc090]'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+            <LanguageSwitcherHeader variant="drawer" />
+          </div>
+        ) : null}
       </div>
     </header>
   );

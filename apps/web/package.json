@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:webpack": "next dev --no-turbo",
-    "dev:clean": "node -e \"require('fs').rmSync('.next', {recursive: true, force: true})\" && next dev",
+    "dev": "node scripts/run-migrations.js && next dev",
+    "dev:webpack": "node scripts/run-migrations.js && next dev --no-turbo",
+    "dev:clean": "node -e \"require('fs').rmSync('.next', {recursive: true, force: true})\" && node scripts/run-migrations.js && next dev",
     "prebuild": "cd ../../packages/db && npm run db:generate",
     "prebuild:migrate": "node scripts/run-migrations.js",
     "build": "npm run prebuild:migrate && next build",

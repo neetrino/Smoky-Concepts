@@ -33,6 +33,11 @@
   "itemDetails": {
     "color": "Գույն:",
     "size": "Չափ:",
+    "customization": "Անհատականացում",
+    "customize_text": "Տեքստ",
+    "customize_font": "Տառատեսակ",
+    "customize_style": "Ձևաչափ",
+    "customize_preview": "Նախադիտում",
     "sku": "SKU: {sku}",
     "quantity": "Քանակ: {qty} × {price} = {total}"
   }

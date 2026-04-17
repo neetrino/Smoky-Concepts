@@ -33,6 +33,11 @@
   "itemDetails": {
     "color": "Color:",
     "size": "Size:",
+    "customization": "Customization",
+    "customize_text": "Text",
+    "customize_font": "Font",
+    "customize_style": "Style",
+    "customize_preview": "Preview",
     "sku": "SKU: {sku}",
     "quantity": "Quantity: {qty} × {price} = {total}"
   }
