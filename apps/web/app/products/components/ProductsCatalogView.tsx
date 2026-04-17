@@ -292,9 +292,9 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
         <div className="font-montserrat">
           <div className="flex flex-col gap-8">
             <div className="flex items-start justify-between gap-4">
-              <h1 className="text-[1.75rem] font-medium leading-none text-[#414141] sm:text-[2rem]">
-                <span className="hidden lg:inline">Product Line: </span>
-                <span className="font-extrabold">Smoky Covers</span>
+              <h1 className="text-[1.75rem] font-normal leading-none text-[#414141] sm:text-[2rem]">
+                <span className="hidden font-extrabold lg:inline">Product Line: </span>
+                <span className="font-semibold">Smoky Covers</span>
               </h1>
               <button
                 type="button"
