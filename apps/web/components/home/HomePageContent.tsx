@@ -65,16 +65,29 @@ function PackFitCard({
   );
 }
 
-function UpcomingLineCard({ title, imageSrc }: (typeof UPCOMING_LINES)[number]) {
+interface UpcomingLineCardProps {
+  title: string;
+  imageSrc: string;
+  emphasizeImage?: boolean;
+}
+
+function UpcomingLineCard({ title, imageSrc, emphasizeImage = false }: UpcomingLineCardProps) {
+  const imageFrameClassName = emphasizeImage
+    ? 'pointer-events-none absolute left-1/2 top-0 h-24 w-24 -translate-x-1/2 -translate-y-[38%] sm:h-32 sm:w-32 sm:-translate-y-[36%]'
+    : 'pointer-events-none absolute left-1/2 top-0 h-20 w-20 -translate-x-1/2 -translate-y-[33%] sm:h-28 sm:w-28 sm:-translate-y-[34%]';
+  const imageClassName = emphasizeImage
+    ? 'object-contain scale-[1.32] sm:scale-[1.24] [filter:blur(1.3px)_brightness(1.02)_drop-shadow(0_10px_16px_rgba(18,42,38,0.16))] sm:[filter:blur(3px)_brightness(0.9)_drop-shadow(0_12px_22px_rgba(18,42,38,0.18))]'
+    : 'object-contain [filter:blur(2px)_brightness(1.03)_drop-shadow(0_8px_14px_rgba(18,42,38,0.12))] sm:[filter:blur(5px)_brightness(0.9)_drop-shadow(0_10px_20px_rgba(18,42,38,0.16))]';
+
   return (
     <div className="relative overflow-visible pt-6 sm:pt-8">
       <div className="relative flex min-h-[7.6rem] flex-col justify-end rounded-[1.2rem] bg-[#f3f3f3] px-3 pb-2.5 pt-10 sm:min-h-[11.5rem] sm:rounded-[2rem] sm:bg-white sm:px-6 sm:pb-6 sm:pt-14">
-        <div className="pointer-events-none absolute left-1/2 top-0 h-20 w-20 -translate-x-1/2 -translate-y-[33%] sm:h-28 sm:w-28 sm:-translate-y-[34%]">
+        <div className={imageFrameClassName}>
           <Image
             src={imageSrc}
             alt={title}
             fill
-            className="object-contain [filter:blur(2px)_brightness(1.03)_drop-shadow(0_8px_14px_rgba(18,42,38,0.12))] sm:[filter:blur(5px)_brightness(0.9)_drop-shadow(0_10px_20px_rgba(18,42,38,0.16))]"
+            className={imageClassName}
             sizes="(max-width: 640px) 84px, 112px"
           />
         </div>
@@ -354,6 +367,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               <UpcomingLineCard
                 key={item.title}
                 {...item}
+                emphasizeImage={item.title === 'Notebooks' || item.title === 'Knifes' || item.title === 'Keys' || item.title === 'Wallets'}
                 title={t(`home.homepage.upcomingLines.cards.${upcomingLineKeyByTitle[item.title] ?? 'documents'}`)}
               />
             ))}
