@@ -29,7 +29,7 @@
   "quantity": "Quantity",
   "addToCart": "Add to Cart",
   "buy_now": "Buy",
-  "choose_size": "Choose Size",
+  "choose_size": "Select Size",
   "size_catalog_search_placeholder": "Search by name",
   "size_catalog_search_no_results": "No sizes match your search.",
   "size_catalog_empty": "No sizes are configured in the admin yet.",
