@@ -293,6 +293,12 @@ export function ProductInfoAndActions({
     onCustomizeApplied(null);
   }, [clearAppliedPreviewTimer, onCustomizeApplied]);
 
+  /** EN labels are shorter — slightly larger type; HY/RU/KA stay compact so four tabs stay on one row. */
+  const productTabLabelClass =
+    language === 'en'
+      ? 'pb-2.5 font-montserrat text-[15px] font-extrabold leading-none sm:text-[16px] md:text-[17px]'
+      : 'pb-2.5 font-montserrat text-[14px] font-extrabold leading-none sm:text-[15px] md:text-[16px]';
+
   const productBadge = product.labels?.[0]?.value || product.categories?.[0]?.title || null;
   const productDetails = [
     product.brand?.name ?? null,
@@ -495,9 +501,9 @@ export function ProductInfoAndActions({
       )}
 
       <div className="mt-12 min-w-0 w-full">
-        <div className="w-full min-w-0 touch-pan-x overflow-x-auto pb-2 scrollbar-hide sm:touch-auto sm:overflow-visible sm:pb-0">
+        <div className="w-full min-w-0 touch-pan-x overflow-x-auto overscroll-x-contain scroll-px-1 pb-2 scrollbar-hide [-webkit-overflow-scrolling:touch] sm:touch-auto sm:pb-0">
           <div
-            className="flex min-w-max snap-x snap-mandatory flex-nowrap items-end gap-5 sm:min-w-0 sm:w-full sm:snap-none sm:flex-wrap sm:gap-6"
+            className="flex w-max max-w-none snap-x snap-mandatory flex-nowrap items-end gap-3 pr-3 sm:snap-none sm:gap-4 sm:pr-4"
             role="tablist"
           >
             <button
@@ -505,13 +511,13 @@ export function ProductInfoAndActions({
               role="tab"
               aria-selected={activeTab === 'description'}
               onClick={() => setActiveTab('description')}
-              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+              className={`relative shrink-0 snap-start whitespace-nowrap ${productTabLabelClass} ${
                 activeTab === 'description' ? 'text-[#414141]' : 'text-[#414141]/70'
               }`}
             >
               {t(language, 'product.description_title')}
               {activeTab === 'description' && (
-                <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-[2px] bg-[#122a26]" />
               )}
             </button>
             <button
@@ -519,13 +525,13 @@ export function ProductInfoAndActions({
               role="tab"
               aria-selected={activeTab === 'details'}
               onClick={() => setActiveTab('details')}
-              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+              className={`relative shrink-0 snap-start whitespace-nowrap ${productTabLabelClass} ${
                 activeTab === 'details' ? 'text-[#414141]' : 'text-[#414141]/70'
               }`}
             >
               {t(language, 'product.details_title')}
               {activeTab === 'details' && (
-                <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-[2px] bg-[#122a26]" />
               )}
             </button>
             <button
@@ -533,13 +539,13 @@ export function ProductInfoAndActions({
               role="tab"
               aria-selected={activeTab === 'shipping'}
               onClick={() => setActiveTab('shipping')}
-              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+              className={`relative shrink-0 snap-start whitespace-nowrap ${productTabLabelClass} ${
                 activeTab === 'shipping' ? 'text-[#414141]' : 'text-[#414141]/70'
               }`}
             >
               {t(language, 'product.shipping_title')}
               {activeTab === 'shipping' && (
-                <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-[2px] bg-[#122a26]" />
               )}
             </button>
             <button
@@ -547,13 +553,13 @@ export function ProductInfoAndActions({
               role="tab"
               aria-selected={activeTab === 'customize'}
               onClick={() => setActiveTab('customize')}
-              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+              className={`relative shrink-0 snap-start whitespace-nowrap ${productTabLabelClass} ${
                 activeTab === 'customize' ? 'text-[#414141]' : 'text-[#414141]/70'
               }`}
             >
               {t(language, 'product.customize_title')}
               {activeTab === 'customize' && (
-                <span className="absolute bottom-0 left-0 h-1 w-[87px] rounded-[2px] bg-[#122a26]" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-[2px] bg-[#122a26]" />
               )}
             </button>
           </div>
@@ -562,8 +568,8 @@ export function ProductInfoAndActions({
         <div className="pt-5 sm:pt-6">{renderedTabContent}</div>
       </div>
 
-      <div className="mt-[48px] flex w-full min-w-0 items-center justify-between gap-2 sm:gap-4">
-        <div className="flex min-w-0 flex-1 flex-wrap items-end gap-2 sm:gap-3">
+      <div className="mt-[48px] flex w-full min-w-0 max-w-[763px] flex-col gap-3 sm:flex-row sm:items-end sm:gap-12">
+        <div className="flex min-w-0 w-full flex-wrap items-end gap-2 sm:max-w-[291px] sm:gap-3">
           <p className="font-montserrat text-[30px] font-extrabold leading-none text-black sm:text-[32px]">
             {formatCatalogPrice(price)}
           </p>
@@ -579,7 +585,7 @@ export function ProductInfoAndActions({
           )}
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+        <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto sm:gap-3">
           <Button
             type="button"
             disabled={!canAddToCart || isAddingToCart}
