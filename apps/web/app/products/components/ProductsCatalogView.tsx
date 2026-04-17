@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { CatalogForProductLineRow } from './CatalogForProductLineRow';
 import { ProductsCatalogCard } from './ProductsCatalogCard';
 import {
   type CatalogProduct,
@@ -17,8 +17,6 @@ import {
 } from './catalogProductLabels';
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
-const FOR_PREVIEW_IMAGE_PATH = '/assets/home/products/compact-figma.svg';
-const FOR_PREVIEW_MARK_PATH = '/assets/home/icons/pack-mark-figma.png';
 const ITEMS_PER_SECTION_PAGE = CATALOG_SECTION_PAGE_SIZE;
 
 const SECTION_ORDER = ['Classic', 'Special', 'Atelier', 'Premium'] as const;
@@ -275,42 +273,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
               </h1>
             </div>
 
-            <div className="flex items-start gap-5">
-              <div
-                className="pt-2  text-[1.75rem] font-medium leading-none text-[#414141] invisible select-none"
-                aria-hidden="true"
-              >
-                For:
-              </div>
-              <div className="-mt-2 flex shrink-0 flex-col items-center">
-                <div className="relative h-[5rem] w-[4.25rem]">
-                  <Image
-                    src={FOR_PREVIEW_IMAGE_PATH}
-                    alt="Compact preview"
-                    fill
-                    className="object-contain"
-                    sizes="68px"
-                    unoptimized
-                  />
-                  <div className="pointer-events-none absolute inset-x-0 top-[2.65rem] flex justify-center">
-                    <Image
-                      src={FOR_PREVIEW_MARK_PATH}
-                      alt=""
-                      width={24}
-                      height={24}
-                      className="h-5 w-5 object-contain opacity-90"
-                      unoptimized
-                      aria-hidden
-                    />
-                  </div>
-                </div>
-                <span className="mt-1 text-center text-[0.375rem] font-extrabold leading-none text-[#414141]">
-                  Cigarette
-                  <br />
-                  Packs
-                </span>
-              </div>
-            </div>
+            <CatalogForProductLineRow />
 
             <div className="grid gap-3 lg:grid-cols-[12.5rem_11rem_11.75rem_4.75rem_1fr_11rem] lg:items-center lg:pr-[7.5rem]">
               <label className="relative block">
