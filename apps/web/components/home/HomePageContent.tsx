@@ -343,7 +343,11 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               centered={false}
               className="gap-4 text-center sm:gap-5 sm:text-left [&_h2]:text-[2.125rem] [&_h2]:leading-[1.18] [&_h2]:sm:text-6xl [&_p]:text-sm [&_p]:sm:text-base [&_p]:leading-relaxed"
             />
-            <HomeActionButton href="/contact" label={t('home.homepage.upcomingLines.cta')} className="mx-auto hidden w-fit sm:inline-flex sm:mx-0" />
+            <HomeActionButton
+              href="/contact"
+              label={t('home.homepage.upcomingLines.cta')}
+              className="mx-auto hidden w-fit !rounded-xl sm:inline-flex sm:mx-0"
+            />
           </div>
           <div className="grid grid-cols-2 gap-x-3 gap-y-3 overflow-visible pt-3 sm:gap-x-4 sm:gap-y-10 sm:pt-10 xl:grid-cols-3 xl:gap-y-14">
             {orderedUpcomingLines.map((item) => (
@@ -355,6 +359,14 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             ))}
           </div>
         </section>
+
+        <div className="flex justify-center sm:hidden">
+          <HomeActionButton
+            href="/contact"
+            label={t('home.homepage.upcomingLines.cta')}
+            className="w-fit !rounded-xl"
+          />
+        </div>
 
         <section className="flex flex-col items-center gap-8">
           <HomeSectionTitle
