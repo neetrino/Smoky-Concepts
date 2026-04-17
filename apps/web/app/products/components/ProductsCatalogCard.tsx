@@ -56,6 +56,8 @@ interface ProductsCatalogCardProps {
   shouldBlockProductNavigation?: () => boolean;
   /** Omit default card drop shadow (e.g. trending carousel center hero card). */
   suppressShadow?: boolean;
+  /** Optional CTA label override for section-specific wording (e.g. Upcoming => Order). */
+  buyButtonLabel?: string;
 }
 
 /**
@@ -75,6 +77,7 @@ export function ProductsCatalogCard({
   legacyHomeCartIcon = false,
   shouldBlockProductNavigation,
   suppressShadow = false,
+  buyButtonLabel = 'Buy',
 }: ProductsCatalogCardProps) {
   const router = useRouter();
   const { isAddingToCart, addToCart } = useAddToCart({
@@ -148,14 +151,14 @@ export function ProductsCatalogCard({
   const titleClassName = compactLayout ? 'text-[1.0625rem]' : 'text-[1.25rem]';
   const metaTextClassName = compactLayout ? 'text-[0.625rem]' : 'text-[0.75rem]';
   const badgeClassNames = compactLayout
-    ? `rounded-[0.375rem] px-[0.375rem] py-[0.125rem] text-[0.625rem] font-medium leading-none ${badgeClassName}`
-    : `rounded-[0.375rem] px-[0.4375rem] py-[0.1875rem] text-[0.75rem] font-medium leading-none ${badgeClassName}`;
+    ? `rounded-[0.375rem] px-[0.375rem] py-[0.125rem] text-[0.625rem] font-medium leading-tight ${badgeClassName}`
+    : `rounded-[0.375rem] px-[0.4375rem] py-[0.1875rem] text-[0.75rem] font-medium leading-tight ${badgeClassName}`;
   const priceClassName = compactLayout
     ? 'text-[0.875rem] sm:text-[1.0625rem]'
     : 'text-[1rem] sm:text-[1.125rem]';
   const buyButtonClassName = compactLayout
-    ? 'inline-flex h-6 min-w-[3.25rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-2 text-[0.75rem] font-extrabold leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10'
-    : 'inline-flex h-[1.625rem] min-w-[3.75rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-3 text-[0.875rem] font-extrabold leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10';
+    ? 'inline-flex h-6 min-w-[3.25rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-2 text-[0.75rem] font-extrabold leading-tight text-[#dcc090] transition-colors hover:bg-[#dcc090]/10'
+    : 'inline-flex h-[1.625rem] min-w-[3.75rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-3 text-[0.875rem] font-extrabold leading-tight text-[#dcc090] transition-colors hover:bg-[#dcc090]/10';
   const iconClassName = compactLayout ? 'h-4 w-4 object-contain' : 'h-5 w-5 object-contain';
   const catalogBagIconClassName = compactLayout
     ? 'h-6 w-[28px] object-contain'
@@ -255,20 +258,20 @@ export function ProductsCatalogCard({
         )}
 
         <Link href={`/products/${product.slug}`} className="block" onClick={handleProductLinkClick}>
-          <h3 className={`line-clamp-1 font-extrabold leading-none text-[#414141] ${titleClassName}`}>
+          <h3 className={`line-clamp-1 font-extrabold leading-tight text-[#414141] ${titleClassName}`}>
             {product.title}
           </h3>
         </Link>
 
         <div className={compactLayout ? 'mt-0.5 flex items-center gap-1.5' : 'mt-2 flex items-center gap-2'}>
-          <span className={`font-medium leading-none text-[#9d9d9d] ${metaTextClassName}`}>{sizeLabel}</span>
+          <span className={`font-medium leading-tight text-[#9d9d9d] ${metaTextClassName}`}>{sizeLabel}</span>
           <span className={badgeClassNames}>
             {categoryLabel}
           </span>
         </div>
 
         <div className={compactLayout ? 'mt-2 flex items-center justify-between gap-2' : 'mt-5 flex items-center justify-between gap-3'}>
-          <span className={`font-extrabold leading-none text-black ${priceClassName}`}>
+          <span className={`font-extrabold leading-tight text-black ${priceClassName}`}>
             {formatCatalogPrice(product.price ?? 0)}
           </span>
 
@@ -279,7 +282,7 @@ export function ProductsCatalogCard({
               disabled={!product.inStock || isAddingToCart}
               className={buyButtonClassName}
             >
-              Buy
+              {buyButtonLabel}
             </button>
 
             <button

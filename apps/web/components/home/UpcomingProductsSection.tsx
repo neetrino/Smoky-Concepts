@@ -214,6 +214,7 @@ export function UpcomingProductsSection() {
                 sectionLabel={section}
                 sizeLabel={getSizeLabel(catalogProduct)}
                 categoryLabel={getCategoryLabel(catalogProduct, section)}
+                buyButtonLabel={t('home.homepage.upcoming.orderCta')}
                 imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                 imageScaleBoost={0.04}
                 className="group lg:w-[12.75rem] xl:w-[13rem]"

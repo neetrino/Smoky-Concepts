@@ -75,6 +75,7 @@
       "title": "Upcoming",
       "loadError": "Failed to load upcoming products.",
       "noUpcoming": "No upcoming products yet.",
+      "orderCta": "Order",
       "shopCta": "Shop",
       "paginationAria": "Upcoming products pagination",
       "pageAriaPrefix": "Page"

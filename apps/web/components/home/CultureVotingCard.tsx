@@ -53,15 +53,15 @@ export function CultureVotingCard({
   earlyAccessLabel = 'Early Access',
 }: CultureVotingCardProps) {
   const imageNudgeClassName = imageNudgeDown ? 'sm:translate-y-3' : '';
-  const mobileTopPaddingClassName = mobileCompactBack ? 'pt-[7.75rem]' : 'pt-[8.75rem]';
+  const mobileTopPaddingClassName = mobileCompactBack ? 'pt-[8.25rem]' : 'pt-[9.25rem]';
   const mobileContentOffsetClassName = mobileCompactBack ? 'translate-y-1' : 'translate-y-0';
   const mobileTitleOffsetClassName = mobileCompactBack ? 'translate-y-1' : '';
   return (
     <article
-      className={`relative z-10 mx-auto flex h-full min-h-0 w-full max-w-[9.25rem] flex-col overflow-visible rounded-3xl bg-white p-3 ${mobileTopPaddingClassName} sm:max-w-[15rem] sm:p-4 sm:pt-4 lg:max-w-none`}
+      className={`relative z-10 mx-auto flex h-full min-h-0 w-full max-w-[10rem] flex-col overflow-visible rounded-3xl bg-white p-2 ${mobileTopPaddingClassName} sm:max-w-[15rem] sm:p-4 sm:pt-4 lg:max-w-none`}
     >
       <div
-        className={`absolute left-3 right-3 top-[-3.25rem] z-10 h-56 shrink-0 overflow-visible rounded-2xl sm:relative sm:left-auto sm:right-auto sm:top-auto sm:-mt-[5.5rem] sm:mb-2 sm:h-64 ${imageNudgeClassName}`.trim()}
+        className={`absolute left-3 right-3 top-[-3.5rem] z-10 h-[15rem] shrink-0 overflow-visible rounded-2xl sm:relative sm:left-auto sm:right-auto sm:top-auto sm:-mt-[5.5rem] sm:mb-2 sm:h-64 ${imageNudgeClassName}`.trim()}
       >
         <img src={imageUrl} alt={title} className="h-full w-full object-cover" loading="lazy" />
       </div>
@@ -71,7 +71,7 @@ export function CultureVotingCard({
       >
         <div className="min-w-0 flex-1">
           <h3
-            className={`min-h-[2.1rem] text-[16px] font-extrabold leading-[1.15] text-[#414141] line-clamp-2 sm:min-h-0 sm:text-xl sm:leading-none ${mobileTitleOffsetClassName}`}
+            className={`min-h-[1.85rem] text-[16px] font-extrabold leading-[1.15] text-[#414141] line-clamp-2 sm:min-h-0 sm:text-xl sm:leading-none ${mobileTitleOffsetClassName}`}
           >
             {title}
           </h3>
@@ -88,7 +88,7 @@ export function CultureVotingCard({
         </div>
 
         <div
-          className={`mt-2 flex min-h-[2rem] shrink-0 items-center gap-2 sm:mt-2.5 ${showEarlyAccess ? 'justify-between' : 'justify-end'}`}
+          className={`mt-1.5 flex min-h-[1.75rem] shrink-0 items-center gap-2 sm:mt-2.5 ${showEarlyAccess ? 'justify-between' : 'justify-end'}`}
         >
           {showEarlyAccess ? (
             <span className="whitespace-nowrap rounded-md border border-[#dcc090] px-1.5 py-0.5 text-xs font-bold leading-none text-[#dcc090]">
