@@ -10,7 +10,9 @@ import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/siz
 import { Button } from '../../../components/ui/buttons';
 import type { AttributeGroupValue, Product, ProductVariant } from './types';
 import { normalizeHexPalette, parseHexFromText } from './utils/swatch-color-utils';
+import { CustomizeFormatToolbar } from './CustomizeFormatToolbar';
 import { CustomizeSizeModal } from './CustomizeSizeModal';
+import type { CustomizeFormatState } from './utils/build-customize-preview-html';
 import {
   getPlainTextFromHtml,
   sanitizeCustomizeHtml,
@@ -36,8 +38,10 @@ interface ProductInfoAndActionsProps {
   /** Last applied customize (hero overlay + cart). */
   appliedCustomize: { plain: string; html: string | null } | null;
   onCustomizeApplied: (value: { plain: string; html: string | null } | null) => void;
-  /** Rich editor lives under the hero image; Apply reads its HTML from the parent ref. */
+  /** Rich preview HTML for cart / overlay — built from draft text + toolbar format on the parent. */
   getCustomizeSanitizedHtml: () => string;
+  customizeFormat: CustomizeFormatState;
+  onCustomizeFormatChange: (next: CustomizeFormatState) => void;
   /** Plain line next to Apply — drives editor seed when it does not match applied rich HTML. */
   customizeDraftText: string;
   onCustomizeDraftTextChange: (value: string) => void;
@@ -163,6 +167,8 @@ export function ProductInfoAndActions({
   customizeDraftText,
   onCustomizeDraftTextChange,
   customizeTextMaxLength,
+  customizeFormat,
+  onCustomizeFormatChange,
 }: ProductInfoAndActionsProps) {
   const [activeTab, setActiveTab] = useState<ProductTabKey>('description');
   const [isCustomizeSizeModalOpen, setIsCustomizeSizeModalOpen] = useState(false);
@@ -331,22 +337,30 @@ export function ProductInfoAndActions({
           <p className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">
             {getCustomizeCopy(language)}
           </p>
-          <div className="flex max-w-[763px] flex-col gap-4 sm:flex-row sm:items-end sm:gap-20 sm:pb-5">
-            <input
-              type="text"
-              value={customizeDraftText}
-              maxLength={customizeTextMaxLength}
-              onChange={(e) => {
-                onCustomizeDraftTextChange(e.target.value);
-              }}
-              className="w-full border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090] sm:max-w-[291px]"
-              aria-label={t(language, 'product.customize_title')}
-              autoComplete="off"
-            />
+          <div className="flex max-w-[763px] flex-col gap-4 sm:flex-row sm:items-start sm:gap-20 sm:pb-5">
+            <div className="w-full min-w-0 sm:max-w-[291px]">
+              <input
+                type="text"
+                value={customizeDraftText}
+                maxLength={customizeTextMaxLength}
+                onChange={(e) => {
+                  onCustomizeDraftTextChange(e.target.value);
+                }}
+                className="w-full border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090]"
+                aria-label={t(language, 'product.customize_title')}
+                autoComplete="off"
+              />
+              <p
+                className="mt-1 text-right font-montserrat text-[10px] font-medium leading-none text-[#898989]"
+                aria-live="polite"
+              >
+                {customizeDraftText.length}/{customizeTextMaxLength}
+              </p>
+            </div>
             <button
               type="button"
               onClick={handleCustomizeApplyClick}
-              className="h-10 w-full shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:w-[168px] sm:translate-y-5"
+              className="h-10 w-full shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:mt-1 sm:w-[168px]"
             >
               {t(language, 'product.customize_apply')}
             </button>
@@ -376,9 +390,12 @@ export function ProductInfoAndActions({
           <p className="max-w-[763px] font-montserrat text-[12px] font-medium leading-snug text-[#898989] sm:text-[13px]">
             {t(language, 'product.customize_apply_cart_hint')}
           </p>
-          <p className="w-full text-right font-montserrat text-[10px] font-medium leading-[30px] text-[#898989] sm:max-w-[291px]">
-            {customizeDraftText.length}/ {customizeTextMaxLength}
-          </p>
+          <CustomizeFormatToolbar
+            key={product.id}
+            language={language}
+            format={customizeFormat}
+            onFormatChange={onCustomizeFormatChange}
+          />
         </div>
       );
     }
@@ -405,6 +422,9 @@ export function ProductInfoAndActions({
     onCustomizeDraftTextChange,
     handleCustomizeApplyClick,
     handleCustomizeClearApplied,
+    product.id,
+    customizeFormat,
+    onCustomizeFormatChange,
   ]);
 
   return (

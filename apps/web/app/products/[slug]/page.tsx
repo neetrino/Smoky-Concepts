@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { t, getProductText } from '../../../lib/i18n';
 import type { SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { RelatedProducts } from '../../../components/RelatedProducts';
-import { CustomizeFormatToolbar } from './CustomizeFormatToolbar';
 import { ProductImageGallery } from './ProductImageGallery';
 import { ProductInfoAndActions } from './ProductInfoAndActions';
 import {
@@ -169,16 +168,6 @@ export default function ProductPage({ params }: ProductPageProps) {
               onThumbnailStartIndexChange={setThumbnailStartIndex}
               customizeOverlayHtml={heroCustomizeOverlayHtml}
             />
-            {isCustomizeTabActive ? (
-              <CustomizeFormatToolbar
-                key={product.id}
-                language={language}
-                plainText={customizeDraftText}
-                maxPlainLength={CUSTOMIZE_TEXT_MAX_LENGTH}
-                format={customizeFormat}
-                onFormatChange={setCustomizeFormat}
-              />
-            ) : null}
           </div>
 
           <ProductInfoAndActions
@@ -189,6 +178,8 @@ export default function ProductPage({ params }: ProductPageProps) {
             customizeDraftText={customizeDraftText}
             onCustomizeDraftTextChange={onCustomizeDraftTextChange}
             customizeTextMaxLength={CUSTOMIZE_TEXT_MAX_LENGTH}
+            customizeFormat={customizeFormat}
+            onCustomizeFormatChange={setCustomizeFormat}
             price={price}
             originalPrice={originalPrice}
             compareAtPrice={compareAtPrice}
