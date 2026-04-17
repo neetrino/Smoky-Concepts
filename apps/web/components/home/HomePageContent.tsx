@@ -170,7 +170,11 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             ))}
           </div>
           <div className="flex justify-center pt-1 sm:pt-2">
-            <HomeActionButton href="/products" label={t('home.homepage.packFit.cta')} className="min-w-[19rem]" />
+            <HomeActionButton
+              href="/products"
+              label={t('home.homepage.packFit.cta')}
+              className="min-w-[19rem] font-semibold sm:font-black"
+            />
           </div>
         </section>
 

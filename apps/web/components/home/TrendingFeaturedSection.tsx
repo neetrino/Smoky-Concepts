@@ -298,7 +298,7 @@ export function TrendingFeaturedSection() {
           href="/products"
           label={t('home.homepage.trending.shopCta')}
           variant="outline"
-          className="min-h-6 -translate-y-2 rounded-[0.5rem] border-[2.5px] px-2.5 text-[0.625rem] font-black uppercase tracking-[0.07em] sm:min-h-9 sm:px-5 sm:text-[0.6875rem] sm:font-black sm:tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:-translate-y-3"
+          className="!w-fit !min-h-8 !-translate-y-1 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-none !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!-translate-y-2 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-none sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:!-translate-y-3"
         />
       </div>
 
@@ -328,7 +328,6 @@ export function TrendingFeaturedSection() {
                 imageScaleBoost={0.08}
                 imageNudgeDown={isMiddleOfThree}
                 compactLayout
-                legacyHomeCartIcon
               />
             </div>
           );
@@ -350,7 +349,6 @@ export function TrendingFeaturedSection() {
                     className="w-[11.25rem]"
                     imageScaleBoost={index === 1 ? -0.07 : 0.02}
                     compactLayout
-                    legacyHomeCartIcon
                   />
                 </div>
               );
@@ -392,7 +390,6 @@ export function TrendingFeaturedSection() {
                       className="w-[13rem]"
                       imageNudgeDown={isMiddle}
                       compactLayout
-                      legacyHomeCartIcon
                     />
                   </div>
                 );
@@ -414,7 +411,6 @@ export function TrendingFeaturedSection() {
                     className="w-[11.25rem]"
                     imageScaleBoost={index === 1 ? -0.07 : 0.02}
                     compactLayout
-                    legacyHomeCartIcon
                   />
                 </div>
               );

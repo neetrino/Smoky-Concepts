@@ -221,7 +221,6 @@ export function UpcomingProductsSection() {
                 imageScaleBoost={0.04}
                 className="lg:w-[12.75rem] xl:w-[13rem]"
                 compactLayout
-                legacyHomeCartIcon
               />
             );
           })}
