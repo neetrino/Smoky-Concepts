@@ -276,7 +276,12 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
             </div>
 
             <div className="flex items-start gap-5">
-              <div className="pt-2 text-[1.75rem] font-medium leading-none text-[#414141]">For:</div>
+              <div
+                className="pt-2  text-[1.75rem] font-medium leading-none text-[#414141] invisible select-none"
+                aria-hidden="true"
+              >
+                For:
+              </div>
               <div className="-mt-2 flex shrink-0 flex-col items-center">
                 <div className="relative h-[5rem] w-[4.25rem]">
                   <Image
@@ -312,7 +317,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <select
                   value={selectedCollection}
                   onChange={(event) => updateQuery({ category: event.target.value })}
-                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-extrabold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
+                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-semibold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
                 >
                   <option value="all">Collections</option>
                   {collectionOptions.filter((option) => option !== 'all').map((option) => (
@@ -330,7 +335,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <select
                   value={selectedColor}
                   onChange={(event) => updateQuery({ color: event.target.value })}
-                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-extrabold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
+                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-semibold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
                 >
                   <option value="all">Color</option>
                   {colorOptions.map((option) => (
@@ -348,9 +353,9 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <button
                   type="button"
                   onClick={() => setShowSizeMenu((value) => !value)}
-                  className="h-10 w-full whitespace-nowrap rounded-[0.5rem] bg-[#dcc090] px-4 text-left text-[1rem] font-extrabold uppercase leading-none tracking-[0.08em] text-[#122a26]"
+                  className="h-10 w-full whitespace-nowrap rounded-[0.5rem] bg-[#dcc090] px-4 text-left text-[0.9375rem] font-semibold leading-none text-[#122a26]"
                 >
-                  {selectedSize === 'all' ? 'Choose size' : selectedSize}
+                  {selectedSize === 'all' ? 'Select size' : selectedSize}
                 </button>
 
                 {showSizeMenu && (
@@ -432,8 +437,8 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                     }}
                     className={
                       isCategoryFilteredView
-                        ? 'mt-4 pt-14 pb-4'
-                        : 'scrollbar-hide mt-4 overflow-x-auto pt-14 pb-4'
+                        ? 'mt-4 pt-[7.5rem] pb-4'
+                        : 'scrollbar-hide mt-4 overflow-x-auto pt-[7.5rem] pb-4'
                     }
                   >
                     <div
@@ -452,7 +457,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                           categoryLabel={getCategoryLabel(product, section.title)}
                           imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                           imageScaleBoost={0.04}
-                          className="lg:w-[11.75rem] xl:w-[12rem]"
+                          className="lg:w-[12.75rem] xl:w-[13rem]"
                           compactLayout
                         />
                       ))}

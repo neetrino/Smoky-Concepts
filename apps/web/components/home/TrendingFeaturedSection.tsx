@@ -17,8 +17,8 @@ import { HOME_ASSET_PATHS } from './homePage.data';
 import { useTranslation } from '@/lib/i18n-client';
 
 const TRENDING_ITEMS_PER_PAGE = 3;
-/** Desktop track width matches original compact card width. */
-const TRENDING_CARD_WIDTH_REM = 11;
+/** Desktop track width — matches products catalog `xl:w-[13rem]` (see ProductsCatalogView). */
+const TRENDING_CARD_WIDTH_REM = 13;
 const TRENDING_CARD_GAP_REM = 0.75;
 const TRENDING_TRACK_STEP_REM = TRENDING_CARD_WIDTH_REM + TRENDING_CARD_GAP_REM;
 /** Viewport for three cards (3×width + 2×gap) + small buffer so right card/shadow is not clipped */
@@ -323,7 +323,7 @@ export function TrendingFeaturedSection() {
                 sectionLabel={section}
                 sizeLabel={getSizeLabel(product)}
                 categoryLabel={getCategoryLabel(product, section)}
-                className={isSideCard ? 'w-[9.75rem]' : 'w-[10.6rem]'}
+                className={isSideCard ? 'w-[10.25rem]' : 'w-[11rem]'}
                 tightenDetailsUnderImage
                 imageScaleBoost={0.08}
                 imageNudgeDown={isMiddleOfThree}
@@ -336,18 +336,18 @@ export function TrendingFeaturedSection() {
       </div>
 
       <div className="relative z-0 mt-2 hidden min-w-0 xl:block xl:w-full">
-        <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-[calc(150%+8.75rem)]">
+        <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-[calc(150%+11.75rem)]">
           <div className="flex items-end gap-3">
             {previousPreviewItems.map((product, index) => {
               const section = getSectionLabel(product);
               return (
-                <div key={`trending-prev-${product.id}-${index}`} className="pointer-events-auto w-[9.5rem] opacity-50 -mt-6">
+                <div key={`trending-prev-${product.id}-${index}`} className="pointer-events-auto w-[11.25rem] opacity-50 -mt-6">
                   <ProductsCatalogCard
                     product={product}
                     sectionLabel={section}
                     sizeLabel={getSizeLabel(product)}
                     categoryLabel={getCategoryLabel(product, section)}
-                    className="w-[9.5rem]"
+                    className="w-[11.25rem]"
                     imageScaleBoost={index === 1 ? -0.07 : 0.02}
                     compactLayout
                     legacyHomeCartIcon
@@ -382,14 +382,14 @@ export function TrendingFeaturedSection() {
                 return (
                   <div
                     key={`trending-${product.id}-${index}`}
-                    className={`w-[11rem] shrink-0 ${isMiddle ? 'pt-28' : 'pt-20'}`}
+                    className={`w-[13rem] shrink-0 ${isMiddle ? 'pt-28' : 'pt-20'}`}
                   >
                     <ProductsCatalogCard
                       product={product}
                       sectionLabel={section}
                       sizeLabel={getSizeLabel(product)}
                       categoryLabel={getCategoryLabel(product, section)}
-                      className="w-[11rem]"
+                      className="w-[13rem]"
                       imageNudgeDown={isMiddle}
                       compactLayout
                       legacyHomeCartIcon
@@ -400,18 +400,18 @@ export function TrendingFeaturedSection() {
           </div>
         </div>
 
-        <div className="pointer-events-none absolute right-1/2 top-0 translate-x-[calc(150%+8.75rem)]">
+        <div className="pointer-events-none absolute right-1/2 top-0 translate-x-[calc(150%+11.75rem)]">
           <div className="flex items-end gap-3">
             {nextPreviewItems.map((product, index) => {
               const section = getSectionLabel(product);
               return (
-                <div key={`trending-next-${product.id}-${index}`} className="pointer-events-auto w-[9.5rem] opacity-50 -mt-6">
+                <div key={`trending-next-${product.id}-${index}`} className="pointer-events-auto w-[11.25rem] opacity-50 -mt-6">
                   <ProductsCatalogCard
                     product={product}
                     sectionLabel={section}
                     sizeLabel={getSizeLabel(product)}
                     categoryLabel={getCategoryLabel(product, section)}
-                    className="w-[9.5rem]"
+                    className="w-[11.25rem]"
                     imageScaleBoost={index === 1 ? -0.07 : 0.02}
                     compactLayout
                     legacyHomeCartIcon

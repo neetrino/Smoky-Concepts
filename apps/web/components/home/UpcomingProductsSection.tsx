@@ -190,7 +190,7 @@ export function UpcomingProductsSection() {
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="scrollbar-hide mt-8 overflow-x-auto overflow-y-hidden pt-14 pb-4 sm:mt-12"
+        className="scrollbar-hide mt-8 overflow-x-auto pt-[7.5rem] pb-4 sm:mt-12"
       >
         <div className="flex min-w-max items-start gap-6">
           {items.map((item, index) => {
@@ -219,7 +219,7 @@ export function UpcomingProductsSection() {
                 categoryLabel={getCategoryLabel(catalogProduct, section)}
                 imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                 imageScaleBoost={0.04}
-                className="lg:w-[11.75rem] xl:w-[12rem]"
+                className="lg:w-[12.75rem] xl:w-[13rem]"
                 compactLayout
                 legacyHomeCartIcon
               />
