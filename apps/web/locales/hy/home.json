@@ -28,7 +28,11 @@
     },
     "ritual": {
       "title": "Քո ռիտուալը\nՔո ոճը",
-      "description": "Անհատականացրու քո Smoky Cover-ը։ Փոքր դետալ։ Հստակ ուղերձ։",
+      "description": {
+        "line1Bold": "Անհատականացրու",
+        "line1Rest": "քո Smoky Cover-ը։",
+        "line2": "Փոքր դետալ։ Հստակ ուղերձ։"
+      },
       "bannerAlt": "Ստեղծման ռիտուալ",
       "cta": "Անհատականացնել",
       "steps": {
@@ -71,6 +75,7 @@
       "title": "Առաջիկա",
       "loadError": "Չհաջողվեց բեռնել առաջիկա ապրանքները։",
       "noUpcoming": "Դեռևս առաջիկա ապրանքներ չկան։",
+      "orderCta": "Պատվիրել",
       "shopCta": "Խանութ",
       "paginationAria": "Առաջիկա ապրանքների էջավորում",
       "pageAriaPrefix": "Էջ"
@@ -111,6 +116,7 @@
     "footer": {
       "contactTitle": "Կոնտակտներ",
       "designedBy": "Դիզայնը՝",
+      "createdBy": "Create by",
       "whatsappLabel": "whatsup :",
       "copyright": "Copyright© 2026. Բոլոր իրավունքները պաշտպանված են։",
       "links": {

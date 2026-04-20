@@ -19,7 +19,7 @@ export function Footer() {
     <footer className="bg-[#122a26]">
       <div className="mx-auto flex max-w-[120rem] flex-col gap-10 px-4 py-16 text-[#dcc090] sm:px-8 lg:px-[7.5rem]">
         <div className="grid justify-items-center gap-10 text-center lg:grid-cols-[1fr_auto_1fr] lg:items-start lg:justify-items-stretch lg:text-left">
-          <div className="flex flex-col items-center gap-4 text-sm font-medium leading-[1.4] lg:items-start">
+          <div className="order-2 flex flex-col items-center gap-4 text-sm font-medium leading-[1.4] lg:order-1 lg:items-start">
             {FOOTER_LINKS.map((item) => (
               <Link key={item.href} href={item.href} className="transition-opacity hover:opacity-80">
                 {item.href === '/privacy'
@@ -32,7 +32,7 @@ export function Footer() {
               </Link>
             ))}
           </div>
-          <div className="flex flex-col items-center gap-4 text-center">
+          <div className="order-1 flex flex-col items-center gap-4 text-center lg:order-2">
             <p className="text-sm font-extrabold">{t('home.homepage.footer.contactTitle')}</p>
             <a href="mailto:official@smokyconcepts.com" className="text-sm font-medium transition-opacity hover:opacity-80">
               official@smokyconcepts.com
@@ -55,7 +55,7 @@ export function Footer() {
               ))}
             </div>
           </div>
-          <div className="flex flex-col items-center gap-4 lg:items-end lg:text-right">
+          <div className="order-3 flex flex-col items-center gap-4 lg:order-3 lg:items-end lg:text-right">
             <p className="text-sm font-extrabold">{t('home.homepage.footer.designedBy')}</p>
             <div className="flex w-full flex-col items-center gap-8 lg:items-end">
               <div className="relative h-12 w-24">
@@ -65,20 +65,23 @@ export function Footer() {
                   className="h-full w-full object-contain object-center lg:object-right"
                 />
               </div>
-              <a
-                href={NEETRINO_PARTNER_HREF}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex max-w-[10rem] translate-x-3 self-end transition-opacity hover:opacity-80 sm:translate-x-4"
-                aria-label="Neetrino"
-              >
-                <img
-                  src={HOME_ASSET_PATHS.neetrinoPartnerLogo}
-                  alt=""
-                  className="h-6 w-full max-h-8 object-contain object-center lg:object-right"
-                  aria-hidden="true"
-                />
-              </a>
+              <div className="mt-2 flex max-w-[10rem] translate-x-1 flex-col items-center self-end sm:translate-x-2 lg:items-end">
+                <p className="mb-2 text-sm font-extrabold lg:-translate-x-6">{t('home.homepage.footer.createdBy')}</p>
+                <a
+                  href={NEETRINO_PARTNER_HREF}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex w-full transition-opacity hover:opacity-80"
+                  aria-label="Neetrino"
+                >
+                  <img
+                    src={HOME_ASSET_PATHS.neetrinoPartnerLogo}
+                    alt=""
+                    className="h-6 w-full max-h-8 object-contain object-center lg:object-right"
+                    aria-hidden="true"
+                  />
+                </a>
+              </div>
             </div>
           </div>
         </div>

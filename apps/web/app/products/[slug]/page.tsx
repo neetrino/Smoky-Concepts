@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { t, getProductText } from '../../../lib/i18n';
 import type { SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { RelatedProducts } from '../../../components/RelatedProducts';
-import { CustomizeFormatToolbar } from './CustomizeFormatToolbar';
 import { ProductImageGallery } from './ProductImageGallery';
 import { ProductInfoAndActions } from './ProductInfoAndActions';
 import {
@@ -17,6 +16,7 @@ import { useProductPage } from './useProductPage';
 import { useProductCartActions } from './useProductCartActions';
 import { useCustomizeGoogleFontLinks } from './useCustomizeGoogleFontLinks';
 import type { ProductPageProps } from './types';
+import type { CustomOrderDraft } from './CustomizeSizeOrderFallback';
 
 const CUSTOMIZE_TEXT_MAX_LENGTH = 18;
 
@@ -51,6 +51,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   } = useProductPage(params);
 
   const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
+  const [selectedCustomSizeRequest, setSelectedCustomSizeRequest] = useState<CustomOrderDraft | null>(null);
   const [customizeApplied, setCustomizeApplied] = useState<{
     plain: string;
     html: string | null;
@@ -61,6 +62,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   useEffect(() => {
     setSelectedCatalogSize(null);
+    setSelectedCustomSizeRequest(null);
     setCustomizeApplied(null);
     setCustomizeDraftText('');
     setCustomizeFormat(getDefaultCustomizeFormat());
@@ -141,6 +143,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     canAddToCart,
     productDisplayTitle,
     selectedCatalogSize,
+    selectedCustomSizeRequest,
     customizeApplied,
     setIsAddingToCart,
     setShowMessage,
@@ -156,9 +159,9 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className="overflow-visible bg-[#efefef]">
-      <div className="mx-auto max-w-[1920px] overflow-visible px-4 pb-16 pt-6 sm:px-6 lg:px-[120px] lg:pb-24 lg:pt-16">
-        <div className="grid items-start gap-10 overflow-visible xl:grid-cols-[minmax(0,640px)_minmax(0,1fr)] xl:gap-[52px]">
-          <div className="flex min-w-0 flex-col gap-6 overflow-visible sm:gap-8">
+      <div className="mx-auto max-w-[1920px] overflow-visible px-4 pb-16 pt-2 sm:px-6 lg:px-[120px] lg:pb-24 lg:pt-5">
+        <div className="grid items-start gap-8 overflow-visible xl:grid-cols-[minmax(0,640px)_minmax(0,1fr)] xl:gap-11">
+          <div className="flex min-w-0 flex-col gap-5 overflow-visible sm:gap-6">
             <ProductImageGallery
               images={images}
               product={product}
@@ -169,16 +172,6 @@ export default function ProductPage({ params }: ProductPageProps) {
               onThumbnailStartIndexChange={setThumbnailStartIndex}
               customizeOverlayHtml={heroCustomizeOverlayHtml}
             />
-            {isCustomizeTabActive ? (
-              <CustomizeFormatToolbar
-                key={product.id}
-                language={language}
-                plainText={customizeDraftText}
-                maxPlainLength={CUSTOMIZE_TEXT_MAX_LENGTH}
-                format={customizeFormat}
-                onFormatChange={setCustomizeFormat}
-              />
-            ) : null}
           </div>
 
           <ProductInfoAndActions
@@ -189,6 +182,8 @@ export default function ProductPage({ params }: ProductPageProps) {
             customizeDraftText={customizeDraftText}
             onCustomizeDraftTextChange={onCustomizeDraftTextChange}
             customizeTextMaxLength={CUSTOMIZE_TEXT_MAX_LENGTH}
+            customizeFormat={customizeFormat}
+            onCustomizeFormatChange={setCustomizeFormat}
             price={price}
             originalPrice={originalPrice}
             compareAtPrice={compareAtPrice}
@@ -208,6 +203,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             onAddToCart={handleAddToCart}
             onBuyNow={handleBuyNow}
             onSelectedCatalogSizeChange={setSelectedCatalogSize}
+            onSelectedCustomSizeRequestChange={setSelectedCustomSizeRequest}
             onCustomizeTabActiveChange={setIsCustomizeTabActive}
           />
         </div>

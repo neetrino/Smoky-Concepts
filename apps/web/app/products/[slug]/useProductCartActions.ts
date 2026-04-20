@@ -6,6 +6,7 @@ import { t } from '@/lib/i18n';
 import type { LanguageCode } from '@/lib/language';
 import type { SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import type { Product, ProductVariant } from './types';
+import type { CustomOrderDraft } from './CustomizeSizeOrderFallback';
 import {
   buildGuestCartLineSnapshot,
   canAddVariantToGuestCart,
@@ -23,6 +24,8 @@ interface UseProductCartActionsParams {
   productDisplayTitle: string;
   /** When user picked a row from the global size catalog modal */
   selectedCatalogSize: SizeCatalogItemDto | null;
+  /** When user submitted fallback custom-size request in the size modal */
+  selectedCustomSizeRequest: CustomOrderDraft | null;
   /** Last applied PDP customize (Apply) — attached to guest cart lines */
   customizeApplied: { plain: string; html: string | null } | null;
   setIsAddingToCart: (value: boolean) => void;
@@ -39,6 +42,7 @@ export function useProductCartActions({
   canAddToCart,
   productDisplayTitle,
   selectedCatalogSize,
+  selectedCustomSizeRequest,
   customizeApplied,
   setIsAddingToCart,
   setShowMessage,
@@ -62,6 +66,17 @@ export function useProductCartActions({
           selectedCatalogSize != null
             ? { title: selectedCatalogSize.title, imageUrl: selectedCatalogSize.imageUrl }
             : null;
+        const customSizeRequest =
+          selectedCustomSizeRequest != null
+            ? {
+                name: selectedCustomSizeRequest.name,
+                phone: selectedCustomSizeRequest.phone,
+                email: selectedCustomSizeRequest.email,
+                description: selectedCustomSizeRequest.description,
+                imageDataUrl: selectedCustomSizeRequest.imageDataUrl,
+                imageFileName: selectedCustomSizeRequest.imageFileName,
+              }
+            : null;
         const customizeForLine =
           customizeApplied != null &&
           (customizeApplied.plain.trim() !== '' ||
@@ -79,7 +94,8 @@ export function useProductCartActions({
           originalPrice,
           productDisplayTitle,
           sizeCatalog,
-          customizeForLine
+          customizeForLine,
+          customSizeRequest
         );
         upsertGuestCartLineSnapshot(snapshot);
 
@@ -100,6 +116,7 @@ export function useProductCartActions({
       originalPrice,
       productDisplayTitle,
       selectedCatalogSize,
+      selectedCustomSizeRequest,
       customizeApplied,
       language,
       setIsAddingToCart,

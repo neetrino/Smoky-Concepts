@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { CatalogForProductLineRow } from './CatalogForProductLineRow';
+import { ProductsCatalogMobileFilterSheet } from './ProductsCatalogMobileFilterSheet';
 import { ProductsCatalogCard } from './ProductsCatalogCard';
 import {
   type CatalogProduct,
@@ -17,8 +18,6 @@ import {
 } from './catalogProductLabels';
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
-const FOR_PREVIEW_IMAGE_PATH = '/assets/home/products/compact-figma.svg';
-const FOR_PREVIEW_MARK_PATH = '/assets/home/icons/pack-mark-figma.png';
 const ITEMS_PER_SECTION_PAGE = CATALOG_SECTION_PAGE_SIZE;
 
 const SECTION_ORDER = ['Classic', 'Special', 'Atelier', 'Premium'] as const;
@@ -69,6 +68,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   const sizeMenuRef = useRef<HTMLDivElement>(null);
   const sectionScrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [showSizeMenu, setShowSizeMenu] = useState(false);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState(searchParams.get('size') ?? 'all');
   const [sectionPages, setSectionPages] = useState<Record<string, number>>({});
 
@@ -206,6 +206,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   const clearFilters = () => {
     setSelectedSize('all');
     setShowSizeMenu(false);
+    setMobileFilterOpen(false);
     router.replace('/products', { scroll: false });
   };
 
@@ -266,53 +267,54 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
 
   return (
     <div className="min-h-full bg-[#f5f4f1]">
+      <ProductsCatalogMobileFilterSheet
+        open={mobileFilterOpen}
+        onClose={() => setMobileFilterOpen(false)}
+        selectedCollection={selectedCollection}
+        selectedColor={selectedColor}
+        selectedSort={selectedSort}
+        selectedSize={selectedSize}
+        collectionOptions={collectionOptions}
+        colorOptions={colorOptions}
+        sizeOptions={sizeOptions}
+        sortOptions={SORT_OPTIONS}
+        onCollectionChange={(value) => updateQuery({ category: value })}
+        onColorChange={(value) => updateQuery({ color: value })}
+        onSortChange={(value) => updateQuery({ sort: value })}
+        onSizeChange={(value) => {
+          setSelectedSize(value === 'all' ? 'all' : value);
+          updateQuery({ size: value });
+        }}
+        onClearAll={clearFilters}
+      />
+
       <div className="mx-auto max-w-[120rem] px-4 pb-20 pt-12 sm:px-8 lg:pl-[7.5rem] lg:pr-0 lg:pt-[5.25rem]">
         <div className="font-montserrat">
           <div className="flex flex-col gap-8">
-            <div>
-              <h1 className="text-[1.75rem] font-medium leading-none text-[#414141] sm:text-[2rem]">
-                Product Line: <span className="font-extrabold">Smoky Covers</span>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-[1.75rem] font-normal leading-none text-[#414141] sm:text-[2rem]">
+                <span className="hidden font-extrabold lg:inline">Product Line: </span>
+                <span className="font-semibold">Smoky Covers</span>
               </h1>
+              <button
+                type="button"
+                onClick={() => setMobileFilterOpen(true)}
+                className="mt-0.5 min-h-[2.5rem] shrink-0 rounded-md bg-[#DBC097] px-7 py-2 text-sm font-black uppercase leading-none tracking-[0.14em] text-[#1A1D1C] transition-colors hover:bg-[#d2b68c] active:bg-[#c9ac82] lg:hidden"
+              >
+                Filter
+              </button>
             </div>
 
-            <div className="flex items-start gap-5">
-              <div className="pt-2 text-[1.75rem] font-medium leading-none text-[#414141]">For:</div>
-              <div className="-mt-2 flex shrink-0 flex-col items-center">
-                <div className="relative h-[5rem] w-[4.25rem]">
-                  <Image
-                    src={FOR_PREVIEW_IMAGE_PATH}
-                    alt="Compact preview"
-                    fill
-                    className="object-contain"
-                    sizes="68px"
-                    unoptimized
-                  />
-                  <div className="pointer-events-none absolute inset-x-0 top-[2.65rem] flex justify-center">
-                    <Image
-                      src={FOR_PREVIEW_MARK_PATH}
-                      alt=""
-                      width={24}
-                      height={24}
-                      className="h-5 w-5 object-contain opacity-90"
-                      unoptimized
-                      aria-hidden
-                    />
-                  </div>
-                </div>
-                <span className="mt-1 text-center text-[0.375rem] font-extrabold leading-none text-[#414141]">
-                  Cigarette
-                  <br />
-                  Packs
-                </span>
-              </div>
+            <div className="hidden lg:block">
+              <CatalogForProductLineRow />
             </div>
 
-            <div className="grid gap-3 lg:grid-cols-[12.5rem_11rem_11.75rem_4.75rem_1fr_11rem] lg:items-center lg:pr-[7.5rem]">
+            <div className="hidden gap-3 lg:grid lg:grid-cols-[12.5rem_11rem_11.75rem_4.75rem_1fr_11rem] lg:items-center lg:pr-[7.5rem]">
               <label className="relative block">
                 <select
                   value={selectedCollection}
                   onChange={(event) => updateQuery({ category: event.target.value })}
-                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-extrabold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
+                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-semibold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
                 >
                   <option value="all">Collections</option>
                   {collectionOptions.filter((option) => option !== 'all').map((option) => (
@@ -330,7 +332,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <select
                   value={selectedColor}
                   onChange={(event) => updateQuery({ color: event.target.value })}
-                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-extrabold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
+                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-semibold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
                 >
                   <option value="all">Color</option>
                   {colorOptions.map((option) => (
@@ -348,9 +350,9 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <button
                   type="button"
                   onClick={() => setShowSizeMenu((value) => !value)}
-                  className="h-10 w-full whitespace-nowrap rounded-[0.5rem] bg-[#dcc090] px-4 text-left text-[1rem] font-extrabold uppercase leading-none tracking-[0.08em] text-[#122a26]"
+                  className="h-10 w-full whitespace-nowrap rounded-[0.5rem] bg-[#dcc090] px-4 text-left text-[0.9375rem] font-semibold leading-none text-[#122a26]"
                 >
-                  {selectedSize === 'all' ? 'Choose size' : selectedSize}
+                  {selectedSize === 'all' ? 'Select size' : selectedSize}
                 </button>
 
                 {showSizeMenu && (
@@ -432,8 +434,8 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                     }}
                     className={
                       isCategoryFilteredView
-                        ? 'mt-4 pt-14 pb-4'
-                        : 'scrollbar-hide mt-4 overflow-x-auto pt-14 pb-4'
+                        ? 'mt-4 pt-[7.5rem] pb-4'
+                        : 'scrollbar-hide mt-4 overflow-x-auto pt-[7.5rem] pb-4'
                     }
                   >
                     <div
@@ -452,7 +454,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                           categoryLabel={getCategoryLabel(product, section.title)}
                           imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                           imageScaleBoost={0.04}
-                          className="lg:w-[11.75rem] xl:w-[12rem]"
+                          className="group lg:w-[12.75rem] xl:w-[13rem]"
                           compactLayout
                         />
                       ))}

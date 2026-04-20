@@ -19,9 +19,9 @@ interface RelatedProductsProps {
   currentProductId: string;
 }
 
-/** Same strip as products catalog (non-filtered): horizontal scroll row, `gap-7`. */
+/** Same strip as products catalog (non-filtered): horizontal scroll row. */
 const CATALOG_ROW_SCROLL_CLASS = 'scrollbar-hide mt-4 overflow-x-auto pt-10 pb-4';
-const CATALOG_ROW_FLEX_CLASS = 'flex min-w-max gap-7';
+const CATALOG_ROW_FLEX_CLASS = 'flex min-w-max gap-6';
 
 /**
  * Related products on the PDP — same card row spacing as the products catalog page.
@@ -55,7 +55,7 @@ export function RelatedProducts({ categorySlug, currentProductId }: RelatedProdu
             {Array.from({ length: CATALOG_SECTION_PAGE_SIZE }).map((_, i) => (
               <div
                 key={i}
-                className="h-[22rem] w-[11rem] shrink-0 animate-pulse rounded-[1.125rem] bg-white/80 shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]"
+                className="h-[23rem] w-[12rem] shrink-0 animate-pulse rounded-[1.125rem] bg-white/80 shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]"
               />
             ))}
           </div>
@@ -93,6 +93,7 @@ export function RelatedProducts({ categorySlug, currentProductId }: RelatedProdu
                   categoryLabel={getCategoryLabel(catalogProduct, section)}
                   imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                   compactLayout
+                  widerCompactCard
                 />
               );
             })}

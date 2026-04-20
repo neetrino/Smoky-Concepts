@@ -13,6 +13,14 @@ export interface CartItem {
     /** PDP customize (optional) */
     customizePlain?: string | null;
     customizeHtml?: string | null;
+    customSizeRequest?: {
+      name: string;
+      phone: string;
+      email: string;
+      description: string;
+      imageDataUrl: string;
+      imageFileName: string;
+    } | null;
     stock?: number;
     product: {
       id: string;
@@ -66,6 +74,14 @@ export interface GuestCartItem {
   sizeCatalogImageUrl?: string | null;
   customizePlain?: string | null;
   customizeHtml?: string | null;
+  customSizeRequest?: {
+    name: string;
+    phone: string;
+    email: string;
+    description: string;
+    imageDataUrl: string;
+    imageFileName: string;
+  } | null;
 }
 
 

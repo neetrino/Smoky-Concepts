@@ -5,6 +5,9 @@ import {
   mergeSizeCatalogIntoVariantOptions,
   sanitizeCheckoutImageUrl,
 } from "../orders/merge-size-catalog-into-variant-options";
+import { isR2Configured, uploadSizeCatalogImageToR2 } from "./r2.service";
+import { parseDataImageUrl } from "./utils/data-url-image";
+import { CUSTOM_SIZE_ORDER_NOTE_MARKER } from "./custom-size-order.service";
 import {
   CUSTOMIZE_PLAIN_MAX_LENGTH,
   getPlainTextFromHtmlServer,
@@ -135,6 +138,13 @@ class OrdersService {
         sizeCatalogImageUrl?: string;
         customizePlain?: string | null;
         customizeHtml?: string | null;
+        customSizeRequest?: {
+          name: string;
+          phone: string;
+          email: string;
+          description: string;
+          imageUrl: string;
+        } | null;
       }> = [];
 
       if (guestItems && Array.isArray(guestItems) && guestItems.length > 0) {
@@ -149,6 +159,14 @@ class OrdersService {
               sizeCatalogImageUrl?: string;
               customizePlain?: string;
               customizeHtml?: string;
+              customSizeRequest?: {
+                name?: string;
+                phone?: string;
+                email?: string;
+                description?: string;
+                imageDataUrl?: string;
+                imageFileName?: string;
+              };
             }) => {
             const { productId, variantId, quantity } = item;
 
@@ -220,16 +238,87 @@ class OrdersService {
             }
 
             const SIZE_CATALOG_TITLE_MAX = 200;
+            const rawCustomRequest = item.customSizeRequest;
+            let customSizeRequest:
+              | {
+                  name: string;
+                  phone: string;
+                  email: string;
+                  description: string;
+                  imageUrl: string;
+                }
+              | undefined;
             const rawCatalogTitle =
               typeof item.sizeCatalogTitle === 'string' ? item.sizeCatalogTitle.trim() : '';
-            const sizeCatalogTitle =
+            let sizeCatalogTitle =
               rawCatalogTitle.length > 0 && rawCatalogTitle.length <= SIZE_CATALOG_TITLE_MAX
                 ? rawCatalogTitle
                 : undefined;
-            const sizeCatalogImageUrl =
+            let sizeCatalogImageUrl =
               sizeCatalogTitle !== undefined
                 ? sanitizeCheckoutImageUrl(item.sizeCatalogImageUrl)
                 : undefined;
+
+            if (rawCustomRequest) {
+              const name = typeof rawCustomRequest.name === 'string' ? rawCustomRequest.name.trim() : '';
+              const requestPhone =
+                typeof rawCustomRequest.phone === 'string' ? rawCustomRequest.phone.trim() : '';
+              const requestEmail =
+                typeof rawCustomRequest.email === 'string' ? rawCustomRequest.email.trim() : '';
+              const requestDescription =
+                typeof rawCustomRequest.description === 'string'
+                  ? rawCustomRequest.description.trim()
+                  : '';
+              const imageDataUrl =
+                typeof rawCustomRequest.imageDataUrl === 'string'
+                  ? rawCustomRequest.imageDataUrl.trim()
+                  : '';
+
+              if (!name || !requestPhone || !requestEmail || !requestDescription || !imageDataUrl) {
+                throw {
+                  status: 400,
+                  type: 'https://api.shop.am/problems/validation-error',
+                  title: 'Validation Error',
+                  detail: 'customSizeRequest requires name, phone, email, description, imageDataUrl',
+                };
+              }
+
+              if (!isR2Configured()) {
+                throw {
+                  status: 503,
+                  type: 'https://api.shop.am/problems/config-error',
+                  title: 'Configuration Error',
+                  detail:
+                    'R2 storage is not configured. Set R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_ENDPOINT, R2_PUBLIC_URL in .env',
+                };
+              }
+
+              const parsedCustomImage = parseDataImageUrl(imageDataUrl);
+              if (!parsedCustomImage) {
+                throw {
+                  status: 400,
+                  type: 'https://api.shop.am/problems/validation-error',
+                  title: 'Validation Error',
+                  detail: 'customSizeRequest.imageDataUrl must be a valid image data URL',
+                };
+              }
+
+              const uploadedCustomImageUrl = await uploadSizeCatalogImageToR2(
+                parsedCustomImage.buffer,
+                parsedCustomImage.contentType
+              );
+
+              customSizeRequest = {
+                name,
+                phone: requestPhone,
+                email: requestEmail,
+                description: requestDescription,
+                imageUrl: uploadedCustomImageUrl,
+              };
+
+              sizeCatalogTitle = requestDescription.slice(0, SIZE_CATALOG_TITLE_MAX);
+              sizeCatalogImageUrl = uploadedCustomImageUrl;
+            }
 
             const rawCustomizePlain =
               typeof item.customizePlain === 'string' ? item.customizePlain.trim() : '';
@@ -278,6 +367,7 @@ class OrdersService {
               sizeCatalogImageUrl,
               customizePlain,
               customizeHtml,
+              customSizeRequest: customSizeRequest ?? null,
             };
           })
         );
@@ -313,6 +403,16 @@ class OrdersService {
               phone: shippingAddress.phone || phone,
             }
           : shippingAddress;
+      const firstCustomSizeRequest =
+        cartItems.find((item) => item.customSizeRequest != null)?.customSizeRequest ?? null;
+      const customRequestNotes = firstCustomSizeRequest
+        ? JSON.stringify({
+            marker: CUSTOM_SIZE_ORDER_NOTE_MARKER,
+            name: firstCustomSizeRequest.name,
+            description: firstCustomSizeRequest.description,
+            source: 'checkout',
+          })
+        : null;
 
       let order: {
         order: Prisma.OrderGetPayload<{ include: { items: true } }>;
@@ -339,12 +439,13 @@ class OrdersService {
             taxAmount,
             total,
             currency: 'USD',
-            customerEmail: email,
-            customerPhone: phone,
+            customerEmail: firstCustomSizeRequest?.email || email,
+            customerPhone: firstCustomSizeRequest?.phone || phone,
             customerLocale: 'en', // TODO: Get from request
             shippingMethod,
             shippingAddress: normalizedShippingAddress ? JSON.parse(JSON.stringify(normalizedShippingAddress)) : null,
             billingAddress: normalizedShippingAddress ? JSON.parse(JSON.stringify(normalizedShippingAddress)) : null,
+            notes: customRequestNotes,
             items: {
               create: cartItems.map((item) => ({
                 variantId: item.variantId,

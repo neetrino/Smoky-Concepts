@@ -45,6 +45,8 @@ interface ProductsCatalogCardProps {
   imageScaleBoost?: number;
   imageNudgeDown?: boolean;
   compactLayout?: boolean;
+  /** Slightly wider compact card (e.g. PDP related strip) without affecting home/catalog compact rows. */
+  widerCompactCard?: boolean;
   /**
    * Home-only: keep the legacy outline bag asset.
    * Everywhere else uses the filled catalog cart icon (`bag-catalog.svg`).
@@ -52,6 +54,10 @@ interface ProductsCatalogCardProps {
   legacyHomeCartIcon?: boolean;
   /** When true (e.g. carousel drag), product links do not navigate. */
   shouldBlockProductNavigation?: () => boolean;
+  /** Omit default card drop shadow (e.g. trending carousel center hero card). */
+  suppressShadow?: boolean;
+  /** Optional CTA label override for section-specific wording (e.g. Upcoming => Order). */
+  buyButtonLabel?: string;
 }
 
 /**
@@ -67,8 +73,11 @@ export function ProductsCatalogCard({
   imageScaleBoost = 0,
   imageNudgeDown = false,
   compactLayout = false,
+  widerCompactCard = false,
   legacyHomeCartIcon = false,
   shouldBlockProductNavigation,
+  suppressShadow = false,
+  buyButtonLabel = 'Buy',
 }: ProductsCatalogCardProps) {
   const router = useRouter();
   const { isAddingToCart, addToCart } = useAddToCart({
@@ -114,20 +123,27 @@ export function ProductsCatalogCard({
   const badgeClassName =
     SECTION_BADGE_CLASS_NAMES[sectionLabel] ?? SECTION_BADGE_CLASS_NAMES.Classic;
   const isCompactSize = sizeLabel === 'Compact';
+  const compactArticleWidth = widerCompactCard ? 'w-[12rem]' : 'w-[11rem]';
+  const cardShadowClass = suppressShadow
+    ? 'shadow-none'
+    : 'shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]';
   const articleClassName = compactLayout
-    ? 'relative w-[11rem] shrink-0 overflow-visible rounded-[1.125rem] bg-white px-3 pb-3 pt-2.5 shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]'
-    : 'relative w-[14.25rem] shrink-0 overflow-visible rounded-[1.375rem] bg-white px-3.5 pb-3.5 pt-3 shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]';
+    ? `relative ${compactArticleWidth} shrink-0 overflow-visible rounded-[1.125rem] bg-white px-3 pb-3 pt-2.5 ${cardShadowClass}`.trim()
+    : `relative w-[14.25rem] shrink-0 overflow-visible rounded-[1.375rem] bg-white px-3.5 pb-3.5 pt-3 ${cardShadowClass}`.trim();
   const imageWrapperClassName = compactLayout
-    ? 'h-[17.75rem]'
-    : (isCompactSize ? 'h-60' : 'h-72');
+    ? widerCompactCard
+      ? 'h-[18.5rem]'
+      : 'h-[17.75rem]'
+    : isCompactSize
+      ? 'h-60'
+      : 'h-72';
   const baseImagePullUpClassName = compactLayout
     ? '-mt-[6.25rem]'
     : (isCompactSize ? '-mt-16' : '-mt-24');
   const imagePullUpClassName = baseImagePullUpClassName;
+  const compactInnerImageHeight = widerCompactCard ? 'h-[17.25rem]' : 'h-[16.5rem]';
   const imageInnerClassName = compactLayout
-    ? imageNudgeDown
-      ? 'h-[16.5rem] w-full'
-      : 'h-[16.5rem] w-full'
+    ? `${compactInnerImageHeight} w-full`
     : 'h-full w-full';
   const compactBaseScale = imageNudgeDown ? 1.05 : 1.12;
   const compactImageScale = compactBaseScale + imageScaleBoost;
@@ -135,16 +151,18 @@ export function ProductsCatalogCard({
   const titleClassName = compactLayout ? 'text-[1.0625rem]' : 'text-[1.25rem]';
   const metaTextClassName = compactLayout ? 'text-[0.625rem]' : 'text-[0.75rem]';
   const badgeClassNames = compactLayout
-    ? `rounded-[0.375rem] px-[0.375rem] py-[0.125rem] text-[0.625rem] font-medium leading-none ${badgeClassName}`
-    : `rounded-[0.375rem] px-[0.4375rem] py-[0.1875rem] text-[0.75rem] font-medium leading-none ${badgeClassName}`;
-  const priceClassName = compactLayout ? 'text-[1.0625rem]' : 'text-[1.125rem]';
+    ? `rounded-[0.375rem] px-[0.375rem] py-[0.125rem] text-[0.625rem] font-medium leading-tight ${badgeClassName}`
+    : `rounded-[0.375rem] px-[0.4375rem] py-[0.1875rem] text-[0.75rem] font-medium leading-tight ${badgeClassName}`;
+  const priceClassName = compactLayout
+    ? 'text-[0.875rem] sm:text-[1.0625rem]'
+    : 'text-[1rem] sm:text-[1.125rem]';
   const buyButtonClassName = compactLayout
-    ? 'inline-flex h-6 min-w-[3.25rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-2 text-[0.75rem] font-extrabold uppercase leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10'
-    : 'inline-flex h-[1.625rem] min-w-[3.75rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-3 text-[0.875rem] font-extrabold uppercase leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10';
-  const iconClassName = compactLayout ? 'h-5 w-5 object-contain' : 'h-6 w-6 object-contain';
+    ? 'inline-flex h-6 min-w-[3.25rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-2 text-[0.75rem] font-extrabold leading-tight text-[#dcc090] transition-colors hover:bg-[#dcc090]/10'
+    : 'inline-flex h-[1.625rem] min-w-[3.75rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-3 text-[0.875rem] font-extrabold leading-tight text-[#dcc090] transition-colors hover:bg-[#dcc090]/10';
+  const iconClassName = compactLayout ? 'h-4 w-4 object-contain' : 'h-5 w-5 object-contain';
   const catalogBagIconClassName = compactLayout
-    ? 'h-7 w-[32px] object-contain'
-    : 'h-8 w-[40px] object-contain';
+    ? 'h-6 w-[28px] object-contain'
+    : 'h-7 w-9 object-contain';
   const detailsOffsetClassName = compactLayout
     ? tightenDetailsUnderImage
       ? '-mt-[5rem]'
@@ -177,7 +195,9 @@ export function ProductsCatalogCard({
       <div
         className={`relative z-10 mb-2 flex items-end justify-center ${imagePullUpClassName} ${imageWrapperClassName} overflow-visible`.trim()}
       >
-        <div className={`relative ${imageInnerClassName}`}>
+        <div
+          className={`relative ${imageInnerClassName} transition-transform duration-300 ease-out md:group-hover:-translate-y-1.5 md:group-hover:scale-[1.045]`}
+        >
           {activeImage && !imageError ? (
             <Link
               href={`/products/${product.slug}`}
@@ -238,31 +258,31 @@ export function ProductsCatalogCard({
         )}
 
         <Link href={`/products/${product.slug}`} className="block" onClick={handleProductLinkClick}>
-          <h3 className={`line-clamp-1 font-extrabold leading-none text-[#414141] ${titleClassName}`}>
+          <h3 className={`line-clamp-1 font-extrabold leading-tight text-[#414141] ${titleClassName}`}>
             {product.title}
           </h3>
         </Link>
 
         <div className={compactLayout ? 'mt-0.5 flex items-center gap-1.5' : 'mt-2 flex items-center gap-2'}>
-          <span className={`font-medium leading-none text-[#9d9d9d] ${metaTextClassName}`}>{sizeLabel}</span>
+          <span className={`font-medium leading-tight text-[#9d9d9d] ${metaTextClassName}`}>{sizeLabel}</span>
           <span className={badgeClassNames}>
             {categoryLabel}
           </span>
         </div>
 
         <div className={compactLayout ? 'mt-2 flex items-center justify-between gap-2' : 'mt-5 flex items-center justify-between gap-3'}>
-          <span className={`font-extrabold leading-none text-black ${priceClassName}`}>
+          <span className={`font-extrabold leading-tight text-black ${priceClassName}`}>
             {formatCatalogPrice(product.price ?? 0)}
           </span>
 
-          <div className="flex items-center gap-[0.625rem]">
+          <div className="flex items-center gap-0.5">
             <button
               type="button"
               onClick={handleBuyNow}
               disabled={!product.inStock || isAddingToCart}
               className={buyButtonClassName}
             >
-              Buy
+              {buyButtonLabel}
             </button>
 
             <button
@@ -274,7 +294,7 @@ export function ProductsCatalogCard({
               title={product.inStock ? 'Add to cart' : 'Out of stock'}
             >
               {isAddingToCart ? (
-                <svg className="h-7 w-7 animate-spin text-[#dcc090]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden>
+                <svg className="h-6 w-6 animate-spin text-[#dcc090]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden>
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
@@ -282,8 +302,8 @@ export function ProductsCatalogCard({
                 <Image
                   src={legacyHomeCartIcon ? BAG_ICON_PATH : CATALOG_BAG_ICON_PATH}
                   alt=""
-                  width={legacyHomeCartIcon ? 24 : 40}
-                  height={legacyHomeCartIcon ? 24 : 40}
+                  width={legacyHomeCartIcon ? 20 : 32}
+                  height={legacyHomeCartIcon ? 20 : 32}
                   aria-hidden
                   className={legacyHomeCartIcon ? iconClassName : catalogBagIconClassName}
                 />

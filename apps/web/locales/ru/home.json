@@ -28,7 +28,11 @@
     },
     "ritual": {
       "title": "Ваш ритуал\nВаш стиль",
-      "description": "Персонализируйте ваш Smoky Cover. Маленькая деталь. Ясный посыл.",
+      "description": {
+        "line1Bold": "Персонализируйте",
+        "line1Rest": "ваш Smoky Cover",
+        "line2": "Маленькая деталь. Ясный посыл."
+      },
       "bannerAlt": "Ритуал создания",
       "cta": "Персонализировать",
       "steps": {
@@ -71,6 +75,7 @@
       "title": "Скоро",
       "loadError": "Не удалось загрузить будущие товары.",
       "noUpcoming": "Пока нет будущих товаров.",
+      "orderCta": "Заказать",
       "shopCta": "Магазин",
       "paginationAria": "Пагинация будущих товаров",
       "pageAriaPrefix": "Страница"
@@ -111,6 +116,7 @@
     "footer": {
       "contactTitle": "Контакты",
       "designedBy": "Дизайн от",
+      "createdBy": "Create by",
       "whatsappLabel": "whatsup :",
       "copyright": "Copyright© 2026. Все права защищены.",
       "links": {

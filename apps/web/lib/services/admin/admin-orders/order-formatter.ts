@@ -153,6 +153,8 @@ export function formatOrderItem(item: {
     total,
     unitPrice,
     variantOptions,
+    sizeCatalogTitle: item.sizeCatalogTitle?.trim() || null,
+    sizeCatalogImageUrl: item.sizeCatalogImageUrl?.trim() || null,
     customizePlain: item.customizePlain?.trim() || null,
     customizeHtml: item.customizeHtml?.trim() || null,
   };

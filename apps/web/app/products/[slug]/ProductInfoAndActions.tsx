@@ -10,7 +10,10 @@ import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/siz
 import { Button } from '../../../components/ui/buttons';
 import type { AttributeGroupValue, Product, ProductVariant } from './types';
 import { normalizeHexPalette, parseHexFromText } from './utils/swatch-color-utils';
+import { CustomizeFormatToolbar } from './CustomizeFormatToolbar';
 import { CustomizeSizeModal } from './CustomizeSizeModal';
+import type { CustomOrderDraft } from './CustomizeSizeOrderFallback';
+import type { CustomizeFormatState } from './utils/build-customize-preview-html';
 import {
   getPlainTextFromHtml,
   sanitizeCustomizeHtml,
@@ -36,8 +39,10 @@ interface ProductInfoAndActionsProps {
   /** Last applied customize (hero overlay + cart). */
   appliedCustomize: { plain: string; html: string | null } | null;
   onCustomizeApplied: (value: { plain: string; html: string | null } | null) => void;
-  /** Rich editor lives under the hero image; Apply reads its HTML from the parent ref. */
+  /** Rich preview HTML for cart / overlay — built from draft text + toolbar format on the parent. */
   getCustomizeSanitizedHtml: () => string;
+  customizeFormat: CustomizeFormatState;
+  onCustomizeFormatChange: (next: CustomizeFormatState) => void;
   /** Plain line next to Apply — drives editor seed when it does not match applied rich HTML. */
   customizeDraftText: string;
   onCustomizeDraftTextChange: (value: string) => void;
@@ -64,6 +69,8 @@ interface ProductInfoAndActionsProps {
   onBuyNow: () => Promise<void>;
   /** Sync size-catalog selection to parent for cart / checkout snapshot */
   onSelectedCatalogSizeChange?: (item: SizeCatalogItemDto | null) => void;
+  /** Sync custom-size request selection to parent for checkout payload */
+  onSelectedCustomSizeRequestChange?: (request: CustomOrderDraft | null) => void;
   /** Fires when the Customize tab is selected — parent loads fonts / toolbar only then. */
   onCustomizeTabActiveChange?: (active: boolean) => void;
 }
@@ -158,16 +165,20 @@ export function ProductInfoAndActions({
   onAddToCart,
   onBuyNow,
   onSelectedCatalogSizeChange,
+  onSelectedCustomSizeRequestChange,
   onCustomizeTabActiveChange,
   getCustomizeSanitizedHtml,
   customizeDraftText,
   onCustomizeDraftTextChange,
   customizeTextMaxLength,
+  customizeFormat,
+  onCustomizeFormatChange,
 }: ProductInfoAndActionsProps) {
   const [activeTab, setActiveTab] = useState<ProductTabKey>('description');
   const [isCustomizeSizeModalOpen, setIsCustomizeSizeModalOpen] = useState(false);
   const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
   const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
+  const [selectedCustomSizeRequest, setSelectedCustomSizeRequest] = useState<CustomOrderDraft | null>(null);
   const [appliedPreviewPlain, setAppliedPreviewPlain] = useState<string | null>(null);
   const appliedPreviewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -224,6 +235,7 @@ export function ProductInfoAndActions({
 
   useEffect(() => {
     setSelectedCatalogSize(null);
+    setSelectedCustomSizeRequest(null);
     setActiveTab('description');
     clearAppliedPreviewTimer();
     setAppliedPreviewPlain(null);
@@ -240,19 +252,35 @@ export function ProductInfoAndActions({
   }, [selectedCatalogSize, onSelectedCatalogSizeChange]);
 
   useEffect(() => {
+    onSelectedCustomSizeRequestChange?.(selectedCustomSizeRequest);
+  }, [selectedCustomSizeRequest, onSelectedCustomSizeRequestChange]);
+
+  useEffect(() => {
     onCustomizeTabActiveChange?.(activeTab === 'customize');
   }, [activeTab, onCustomizeTabActiveChange]);
 
   const sizeButtonLabel =
-    selectedCatalogSize?.title ?? activeSizeOption?.label ?? t(language, 'product.choose_size');
+    (selectedCustomSizeRequest ? t(language, 'product.size_catalog_custom_order_selected') : null) ||
+    selectedCatalogSize?.title ||
+    activeSizeOption?.label ||
+    t(language, 'product.choose_size');
 
   const handleSelectCatalogSizeItem = (item: SizeCatalogItemDto) => {
     setSelectedCatalogSize(item);
+    setSelectedCustomSizeRequest(null);
     if (sizeOptions.length > 0) {
       const matched = matchVariantSizeFromCatalogTitle(item.title, sizeOptions);
       if (matched) {
         onSizeSelect(matched);
       }
+    }
+  };
+
+  const handleSelectCustomSizeRequest = (draft: CustomOrderDraft) => {
+    setSelectedCatalogSize(null);
+    setSelectedCustomSizeRequest(draft);
+    if (sizeOptions.length > 0) {
+      onSizeSelect(sizeOptions[0].value);
     }
   };
 
@@ -287,12 +315,20 @@ export function ProductInfoAndActions({
     onCustomizeApplied(null);
   }, [clearAppliedPreviewTimer, onCustomizeApplied]);
 
+  /** EN labels are shorter — slightly larger type; HY/RU/KA stay compact so four tabs stay on one row. */
+  const productTabLabelClass =
+    language === 'en'
+      ? 'pb-2.5 font-montserrat text-[15px] font-extrabold leading-none sm:text-[16px] md:text-[17px]'
+      : 'pb-2.5 font-montserrat text-[14px] font-extrabold leading-none sm:text-[15px] md:text-[16px]';
+
   const productBadge = product.labels?.[0]?.value || product.categories?.[0]?.title || null;
   const productDetails = [
     product.brand?.name ?? null,
     activeColorOption ? `${t(language, 'product.color')}: ${activeColorOption.label}` : null,
     activeSizeOption
       ? `${t(language, 'product.size')}: ${activeSizeOption.label}`
+      : selectedCustomSizeRequest
+        ? `${t(language, 'product.size')}: ${t(language, 'product.size_catalog_custom_order_selected')}`
       : selectedCatalogSize
         ? `${t(language, 'product.size')}: ${selectedCatalogSize.title}`
         : null,
@@ -327,26 +363,34 @@ export function ProductInfoAndActions({
 
     if (activeTab === 'customize') {
       return (
-        <div className="flex max-w-[763px] flex-col gap-[13px]">
+        <div className="flex max-w-[763px] flex-col gap-2.5">
           <p className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">
             {getCustomizeCopy(language)}
           </p>
-          <div className="flex max-w-[763px] flex-col gap-4 sm:flex-row sm:items-end sm:gap-20 sm:pb-5">
-            <input
-              type="text"
-              value={customizeDraftText}
-              maxLength={customizeTextMaxLength}
-              onChange={(e) => {
-                onCustomizeDraftTextChange(e.target.value);
-              }}
-              className="w-full border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090] sm:max-w-[291px]"
-              aria-label={t(language, 'product.customize_title')}
-              autoComplete="off"
-            />
+          <div className="flex max-w-[763px] flex-col gap-3 sm:flex-row sm:items-start sm:gap-12 sm:pb-4">
+            <div className="w-full min-w-0 sm:max-w-[291px]">
+              <input
+                type="text"
+                value={customizeDraftText}
+                maxLength={customizeTextMaxLength}
+                onChange={(e) => {
+                  onCustomizeDraftTextChange(e.target.value);
+                }}
+                className="w-full border-0 border-b border-[#dcc090] bg-transparent pb-0.5 font-montserrat text-[18px] font-medium leading-[30px] text-[#414141] outline-none focus:border-[#dcc090] focus-visible:border-[#dcc090] active:border-[#dcc090]"
+                aria-label={t(language, 'product.customize_title')}
+                autoComplete="off"
+              />
+              <p
+                className="mt-1 text-right font-montserrat text-[10px] font-medium leading-none text-[#898989]"
+                aria-live="polite"
+              >
+                {customizeDraftText.length}/{customizeTextMaxLength}
+              </p>
+            </div>
             <button
               type="button"
               onClick={handleCustomizeApplyClick}
-              className="h-10 w-full shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:w-[168px] sm:translate-y-5"
+              className="h-10 w-full shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:mt-1 sm:w-[168px]"
             >
               {t(language, 'product.customize_apply')}
             </button>
@@ -376,9 +420,12 @@ export function ProductInfoAndActions({
           <p className="max-w-[763px] font-montserrat text-[12px] font-medium leading-snug text-[#898989] sm:text-[13px]">
             {t(language, 'product.customize_apply_cart_hint')}
           </p>
-          <p className="w-full text-right font-montserrat text-[10px] font-medium leading-[30px] text-[#898989] sm:max-w-[291px]">
-            {customizeDraftText.length}/ {customizeTextMaxLength}
-          </p>
+          <CustomizeFormatToolbar
+            key={product.id}
+            language={language}
+            format={customizeFormat}
+            onFormatChange={onCustomizeFormatChange}
+          />
         </div>
       );
     }
@@ -398,6 +445,7 @@ export function ProductInfoAndActions({
     productDescription,
     productDetails,
     selectedCatalogSize,
+    selectedCustomSizeRequest,
     appliedCustomize,
     appliedPreviewPlain,
     customizeDraftText,
@@ -405,6 +453,9 @@ export function ProductInfoAndActions({
     onCustomizeDraftTextChange,
     handleCustomizeApplyClick,
     handleCustomizeClearApplied,
+    product.id,
+    customizeFormat,
+    onCustomizeFormatChange,
   ]);
 
   return (
@@ -475,9 +526,9 @@ export function ProductInfoAndActions({
       )}
 
       <div className="mt-12 min-w-0 w-full">
-        <div className="w-full min-w-0 touch-pan-x overflow-x-auto pb-2 scrollbar-hide sm:touch-auto sm:overflow-visible sm:pb-0">
+        <div className="w-full min-w-0 touch-pan-x overflow-x-auto overscroll-x-contain scroll-px-1 pb-2 scrollbar-hide [-webkit-overflow-scrolling:touch] sm:touch-auto sm:pb-0">
           <div
-            className="flex min-w-max snap-x snap-mandatory flex-nowrap items-end gap-6 sm:min-w-0 sm:w-full sm:snap-none sm:flex-wrap sm:gap-8"
+            className="flex w-max max-w-none snap-x snap-mandatory flex-nowrap items-end gap-3 pr-3 sm:snap-none sm:gap-4 sm:pr-4"
             role="tablist"
           >
             <button
@@ -485,13 +536,13 @@ export function ProductInfoAndActions({
               role="tab"
               aria-selected={activeTab === 'description'}
               onClick={() => setActiveTab('description')}
-              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+              className={`relative shrink-0 snap-start whitespace-nowrap ${productTabLabelClass} ${
                 activeTab === 'description' ? 'text-[#414141]' : 'text-[#414141]/70'
               }`}
             >
               {t(language, 'product.description_title')}
               {activeTab === 'description' && (
-                <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-[2px] bg-[#122a26]" />
               )}
             </button>
             <button
@@ -499,13 +550,13 @@ export function ProductInfoAndActions({
               role="tab"
               aria-selected={activeTab === 'details'}
               onClick={() => setActiveTab('details')}
-              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+              className={`relative shrink-0 snap-start whitespace-nowrap ${productTabLabelClass} ${
                 activeTab === 'details' ? 'text-[#414141]' : 'text-[#414141]/70'
               }`}
             >
               {t(language, 'product.details_title')}
               {activeTab === 'details' && (
-                <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-[2px] bg-[#122a26]" />
               )}
             </button>
             <button
@@ -513,13 +564,13 @@ export function ProductInfoAndActions({
               role="tab"
               aria-selected={activeTab === 'shipping'}
               onClick={() => setActiveTab('shipping')}
-              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+              className={`relative shrink-0 snap-start whitespace-nowrap ${productTabLabelClass} ${
                 activeTab === 'shipping' ? 'text-[#414141]' : 'text-[#414141]/70'
               }`}
             >
               {t(language, 'product.shipping_title')}
               {activeTab === 'shipping' && (
-                <span className="absolute bottom-0 left-0 h-0.5 w-[72px] rounded-[2px] bg-[#122a26] sm:w-[80px]" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-[2px] bg-[#122a26]" />
               )}
             </button>
             <button
@@ -527,23 +578,23 @@ export function ProductInfoAndActions({
               role="tab"
               aria-selected={activeTab === 'customize'}
               onClick={() => setActiveTab('customize')}
-              className={`relative shrink-0 snap-start whitespace-nowrap pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:shrink sm:text-[19px] ${
+              className={`relative shrink-0 snap-start whitespace-nowrap ${productTabLabelClass} ${
                 activeTab === 'customize' ? 'text-[#414141]' : 'text-[#414141]/70'
               }`}
             >
               {t(language, 'product.customize_title')}
               {activeTab === 'customize' && (
-                <span className="absolute bottom-0 left-0 h-1 w-[87px] rounded-[2px] bg-[#122a26]" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-[2px] bg-[#122a26]" />
               )}
             </button>
           </div>
         </div>
 
-        <div className="pt-6 sm:pt-7">{renderedTabContent}</div>
+        <div className="pt-5 sm:pt-6">{renderedTabContent}</div>
       </div>
 
-      <div className="mt-[48px] flex w-full min-w-0 items-center justify-between gap-2 sm:gap-4">
-        <div className="flex min-w-0 flex-1 flex-wrap items-end gap-2 sm:gap-3">
+      <div className="mt-[48px] flex w-full min-w-0 max-w-[763px] flex-col gap-3 sm:flex-row sm:items-end sm:gap-12">
+        <div className="flex min-w-0 w-full flex-wrap items-end gap-2 sm:max-w-[291px] sm:gap-3">
           <p className="font-montserrat text-[30px] font-extrabold leading-none text-black sm:text-[32px]">
             {formatCatalogPrice(price)}
           </p>
@@ -559,7 +610,7 @@ export function ProductInfoAndActions({
           )}
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+        <div className="flex w-full shrink-0 items-center gap-0.5 sm:w-auto sm:gap-1.5">
           <Button
             type="button"
             disabled={!canAddToCart || isAddingToCart}
@@ -586,7 +637,7 @@ export function ProductInfoAndActions({
           >
             {isAddingToCart ? (
               <svg
-                className="h-7 w-7 animate-spin text-[#dcc090]"
+                className="h-6 w-6 animate-spin text-[#dcc090]"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -603,9 +654,9 @@ export function ProductInfoAndActions({
               <Image
                 src={CATALOG_BAG_ICON_PATH}
                 alt=""
-                width={40}
-                height={40}
-                className="h-8 w-[40px] object-contain"
+                width={32}
+                height={32}
+                className="h-7 w-9 object-contain"
                 aria-hidden
               />
             )}
@@ -626,6 +677,7 @@ export function ProductInfoAndActions({
       sizeCategories={sizeCatalogCategories}
       selectedSizeItemId={selectedCatalogSize?.id ?? null}
       onSelectSizeCatalogItem={handleSelectCatalogSizeItem}
+      onSelectCustomSizeRequest={handleSelectCustomSizeRequest}
     />
     </>
   );

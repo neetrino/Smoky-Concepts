@@ -11,13 +11,13 @@ import { shouldLogError, shouldLogWarning, parseErrorResponse, createApiError } 
 function handleNetworkError(error: unknown, baseUrl: string, url: string): never {
   const networkError = error as { message?: string; name?: string };
   
-  // Check if it's a timeout error
+  // Check if it's a timeout error (operational — warn, then rethrow for callers)
   if (networkError.message?.includes('timeout') || networkError.message?.includes('Request timeout')) {
-    console.error('⏱️ [API CLIENT] Request timeout:', networkError.message);
+    console.warn('[API CLIENT] Request timeout:', networkError.message);
     throw networkError;
   }
-  
-  console.error('❌ [API CLIENT] Network error during fetch:', networkError);
+
+  console.error('[API CLIENT] Network error during fetch:', networkError);
   
   // Check if it's a connection refused error
   const isConnectionRefused = 

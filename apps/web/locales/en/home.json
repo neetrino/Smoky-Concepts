@@ -27,8 +27,12 @@
       "title": "Cover Collections"
     },
     "ritual": {
-      "title": "Your Ritual\nYour Signature",
-      "description": "Personalize your Smoky Cover. A small detail. A clear message.",
+      "title": "Your Ritual.\nYour Signature",
+      "description": {
+        "line1Bold": "Personalize",
+        "line1Rest": "your Smoky Cover",
+        "line2": "A small detail. A clear message."
+      },
       "bannerAlt": "Crafting ritual",
       "cta": "Personalize",
       "steps": {
@@ -39,7 +43,7 @@
       }
     },
     "bringing": {
-      "title": "Bringing Concepts to Life.",
+      "title": "Bring Concepts\nto life.",
       "imageAltLeft": "Concept tools",
       "imageAltRight": "Craft details",
       "moreLabel": "More",
@@ -71,6 +75,7 @@
       "title": "Upcoming",
       "loadError": "Failed to load upcoming products.",
       "noUpcoming": "No upcoming products yet.",
+      "orderCta": "Order",
       "shopCta": "Shop",
       "paginationAria": "Upcoming products pagination",
       "pageAriaPrefix": "Page"
@@ -111,6 +116,7 @@
     "footer": {
       "contactTitle": "Contact info",
       "designedBy": "Designed by",
+      "createdBy": "Create by",
       "whatsappLabel": "whatsup :",
       "copyright": "Copyright© 2026. All Rights Reserved.",
       "links": {

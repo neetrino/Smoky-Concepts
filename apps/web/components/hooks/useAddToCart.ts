@@ -3,12 +3,11 @@
 import { useState } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
 import { logger } from '../../lib/services/utils/logger';
+import { dispatchCartDrawerOpen } from '@/app/cart/constants';
 import {
   buildCatalogGuestCartSnapshot,
   upsertGuestCartLineSnapshot,
 } from '@/app/products/[slug]/product-cart-snapshot';
-
-const CART_DRAWER_OPEN_EVENT = 'cart-drawer-open';
 
 interface UseAddToCartProps {
   productId: string;
@@ -83,13 +82,7 @@ export function useAddToCart({
       upsertGuestCartLineSnapshot(line);
 
       if (openDrawer) {
-        window.dispatchEvent(
-          new CustomEvent(CART_DRAWER_OPEN_EVENT, {
-            detail: {
-              productId,
-            },
-          })
-        );
+        dispatchCartDrawerOpen(productId);
       }
     } catch (error: unknown) {
       logger.error('Error adding catalog product to cart', { error, productId });

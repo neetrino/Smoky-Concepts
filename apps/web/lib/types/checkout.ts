@@ -13,6 +13,15 @@ export interface CheckoutData {
     /** PDP text customize (optional; sanitized server-side) */
     customizePlain?: string;
     customizeHtml?: string;
+    /** PDP fallback custom size request (optional) */
+    customSizeRequest?: {
+      name: string;
+      phone: string;
+      email: string;
+      description: string;
+      imageDataUrl: string;
+      imageFileName?: string;
+    };
   }>;
   email: string;
   phone: string;

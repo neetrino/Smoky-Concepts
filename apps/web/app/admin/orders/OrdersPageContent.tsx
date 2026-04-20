@@ -14,6 +14,7 @@ export function OrdersPageContent() {
     loading,
     statusFilter,
     paymentStatusFilter,
+    orderTypeFilter,
     searchQuery,
     page,
     meta,
@@ -26,6 +27,7 @@ export function OrdersPageContent() {
     bulkDeleting,
     setStatusFilter,
     setPaymentStatusFilter,
+    setOrderTypeFilter,
     setSearchQuery,
     setPage,
     handleViewOrderDetails,
@@ -58,10 +60,12 @@ export function OrdersPageContent() {
         <OrdersFilters
           statusFilter={statusFilter}
           paymentStatusFilter={paymentStatusFilter}
+          orderTypeFilter={orderTypeFilter}
           searchQuery={searchQuery}
           updateMessage={updateMessage}
           setStatusFilter={setStatusFilter}
           setPaymentStatusFilter={setPaymentStatusFilter}
+          setOrderTypeFilter={setOrderTypeFilter}
           setSearchQuery={setSearchQuery}
           setPage={setPage}
           router={router}

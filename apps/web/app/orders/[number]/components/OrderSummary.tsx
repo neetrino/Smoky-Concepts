@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Card, Button } from '@shop/ui';
+import { dispatchCartDrawerOpen } from '../../../cart/constants';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { amountToUsd, catalogPriceToUsd, formatPriceInCurrency } from '../../../../lib/currency';
 import type { Order } from '../types';
@@ -82,11 +83,14 @@ export function OrderSummary({
             {t('orders.buttons.continueShopping')}
           </Button>
         </Link>
-        <Link href="/cart">
-          <Button variant="ghost" className="w-full">
-            {t('orders.buttons.viewCart')}
-          </Button>
-        </Link>
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full"
+          onClick={() => dispatchCartDrawerOpen()}
+        >
+          {t('orders.buttons.viewCart')}
+        </Button>
       </div>
     </Card>
   );

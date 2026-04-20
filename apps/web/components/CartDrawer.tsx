@@ -7,11 +7,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { formatStorePriceForDisplay } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
+import { CART_DRAWER_OPEN_EVENT } from '../app/cart/constants';
 import { readGuestCartFromStorage } from '../app/cart/cart-fetcher';
 import { handleRemoveItem, handleUpdateQuantity } from '../app/cart/cart-handlers';
 import type { Cart } from '../app/cart/types';
-
-const CART_DRAWER_OPEN_EVENT = 'cart-drawer-open';
 
 function CloseIcon() {
   return (
@@ -155,7 +154,7 @@ export function CartDrawer() {
         onClick={() => setIsOpen(false)}
       />
 
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-[28rem] flex-col overflow-hidden bg-[#efefef] shadow-[-12px_0_32px_rgba(18,42,38,0.16)]">
+      <aside className="absolute right-0 top-0 flex h-full w-full max-w-[30rem] flex-col overflow-hidden bg-[#efefef] shadow-[-12px_0_32px_rgba(18,42,38,0.16)]">
         <button
           type="button"
           onClick={() => setIsOpen(false)}

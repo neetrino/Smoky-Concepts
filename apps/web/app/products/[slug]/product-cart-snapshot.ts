@@ -8,7 +8,10 @@ function guestLineKey(line: GuestCartItem): string {
   const v = line.variantId ?? '';
   const p = line.customizePlain?.trim() ?? '';
   const h = line.customizeHtml?.trim() ?? '';
-  return `${v}::${p}::${h}`;
+  const c = line.customSizeRequest
+    ? `${line.customSizeRequest.name.trim()}::${line.customSizeRequest.phone.trim()}::${line.customSizeRequest.email.trim()}::${line.customSizeRequest.description.trim()}`
+    : '';
+  return `${v}::${p}::${h}::${c}`;
 }
 
 function readGuestCart(): GuestCartItem[] {
@@ -110,12 +113,31 @@ export function buildGuestCartLineSnapshot(
   originalPrice: number | null,
   productTitle: string,
   sizeCatalog?: { title: string; imageUrl: string } | null,
-  customize?: { plain: string; html: string | null } | null
+  customize?: { plain: string; html: string | null } | null,
+  customSizeRequest?: {
+    name: string;
+    phone: string;
+    email: string;
+    description: string;
+    imageDataUrl: string;
+    imageFileName: string;
+  } | null
 ): GuestCartItem {
   const trimmedTitle = sizeCatalog?.title?.trim() ?? '';
   const trimmedImg = sizeCatalog?.imageUrl?.trim() ?? '';
   const plain = customize?.plain?.trim() ?? '';
   const html = customize?.html?.trim() ?? '';
+  const customRequest =
+    customSizeRequest != null
+      ? {
+          name: customSizeRequest.name.trim(),
+          phone: customSizeRequest.phone.trim(),
+          email: customSizeRequest.email.trim(),
+          description: customSizeRequest.description.trim(),
+          imageDataUrl: customSizeRequest.imageDataUrl.trim(),
+          imageFileName: customSizeRequest.imageFileName.trim(),
+        }
+      : null;
   return {
     productId: product.id,
     productSlug: product.slug.trim(),
@@ -133,6 +155,7 @@ export function buildGuestCartLineSnapshot(
     sizeCatalogImageUrl: trimmedTitle !== '' && trimmedImg !== '' ? trimmedImg : null,
     customizePlain: plain !== '' ? plain : null,
     customizeHtml: html !== '' ? html : null,
+    customSizeRequest: customRequest,
   };
 }
 

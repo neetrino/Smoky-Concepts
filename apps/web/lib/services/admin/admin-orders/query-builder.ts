@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import type { OrderFilters } from "./types";
+import { CUSTOM_SIZE_ORDER_NOTE_MARKER } from "../../custom-size-order.service";
 
 /**
  * Build where clause for order queries
@@ -36,6 +37,79 @@ export function buildOrderWhereClause(filters: OrderFilters): Prisma.OrderWhereI
           },
         },
       ],
+    });
+  }
+
+  if (filters.orderType === 'custom') {
+    andConditions.push({
+      items: {
+        some: {
+          OR: [
+            { customizePlain: { not: null } },
+            { customizeHtml: { not: null } },
+          ],
+        },
+      },
+    });
+  }
+
+  if (filters.orderType === 'new') {
+    andConditions.push({
+      AND: [
+        {
+          items: {
+            some: {
+              sizeCatalogImageUrl: { not: null },
+            },
+          },
+        },
+        {
+          notes: {
+            contains: CUSTOM_SIZE_ORDER_NOTE_MARKER,
+            mode: 'insensitive',
+          },
+        },
+        { customerEmail: { not: null } },
+        { customerEmail: { not: '' } },
+        { customerPhone: { not: null } },
+        { customerPhone: { not: '' } },
+      ],
+    });
+  }
+
+  if (filters.orderType === 'orders') {
+    andConditions.push({
+      NOT: {
+        OR: [
+          {
+            items: {
+              some: {
+                OR: [
+                  { customizePlain: { not: null } },
+                  { customizeHtml: { not: null } },
+                ],
+              },
+            },
+          },
+          {
+            AND: [
+              {
+                items: {
+                  some: {
+                    sizeCatalogImageUrl: { not: null },
+                  },
+                },
+              },
+              {
+                notes: {
+                  contains: CUSTOM_SIZE_ORDER_NOTE_MARKER,
+                  mode: 'insensitive',
+                },
+              },
+            ],
+          },
+        ],
+      },
     });
   }
 
