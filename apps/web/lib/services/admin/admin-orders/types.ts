@@ -7,6 +7,7 @@ export interface OrderFilters {
   status?: string;
   paymentStatus?: string;
   search?: string;
+  orderType?: 'all' | 'custom' | 'new';
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }

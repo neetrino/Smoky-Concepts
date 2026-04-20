@@ -12,6 +12,7 @@ import type { AttributeGroupValue, Product, ProductVariant } from './types';
 import { normalizeHexPalette, parseHexFromText } from './utils/swatch-color-utils';
 import { CustomizeFormatToolbar } from './CustomizeFormatToolbar';
 import { CustomizeSizeModal } from './CustomizeSizeModal';
+import type { CustomOrderDraft } from './CustomizeSizeOrderFallback';
 import type { CustomizeFormatState } from './utils/build-customize-preview-html';
 import {
   getPlainTextFromHtml,
@@ -68,6 +69,8 @@ interface ProductInfoAndActionsProps {
   onBuyNow: () => Promise<void>;
   /** Sync size-catalog selection to parent for cart / checkout snapshot */
   onSelectedCatalogSizeChange?: (item: SizeCatalogItemDto | null) => void;
+  /** Sync custom-size request selection to parent for checkout payload */
+  onSelectedCustomSizeRequestChange?: (request: CustomOrderDraft | null) => void;
   /** Fires when the Customize tab is selected — parent loads fonts / toolbar only then. */
   onCustomizeTabActiveChange?: (active: boolean) => void;
 }
@@ -162,6 +165,7 @@ export function ProductInfoAndActions({
   onAddToCart,
   onBuyNow,
   onSelectedCatalogSizeChange,
+  onSelectedCustomSizeRequestChange,
   onCustomizeTabActiveChange,
   getCustomizeSanitizedHtml,
   customizeDraftText,
@@ -174,6 +178,7 @@ export function ProductInfoAndActions({
   const [isCustomizeSizeModalOpen, setIsCustomizeSizeModalOpen] = useState(false);
   const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
   const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
+  const [selectedCustomSizeRequest, setSelectedCustomSizeRequest] = useState<CustomOrderDraft | null>(null);
   const [appliedPreviewPlain, setAppliedPreviewPlain] = useState<string | null>(null);
   const appliedPreviewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -230,6 +235,7 @@ export function ProductInfoAndActions({
 
   useEffect(() => {
     setSelectedCatalogSize(null);
+    setSelectedCustomSizeRequest(null);
     setActiveTab('description');
     clearAppliedPreviewTimer();
     setAppliedPreviewPlain(null);
@@ -246,19 +252,35 @@ export function ProductInfoAndActions({
   }, [selectedCatalogSize, onSelectedCatalogSizeChange]);
 
   useEffect(() => {
+    onSelectedCustomSizeRequestChange?.(selectedCustomSizeRequest);
+  }, [selectedCustomSizeRequest, onSelectedCustomSizeRequestChange]);
+
+  useEffect(() => {
     onCustomizeTabActiveChange?.(activeTab === 'customize');
   }, [activeTab, onCustomizeTabActiveChange]);
 
   const sizeButtonLabel =
-    selectedCatalogSize?.title ?? activeSizeOption?.label ?? t(language, 'product.choose_size');
+    selectedCustomSizeRequest?.description ||
+    selectedCatalogSize?.title ||
+    activeSizeOption?.label ||
+    t(language, 'product.choose_size');
 
   const handleSelectCatalogSizeItem = (item: SizeCatalogItemDto) => {
     setSelectedCatalogSize(item);
+    setSelectedCustomSizeRequest(null);
     if (sizeOptions.length > 0) {
       const matched = matchVariantSizeFromCatalogTitle(item.title, sizeOptions);
       if (matched) {
         onSizeSelect(matched);
       }
+    }
+  };
+
+  const handleSelectCustomSizeRequest = (draft: CustomOrderDraft) => {
+    setSelectedCatalogSize(null);
+    setSelectedCustomSizeRequest(draft);
+    if (sizeOptions.length > 0) {
+      onSizeSelect(sizeOptions[0].value);
     }
   };
 
@@ -305,6 +327,8 @@ export function ProductInfoAndActions({
     activeColorOption ? `${t(language, 'product.color')}: ${activeColorOption.label}` : null,
     activeSizeOption
       ? `${t(language, 'product.size')}: ${activeSizeOption.label}`
+      : selectedCustomSizeRequest
+        ? `${t(language, 'product.size')}: ${selectedCustomSizeRequest.description}`
       : selectedCatalogSize
         ? `${t(language, 'product.size')}: ${selectedCatalogSize.title}`
         : null,
@@ -421,6 +445,7 @@ export function ProductInfoAndActions({
     productDescription,
     productDetails,
     selectedCatalogSize,
+    selectedCustomSizeRequest,
     appliedCustomize,
     appliedPreviewPlain,
     customizeDraftText,
@@ -652,6 +677,7 @@ export function ProductInfoAndActions({
       sizeCategories={sizeCatalogCategories}
       selectedSizeItemId={selectedCatalogSize?.id ?? null}
       onSelectSizeCatalogItem={handleSelectCatalogSizeItem}
+      onSelectCustomSizeRequest={handleSelectCustomSizeRequest}
     />
     </>
   );

@@ -3,14 +3,17 @@
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
 import type { useOrders } from '../useOrders';
+import type { OrderTypeFilter } from '../useOrders';
 
 interface OrdersFiltersProps {
   statusFilter: string;
   paymentStatusFilter: string;
+  orderTypeFilter: OrderTypeFilter;
   searchQuery: string;
   updateMessage: { type: 'success' | 'error'; text: string } | null;
   setStatusFilter: (value: string) => void;
   setPaymentStatusFilter: (value: string) => void;
+  setOrderTypeFilter: (value: OrderTypeFilter) => void;
   setSearchQuery: (value: string) => void;
   setPage: (value: number | ((prev: number) => number)) => void;
   router: ReturnType<typeof useOrders>['router'];
@@ -20,16 +23,23 @@ interface OrdersFiltersProps {
 export function OrdersFilters({
   statusFilter,
   paymentStatusFilter,
+  orderTypeFilter,
   searchQuery,
   updateMessage,
   setStatusFilter,
   setPaymentStatusFilter,
+  setOrderTypeFilter,
   setSearchQuery,
   setPage,
   router,
   searchParams,
 }: OrdersFiltersProps) {
   const { t } = useTranslation();
+
+  const pushFilters = (params: URLSearchParams) => {
+    const newUrl = params.toString() ? `/admin/orders?${params.toString()}` : '/admin/orders';
+    router.push(newUrl, { scroll: false });
+  };
 
   const handleStatusChange = (newStatus: string) => {
     setStatusFilter(newStatus);
@@ -40,8 +50,7 @@ export function OrdersFilters({
     } else {
       params.delete('status');
     }
-    const newUrl = params.toString() ? `/admin/orders?${params.toString()}` : '/admin/orders';
-    router.push(newUrl, { scroll: false });
+    pushFilters(params);
   };
 
   const handlePaymentStatusChange = (newPaymentStatus: string) => {
@@ -53,8 +62,19 @@ export function OrdersFilters({
     } else {
       params.delete('paymentStatus');
     }
-    const newUrl = params.toString() ? `/admin/orders?${params.toString()}` : '/admin/orders';
-    router.push(newUrl, { scroll: false });
+    pushFilters(params);
+  };
+
+  const handleOrderTypeChange = (newOrderType: OrderTypeFilter) => {
+    setOrderTypeFilter(newOrderType);
+    setPage(1);
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (newOrderType === 'all') {
+      params.delete('orderType');
+    } else {
+      params.set('orderType', newOrderType);
+    }
+    pushFilters(params);
   };
 
   const handleSearchChange = (newSearch: string) => {
@@ -66,12 +86,43 @@ export function OrdersFilters({
     } else {
       params.delete('search');
     }
-    const newUrl = params.toString() ? `/admin/orders?${params.toString()}` : '/admin/orders';
-    router.push(newUrl, { scroll: false });
+    pushFilters(params);
   };
 
   return (
     <Card className="p-4 mb-6">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="inline-flex rounded-full bg-gray-100 p-1 text-xs">
+          <button
+            type="button"
+            onClick={() => handleOrderTypeChange('all')}
+            className={`px-3 py-1 rounded-full transition-all ${
+              orderTypeFilter === 'all' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t('admin.orders.allOrders')}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleOrderTypeChange('custom')}
+            className={`px-3 py-1 rounded-full transition-all ${
+              orderTypeFilter === 'custom' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t('admin.orders.customOrders')}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleOrderTypeChange('new')}
+            className={`px-3 py-1 rounded-full transition-all ${
+              orderTypeFilter === 'new' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t('admin.orders.newOrders')}
+          </button>
+        </div>
+      </div>
+
       <div className="flex gap-4 items-center flex-wrap">
         <select
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

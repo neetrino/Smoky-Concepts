@@ -98,6 +98,8 @@ export interface OrderDetails {
   updatedAt?: string;
 }
 
+export type OrderTypeFilter = 'all' | 'custom' | 'new';
+
 export function useOrders() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -106,6 +108,7 @@ export function useOrders() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
+  const [orderTypeFilter, setOrderTypeFilter] = useState<OrderTypeFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState<OrdersResponse['meta'] | null>(null);
@@ -123,8 +126,12 @@ export function useOrders() {
       const status = searchParams.get('status') || '';
       const paymentStatus = searchParams.get('paymentStatus') || '';
       const search = searchParams.get('search') || '';
+      const orderTypeParam = searchParams.get('orderType');
+      const orderType: OrderTypeFilter =
+        orderTypeParam === 'custom' || orderTypeParam === 'new' ? orderTypeParam : 'all';
       setStatusFilter(status);
       setPaymentStatusFilter(paymentStatus);
+      setOrderTypeFilter(orderType);
       setSearchQuery(search);
     }
   }, [searchParams]);
@@ -132,7 +139,7 @@ export function useOrders() {
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('📦 [ADMIN] Fetching orders...', { page, statusFilter, paymentStatusFilter, searchQuery, sortBy, sortOrder });
+      console.log('📦 [ADMIN] Fetching orders...', { page, statusFilter, paymentStatusFilter, orderTypeFilter, searchQuery, sortBy, sortOrder });
       
       const response = await apiClient.get<OrdersResponse>('/api/v1/admin/orders', {
         params: {
@@ -140,6 +147,7 @@ export function useOrders() {
           limit: '20',
           status: statusFilter || '',
           paymentStatus: paymentStatusFilter || '',
+          orderType: orderTypeFilter || '',
           search: searchQuery || '',
           sortBy: sortBy || '',
           sortOrder: sortOrder || '',
@@ -154,12 +162,12 @@ export function useOrders() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, paymentStatusFilter, searchQuery, sortBy, sortOrder]);
+  }, [page, statusFilter, paymentStatusFilter, orderTypeFilter, searchQuery, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, statusFilter, paymentStatusFilter, searchQuery, sortBy, sortOrder]);
+  }, [page, statusFilter, paymentStatusFilter, orderTypeFilter, searchQuery, sortBy, sortOrder]);
 
   const formatCurrency = (amount: number, _orderCurrency?: string, storedAs?: string) =>
     formatAdminOrderAmount(amount, storedAs);
@@ -342,6 +350,7 @@ export function useOrders() {
     loading,
     statusFilter,
     paymentStatusFilter,
+    orderTypeFilter,
     searchQuery,
     page,
     meta,
@@ -355,6 +364,7 @@ export function useOrders() {
     // Actions
     setStatusFilter,
     setPaymentStatusFilter,
+    setOrderTypeFilter,
     setSearchQuery,
     setPage,
     fetchOrders,

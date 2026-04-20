@@ -48,6 +48,7 @@ interface CustomizeSizeModalProps {
   sizeCategories: SizeCatalogCategoryDto[];
   selectedSizeItemId: string | null;
   onSelectSizeCatalogItem: (item: SizeCatalogItemDto) => void;
+  onSelectCustomSizeRequest: (draft: CustomOrderDraft) => void;
 }
 
 export function CustomizeSizeModal({
@@ -57,11 +58,14 @@ export function CustomizeSizeModal({
   sizeCategories,
   selectedSizeItemId,
   onSelectSizeCatalogItem,
+  onSelectCustomSizeRequest,
 }: CustomizeSizeModalProps) {
   const titleId = useId();
   const searchInputId = useId();
   const [sizeSearchQuery, setSizeSearchQuery] = useState('');
   const [customOrderDraft, setCustomOrderDraft] = useState<CustomOrderDraft>(EMPTY_CUSTOM_ORDER_DRAFT);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [customOrderSubmitError, setCustomOrderSubmitError] = useState<string | null>(null);
 
   const filteredSizeCategories = useMemo(
     () => filterSizeCatalogByTitle(sizeCategories, sizeSearchQuery),
@@ -82,6 +86,8 @@ export function CustomizeSizeModal({
     if (!isOpen) {
       setSizeSearchQuery('');
       setCustomOrderDraft(EMPTY_CUSTOM_ORDER_DRAFT);
+      setIsUploadingImage(false);
+      setCustomOrderSubmitError(null);
     }
   }, [isOpen]);
 
@@ -123,9 +129,82 @@ export function CustomizeSizeModal({
     []
   );
 
+  const handleCustomOrderImageUpload = useCallback(async (file: File) => {
+    const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+    if (!allowedTypes.has(file.type)) {
+      setCustomOrderSubmitError(t(language, 'product.size_catalog_custom_order_upload_invalid_type'));
+      return;
+    }
+
+    const maxBytes = 10 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setCustomOrderSubmitError(t(language, 'product.size_catalog_custom_order_upload_too_large'));
+      return;
+    }
+
+    setCustomOrderSubmitError(null);
+    setIsUploadingImage(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (typeof reader.result === 'string') {
+            resolve(reader.result);
+            return;
+          }
+          reject(new Error('Failed to read image'));
+        };
+        reader.onerror = () => reject(new Error('Failed to read image'));
+        reader.readAsDataURL(file);
+      });
+
+      setCustomOrderDraft((previous) => ({
+        ...previous,
+        imageDataUrl: dataUrl,
+        imageFileName: file.name,
+      }));
+    } catch {
+      setCustomOrderSubmitError(t(language, 'product.size_catalog_custom_order_upload_failed'));
+    } finally {
+      setIsUploadingImage(false);
+    }
+  }, [language]);
+
+  const handleCustomOrderSubmit = useCallback((draft: CustomOrderDraft) => {
+    const canSubmit =
+      draft.name.trim() &&
+      draft.phone.trim() &&
+      draft.email.trim() &&
+      draft.description.trim() &&
+      draft.imageDataUrl.trim();
+
+    if (!canSubmit) {
+      setCustomOrderSubmitError(t(language, 'product.size_catalog_custom_order_required_fields'));
+      return;
+    }
+    setCustomOrderSubmitError(null);
+    onSelectCustomSizeRequest({
+      ...draft,
+      name: draft.name.trim(),
+      phone: draft.phone.trim(),
+      email: draft.email.trim(),
+      description: draft.description.trim(),
+      imageDataUrl: draft.imageDataUrl.trim(),
+      imageFileName: draft.imageFileName.trim(),
+    });
+    onClose();
+  }, [language, onClose, onSelectCustomSizeRequest]);
+
   if (!isOpen) {
     return null;
   }
+
+  const canSubmitCustomOrder =
+    customOrderDraft.name.trim().length > 0 &&
+    customOrderDraft.phone.trim().length > 0 &&
+    customOrderDraft.email.trim().length > 0 &&
+    customOrderDraft.description.trim().length > 0 &&
+    customOrderDraft.imageDataUrl.trim().length > 0;
 
   const handlePickSizeItem = (item: SizeCatalogItemDto) => {
     onSelectSizeCatalogItem(item);
@@ -190,6 +269,12 @@ export function CustomizeSizeModal({
                 language={language}
                 draft={customOrderDraft}
                 onDraftChange={handleCustomOrderDraftChange}
+                onUploadImage={handleCustomOrderImageUpload}
+                onSubmit={handleCustomOrderSubmit}
+                isUploadingImage={isUploadingImage}
+                isSubmitting={false}
+                submitError={customOrderSubmitError}
+                canSubmit={canSubmitCustomOrder}
               />
             ) : (
               <SizeCatalogPickerContent

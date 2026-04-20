@@ -31,6 +31,7 @@ export function useOrderSubmission({
         const img = item.variant.sizeCatalogImageUrl?.trim();
         const cPlain = item.variant.customizePlain?.trim();
         const cHtml = item.variant.customizeHtml?.trim();
+        const customSizeRequest = item.variant.customSizeRequest;
         return {
           productId: item.variant.product.id,
           variantId: item.variant.id,
@@ -45,6 +46,18 @@ export function useOrderSubmission({
             ? {
                 ...(cPlain ? { customizePlain: cPlain } : {}),
                 ...(cHtml ? { customizeHtml: cHtml } : {}),
+              }
+            : {}),
+          ...(customSizeRequest
+            ? {
+                customSizeRequest: {
+                  name: customSizeRequest.name,
+                  phone: customSizeRequest.phone,
+                  email: customSizeRequest.email,
+                  description: customSizeRequest.description,
+                  imageDataUrl: customSizeRequest.imageDataUrl,
+                  imageFileName: customSizeRequest.imageFileName,
+                },
               }
             : {}),
         };

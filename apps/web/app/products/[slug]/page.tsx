@@ -16,6 +16,7 @@ import { useProductPage } from './useProductPage';
 import { useProductCartActions } from './useProductCartActions';
 import { useCustomizeGoogleFontLinks } from './useCustomizeGoogleFontLinks';
 import type { ProductPageProps } from './types';
+import type { CustomOrderDraft } from './CustomizeSizeOrderFallback';
 
 const CUSTOMIZE_TEXT_MAX_LENGTH = 18;
 
@@ -50,6 +51,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   } = useProductPage(params);
 
   const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
+  const [selectedCustomSizeRequest, setSelectedCustomSizeRequest] = useState<CustomOrderDraft | null>(null);
   const [customizeApplied, setCustomizeApplied] = useState<{
     plain: string;
     html: string | null;
@@ -60,6 +62,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   useEffect(() => {
     setSelectedCatalogSize(null);
+    setSelectedCustomSizeRequest(null);
     setCustomizeApplied(null);
     setCustomizeDraftText('');
     setCustomizeFormat(getDefaultCustomizeFormat());
@@ -140,6 +143,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     canAddToCart,
     productDisplayTitle,
     selectedCatalogSize,
+    selectedCustomSizeRequest,
     customizeApplied,
     setIsAddingToCart,
     setShowMessage,
@@ -199,6 +203,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             onAddToCart={handleAddToCart}
             onBuyNow={handleBuyNow}
             onSelectedCatalogSizeChange={setSelectedCatalogSize}
+            onSelectedCustomSizeRequestChange={setSelectedCustomSizeRequest}
             onCustomizeTabActiveChange={setIsCustomizeTabActive}
           />
         </div>

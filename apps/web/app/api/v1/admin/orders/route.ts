@@ -25,6 +25,11 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status') || undefined;
     const paymentStatus = searchParams.get('paymentStatus') || undefined;
     const search = searchParams.get('search') || undefined;
+    const orderTypeRaw = searchParams.get('orderType');
+    const orderType =
+      orderTypeRaw === 'custom' || orderTypeRaw === 'new' || orderTypeRaw === 'all'
+        ? orderTypeRaw
+        : undefined;
     const sortBy = searchParams.get('sortBy') || undefined;
     const sortOrder = searchParams.get('sortOrder') || undefined;
 
@@ -34,6 +39,7 @@ export async function GET(req: NextRequest) {
       ...(status && { status }),
       ...(paymentStatus && { paymentStatus }),
       ...(search && { search }),
+      ...(orderType && { orderType }),
       ...(sortBy && { sortBy }),
       ...(sortOrder && { sortOrder: sortOrder as 'asc' | 'desc' }),
     };
