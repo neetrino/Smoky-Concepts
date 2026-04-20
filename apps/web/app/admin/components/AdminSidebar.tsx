@@ -47,7 +47,7 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
                   tab
                 )} ${isActive ? adminNavItemActiveClass(theme) : adminNavItemInactiveClass(theme)}`}
               >
-                <span className={adminNavIconClass(isActive, theme)}>{tab.icon}</span>
+                {tab.icon ? <span className={adminNavIconClass(isActive, theme)}>{tab.icon}</span> : null}
                 <span className="text-left">{tab.label}</span>
               </button>
             );

@@ -2,7 +2,7 @@
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { ADMIN_PRICE_CURRENCY, amountToUsd, formatPriceInCurrency } from '../../../../lib/currency';
-import { getStatusColor, getPaymentStatusColor } from '../utils/orderUtils';
+import { getStatusColor, getPaymentStatusColor, getColorValue } from '../utils/orderUtils';
 import type { Order } from '../useOrders';
 
 interface OrderRowProps {
@@ -40,6 +40,8 @@ export function OrderRow({
     return formatPriceInCurrency(totalUsd - shippingUsd, ADMIN_PRICE_CURRENCY);
   };
 
+  const previews = order.colorSizePreviews || [];
+
   return (
     <tr className="hover:bg-gray-50">
       <td className="px-4 py-4">
@@ -71,8 +73,44 @@ export function OrderRow({
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {calculateTotalWithoutShipping()}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-        {order.itemsCount}
+      <td className="px-6 py-4 text-sm text-gray-500">
+        {previews.length > 0 ? (
+          <div className="flex max-w-[260px] flex-wrap items-center gap-1.5">
+            {previews.map((preview) => {
+              const swatchColor = preview.colorHex || (preview.colorLabel ? getColorValue(preview.colorLabel) : undefined);
+              return (
+                <span
+                  key={`${order.id}-${preview.label}-${preview.imageUrl || ''}-${preview.colorHex || ''}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700"
+                  title={preview.label}
+                >
+                  {preview.imageUrl ? (
+                    <img
+                      src={preview.imageUrl}
+                      alt={preview.label}
+                      className="h-4 w-4 rounded border border-gray-300 object-cover"
+                    />
+                  ) : null}
+                  {swatchColor ? (
+                    <span
+                      className="h-3.5 w-3.5 rounded-full border border-gray-300"
+                      style={{ backgroundColor: swatchColor }}
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                  <span className="max-w-[120px] truncate">{preview.label}</span>
+                </span>
+              );
+            })}
+            {order.colorSizePreviewsHasMore && order.colorSizePreviewsHasMore > 0 ? (
+              <span className="text-xs text-gray-500">+{order.colorSizePreviewsHasMore}</span>
+            ) : null}
+          </div>
+        ) : (
+          <span className="block max-w-[220px] truncate" title={order.colorSizeSummary || undefined}>
+            {order.colorSizeSummary || '—'}
+          </span>
+        )}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center gap-2">

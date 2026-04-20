@@ -1,8 +1,8 @@
 {
-  "title": "Categories",
-  "description": "Select product categories to find what you're looking for.",
-  "loading": "Loading categories...",
-  "empty": "No categories found",
+  "title": "Collections",
+  "description": "Select product collections to find what you're looking for.",
+  "loading": "Loading collections...",
+  "empty": "No collections found",
   "productsCount": "products"
 }
 

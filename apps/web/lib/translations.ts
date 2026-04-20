@@ -31,7 +31,7 @@ export const translations = {
     breadcrumb: {
       home: 'Home',
       products: 'Products',
-      categories: 'Categories',
+      categories: 'Collections',
       cart: 'Cart',
       checkout: 'Checkout',
       profile: 'Profile',

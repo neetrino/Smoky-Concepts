@@ -24,6 +24,14 @@ export interface Order {
   customerLastName?: string;
   customerId?: string | null;
   itemsCount: number;
+  colorSizeSummary?: string | null;
+  colorSizePreviews?: Array<{
+    label: string;
+    imageUrl?: string;
+    colorLabel?: string;
+    colorHex?: string;
+  }>;
+  colorSizePreviewsHasMore?: number;
   createdAt: string;
 }
 

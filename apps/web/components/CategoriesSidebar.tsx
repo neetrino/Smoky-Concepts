@@ -103,7 +103,7 @@ function CategoriesSidebarContent() {
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-          <span className="text-base font-semibold text-gray-900">All Categories</span>
+          <span className="text-base font-semibold text-gray-900">All Collections</span>
         </div>
         <svg
           className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}

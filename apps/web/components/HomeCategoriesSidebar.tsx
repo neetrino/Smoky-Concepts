@@ -299,7 +299,7 @@ export function HomeCategoriesSidebar() {
 
           {filteredCategories.length === 0 && (
             <div className="text-center py-4 text-sm text-gray-500">
-              No categories found
+              No collections found
             </div>
           )}
         </div>
