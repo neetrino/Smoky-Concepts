@@ -1,18 +1,21 @@
 import type { AdminMenuItem } from '../../components/AdminMenuDrawer';
 
+/** Toggle when the "Filter by price" admin screen should be listed in the nav again. */
+export const ADMIN_MENU_SHOW_FILTER_BY_PRICE = false;
+
 /**
  * Unified admin navigation configuration.
  *
  * ԿԱՐԵՎՈՐ.
  * - Մենյուի բոլոր կետերը centrally պահում ենք այստեղ, որ բոլոր admin էջերում նույնը լինի։
  * - "Discounts" label-ը նույնն է ամեն տեղ, ուղիղ տանում է `/admin/quick-settings` էջ։
- * - "Delivery" կետը միշտ առկա է, այդ թվում Analytics և Filter by Price էջերում sidebar-ում։
+ * - "Delivery" կետը միշտ առկա է sidebar-ում (Analytics-ի հետ միասին)։
  * 
  * Note: This function returns menu items with translated labels.
  * Use getAdminMenuTabs(t) in client components where t is from useTranslation().
  */
 export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
-  return [
+  const tabs: AdminMenuItem[] = [
   {
     id: 'dashboard',
     label: t('admin.menu.dashboard'),
@@ -223,6 +226,9 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     ),
   },
   ];
+  return ADMIN_MENU_SHOW_FILTER_BY_PRICE
+    ? tabs
+    : tabs.filter((item) => item.id !== 'price-filter-settings');
 }
 
 
