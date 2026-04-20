@@ -48,6 +48,7 @@
   "size_catalog_custom_order_submitting": "Отправка...",
   "size_catalog_custom_order_success": "Ваш заказ на индивидуальный размер успешно отправлен.",
   "size_catalog_custom_order_submit_failed": "Не удалось отправить заказ на индивидуальный размер. Попробуйте снова.",
+  "size_catalog_custom_order_selected": "Выбрано",
   "size_catalog_custom_order_cta": "Заказать",
   "size_catalog_custom_order_cta_aria": "Отправить заказ на индивидуальный размер",
   "size_catalog_empty": "Размеры ещё не настроены в админке.",

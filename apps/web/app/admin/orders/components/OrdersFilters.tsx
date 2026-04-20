@@ -104,6 +104,15 @@ export function OrdersFilters({
           </button>
           <button
             type="button"
+            onClick={() => handleOrderTypeChange('orders')}
+            className={`px-3 py-1 rounded-full transition-all ${
+              orderTypeFilter === 'orders' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t('admin.orders.ordersOnly')}
+          </button>
+          <button
+            type="button"
             onClick={() => handleOrderTypeChange('custom')}
             className={`px-3 py-1 rounded-full transition-all ${
               orderTypeFilter === 'custom' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'

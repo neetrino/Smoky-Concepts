@@ -48,6 +48,7 @@
   "size_catalog_custom_order_submitting": "Ուղարկվում է...",
   "size_catalog_custom_order_success": "Ձեր անհատական չափի պատվերը հաջողությամբ ուղարկվեց։",
   "size_catalog_custom_order_submit_failed": "Չհաջողվեց ուղարկել անհատական չափի պատվերը։ Խնդրում ենք փորձել կրկին։",
+  "size_catalog_custom_order_selected": "Ընտրված",
   "size_catalog_custom_order_cta": "Պատվիրել",
   "size_catalog_custom_order_cta_aria": "Ուղարկել անհատական չափի պատվեր",
   "size_catalog_empty": "Ադմինում դեռ չափեր չեն կարգավորված։",

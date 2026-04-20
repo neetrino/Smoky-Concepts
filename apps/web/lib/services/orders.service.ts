@@ -354,14 +354,6 @@ class OrdersService {
               }
             }
 
-            if (
-              customSizeRequest &&
-              (!customizePlain || customizePlain.trim() === '') &&
-              (!customizeHtml || customizeHtml.trim() === '')
-            ) {
-              customizePlain = customSizeRequest.description;
-            }
-
             return {
               variantId: variant.id,
               productId: variant.product.id,

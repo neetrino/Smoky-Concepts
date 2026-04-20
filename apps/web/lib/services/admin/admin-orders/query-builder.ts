@@ -77,6 +77,42 @@ export function buildOrderWhereClause(filters: OrderFilters): Prisma.OrderWhereI
     });
   }
 
+  if (filters.orderType === 'orders') {
+    andConditions.push({
+      NOT: {
+        OR: [
+          {
+            items: {
+              some: {
+                OR: [
+                  { customizePlain: { not: null } },
+                  { customizeHtml: { not: null } },
+                ],
+              },
+            },
+          },
+          {
+            AND: [
+              {
+                items: {
+                  some: {
+                    sizeCatalogImageUrl: { not: null },
+                  },
+                },
+              },
+              {
+                notes: {
+                  contains: CUSTOM_SIZE_ORDER_NOTE_MARKER,
+                  mode: 'insensitive',
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+  }
+
   // Return where clause
   if (andConditions.length > 0) {
     return { AND: andConditions };

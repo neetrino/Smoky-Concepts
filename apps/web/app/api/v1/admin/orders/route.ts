@@ -26,8 +26,11 @@ export async function GET(req: NextRequest) {
     const paymentStatus = searchParams.get('paymentStatus') || undefined;
     const search = searchParams.get('search') || undefined;
     const orderTypeRaw = searchParams.get('orderType');
-    const orderType =
-      orderTypeRaw === 'custom' || orderTypeRaw === 'new' || orderTypeRaw === 'all'
+    const orderType: 'all' | 'orders' | 'custom' | 'new' | undefined =
+      orderTypeRaw === 'custom' ||
+      orderTypeRaw === 'new' ||
+      orderTypeRaw === 'orders' ||
+      orderTypeRaw === 'all'
         ? orderTypeRaw
         : undefined;
     const sortBy = searchParams.get('sortBy') || undefined;

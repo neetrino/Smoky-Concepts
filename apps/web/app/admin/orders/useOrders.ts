@@ -91,6 +91,8 @@ export interface OrderDetails {
       imageUrl?: string;
       colors?: string[] | any;
     }>;
+    sizeCatalogTitle?: string | null;
+    sizeCatalogImageUrl?: string | null;
     customizePlain?: string | null;
     customizeHtml?: string | null;
   }>;
@@ -98,7 +100,7 @@ export interface OrderDetails {
   updatedAt?: string;
 }
 
-export type OrderTypeFilter = 'all' | 'custom' | 'new';
+export type OrderTypeFilter = 'all' | 'orders' | 'custom' | 'new';
 
 export function useOrders() {
   const { t } = useTranslation();
@@ -128,7 +130,9 @@ export function useOrders() {
       const search = searchParams.get('search') || '';
       const orderTypeParam = searchParams.get('orderType');
       const orderType: OrderTypeFilter =
-        orderTypeParam === 'custom' || orderTypeParam === 'new' ? orderTypeParam : 'all';
+        orderTypeParam === 'custom' || orderTypeParam === 'new' || orderTypeParam === 'orders'
+          ? orderTypeParam
+          : 'all';
       setStatusFilter(status);
       setPaymentStatusFilter(paymentStatus);
       setOrderTypeFilter(orderType);

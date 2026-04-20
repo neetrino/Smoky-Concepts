@@ -260,7 +260,7 @@ export function ProductInfoAndActions({
   }, [activeTab, onCustomizeTabActiveChange]);
 
   const sizeButtonLabel =
-    selectedCustomSizeRequest?.description ||
+    (selectedCustomSizeRequest ? t(language, 'product.size_catalog_custom_order_selected') : null) ||
     selectedCatalogSize?.title ||
     activeSizeOption?.label ||
     t(language, 'product.choose_size');
@@ -328,7 +328,7 @@ export function ProductInfoAndActions({
     activeSizeOption
       ? `${t(language, 'product.size')}: ${activeSizeOption.label}`
       : selectedCustomSizeRequest
-        ? `${t(language, 'product.size')}: ${selectedCustomSizeRequest.description}`
+        ? `${t(language, 'product.size')}: ${t(language, 'product.size_catalog_custom_order_selected')}`
       : selectedCatalogSize
         ? `${t(language, 'product.size')}: ${selectedCatalogSize.title}`
         : null,
