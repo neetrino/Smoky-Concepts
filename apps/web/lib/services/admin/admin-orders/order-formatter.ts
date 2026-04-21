@@ -73,6 +73,7 @@ export function formatOrderForList(order: {
   createdAt: Date;
   items: Array<{
     sizeCatalogTitle?: string | null;
+    sizeCatalogVersion?: string | null;
     sizeCatalogImageUrl?: string | null;
     variant?: {
       attributes?: unknown;
@@ -89,6 +90,7 @@ export function formatOrderForList(order: {
   const buildOrderVariantPreviews = (
     items: Array<{
       sizeCatalogTitle?: string | null;
+      sizeCatalogVersion?: string | null;
       sizeCatalogImageUrl?: string | null;
       variant?: {
         attributes?: unknown;
@@ -102,6 +104,7 @@ export function formatOrderForList(order: {
       const variantOptions = mergeSizeCatalogIntoVariantOptions(
         variantOptionsBase,
         item.sizeCatalogTitle,
+        item.sizeCatalogVersion,
         item.sizeCatalogImageUrl
       );
 
@@ -146,6 +149,7 @@ export function formatOrderForList(order: {
   const buildOrderColorSizeSummary = (
     items: Array<{
       sizeCatalogTitle?: string | null;
+      sizeCatalogVersion?: string | null;
       sizeCatalogImageUrl?: string | null;
       variant?: {
         attributes?: unknown;
@@ -158,6 +162,7 @@ export function formatOrderForList(order: {
         const variantOptions = mergeSizeCatalogIntoVariantOptions(
           variantOptionsBase,
           item.sizeCatalogTitle,
+          item.sizeCatalogVersion,
           item.sizeCatalogImageUrl
         );
 
@@ -261,6 +266,7 @@ export function formatOrderItem(item: {
   quantity: number | null;
   total: number | null;
   sizeCatalogTitle?: string | null;
+  sizeCatalogVersion?: string | null;
   sizeCatalogImageUrl?: string | null;
   customizePlain?: string | null;
   customizeHtml?: string | null;
@@ -289,6 +295,7 @@ export function formatOrderItem(item: {
   const variantOptions = mergeSizeCatalogIntoVariantOptions(
     variantOptionsBase,
     item.sizeCatalogTitle,
+    item.sizeCatalogVersion,
     item.sizeCatalogImageUrl
   );
 
@@ -303,6 +310,7 @@ export function formatOrderItem(item: {
     unitPrice,
     variantOptions,
     sizeCatalogTitle: item.sizeCatalogTitle?.trim() || null,
+    sizeCatalogVersion: item.sizeCatalogVersion?.trim() || null,
     sizeCatalogImageUrl: item.sizeCatalogImageUrl?.trim() || null,
     customizePlain: item.customizePlain?.trim() || null,
     customizeHtml: item.customizeHtml?.trim() || null,
@@ -350,6 +358,7 @@ export function formatOrderForDetail(order: {
     quantity: number | null;
     total: number | null;
     sizeCatalogTitle?: string | null;
+    sizeCatalogVersion?: string | null;
     sizeCatalogImageUrl?: string | null;
     customizePlain?: string | null;
     customizeHtml?: string | null;

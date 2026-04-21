@@ -49,10 +49,11 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     }
 
     const { itemId } = await context.params;
-    const body = (await req.json()) as { title?: string; imageUrl?: string; published?: boolean };
+    const body = (await req.json()) as { title?: string; imageUrl?: string; version?: string | null; published?: boolean };
     const result = await adminService.updateSizeCatalogItem(itemId, {
       title: body.title,
       imageUrl: body.imageUrl,
+      version: body.version,
       published: body.published,
     });
     return NextResponse.json(result);

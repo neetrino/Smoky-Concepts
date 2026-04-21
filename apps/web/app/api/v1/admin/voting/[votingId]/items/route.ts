@@ -20,20 +20,17 @@ function createErrorResponse(error: unknown, url: string) {
       detail: problem.detail || problem.message || "An error occurred",
       instance: url,
     },
-    { status: problem.status || 500 }
+    { status: problem.status || 500 },
   );
 }
 
-interface RouteContext {
-  params: Promise<{ categoryId: string }>;
-}
-
-/**
- * POST /api/v1/admin/size-catalog/categories/[categoryId]/items
- */
-export async function POST(req: NextRequest, context: RouteContext) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ votingId: string }> },
+) {
   try {
     const user = await authenticateToken(req);
+
     if (!user || !requireAdmin(user)) {
       return NextResponse.json(
         {
@@ -43,18 +40,17 @@ export async function POST(req: NextRequest, context: RouteContext) {
           detail: "Admin access required",
           instance: req.url,
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
-    const { categoryId } = await context.params;
-    const body = (await req.json()) as { title?: string; imageUrl?: string; version?: string | null; published?: boolean };
-    const result = await adminService.createSizeCatalogItem(categoryId, {
-      title: body.title ?? "",
-      imageUrl: body.imageUrl ?? "",
-      version: body.version,
-      published: body.published,
-    });
+    const { votingId } = await params;
+    const body = (await req.json()) as {
+      title?: string;
+      imageUrl?: string;
+    };
+
+    const result = await adminService.createVotingItem(votingId, body);
     return NextResponse.json(result, { status: 201 });
   } catch (error: unknown) {
     return createErrorResponse(error, req.url);

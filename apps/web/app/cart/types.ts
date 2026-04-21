@@ -9,6 +9,7 @@ export interface CartItem {
     sizeLabel?: string | null;
     /** Size catalog (PDP modal) — passed to checkout for order display */
     sizeCatalogTitle?: string | null;
+    sizeCatalogVersion?: string | null;
     sizeCatalogImageUrl?: string | null;
     /** PDP customize (optional) */
     customizePlain?: string | null;
@@ -71,6 +72,7 @@ export interface GuestCartItem {
   sizeLabel?: string | null;
   categoryLabel?: string | null;
   sizeCatalogTitle?: string | null;
+  sizeCatalogVersion?: string | null;
   sizeCatalogImageUrl?: string | null;
   customizePlain?: string | null;
   customizeHtml?: string | null;

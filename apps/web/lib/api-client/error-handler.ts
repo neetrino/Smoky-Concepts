@@ -2,12 +2,13 @@ import { ApiError } from "./types";
 
 /**
  * Check if error should be logged (skip expected / client-handled statuses)
+ * 400 - validation/input errors handled in UI
  * 401 - authentication
  * 404 - resource not found
  * 422 - validation / business rules (e.g. insufficient stock)
  */
 export function shouldLogError(status: number): boolean {
-  return status !== 401 && status !== 404 && status !== 422;
+  return status !== 400 && status !== 401 && status !== 404 && status !== 422;
 }
 
 /**

@@ -57,14 +57,15 @@ async function handleErrorResponse(
 ): Promise<never> {
   const isUnauthorized = response.status === 401;
   const isNotFound = response.status === 404;
+  const isServerError = response.status >= 500;
   
   // Log 404 as warning (expected situation - resource doesn't exist)
   if (shouldLogWarning(response.status)) {
     console.warn(`⚠️ [API CLIENT] Not Found (404): ${url}`);
   }
   // Log other errors (except 401 which is expected)
-  else if (shouldLogError(response.status)) {
-    console.error(`❌ [API CLIENT] Error: ${response.status} ${response.statusText}`, {
+  else if (shouldLogError(response.status) && isServerError && process.env.NODE_ENV === 'development') {
+    console.warn(`⚠️ [API CLIENT] Error: ${response.status} ${response.statusText}`, {
       url,
       status: response.status,
       statusText: response.statusText,
@@ -82,8 +83,8 @@ async function handleErrorResponse(
   // Log error details
   if (isNotFound) {
     console.warn('⚠️ [API CLIENT] Not Found response:', errorData || errorText);
-  } else if (!isUnauthorized && shouldLogError(response.status)) {
-    console.error('❌ [API CLIENT] Error response:', errorData || errorText);
+  } else if (!isUnauthorized && shouldLogError(response.status) && isServerError && process.env.NODE_ENV === 'development') {
+    console.warn('⚠️ [API CLIENT] Error response:', errorData || errorText);
   }
   
   throw createApiError(response, errorText, errorData);

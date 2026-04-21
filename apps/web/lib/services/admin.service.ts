@@ -71,7 +71,11 @@ class AdminService {
   updateProductDiscount = adminProductsService.updateProductDiscount.bind(adminProductsService);
 
   // Voting methods
-  getVotingItems = adminVotingService.getVotingItems.bind(adminVotingService);
+  listVotings = adminVotingService.listVotings.bind(adminVotingService);
+  getVotingWithItems = adminVotingService.getVotingWithItems.bind(adminVotingService);
+  createVoting = adminVotingService.createVoting.bind(adminVotingService);
+  updateVoting = adminVotingService.updateVoting.bind(adminVotingService);
+  deleteVoting = adminVotingService.deleteVoting.bind(adminVotingService);
   getVotingItemById = adminVotingService.getVotingItemById.bind(adminVotingService);
   createVotingItem = adminVotingService.createVotingItem.bind(adminVotingService);
   updateVotingItem = adminVotingService.updateVotingItem.bind(adminVotingService);

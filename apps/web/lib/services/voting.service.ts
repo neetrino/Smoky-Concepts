@@ -25,8 +25,21 @@ interface VotingItemRow {
 
 class VotingService {
   async getVotingItems(userId?: string) {
+    const publishedVoting = await db.voting.findFirst({
+      where: {
+        published: true,
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+
+    if (!publishedVoting) {
+      return { data: [] };
+    }
+
     const rawItems = await db.votingItem.findMany({
       where: {
+        votingId: publishedVoting.id,
         deletedAt: null,
       },
       select: {
@@ -117,10 +130,16 @@ class VotingService {
       },
       select: {
         id: true,
+        voting: {
+          select: {
+            published: true,
+            deletedAt: true,
+          },
+        },
       },
     });
 
-    if (!item) {
+    if (!item || item.voting.deletedAt !== null || !item.voting.published) {
       throw buildProblem(404, "Voting item not found", `Voting item with id '${itemId}' does not exist.`);
     }
   }

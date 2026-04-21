@@ -64,7 +64,11 @@ export function useProductCartActions({
       try {
         const sizeCatalog =
           selectedCatalogSize != null
-            ? { title: selectedCatalogSize.title, imageUrl: selectedCatalogSize.imageUrl }
+            ? {
+                title: selectedCatalogSize.title,
+                version: selectedCatalogSize.version,
+                imageUrl: selectedCatalogSize.imageUrl,
+              }
             : null;
         const customSizeRequest =
           selectedCustomSizeRequest != null

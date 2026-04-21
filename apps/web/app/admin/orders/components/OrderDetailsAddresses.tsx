@@ -65,8 +65,9 @@ export function OrderDetailsAddresses({ orderDetails }: OrderDetailsAddressesPro
 
   const itemsWithCustomize = orderDetails.items.filter((item) => {
     const hasCustomizeText = Boolean(item.customizeHtml?.trim() || item.customizePlain?.trim());
+    const hasVersion = Boolean(item.sizeCatalogVersion?.trim());
     const hasSizeImage = Boolean(item.sizeCatalogImageUrl?.trim());
-    return hasCustomizeText || hasSizeImage;
+    return hasCustomizeText || hasVersion || hasSizeImage;
   });
   const hasCustomizeContent = itemsWithCustomize.length > 0 || customSizeDescription !== null;
 
@@ -196,6 +197,8 @@ export function OrderDetailsAddresses({ orderDetails }: OrderDetailsAddressesPro
                     hideHeading
                     customizeHtml={item.customizeHtml}
                     customizePlain={item.customizePlain}
+                    sizeCatalogVersion={item.sizeCatalogVersion}
+                    showVersion
                   />
                 </div>
               );

@@ -1,5 +1,28 @@
+export interface VotingSummary {
+  id: string;
+  title: string;
+  published: boolean;
+  itemCount: number;
+  totalLikes: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VotingListResponse {
+  data: VotingSummary[];
+}
+
+export interface VotingDetail {
+  id: string;
+  title: string;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface VotingItem {
   id: string;
+  votingId: string;
   title: string;
   imageUrl: string;
   likeCount: number;
@@ -8,8 +31,11 @@ export interface VotingItem {
   updatedAt: string;
 }
 
-export interface VotingItemsResponse {
-  data: VotingItem[];
+export interface VotingWithItemsResponse {
+  data: {
+    voting: VotingDetail;
+    items: VotingItem[];
+  };
   meta?: {
     totalItems: number;
     totalLikes: number;
@@ -20,4 +46,8 @@ export interface VotingItemsResponse {
 export interface VotingFormData {
   title: string;
   imageUrl: string;
+}
+
+export interface VotingCampaignFormData {
+  title: string;
 }

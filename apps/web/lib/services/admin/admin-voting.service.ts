@@ -12,6 +12,7 @@ interface VotingProblem {
 
 interface VotingItemRecord {
   id: string;
+  votingId: string;
   title: string;
   imageUrl: string;
   createdAt: Date;
@@ -24,6 +25,11 @@ interface VotingItemRecord {
 interface VotingItemInput {
   title?: string;
   imageUrl?: string;
+}
+
+interface VotingCampaignInput {
+  title?: string;
+  published?: boolean;
 }
 
 function buildProblem(status: number, title: string, detail: string): VotingProblem {
@@ -90,6 +96,7 @@ function getTopLikedId(items: VotingItemRecord[]): string | null {
 function mapVotingItem(item: VotingItemRecord, topLikedId: string | null) {
   return {
     id: item.id,
+    votingId: item.votingId,
     title: item.title,
     imageUrl: item.imageUrl,
     likeCount: item._count.likes,
@@ -100,13 +107,72 @@ function mapVotingItem(item: VotingItemRecord, topLikedId: string | null) {
 }
 
 class AdminVotingService {
-  async getVotingItems() {
+  async listVotings() {
+    const rows = await db.voting.findMany({
+      where: { deletedAt: null },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+        items: {
+          where: { deletedAt: null },
+          select: {
+            _count: {
+              select: { likes: true },
+            },
+          },
+        },
+      },
+    });
+
+    const data = rows.map((row: (typeof rows)[number]) => {
+      const itemCount = row.items.length;
+      const totalLikes = row.items.reduce(
+        (sum: number, it: { _count: { likes: number } }) => sum + it._count.likes,
+        0,
+      );
+
+      return {
+        id: row.id,
+        title: row.title,
+        published: row.published,
+        itemCount,
+        totalLikes,
+        createdAt: row.createdAt.toISOString(),
+        updatedAt: row.updatedAt.toISOString(),
+      };
+    });
+
+    return { data };
+  }
+
+  async getVotingWithItems(votingId: string) {
+    const voting = await db.voting.findFirst({
+      where: { id: votingId, deletedAt: null },
+      select: {
+        id: true,
+        title: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!voting) {
+      return null;
+    }
+
     const rawItems = await db.votingItem.findMany({
       where: {
+        votingId,
         deletedAt: null,
       },
       select: {
         id: true,
+        votingId: true,
         title: true,
         imageUrl: true,
         createdAt: true,
@@ -121,21 +187,199 @@ class AdminVotingService {
         createdAt: "desc",
       },
     });
-    const items: VotingItemRecord[] = rawItems as VotingItemRecord[];
 
+    const items: VotingItemRecord[] = rawItems as VotingItemRecord[];
     const topLikedId = getTopLikedId(items);
-    const totalLikes = items.reduce(
-      (sum: number, item: VotingItemRecord) => sum + item._count.likes,
-      0
-    );
+    const totalLikes = items.reduce((sum, item) => sum + item._count.likes, 0);
 
     return {
-      data: items.map((item) => mapVotingItem(item, topLikedId)),
+      data: {
+        voting: {
+          id: voting.id,
+          title: voting.title,
+          published: voting.published,
+          createdAt: voting.createdAt.toISOString(),
+          updatedAt: voting.updatedAt.toISOString(),
+        },
+        items: items.map((item) => mapVotingItem(item, topLikedId)),
+      },
       meta: {
         totalItems: items.length,
         totalLikes,
         topLikedId,
       },
+    };
+  }
+
+  async createVoting(data: VotingCampaignInput) {
+    const title = requireTrimmedValue(data.title, "Title");
+
+    const voting = await db.voting.create({
+      data: {
+        title,
+        published: false,
+      },
+      select: {
+        id: true,
+        title: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      data: {
+        id: voting.id,
+        title: voting.title,
+        published: voting.published,
+        createdAt: voting.createdAt.toISOString(),
+        updatedAt: voting.updatedAt.toISOString(),
+      },
+    };
+  }
+
+  async updateVoting(votingId: string, data: VotingCampaignInput) {
+    const existing = await db.voting.findFirst({
+      where: { id: votingId, deletedAt: null },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      throw buildProblem(404, "Voting not found", `Voting with id '${votingId}' does not exist.`);
+    }
+
+    if (data.published === true) {
+      await db.voting.updateMany({
+        where: {
+          deletedAt: null,
+          id: { not: votingId },
+        },
+        data: { published: false },
+      });
+    }
+
+    const patch: { title?: string; published?: boolean } = {};
+
+    if (typeof data.title === "string") {
+      patch.title = requireTrimmedValue(data.title, "Title");
+    }
+
+    if (typeof data.published === "boolean") {
+      patch.published = data.published;
+    }
+
+    if (Object.keys(patch).length === 0) {
+      const current = await db.voting.findFirst({
+        where: { id: votingId },
+        select: {
+          id: true,
+          title: true,
+          published: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+      if (!current) {
+        throw buildProblem(404, "Voting not found", `Voting with id '${votingId}' does not exist.`);
+      }
+      return {
+        data: {
+          id: current.id,
+          title: current.title,
+          published: current.published,
+          createdAt: current.createdAt.toISOString(),
+          updatedAt: current.updatedAt.toISOString(),
+        },
+      };
+    }
+
+    const voting = await db.voting.update({
+      where: { id: votingId },
+      data: patch,
+      select: {
+        id: true,
+        title: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      data: {
+        id: voting.id,
+        title: voting.title,
+        published: voting.published,
+        createdAt: voting.createdAt.toISOString(),
+        updatedAt: voting.updatedAt.toISOString(),
+      },
+    };
+  }
+
+  async deleteVoting(votingId: string) {
+    const existing = await db.voting.findFirst({
+      where: { id: votingId, deletedAt: null },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      throw buildProblem(404, "Voting not found", `Voting with id '${votingId}' does not exist.`);
+    }
+
+    const now = new Date();
+
+    await db.$transaction([
+      db.votingItem.updateMany({
+        where: { votingId, deletedAt: null },
+        data: { deletedAt: now },
+      }),
+      db.voting.update({
+        where: { id: votingId },
+        data: { deletedAt: now, published: false },
+      }),
+    ]);
+
+    return { success: true };
+  }
+
+  async createVotingItem(votingId: string, data: VotingItemInput) {
+    const voting = await db.voting.findFirst({
+      where: { id: votingId, deletedAt: null },
+      select: { id: true },
+    });
+
+    if (!voting) {
+      throw buildProblem(404, "Voting not found", `Voting with id '${votingId}' does not exist.`);
+    }
+
+    const title = requireTrimmedValue(data.title, "Title");
+    const rawImageUrl = requireTrimmedValue(data.imageUrl, "Image");
+    const imageUrl = await resolveVotingImageUrl(rawImageUrl);
+
+    const item = await db.votingItem.create({
+      data: {
+        votingId,
+        title,
+        imageUrl,
+      },
+      select: {
+        id: true,
+        votingId: true,
+        title: true,
+        imageUrl: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            likes: true,
+          },
+        },
+      },
+    });
+
+    return {
+      data: mapVotingItem(item, null),
     };
   }
 
@@ -147,6 +391,7 @@ class AdminVotingService {
       },
       select: {
         id: true,
+        votingId: true,
         title: true,
         imageUrl: true,
         createdAt: true,
@@ -164,35 +409,6 @@ class AdminVotingService {
     }
 
     return mapVotingItem(item, null);
-  }
-
-  async createVotingItem(data: VotingItemInput) {
-    const title = requireTrimmedValue(data.title, "Title");
-    const rawImageUrl = requireTrimmedValue(data.imageUrl, "Image");
-    const imageUrl = await resolveVotingImageUrl(rawImageUrl);
-
-    const item = await db.votingItem.create({
-      data: {
-        title,
-        imageUrl,
-      },
-      select: {
-        id: true,
-        title: true,
-        imageUrl: true,
-        createdAt: true,
-        updatedAt: true,
-        _count: {
-          select: {
-            likes: true,
-          },
-        },
-      },
-    });
-
-    return {
-      data: mapVotingItem(item, null),
-    };
   }
 
   async updateVotingItem(itemId: string, data: VotingItemInput) {
@@ -224,6 +440,7 @@ class AdminVotingService {
       },
       select: {
         id: true,
+        votingId: true,
         title: true,
         imageUrl: true,
         createdAt: true,

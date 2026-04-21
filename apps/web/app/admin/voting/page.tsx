@@ -1,37 +1,28 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button, Card } from '@shop/ui';
 
+import { showToast } from '../../../components/Toast';
+import { apiClient } from '../../../lib/api-client';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
+import { logger } from '../../../lib/utils/logger';
 import { AdminSidebar } from '../components/AdminSidebar';
 
-import { VotingFormModal } from './components/VotingFormModal';
-import { useVoting } from './hooks/useVoting';
-import { useVotingActions } from './hooks/useVotingActions';
+import { VotingCampaignModal } from './components/VotingCampaignModal';
+import { useVotingList } from './hooks/useVotingList';
 
 export default function VotingPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const { items, loading, fetchVotingItems } = useVoting();
-  const {
-    showAddModal,
-    showEditModal,
-    formData,
-    saving,
-    setShowAddModal,
-    setShowEditModal,
-    setFormData,
-    resetForm,
-    handleAddItem,
-    handleEditItem,
-    handleUpdateItem,
-    handleDeleteItem,
-  } = useVotingActions();
+  const { votings, loading, fetchVotings } = useVotingList();
+  const [showCampaignModal, setShowCampaignModal] = useState(false);
+  const [savingCampaign, setSavingCampaign] = useState(false);
+  const [busyVotingId, setBusyVotingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoading && (!isLoggedIn || !isAdmin)) {
@@ -41,26 +32,99 @@ export default function VotingPage() {
 
   useEffect(() => {
     if (isLoggedIn && isAdmin) {
-      fetchVotingItems().catch(() => undefined);
+      fetchVotings().catch(() => undefined);
     }
-  }, [fetchVotingItems, isAdmin, isLoggedIn]);
+  }, [fetchVotings, isAdmin, isLoggedIn]);
 
   const analytics = useMemo(() => {
-    const totalLikes = items.reduce((sum, item) => sum + item.likeCount, 0);
-    const topLikedItem = items.reduce<(typeof items)[number] | null>((topItem, item) => {
-      if (!topItem || item.likeCount > topItem.likeCount) {
-        return item;
-      }
-
-      return topItem;
-    }, null);
+    const totalItems = votings.reduce((sum, v) => sum + v.itemCount, 0);
+    const totalLikes = votings.reduce((sum, v) => sum + v.totalLikes, 0);
 
     return {
-      totalItems: items.length,
+      totalVotings: votings.length,
+      totalItems,
       totalLikes,
-      topLikedItem: topLikedItem && topLikedItem.likeCount > 0 ? topLikedItem : null,
     };
-  }, [items]);
+  }, [votings]);
+
+  const handleCreateVoting = useCallback(
+    async (title: string) => {
+      if (!title) {
+        showToast(t('admin.voting.votingNameRequired'), 'warning');
+        return;
+      }
+
+      setSavingCampaign(true);
+
+      try {
+        const response = await apiClient.post<{ data: { id: string } }>('/api/v1/admin/voting', {
+          title,
+        });
+        setShowCampaignModal(false);
+        await fetchVotings();
+        showToast(t('admin.voting.votingCreatedSuccess'), 'success');
+        router.push(`/admin/voting/${response.data.id}`);
+      } catch (error: unknown) {
+        logger.error('Error creating voting', { error });
+        const message =
+          error && typeof error === 'object' && 'data' in error
+            ? (error as { data?: { detail?: string } }).data?.detail
+            : t('admin.voting.errorCreatingVoting');
+        showToast(message || t('admin.voting.errorCreatingVoting'), 'error');
+      } finally {
+        setSavingCampaign(false);
+      }
+    },
+    [fetchVotings, router, t],
+  );
+
+  const togglePublished = useCallback(
+    async (id: string, published: boolean) => {
+      setBusyVotingId(id);
+
+      try {
+        await apiClient.patch(`/api/v1/admin/voting/${id}`, { published });
+        await fetchVotings();
+        showToast(t('admin.voting.publishStateUpdated'), 'success');
+      } catch (error: unknown) {
+        logger.error('Error updating voting publish state', { error });
+        const message =
+          error && typeof error === 'object' && 'data' in error
+            ? (error as { data?: { detail?: string } }).data?.detail
+            : t('admin.voting.errorUpdatingVoting');
+        showToast(message || t('admin.voting.errorUpdatingVoting'), 'error');
+      } finally {
+        setBusyVotingId(null);
+      }
+    },
+    [fetchVotings, t],
+  );
+
+  const deleteVoting = useCallback(
+    async (id: string, name: string) => {
+      if (!confirm(t('admin.voting.votingDeleteConfirm').replace('{name}', name))) {
+        return;
+      }
+
+      setBusyVotingId(id);
+
+      try {
+        await apiClient.delete(`/api/v1/admin/voting/${id}`);
+        await fetchVotings();
+        showToast(t('admin.voting.votingDeletedSuccess'), 'success');
+      } catch (error: unknown) {
+        logger.error('Error deleting voting', { error });
+        const message =
+          error && typeof error === 'object' && 'data' in error
+            ? (error as { data?: { detail?: string } }).data?.detail
+            : t('admin.voting.errorDeletingVoting');
+        showToast(message || t('admin.voting.errorDeletingVoting'), 'error');
+      } finally {
+        setBusyVotingId(null);
+      }
+    },
+    [fetchVotings, t],
+  );
 
   if (isLoading) {
     return (
@@ -82,6 +146,7 @@ export default function VotingPage() {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <button
+            type="button"
             onClick={() => router.push('/admin')}
             className="mb-4 flex items-center text-gray-600 transition-colors duration-200 hover:text-gray-900"
           >
@@ -93,20 +158,17 @@ export default function VotingPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{t('admin.voting.title')}</h1>
-              <p className="mt-2 text-sm text-gray-600">{t('admin.voting.subtitle')}</p>
+              <p className="mt-2 text-sm text-gray-600">{t('admin.voting.subtitleList')}</p>
             </div>
             <Button
               variant="primary"
-              onClick={() => {
-                resetForm();
-                setShowAddModal(true);
-              }}
+              onClick={() => setShowCampaignModal(true)}
               className="flex items-center gap-2"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              {t('admin.voting.addItem')}
+              {t('admin.voting.addVoting')}
             </Button>
           </div>
         </div>
@@ -117,72 +179,87 @@ export default function VotingPage() {
           <div className="min-w-0 flex-1 space-y-6">
             <div className="grid gap-4 md:grid-cols-3">
               <Card className="p-5">
-                <p className="text-sm font-medium text-gray-500">{t('admin.voting.totalItems')}</p>
+                <p className="text-sm font-medium text-gray-500">{t('admin.voting.totalVotings')}</p>
+                <p className="mt-2 text-3xl font-bold text-gray-900">{analytics.totalVotings}</p>
+              </Card>
+              <Card className="p-5">
+                <p className="text-sm font-medium text-gray-500">{t('admin.voting.totalItemsAll')}</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">{analytics.totalItems}</p>
               </Card>
               <Card className="p-5">
                 <p className="text-sm font-medium text-gray-500">{t('admin.voting.totalLikes')}</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">{analytics.totalLikes}</p>
               </Card>
-              <Card className="p-5">
-                <p className="text-sm font-medium text-gray-500">{t('admin.voting.topLiked')}</p>
-                <p className="mt-2 text-lg font-semibold text-gray-900">
-                  {analytics.topLikedItem?.title || t('admin.voting.noTopLiked')}
-                </p>
-                <p className="mt-1 text-sm text-gray-500">
-                  {analytics.topLikedItem ? `${analytics.topLikedItem.likeCount} ${t('admin.voting.likesLabel')}` : '—'}
-                </p>
-              </Card>
             </div>
 
             <Card className="p-6">
               {loading ? (
-                <div className="py-10 text-center text-sm text-gray-500">{t('admin.voting.loadingItems')}</div>
-              ) : items.length === 0 ? (
+                <div className="py-10 text-center text-sm text-gray-500">{t('admin.voting.loadingVotings')}</div>
+              ) : votings.length === 0 ? (
                 <div className="py-10 text-center">
-                  <p className="text-sm text-gray-500">{t('admin.voting.noItems')}</p>
+                  <p className="text-sm text-gray-500">{t('admin.voting.noVotings')}</p>
                 </div>
               ) : (
                 <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                  {items.map((item) => (
-                    <article
-                      key={item.id}
-                      className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
-                    >
-                      <div className="relative h-52 bg-gray-100">
-                        <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover" />
-                        {item.topLiked ? (
-                          <span className="absolute left-3 top-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-semibold text-white">
-                            {t('admin.voting.topLikedBadge')}
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className="space-y-4 p-4">
-                        <div>
-                          <h2 className="text-lg font-semibold text-gray-900">{item.title}</h2>
-                          <p className="mt-1 text-sm text-gray-500">
-                            {item.likeCount} {t('admin.voting.likesLabel')}
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            onClick={() => handleEditItem(item)}
-                            className="flex-1"
+                  {votings.map((voting) => {
+                    const disabled = busyVotingId === voting.id;
+
+                    return (
+                      <article
+                        key={voting.id}
+                        className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h2 className="text-lg font-semibold text-gray-900">{voting.title}</h2>
+                            <p className="mt-2 text-sm text-gray-500">
+                              {voting.itemCount} {t('admin.voting.choicesLabel')} · {voting.totalLikes}{' '}
+                              {t('admin.voting.likesLabel')}
+                            </p>
+                          </div>
+                          <span
+                            className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                              voting.published ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700'
+                            }`}
                           >
-                            {t('admin.common.edit')}
+                            {voting.published ? t('admin.voting.statusLive') : t('admin.voting.statusDraft')}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 flex items-center justify-between gap-3 border-t border-gray-100 pt-4">
+                          <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4 rounded border-gray-300 text-teal-700 focus:ring-teal-600"
+                              checked={voting.published}
+                              disabled={disabled}
+                              onChange={() => togglePublished(voting.id, !voting.published)}
+                            />
+                            <span>{t('admin.voting.showOnHome')}</span>
+                          </label>
+                        </div>
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <Button
+                            variant="primary"
+                            className="flex-1 min-w-[8rem]"
+                            onClick={() => router.push(`/admin/voting/${voting.id}`)}
+                            disabled={disabled}
+                          >
+                            {t('admin.voting.manageChoices')}
                           </Button>
                           <Button
                             variant="ghost"
-                            onClick={() => handleDeleteItem(item, fetchVotingItems)}
-                            className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700"
+                            className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                            onClick={() => deleteVoting(voting.id, voting.title)}
+                            disabled={disabled}
                           >
                             {t('admin.common.delete')}
                           </Button>
                         </div>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
               )}
             </Card>
@@ -190,30 +267,11 @@ export default function VotingPage() {
         </div>
       </div>
 
-      <VotingFormModal
-        isOpen={showAddModal}
-        mode="create"
-        formData={formData}
-        saving={saving}
-        onClose={() => {
-          setShowAddModal(false);
-          resetForm();
-        }}
-        onFormDataChange={setFormData}
-        onSubmit={() => handleAddItem(fetchVotingItems)}
-      />
-
-      <VotingFormModal
-        isOpen={showEditModal}
-        mode="edit"
-        formData={formData}
-        saving={saving}
-        onClose={() => {
-          setShowEditModal(false);
-          resetForm();
-        }}
-        onFormDataChange={setFormData}
-        onSubmit={() => handleUpdateItem(fetchVotingItems)}
+      <VotingCampaignModal
+        isOpen={showCampaignModal}
+        saving={savingCampaign}
+        onClose={() => setShowCampaignModal(false)}
+        onSubmit={handleCreateVoting}
       />
     </div>
   );

@@ -2,6 +2,7 @@ export interface SizeCatalogItemDto {
   id: string;
   title: string;
   imageUrl: string;
+  version: string;
   position: number;
   published: boolean;
 }

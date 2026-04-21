@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { dispatchCartDrawerOpen } from '../app/cart/constants';
 import { getCartCount } from '../lib/storageCounts';
+import { HeaderDesktopAccount, HeaderMobileAccountLinks } from './HeaderAccountMenu';
 import { LanguageSwitcherHeader } from './LanguageSwitcherHeader';
 import { HOME_ASSET_PATHS } from './home/homePage.data';
 
@@ -140,8 +141,9 @@ export function Header() {
                 </span>
               ) : null}
             </button>
-            <div className="hidden md:block">
+            <div className="hidden items-center gap-2 md:flex">
               <LanguageSwitcherHeader />
+              <HeaderDesktopAccount />
             </div>
             <MobileMenuButton open={mobileMenuOpen} onToggle={() => setMobileMenuOpen((v) => !v)} />
           </div>
@@ -156,7 +158,7 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`border-b border-white/10 py-3.5 text-xs font-extrabold uppercase tracking-[0.16em] transition-opacity last:border-b-0 ${
+                    className={`border-b border-white/10 py-3.5 text-xs font-extrabold uppercase tracking-[0.16em] transition-opacity ${
                       isActive ? 'text-[#dcc090]' : 'text-[#dcc090]/80 hover:text-[#dcc090]'
                     }`}
                   >
@@ -164,6 +166,9 @@ export function Header() {
                   </Link>
                 );
               })}
+              <div className="flex flex-col border-t border-white/10" role="group" aria-label="Account">
+                <HeaderMobileAccountLinks onNavigate={() => setMobileMenuOpen(false)} />
+              </div>
             </nav>
             <LanguageSwitcherHeader variant="drawer" />
           </div>

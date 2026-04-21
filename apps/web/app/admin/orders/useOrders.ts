@@ -100,6 +100,7 @@ export interface OrderDetails {
       colors?: string[] | any;
     }>;
     sizeCatalogTitle?: string | null;
+    sizeCatalogVersion?: string | null;
     sizeCatalogImageUrl?: string | null;
     customizePlain?: string | null;
     customizeHtml?: string | null;

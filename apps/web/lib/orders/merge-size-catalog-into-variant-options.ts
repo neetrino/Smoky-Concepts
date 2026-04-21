@@ -13,12 +13,15 @@ export type OrderVariantOptionRow = {
 export function mergeSizeCatalogIntoVariantOptions(
   variantOptions: OrderVariantOptionRow[],
   sizeCatalogTitle: string | null | undefined,
+  sizeCatalogVersion: string | null | undefined,
   sizeCatalogImageUrl: string | null | undefined
 ): OrderVariantOptionRow[] {
   const title = sizeCatalogTitle?.trim();
   if (!title) {
     return variantOptions;
   }
+  const version = sizeCatalogVersion?.trim();
+  const titleWithVersion = version ? `${title} (${version})` : title;
 
   const imgRaw = sizeCatalogImageUrl?.trim();
   const img = imgRaw && imgRaw.length > 0 ? imgRaw : undefined;
@@ -30,15 +33,15 @@ export function mergeSizeCatalogIntoVariantOptions(
     const prev = next[idx];
     next[idx] = {
       ...prev,
-      label: title,
+      label: titleWithVersion,
       imageUrl: img ?? prev.imageUrl,
-      value: prev.value && prev.value.trim() !== '' ? prev.value : title,
+      value: prev.value && prev.value.trim() !== '' ? prev.value : titleWithVersion,
     };
   } else {
     next.push({
       attributeKey: 'size',
-      value: title,
-      label: title,
+      value: titleWithVersion,
+      label: titleWithVersion,
       imageUrl: img,
     });
   }

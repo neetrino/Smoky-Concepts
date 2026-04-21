@@ -1,11 +1,20 @@
 import { db } from "@white-shop/db";
 
-import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from "@/lib/types/size-catalog";
+import { type SizeCatalogCategoryDto, type SizeCatalogItemDto } from "@/lib/types/size-catalog";
+
+function normalizeSizeItemVersion(value: string | undefined, fallback = ""): string {
+  const normalized = value?.trim();
+  if (normalized && normalized.length <= 32) {
+    return normalized;
+  }
+  return fallback;
+}
 
 function mapItem(row: {
   id: string;
   title: string;
   imageUrl: string;
+  version?: string | null;
   position: number;
   published?: boolean | null;
 }): SizeCatalogItemDto {
@@ -13,6 +22,7 @@ function mapItem(row: {
     id: row.id,
     title: row.title,
     imageUrl: row.imageUrl,
+    version: normalizeSizeItemVersion(row.version ?? undefined),
     position: row.position,
     published: row.published ?? true,
   };
@@ -26,6 +36,7 @@ type SizeCategoryRow = {
     id: string;
     title: string;
     imageUrl: string;
+    version?: string | null;
     position: number;
     published?: boolean | null;
   }>;
@@ -168,7 +179,7 @@ class AdminSizeCatalogService {
 
   async createItem(
     categoryId: string,
-    data: { title: string; imageUrl: string; published?: boolean }
+    data: { title: string; imageUrl: string; version?: string | null; published?: boolean }
   ): Promise<{ data: SizeCatalogItemDto }> {
     const category = await db.sizeCatalogCategory.findUnique({
       where: { id: categoryId },
@@ -185,6 +196,7 @@ class AdminSizeCatalogService {
 
     const title = data.title.trim();
     const imageUrl = data.imageUrl.trim();
+    const version = normalizeSizeItemVersion(data.version ?? undefined);
 
     if (!title || !imageUrl) {
       throw {
@@ -208,6 +220,7 @@ class AdminSizeCatalogService {
         categoryId,
         title,
         imageUrl,
+        version: version || "",
         published,
         position: (last?.position ?? -1) + 1,
       },
@@ -218,7 +231,7 @@ class AdminSizeCatalogService {
 
   async updateItem(
     itemId: string,
-    data: { title?: string; imageUrl?: string; published?: boolean }
+    data: { title?: string; imageUrl?: string; version?: string | null; published?: boolean }
   ): Promise<{ data: SizeCatalogItemDto }> {
     const existing = await db.sizeCatalogItem.findUnique({
       where: { id: itemId },
@@ -233,8 +246,11 @@ class AdminSizeCatalogService {
       };
     }
 
+    const hasVersion = Object.prototype.hasOwnProperty.call(data, "version");
     const title = data.title !== undefined ? data.title.trim() : existing.title;
     const imageUrl = data.imageUrl !== undefined ? data.imageUrl.trim() : existing.imageUrl;
+    const existingVersion = normalizeSizeItemVersion(existing.version ?? undefined);
+    const version = hasVersion ? normalizeSizeItemVersion(data.version ?? undefined) : existingVersion;
     const published = data.published !== undefined ? data.published : existing.published;
 
     if (!title || !imageUrl) {
@@ -248,7 +264,7 @@ class AdminSizeCatalogService {
 
     const updated = await db.sizeCatalogItem.update({
       where: { id: itemId },
-      data: { title, imageUrl, published },
+      data: { title, imageUrl, version: hasVersion ? version : undefined, published },
     });
 
     return { data: mapItem(updated) };

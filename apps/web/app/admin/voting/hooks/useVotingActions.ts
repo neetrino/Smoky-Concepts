@@ -41,7 +41,7 @@ export function useVotingActions() {
     return true;
   };
 
-  const handleAddItem = async (fetchVotingItems: () => Promise<void>) => {
+  const handleAddItem = async (votingId: string, fetchDetail: () => Promise<void>) => {
     if (!validateForm()) {
       return;
     }
@@ -49,13 +49,13 @@ export function useVotingActions() {
     setSaving(true);
 
     try {
-      await apiClient.post('/api/v1/admin/voting', {
+      await apiClient.post(`/api/v1/admin/voting/${votingId}/items`, {
         title: formData.title.trim(),
         imageUrl: formData.imageUrl.trim(),
       });
       setShowAddModal(false);
       resetForm();
-      await fetchVotingItems();
+      await fetchDetail();
       showToast(t('admin.voting.createdSuccess'), 'success');
     } catch (error: unknown) {
       logger.error('Error creating voting item', { error });
@@ -78,7 +78,7 @@ export function useVotingActions() {
     setShowEditModal(true);
   };
 
-  const handleUpdateItem = async (fetchVotingItems: () => Promise<void>) => {
+  const handleUpdateItem = async (fetchDetail: () => Promise<void>) => {
     if (!editingItem || !validateForm()) {
       return;
     }
@@ -86,14 +86,14 @@ export function useVotingActions() {
     setSaving(true);
 
     try {
-      await apiClient.put(`/api/v1/admin/voting/${editingItem.id}`, {
+      await apiClient.put(`/api/v1/admin/voting/items/${editingItem.id}`, {
         title: formData.title.trim(),
         imageUrl: formData.imageUrl.trim(),
       });
       setShowEditModal(false);
       setEditingItem(null);
       resetForm();
-      await fetchVotingItems();
+      await fetchDetail();
       showToast(t('admin.voting.updatedSuccess'), 'success');
     } catch (error: unknown) {
       logger.error('Error updating voting item', { error });
@@ -107,14 +107,14 @@ export function useVotingActions() {
     }
   };
 
-  const handleDeleteItem = async (item: VotingItem, fetchVotingItems: () => Promise<void>) => {
+  const handleDeleteItem = async (item: VotingItem, fetchDetail: () => Promise<void>) => {
     if (!confirm(t('admin.voting.deleteConfirm').replace('{name}', item.title))) {
       return;
     }
 
     try {
-      await apiClient.delete(`/api/v1/admin/voting/${item.id}`);
-      await fetchVotingItems();
+      await apiClient.delete(`/api/v1/admin/voting/items/${item.id}`);
+      await fetchDetail();
       showToast(t('admin.voting.deletedSuccess'), 'success');
     } catch (error: unknown) {
       logger.error('Error deleting voting item', { error });

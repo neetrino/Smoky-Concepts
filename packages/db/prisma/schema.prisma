@@ -248,6 +248,7 @@ model OrderItem {
   imageUrl             String?
   /// PDP size-catalog pick (title + thumb) persisted for order display
   sizeCatalogTitle     String?
+  sizeCatalogVersion   String?
   sizeCatalogImageUrl  String?
   /// PDP text customization (plain length capped at checkout; HTML is sanitized)
   customizePlain       String? @db.Text
@@ -344,16 +345,35 @@ model ProductUpdateSubscriber {
   @@map("product_update_subscribers")
 }
 
+model Voting {
+  id        String       @id @default(cuid())
+  title     String
+  /// Only one voting should be published: its items appear on the home Culture section.
+  published Boolean      @default(false)
+  deletedAt DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  items VotingItem[]
+
+  @@index([deletedAt])
+  @@index([published])
+  @@map("votings")
+}
+
 model VotingItem {
   id        String       @id @default(cuid())
+  votingId  String
   title     String
   imageUrl  String
   deletedAt DateTime?
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 
-  likes VotingLike[]
+  voting Voting     @relation(fields: [votingId], references: [id], onDelete: Restrict)
+  likes  VotingLike[]
 
+  @@index([votingId])
   @@index([deletedAt])
   @@index([createdAt(sort: Desc)])
   @@map("voting_items")
@@ -395,6 +415,7 @@ model SizeCatalogItem {
   categoryId String
   title      String
   imageUrl   String
+  version    String              @default("v1")
   /// false = draft (hidden on storefront until published)
   published  Boolean             @default(true)
   position   Int                 @default(0)
