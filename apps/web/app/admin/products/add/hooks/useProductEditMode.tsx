@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import { cleanImageUrls } from '@/lib/services/utils/image-utils';
 import { isDefaultPricingVariant } from '@/lib/default-pricing-variant';
+import { convertPrice, initializeCurrencyRates } from '@/lib/currency';
 import { DEFAULT_SIMPLE_PRODUCT_DATA } from '../constants/defaultSimpleProductData.constants';
 import type { ProductData } from '../types';
 import type { GeneratedVariant } from '../types';
@@ -44,6 +45,7 @@ export function useProductEditMode({
     const loadProduct = async () => {
       try {
         setLoadingProduct(true);
+        await initializeCurrencyRates();
         const product = await apiClient.get<ProductData>(`/api/v1/admin/products/${productId}`);
 
         const mediaList = product.media || [];
@@ -113,6 +115,8 @@ export function useProductEditMode({
               typeof source.compareAtPrice === 'number'
                 ? source.compareAtPrice
                 : parseFloat(String(source.compareAtPrice ?? '')) || 0;
+            const priceAmd = convertPrice(priceNum, 'USD', 'AMD');
+            const compareAmd = compareNum > 0 ? convertPrice(compareNum, 'USD', 'AMD') : 0;
             const stockNum =
               typeof source.stock === 'number' ? source.stock : parseInt(String(source.stock ?? '0'), 10) || 0;
             const skuFromApi =
@@ -122,23 +126,25 @@ export function useProductEditMode({
             setGeneratedVariants([]);
             setProductType('simple');
             setSimpleProductData({
-              price: String(priceNum || DEFAULT_SIMPLE_PRODUCT_DATA.price),
-              compareAtPrice: compareNum > 0 ? String(compareNum) : '',
+              price: String(priceAmd || DEFAULT_SIMPLE_PRODUCT_DATA.price),
+              compareAtPrice: compareAmd > 0 ? String(compareAmd) : '',
               sku: skuFromApi,
               quantity: String(stockNum),
             });
             setVariableProductTypeAllowed(false);
           } else {
             const generated: GeneratedVariant[] = selectableVariants.map((v: VariantItem) => {
-              const priceNum = typeof v.price === 'number' ? v.price : parseFloat(String(v.price)) || 0;
+              const priceNumUsd = typeof v.price === 'number' ? v.price : parseFloat(String(v.price)) || 0;
               const compareNum =
                 typeof v.compareAtPrice === 'number' ? v.compareAtPrice : parseFloat(String(v.compareAtPrice)) || 0;
+              const priceNum = convertPrice(priceNumUsd, 'USD', 'AMD');
+              const compareAmd = compareNum ? convertPrice(compareNum, 'USD', 'AMD') : 0;
               const stockNum = typeof v.stock === 'number' ? v.stock : parseInt(String(v.stock), 10) || 0;
               return {
                 id: v.id || `variant-${Date.now()}-${Math.random().toString(36).slice(2)}`,
                 selectedValueIds: Array.isArray(v.selectedValueIds) ? v.selectedValueIds : [],
                 price: String(priceNum),
-                compareAtPrice: compareNum ? String(compareNum) : '',
+                compareAtPrice: compareAmd ? String(compareAmd) : '',
                 stock: String(stockNum),
                 sku: v.sku || '',
                 image: v.imageUrl ?? null,
@@ -149,14 +155,17 @@ export function useProductEditMode({
               typeof defaultPricingVariant?.price === 'number'
                 ? defaultPricingVariant.price
                 : parseFloat(String(defaultPricingVariant?.price)) || 0;
+            const defaultPriceAmd = convertPrice(defaultPriceNum, 'USD', 'AMD');
             const defaultCompareAtPriceNum =
               typeof defaultPricingVariant?.compareAtPrice === 'number'
                 ? defaultPricingVariant.compareAtPrice
                 : parseFloat(String(defaultPricingVariant?.compareAtPrice)) || 0;
+            const defaultCompareAtPriceAmd =
+              defaultCompareAtPriceNum > 0 ? convertPrice(defaultCompareAtPriceNum, 'USD', 'AMD') : 0;
             const fallbackPriceFromVariant = generated[0]?.price;
             const resolvedPrice =
               defaultPricingVariant !== undefined
-                ? String(defaultPriceNum)
+                ? String(defaultPriceAmd)
                 : fallbackPriceFromVariant && String(fallbackPriceFromVariant).trim() !== ''
                   ? String(fallbackPriceFromVariant)
                   : DEFAULT_SIMPLE_PRODUCT_DATA.price;
@@ -175,7 +184,7 @@ export function useProductEditMode({
             setSimpleProductData({
               price: resolvedPrice,
               compareAtPrice:
-                defaultPricingVariant && defaultCompareAtPriceNum > 0 ? String(defaultCompareAtPriceNum) : '',
+                defaultPricingVariant && defaultCompareAtPriceAmd > 0 ? String(defaultCompareAtPriceAmd) : '',
               sku: defaultSkuFromApi,
               quantity: String(defaultStockNum),
             });

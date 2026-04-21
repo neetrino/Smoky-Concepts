@@ -81,6 +81,7 @@ export function ProductsCatalogCard({
   buyButtonLabel = 'Buy',
 }: ProductsCatalogCardProps) {
   const displayCurrency = useCurrency();
+  const isAmdCurrency = displayCurrency === 'AMD';
   const router = useRouter();
   const { isAddingToCart, addToCart } = useAddToCart({
     productId: product.id,
@@ -156,8 +157,8 @@ export function ProductsCatalogCard({
     ? `rounded-[0.375rem] px-[0.375rem] py-[0.125rem] text-[0.625rem] font-medium leading-tight ${badgeClassName}`
     : `rounded-[0.375rem] px-[0.4375rem] py-[0.1875rem] text-[0.75rem] font-medium leading-tight ${badgeClassName}`;
   const priceClassName = compactLayout
-    ? 'text-[0.875rem] sm:text-[1.0625rem]'
-    : 'text-[1rem] sm:text-[1.125rem]';
+    ? 'text-[0.8125rem] sm:text-[0.98rem]'
+    : 'text-[0.95rem] sm:text-[1.05rem]';
   const buyButtonClassName = compactLayout
     ? 'inline-flex h-6 min-w-[3.25rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-2 text-[0.75rem] font-extrabold leading-tight text-[#dcc090] transition-colors hover:bg-[#dcc090]/10'
     : 'inline-flex h-[1.625rem] min-w-[3.75rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-3 text-[0.875rem] font-extrabold leading-tight text-[#dcc090] transition-colors hover:bg-[#dcc090]/10';
@@ -191,6 +192,9 @@ export function ProductsCatalogCard({
       event.preventDefault();
     }
   };
+
+  const formattedPrice = formatCatalogPrice(product.price ?? 0, displayCurrency);
+  const amountText = isAmdCurrency ? formattedPrice.replace(/\s?֏$/, '') : formattedPrice;
 
   return (
     <article className={`${articleClassName} ${className ?? ''}`.trim()}>
@@ -278,7 +282,8 @@ export function ProductsCatalogCard({
 
         <div className={compactLayout ? 'mt-2 flex items-center justify-between gap-2' : 'mt-5 flex items-center justify-between gap-3'}>
           <span className={`font-extrabold leading-tight text-black ${priceClassName}`}>
-            {formatCatalogPrice(product.price ?? 0, displayCurrency)}
+            {amountText}
+            {isAmdCurrency ? <span className="ml-1 text-[0.78em]">֏</span> : null}
           </span>
 
           <div className="flex items-center gap-0.5">

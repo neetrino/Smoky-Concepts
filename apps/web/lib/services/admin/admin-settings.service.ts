@@ -36,14 +36,16 @@ class AdminSettingsService {
     
     // Default currency rates (fallback)
     const defaultCurrencyRates = {
-      USD: 1,
+      AMD: 1,
+      USD: 1 / 400,
+      RUB: 0.2,
     };
     
     return {
       globalDiscount: globalDiscountSetting ? Number(globalDiscountSetting.value) : 0,
       categoryDiscounts: categoryDiscountsSetting ? (categoryDiscountsSetting.value as Record<string, number>) : {},
       brandDiscounts: brandDiscountsSetting ? (brandDiscountsSetting.value as Record<string, number>) : {},
-      defaultCurrency: defaultCurrencySetting ? (defaultCurrencySetting.value as string) : 'USD',
+      defaultCurrency: defaultCurrencySetting ? (defaultCurrencySetting.value as string) : 'AMD',
       currencyRates: currencyRatesSetting ? (currencyRatesSetting.value as Record<string, number>) : defaultCurrencyRates,
       homeHero: parseHomeHeroConfigForAdmin(homeHeroRow?.value),
     };
@@ -116,7 +118,7 @@ class AdminSettingsService {
     
     // Update default currency
     if (data.defaultCurrency !== undefined) {
-      const currencyValue = String(data.defaultCurrency);
+      const currencyValue = String(data.defaultCurrency).toUpperCase();
       await db.settings.upsert({
         where: { key: 'defaultCurrency' },
         update: {
@@ -126,7 +128,7 @@ class AdminSettingsService {
         create: {
           key: 'defaultCurrency',
           value: currencyValue,
-          description: 'Default currency for admin product pricing (USD)',
+          description: 'Default storefront currency (AMD/USD/RUB)',
         },
       });
       console.log('✅ [ADMIN SERVICE] Default currency updated:', currencyValue);
@@ -134,19 +136,26 @@ class AdminSettingsService {
     
     // Update currency rates
     if (data.currencyRates !== undefined) {
+      const rawRates = data.currencyRates;
+      const normalizedRates: Record<string, number> = { AMD: 1 };
+      const usd = Number(rawRates.USD);
+      const rub = Number(rawRates.RUB);
+      normalizedRates.USD = Number.isFinite(usd) && usd > 0 ? usd : 1 / 400;
+      normalizedRates.RUB = Number.isFinite(rub) && rub > 0 ? rub : 0.2;
+
       await db.settings.upsert({
         where: { key: 'currencyRates' },
         update: {
-          value: data.currencyRates,
+          value: normalizedRates,
           updatedAt: new Date(),
         },
         create: {
           key: 'currencyRates',
-          value: data.currencyRates,
-          description: 'Currency exchange rates (USD-only fixed)',
+          value: normalizedRates,
+          description: 'Currency exchange rates using AMD as base (1 AMD = X)',
         },
       });
-      console.log('✅ [ADMIN SERVICE] Currency rates updated:', data.currencyRates);
+      console.log('✅ [ADMIN SERVICE] Currency rates updated:', normalizedRates);
     }
 
     if (data.homeHero !== undefined) {

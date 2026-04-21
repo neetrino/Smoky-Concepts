@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { dispatchCartDrawerOpen } from '../app/cart/constants';
+import { initializeCurrencyRates } from '../lib/currency';
 import { getCartCount } from '../lib/storageCounts';
 import { CurrencySwitcherHeader } from './CurrencySwitcherHeader';
 import { HeaderDesktopAccount, HeaderMobileAccountLinks } from './HeaderAccountMenu';
@@ -81,6 +82,10 @@ export function Header() {
   const [cartCount, setCartCount] = useState(0);
   const [cartReady, setCartReady] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    void initializeCurrencyRates();
+  }, []);
 
   useEffect(() => {
     setCartCount(getCartCount());

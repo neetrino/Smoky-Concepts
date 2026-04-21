@@ -14,7 +14,21 @@ interface Settings {
   currencyRates?: Record<string, number>;
 }
 
-const USD_ONLY_RATES: Record<string, number> = { USD: 1 };
+const DEFAULT_CURRENCY_RATES: Record<string, number> = {
+  AMD: 1,
+  USD: 1 / 400,
+  RUB: 0.2,
+};
+
+function normalizeCurrencyRates(rates?: Record<string, number>): Record<string, number> {
+  const usd = Number(rates?.USD);
+  const rub = Number(rates?.RUB);
+  return {
+    AMD: 1,
+    USD: Number.isFinite(usd) && usd > 0 ? usd : DEFAULT_CURRENCY_RATES.USD,
+    RUB: Number.isFinite(rub) && rub > 0 ? rub : DEFAULT_CURRENCY_RATES.RUB,
+  };
+}
 
 export default function SettingsPage() {
   const { t } = useTranslation();
@@ -23,8 +37,8 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<Settings>({
-    defaultCurrency: 'USD',
-    currencyRates: USD_ONLY_RATES,
+    defaultCurrency: 'AMD',
+    currencyRates: DEFAULT_CURRENCY_RATES,
   });
 
   useEffect(() => {
@@ -47,19 +61,18 @@ export default function SettingsPage() {
       setLoading(true);
       console.log('⚙️ [ADMIN] Fetching settings...');
       const data = await apiClient.get<Settings>('/api/v1/admin/settings');
-      const usdRates = data.currencyRates || USD_ONLY_RATES;
+      const normalizedRates = normalizeCurrencyRates(data.currencyRates);
       setSettings({
-        defaultCurrency: data.defaultCurrency || 'USD',
+        defaultCurrency: data.defaultCurrency || 'AMD',
         globalDiscount: data.globalDiscount,
         categoryDiscounts: data.categoryDiscounts,
         brandDiscounts: data.brandDiscounts,
-        currencyRates: usdRates,
+        currencyRates: normalizedRates,
       });
       console.log('✅ [ADMIN] Settings loaded:', data);
     } catch (err: any) {
       console.error('❌ [ADMIN] Error fetching settings:', err);
-      const defaultRates = USD_ONLY_RATES;
-      setSettings({ defaultCurrency: 'USD', currencyRates: defaultRates });
+      setSettings({ defaultCurrency: 'AMD', currencyRates: DEFAULT_CURRENCY_RATES });
     } finally {
       setLoading(false);
     }
@@ -70,10 +83,11 @@ export default function SettingsPage() {
     try {
       console.log('⚙️ [ADMIN] Saving settings...', settings);
 
-      const currencyRatesToSave = USD_ONLY_RATES;
+      const currencyRatesToSave = normalizeCurrencyRates(settings.currencyRates);
+      const nextDefaultCurrency = settings.defaultCurrency || 'AMD';
 
       await apiClient.put('/api/v1/admin/settings', {
-        defaultCurrency: settings.defaultCurrency,
+        defaultCurrency: nextDefaultCurrency,
         currencyRates: currencyRatesToSave,
       });
 
@@ -155,11 +169,13 @@ export default function SettingsPage() {
                 {t('admin.settings.defaultCurrency')}
               </label>
               <select 
-                value={settings.defaultCurrency || 'USD'}
+                value={settings.defaultCurrency || 'AMD'}
                 onChange={(e) => setSettings({ ...settings, defaultCurrency: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
+                <option value="AMD">{t('admin.settings.amd')}</option>
                 <option value="USD">{t('admin.settings.usd')}</option>
+                <option value="RUB">{t('admin.settings.rub')}</option>
               </select>
             </div>
             <div>
@@ -178,7 +194,65 @@ export default function SettingsPage() {
         {/* Currency Exchange Rates */}
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.settings.currencyRates')}</h2>
-          <p className="text-sm text-gray-600">{t('admin.settings.usdOnlyNote')}</p>
+          <p className="mb-4 text-sm text-gray-600">{t('admin.settings.currencyRatesDescription')}</p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('admin.settings.baseCurrency')}
+              </label>
+              <input
+                type="number"
+                value={1}
+                disabled
+                className="w-full cursor-not-allowed rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-gray-600"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('admin.settings.rateToUSD')}
+              </label>
+              <input
+                type="number"
+                min="0.000001"
+                step="0.000001"
+                value={settings.currencyRates?.USD ?? DEFAULT_CURRENCY_RATES.USD}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  setSettings((prev) => ({
+                    ...prev,
+                    currencyRates: {
+                      ...(prev.currencyRates || DEFAULT_CURRENCY_RATES),
+                      USD: Number.isFinite(value) ? value : DEFAULT_CURRENCY_RATES.USD,
+                    },
+                  }));
+                }}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('admin.settings.rateToRub')}
+              </label>
+              <input
+                type="number"
+                min="0.000001"
+                step="0.000001"
+                value={settings.currencyRates?.RUB ?? DEFAULT_CURRENCY_RATES.RUB}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  setSettings((prev) => ({
+                    ...prev,
+                    currencyRates: {
+                      ...(prev.currencyRates || DEFAULT_CURRENCY_RATES),
+                      RUB: Number.isFinite(value) ? value : DEFAULT_CURRENCY_RATES.RUB,
+                    },
+                  }));
+                }}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          <p className="mt-3 text-xs text-gray-500">{t('admin.settings.amdPrimaryNote')}</p>
         </Card>
 
         {/* Actions */}

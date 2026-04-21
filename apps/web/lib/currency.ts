@@ -1,5 +1,5 @@
-// Storefront catalog and admin UI use USD for pricing (see ADMIN_PRICE_CURRENCY).
-// Legacy rows with currency = AMD are converted with a fixed dram-per-USD rate.
+// Storefront prices are stored in USD and displayed via selected currency.
+// Admin product input uses AMD and is converted to USD on save.
 
 export const CURRENCIES = {
   USD: { code: 'USD', symbol: '$', name: 'US Dollar', rate: 1 },
@@ -7,8 +7,10 @@ export const CURRENCIES = {
   RUB: { code: 'RUB', symbol: '₽', name: 'Russian Ruble', rate: 1 },
 } as const;
 
-/** Admin dashboard and product forms: display and label currency. */
+/** Admin reports/orders totals base display currency (stored data is mostly USD). */
 export const ADMIN_PRICE_CURRENCY = 'USD' as const;
+/** Admin add/edit product form input currency. */
+export const ADMIN_PRODUCT_INPUT_CURRENCY = 'AMD' as const;
 
 export type CurrencyCode = keyof typeof CURRENCIES;
 
@@ -17,26 +19,82 @@ const LEGACY_ORDER_DRAM_CODE = 'AMD';
 const LEGACY_AMD_PER_USD = 400;
 
 const CURRENCY_STORAGE_KEY = 'shop_currency';
+const CURRENCY_RATES_STORAGE_KEY = 'shop_currency_rates';
+const DEFAULT_CURRENCY_CODE: CurrencyCode = 'AMD';
+const DEFAULT_CURRENCY_RATES: Record<CurrencyCode, number> = {
+  AMD: 1,
+  USD: 1 / LEGACY_AMD_PER_USD,
+  RUB: 0.2,
+};
+
+function isCurrencyCode(value: string): value is CurrencyCode {
+  return value in CURRENCIES;
+}
+
+function normalizeCurrencyRates(rawRates: Partial<Record<CurrencyCode, number>> | undefined): Record<CurrencyCode, number> {
+  const normalized: Record<CurrencyCode, number> = { ...DEFAULT_CURRENCY_RATES };
+  normalized.AMD = 1;
+
+  if (!rawRates) {
+    return normalized;
+  }
+
+  (Object.keys(CURRENCIES) as CurrencyCode[]).forEach((code) => {
+    if (code === 'AMD') {
+      return;
+    }
+    const raw = rawRates[code];
+    if (typeof raw === 'number' && Number.isFinite(raw) && raw > 0) {
+      normalized[code] = raw;
+    }
+  });
+
+  return normalized;
+}
+
+function getStoredCurrencyRates(): Record<CurrencyCode, number> {
+  if (typeof window === 'undefined') {
+    return DEFAULT_CURRENCY_RATES;
+  }
+  try {
+    const raw = localStorage.getItem(CURRENCY_RATES_STORAGE_KEY);
+    if (!raw) {
+      return DEFAULT_CURRENCY_RATES;
+    }
+    const parsed = JSON.parse(raw) as Partial<Record<CurrencyCode, number>>;
+    return normalizeCurrencyRates(parsed);
+  } catch {
+    return DEFAULT_CURRENCY_RATES;
+  }
+}
+
+function setStoredCurrencyRates(rates: Partial<Record<CurrencyCode, number>>): void {
+  if (typeof window === 'undefined') return;
+  const normalized = normalizeCurrencyRates(rates);
+  localStorage.setItem(CURRENCY_RATES_STORAGE_KEY, JSON.stringify(normalized));
+  window.dispatchEvent(new Event('currency-rates-updated'));
+  window.dispatchEvent(new Event('currency-updated'));
+}
 
 export function getStoredCurrency(): CurrencyCode {
-  if (typeof window === 'undefined') return 'USD';
+  if (typeof window === 'undefined') return DEFAULT_CURRENCY_CODE;
   try {
     const stored = localStorage.getItem(CURRENCY_STORAGE_KEY)?.toUpperCase();
-    if (stored && stored in CURRENCIES) {
-      return stored as CurrencyCode;
+    if (stored && isCurrencyCode(stored)) {
+      return stored;
     }
-    localStorage.setItem(CURRENCY_STORAGE_KEY, 'USD');
+    localStorage.setItem(CURRENCY_STORAGE_KEY, DEFAULT_CURRENCY_CODE);
   } catch {
     // ignore
   }
-  return 'USD';
+  return DEFAULT_CURRENCY_CODE;
 }
 
 export function setStoredCurrency(currency: CurrencyCode): void {
   if (typeof window === 'undefined') return;
   try {
-    const normalized = currency.toUpperCase() as CurrencyCode;
-    const next = normalized in CURRENCIES ? normalized : 'USD';
+    const normalizedRaw = currency.toUpperCase();
+    const next = isCurrencyCode(normalizedRaw) ? normalizedRaw : DEFAULT_CURRENCY_CODE;
     localStorage.setItem(CURRENCY_STORAGE_KEY, next);
     window.dispatchEvent(new Event('currency-updated'));
   } catch (error) {
@@ -51,35 +109,59 @@ export function formatPrice(price: number, _currency: CurrencyCode = 'USD'): str
   return formatPriceInCurrency(price, 'USD');
 }
 
-/**
- * No-op for compatibility (admin settings). Rates are not fetched.
- */
 export function clearCurrencyRatesCache(): void {
   if (typeof window !== 'undefined') {
+    localStorage.removeItem(CURRENCY_RATES_STORAGE_KEY);
     window.dispatchEvent(new Event('currency-rates-updated'));
+    window.dispatchEvent(new Event('currency-updated'));
   }
 }
 
 /**
- * No-op; storefront is USD-only and does not load FX rates.
+ * Load exchange rates from admin settings.
  */
 export async function initializeCurrencyRates(_forceReload: boolean = false): Promise<void> {
-  return Promise.resolve();
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/v1/currency-rates', {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      return;
+    }
+    const data = (await response.json()) as Partial<Record<CurrencyCode, number>>;
+    setStoredCurrencyRates(data);
+  } catch {
+    // Keep defaults on network failure.
+  }
 }
 
-export function convertPrice(price: number, _fromCurrency: CurrencyCode, _toCurrency: CurrencyCode): number {
-  return price;
+export function convertPrice(price: number, fromCurrency: CurrencyCode, toCurrency: CurrencyCode): number {
+  if (fromCurrency === toCurrency) {
+    return price;
+  }
+
+  const rates = getStoredCurrencyRates();
+  const fromRate = rates[fromCurrency];
+  const toRate = rates[toCurrency];
+
+  if (!fromRate || !toRate || fromRate <= 0 || toRate <= 0) {
+    return price;
+  }
+
+  const amdAmount = fromCurrency === 'AMD' ? price : price / fromRate;
+  if (toCurrency === 'AMD') {
+    return amdAmount;
+  }
+  return amdAmount * toRate;
 }
 
 function legacyDramToUsd(amount: number): number {
   return amount / LEGACY_AMD_PER_USD;
-}
-
-function usdToDisplayAmount(amount: number, currency: CurrencyCode): number {
-  if (currency === 'AMD') {
-    return amount * LEGACY_AMD_PER_USD;
-  }
-  return amount;
 }
 
 /**
@@ -94,14 +176,29 @@ export function catalogPriceToUsd(amount: number): number {
  * Keeps up to 2 decimals when needed (e.g. $45.99).
  */
 export function formatCatalogPrice(amount: number, displayCurrency?: CurrencyCode): string {
-  const currency = displayCurrency ?? (typeof window === 'undefined' ? 'USD' : getStoredCurrency());
-  const locale = currency === 'RUB' ? 'ru-RU' : currency === 'AMD' ? 'hy-AM' : 'en-US';
+  const currency = displayCurrency ?? (typeof window === 'undefined' ? DEFAULT_CURRENCY_CODE : getStoredCurrency());
+  const convertedAmount = convertPrice(amount, 'USD', currency);
+  if (currency === 'AMD') {
+    const formatted = new Intl.NumberFormat('hy-AM', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(convertedAmount);
+    return `${formatted} ֏`;
+  }
+  if (currency === 'RUB') {
+    const formatted = new Intl.NumberFormat('ru-RU', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(convertedAmount);
+    return `₽ ${formatted}`;
+  }
+  const locale = 'en-US';
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  }).format(usdToDisplayAmount(amount, currency));
+  }).format(convertedAmount);
 }
 
 /**
@@ -112,12 +209,24 @@ export function amountToUsd(amount: number, storedCurrency: string | undefined):
   if (c === LEGACY_ORDER_DRAM_CODE) {
     return legacyDramToUsd(amount);
   }
+  if (isCurrencyCode(c)) {
+    return convertPrice(amount, c, 'USD');
+  }
   return amount;
+}
+
+function usdToDisplayCurrency(amountUsd: number, displayCurrency: string): number {
+  const code = displayCurrency.trim().toUpperCase();
+  if (isCurrencyCode(code)) {
+    return convertPrice(amountUsd, 'USD', code);
+  }
+  return amountUsd;
 }
 
 /** Format a raw order line amount for admin (normalizes legacy AMD, displays in {@link ADMIN_PRICE_CURRENCY}). */
 export function formatAdminOrderAmount(amount: number, storedCurrency?: string): string {
-  return formatPriceInCurrency(amountToUsd(amount, storedCurrency), ADMIN_PRICE_CURRENCY);
+  const amountUsd = amountToUsd(amount, storedCurrency);
+  return formatPriceInCurrency(usdToDisplayCurrency(amountUsd, ADMIN_PRICE_CURRENCY), ADMIN_PRICE_CURRENCY);
 }
 
 export function formatStoredMoney(
@@ -125,19 +234,35 @@ export function formatStoredMoney(
   storedCurrency: string | undefined,
   displayCurrency: string = 'USD',
 ): string {
-  return formatPriceInCurrency(amountToUsd(amount, storedCurrency), displayCurrency);
+  const amountUsd = amountToUsd(amount, storedCurrency);
+  return formatPriceInCurrency(usdToDisplayCurrency(amountUsd, displayCurrency), displayCurrency);
 }
 
-export const STORE_PRICE_CURRENCY: CurrencyCode = 'USD';
+export const STORE_PRICE_CURRENCY: CurrencyCode = DEFAULT_CURRENCY_CODE;
 
 export function formatStorePriceForDisplay(amount: number, _displayCurrency: CurrencyCode = 'USD'): string {
-  const currency = typeof window === 'undefined' ? 'USD' : getStoredCurrency();
-  return formatPriceInCurrency(usdToDisplayAmount(amount, currency), currency);
+  const currency = typeof window === 'undefined' ? DEFAULT_CURRENCY_CODE : getStoredCurrency();
+  const converted = convertPrice(amount, 'USD', currency);
+  return formatPriceInCurrency(converted, currency);
 }
 
 export function formatPriceInCurrency(price: number, currency: string = 'USD'): string {
   const code = currency.trim().toUpperCase();
-  const locale = code === 'RUB' ? 'ru-RU' : 'en-US';
+  if (code === 'AMD') {
+    const formatted = new Intl.NumberFormat('hy-AM', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
+    return `${formatted} ֏`;
+  }
+  if (code === 'RUB') {
+    const formatted = new Intl.NumberFormat('ru-RU', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+    return `₽ ${formatted}`;
+  }
+  const locale = 'en-US';
   try {
     return new Intl.NumberFormat(locale, {
       style: 'currency',

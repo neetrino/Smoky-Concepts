@@ -594,10 +594,12 @@
     "siteNamePlaceholder": "My Shop",
     "siteDescriptionPlaceholder": "Your shop description",
     "currencyRates": "Currency Rates",
-    "usdOnlyNote": "USD is the only currency for admin pricing. Exchange rates are disabled.",
-    "currencyRatesDescription": "Set currency rates relative to USD. These rates are used for product price conversion.",
-    "baseCurrency": "Base Currency (always 1)",
-    "rateToUSD": "Rate to USD (1 USD = specified value)"
+    "usdOnlyNote": "Storefront now uses live exchange rates.",
+    "currencyRatesDescription": "Set rates using AMD as base currency. Used across storefront and admin product pricing conversion.",
+    "baseCurrency": "Base Currency AMD (fixed as 1)",
+    "rateToUSD": "Rate to USD (1 AMD = value)",
+    "rateToRub": "Rate to RUB (1 AMD = value)",
+    "amdPrimaryNote": "AMD is the primary currency. Product create/edit inputs are entered in AMD and stored in USD after conversion."
   },
   "quickSettings": {
     "title": "Quick Settings",
