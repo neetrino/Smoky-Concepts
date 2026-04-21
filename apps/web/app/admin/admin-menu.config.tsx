@@ -15,7 +15,25 @@ export const ADMIN_MENU_SHOW_FILTER_BY_PRICE = false;
  * Use getAdminMenuTabs(t) in client components where t is from useTranslation().
  */
 export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
+  const translatedHomeLabel = t('admin.menu.home');
+  const homeLabel = translatedHomeLabel === 'admin.menu.home' ? 'Home' : translatedHomeLabel;
+
   const tabs: AdminMenuItem[] = [
+  {
+    id: 'site-home',
+    label: homeLabel,
+    path: '/',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 10.5l9-7 9 7M5.25 8.75V20.25H18.75V8.75M9.75 20.25V14.25H14.25V20.25"
+        />
+      </svg>
+    ),
+  },
   {
     id: 'dashboard',
     label: t('admin.menu.dashboard'),

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { formatCatalogPrice } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
+import { useCurrency } from '../../../components/hooks/useCurrency';
 import { apiClient } from '../../../lib/api-client';
 import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { Button } from '../../../components/ui/buttons';
@@ -174,6 +175,7 @@ export function ProductInfoAndActions({
   customizeFormat,
   onCustomizeFormatChange,
 }: ProductInfoAndActionsProps) {
+  const displayCurrency = useCurrency();
   const [activeTab, setActiveTab] = useState<ProductTabKey>('description');
   const [isCustomizeSizeModalOpen, setIsCustomizeSizeModalOpen] = useState(false);
   const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
@@ -596,11 +598,11 @@ export function ProductInfoAndActions({
       <div className="mt-[48px] flex w-full min-w-0 max-w-[763px] flex-col gap-3 sm:flex-row sm:items-end sm:gap-12">
         <div className="flex min-w-0 w-full flex-wrap items-end gap-2 sm:max-w-[291px] sm:gap-3">
           <p className="font-montserrat text-[30px] font-extrabold leading-none text-black sm:text-[32px]">
-            {formatCatalogPrice(price)}
+            {formatCatalogPrice(price, displayCurrency)}
           </p>
           {(originalPrice || (compareAtPrice && compareAtPrice > price)) && (
             <p className="pb-0.5 text-[15px] leading-none text-[#9d9d9d] line-through sm:text-[16px]">
-              {formatCatalogPrice(originalPrice || compareAtPrice || 0)}
+              {formatCatalogPrice(originalPrice || compareAtPrice || 0, displayCurrency)}
             </p>
           )}
           {discountPercent && discountPercent > 0 && (

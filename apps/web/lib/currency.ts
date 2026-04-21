@@ -3,6 +3,7 @@
 
 export const CURRENCIES = {
   USD: { code: 'USD', symbol: '$', name: 'US Dollar', rate: 1 },
+  AMD: { code: 'AMD', symbol: '֏', name: 'Armenian Dram', rate: 400 },
   RUB: { code: 'RUB', symbol: '₽', name: 'Russian Ruble', rate: 1 },
 } as const;
 
@@ -18,20 +19,25 @@ const LEGACY_AMD_PER_USD = 400;
 const CURRENCY_STORAGE_KEY = 'shop_currency';
 
 export function getStoredCurrency(): CurrencyCode {
-  if (typeof window !== 'undefined') {
-    try {
-      localStorage.setItem(CURRENCY_STORAGE_KEY, 'USD');
-    } catch {
-      // ignore
+  if (typeof window === 'undefined') return 'USD';
+  try {
+    const stored = localStorage.getItem(CURRENCY_STORAGE_KEY)?.toUpperCase();
+    if (stored && stored in CURRENCIES) {
+      return stored as CurrencyCode;
     }
+    localStorage.setItem(CURRENCY_STORAGE_KEY, 'USD');
+  } catch {
+    // ignore
   }
   return 'USD';
 }
 
-export function setStoredCurrency(_currency: CurrencyCode): void {
+export function setStoredCurrency(currency: CurrencyCode): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(CURRENCY_STORAGE_KEY, 'USD');
+    const normalized = currency.toUpperCase() as CurrencyCode;
+    const next = normalized in CURRENCIES ? normalized : 'USD';
+    localStorage.setItem(CURRENCY_STORAGE_KEY, next);
     window.dispatchEvent(new Event('currency-updated'));
   } catch (error) {
     console.error('Failed to save currency:', error);
@@ -69,6 +75,13 @@ function legacyDramToUsd(amount: number): number {
   return amount / LEGACY_AMD_PER_USD;
 }
 
+function usdToDisplayAmount(amount: number, currency: CurrencyCode): number {
+  if (currency === 'AMD') {
+    return amount * LEGACY_AMD_PER_USD;
+  }
+  return amount;
+}
+
 /**
  * Catalog, cart snapshots, and delivery API amounts are USD.
  */
@@ -80,13 +93,15 @@ export function catalogPriceToUsd(amount: number): number {
  * Storefront catalog / PDP: USD without redundant “.00” (e.g. $45 not $45.00).
  * Keeps up to 2 decimals when needed (e.g. $45.99).
  */
-export function formatCatalogPrice(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
+export function formatCatalogPrice(amount: number, displayCurrency?: CurrencyCode): string {
+  const currency = displayCurrency ?? (typeof window === 'undefined' ? 'USD' : getStoredCurrency());
+  const locale = currency === 'RUB' ? 'ru-RU' : currency === 'AMD' ? 'hy-AM' : 'en-US';
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: 'USD',
+    currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  }).format(amount);
+  }).format(usdToDisplayAmount(amount, currency));
 }
 
 /**
@@ -116,7 +131,8 @@ export function formatStoredMoney(
 export const STORE_PRICE_CURRENCY: CurrencyCode = 'USD';
 
 export function formatStorePriceForDisplay(amount: number, _displayCurrency: CurrencyCode = 'USD'): string {
-  return formatPriceInCurrency(amount, 'USD');
+  const currency = typeof window === 'undefined' ? 'USD' : getStoredCurrency();
+  return formatPriceInCurrency(usdToDisplayAmount(amount, currency), currency);
 }
 
 export function formatPriceInCurrency(price: number, currency: string = 'USD'): string {

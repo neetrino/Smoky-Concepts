@@ -9,8 +9,8 @@ import { useAuth } from '../lib/auth/AuthContext';
 function HeaderAccountIcon() {
   return (
     <svg
-      width={31}
-      height={21}
+      width={28}
+      height={19}
       viewBox="0 0 31 21"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

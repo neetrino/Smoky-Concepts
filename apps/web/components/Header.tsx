@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { dispatchCartDrawerOpen } from '../app/cart/constants';
 import { getCartCount } from '../lib/storageCounts';
+import { CurrencySwitcherHeader } from './CurrencySwitcherHeader';
 import { HeaderDesktopAccount, HeaderMobileAccountLinks } from './HeaderAccountMenu';
 import { LanguageSwitcherHeader } from './LanguageSwitcherHeader';
 import { HOME_ASSET_PATHS } from './home/homePage.data';
@@ -73,6 +74,10 @@ function MobileMenuButton({
  */
 export function Header() {
   const pathname = usePathname();
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
+
   const [cartCount, setCartCount] = useState(0);
   const [cartReady, setCartReady] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -142,6 +147,7 @@ export function Header() {
               ) : null}
             </button>
             <div className="hidden items-center gap-2 md:flex">
+              <CurrencySwitcherHeader />
               <LanguageSwitcherHeader />
               <HeaderDesktopAccount />
             </div>
@@ -170,6 +176,7 @@ export function Header() {
                 <HeaderMobileAccountLinks onNavigate={() => setMobileMenuOpen(false)} />
               </div>
             </nav>
+            <CurrencySwitcherHeader variant="drawer" />
             <LanguageSwitcherHeader variant="drawer" />
           </div>
         ) : null}

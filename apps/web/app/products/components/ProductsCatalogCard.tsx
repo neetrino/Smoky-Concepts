@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { useAddToCart } from '../../../components/hooks/useAddToCart';
+import { useCurrency } from '../../../components/hooks/useCurrency';
 import { formatCatalogPrice } from '../../../lib/currency';
 
 const BAG_ICON_PATH = '/assets/home/icons/bag.svg';
@@ -79,6 +80,7 @@ export function ProductsCatalogCard({
   suppressShadow = false,
   buyButtonLabel = 'Buy',
 }: ProductsCatalogCardProps) {
+  const displayCurrency = useCurrency();
   const router = useRouter();
   const { isAddingToCart, addToCart } = useAddToCart({
     productId: product.id,
@@ -245,11 +247,15 @@ export function ProductsCatalogCard({
                     event.stopPropagation();
                     setActiveImageIndex(index);
                   }}
-                  className={`h-[0.1875rem] rounded-[0.15625rem] transition-colors ${
-                    isActive ? 'w-[1.625rem] bg-[#122a26]' : 'w-[1.625rem] bg-[#d9d9d9]'
-                  } cursor-pointer`}
+                  className="relative flex h-3 w-[1.625rem] cursor-pointer items-center"
                   aria-label={`Select product image ${index + 1}`}
-                />
+                >
+                  <span
+                    className={`block h-[0.25rem] w-full rounded-[0.15625rem] transition-colors ${
+                      isActive ? 'bg-[#122a26]' : 'bg-[#d9d9d9]'
+                    }`}
+                  />
+                </button>
               );
             })}
           </div>
@@ -272,7 +278,7 @@ export function ProductsCatalogCard({
 
         <div className={compactLayout ? 'mt-2 flex items-center justify-between gap-2' : 'mt-5 flex items-center justify-between gap-3'}>
           <span className={`font-extrabold leading-tight text-black ${priceClassName}`}>
-            {formatCatalogPrice(product.price ?? 0)}
+            {formatCatalogPrice(product.price ?? 0, displayCurrency)}
           </span>
 
           <div className="flex items-center gap-0.5">

@@ -1,11 +1,22 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import type { CurrencyCode } from '../../lib/currency';
-import { STORE_PRICE_CURRENCY } from '../../lib/currency';
+import { getStoredCurrency } from '../../lib/currency';
 
 /**
- * Storefront currency is fixed to USD.
+ * Storefront display currency synced with localStorage.
  */
 export function useCurrency(): CurrencyCode {
-  return STORE_PRICE_CURRENCY;
+  const [currency, setCurrency] = useState<CurrencyCode>('USD');
+
+  useEffect(() => {
+    const syncCurrency = () => setCurrency(getStoredCurrency());
+    syncCurrency();
+    window.addEventListener('currency-updated', syncCurrency);
+    return () => window.removeEventListener('currency-updated', syncCurrency);
+  }, []);
+
+  return currency;
 }

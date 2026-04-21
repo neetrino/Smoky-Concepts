@@ -34,8 +34,9 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
           {adminTabs.map((tab) => {
             const isActive =
               currentPath === tab.path ||
+              (tab.path === '/' && currentPath === '/') ||
               (tab.path === '/admin' && currentPath === '/admin') ||
-              (tab.path !== '/admin' && currentPath.startsWith(tab.path));
+              (tab.path !== '/' && tab.path !== '/admin' && currentPath.startsWith(tab.path));
             return (
               <button
                 key={tab.id}
