@@ -6,24 +6,11 @@ import { useRef, useState } from 'react';
 import { Button, Input } from '@shop/ui';
 
 import { apiClient } from '@/lib/api-client';
-import { processImageFile } from '@/lib/services/utils/image-utils';
 import { useTranslation } from '@/lib/i18n-client';
 
 import type { VotingFormData } from '../types';
 
 const UPLOAD_IMAGES_ENDPOINT = '/api/v1/admin/voting/upload-images';
-
-function getOutputFileType(file: File): string {
-  if (file.type === 'image/png') {
-    return 'image/png';
-  }
-
-  if (file.type === 'image/webp') {
-    return 'image/webp';
-  }
-
-  return 'image/jpeg';
-}
 
 async function uploadVotingImage(imageBase64: string): Promise<string | null> {
   const response = await apiClient.post<{ urls: string[] }>(UPLOAD_IMAGES_ENDPOINT, {
@@ -31,6 +18,24 @@ async function uploadVotingImage(imageBase64: string): Promise<string | null> {
   });
 
   return response?.urls?.[0] ?? null;
+}
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error('Failed to read image'));
+    };
+
+    reader.onerror = () => reject(new Error('Failed to read image'));
+    reader.readAsDataURL(file);
+  });
 }
 
 interface VotingFormModalProps {
@@ -74,13 +79,7 @@ export function VotingFormModal({
     setUploadError(null);
 
     try {
-      const base64 = await processImageFile(file, {
-        maxSizeMB: 2,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        fileType: getOutputFileType(file),
-        initialQuality: 0.8,
-      });
+      const base64 = await readFileAsDataUrl(file);
 
       if (!base64) {
         setUploadError(t('admin.voting.imageUploadFailed'));
@@ -143,55 +142,41 @@ export function VotingFormModal({
             <label className="mb-1 block text-sm font-medium text-gray-700">
               {t('admin.voting.imageField')} *
             </label>
-            <Input
-              type="text"
-              value={formData.imageUrl}
-              onChange={(event) =>
-                onFormDataChange({
-                  ...formData,
-                  imageUrl: event.target.value,
-                })
-              }
-              placeholder={t('admin.voting.imagePlaceholder')}
-              className="w-full"
-              disabled={saving || uploading}
-            />
-          </div>
-
-          <div className="flex items-center gap-3">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="sr-only"
-              aria-hidden
-              onChange={handleFileUpload}
-              disabled={saving || uploading}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={saving || uploading}
-            >
-              {uploading ? t('admin.voting.uploadingImage') : t('admin.voting.uploadImage')}
-            </Button>
-            {formData.imageUrl ? (
+            <div className="flex items-center gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                aria-hidden
+                onChange={handleFileUpload}
+                disabled={saving || uploading}
+              />
               <Button
                 type="button"
                 variant="ghost"
-                onClick={() =>
-                  onFormDataChange({
-                    ...formData,
-                    imageUrl: '',
-                  })
-                }
+                onClick={() => fileInputRef.current?.click()}
                 disabled={saving || uploading}
-                className="text-red-600 hover:bg-red-50 hover:text-red-700"
               >
-                {t('admin.voting.removeImage')}
+                {uploading ? t('admin.voting.uploadingImage') : t('admin.voting.uploadImage')}
               </Button>
-            ) : null}
+              {formData.imageUrl ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() =>
+                    onFormDataChange({
+                      ...formData,
+                      imageUrl: '',
+                    })
+                  }
+                  disabled={saving || uploading}
+                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                >
+                  {t('admin.voting.removeImage')}
+                </Button>
+              ) : null}
+            </div>
           </div>
 
           {uploadError ? <p className="text-sm text-red-600">{uploadError}</p> : null}
