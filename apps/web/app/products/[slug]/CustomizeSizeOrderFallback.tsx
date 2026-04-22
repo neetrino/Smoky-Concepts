@@ -37,12 +37,14 @@ function CustomOrderInputField({
 }) {
   return (
     <label className="block">
-      <span className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">{label}</span>
+      <span className="font-montserrat text-[14px] font-medium leading-[22px] text-[#414141] sm:text-[15px]">
+        {label}
+      </span>
       <input
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="block h-5 w-full border-0 border-b border-[#dcc090] bg-transparent font-montserrat text-[18px] font-medium text-[#414141] outline-none"
+        className="block h-7 w-full border-0 border-b border-[#dcc090] bg-transparent font-montserrat text-[14px] font-medium text-[#414141] outline-none sm:text-[15px]"
         autoComplete={autoComplete}
       />
     </label>
@@ -69,9 +71,9 @@ function CustomOrderUpload({
   };
 
   return (
-    <div className="mt-12 flex items-start gap-4">
+    <div className="mt-8 flex items-start gap-3">
       <label
-        className={`mt-1 inline-flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#dcc090] font-montserrat text-[34px] leading-none text-[#122a26] ${
+        className={`mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#dcc090] font-montserrat text-[24px] leading-none text-[#122a26] ${
           isUploading ? 'cursor-not-allowed opacity-70' : 'cursor-pointer hover:bg-[#d3b67f]'
         }`}
         aria-label={t(language, 'product.size_catalog_custom_order_upload_button')}
@@ -86,7 +88,7 @@ function CustomOrderUpload({
         +
       </label>
       <div>
-        <p className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">
+        <p className="font-montserrat text-[14px] font-medium leading-[20px] text-[#414141] sm:text-[15px] sm:leading-[22px]">
           {t(language, 'product.size_catalog_custom_order_upload')}
         </p>
         <p className="mt-0.5 font-montserrat text-[12px] font-medium leading-none text-[#9d9d9d]">
@@ -128,11 +130,11 @@ export function CustomizeSizeOrderFallback({
 }) {
   return (
     <div className="max-w-[978px]">
-      <p className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">
+      <p className="font-montserrat text-[14px] font-medium leading-[22px] text-[#414141] sm:text-[15px] sm:leading-[24px]">
         {t(language, 'product.size_catalog_custom_order_message')}
       </p>
 
-      <div className="mt-12 flex max-w-[454px] flex-col gap-8">
+      <div className="mt-8 flex max-w-[454px] flex-col gap-6">
         <CustomOrderInputField
           label={t(language, 'product.size_catalog_custom_order_name')}
           type="text"
@@ -174,7 +176,7 @@ export function CustomizeSizeOrderFallback({
         type="button"
         onClick={() => onSubmit(draft)}
         disabled={!canSubmit || isSubmitting || isUploadingImage}
-        className={`mt-8 h-12 min-w-[166px] rounded-[8px] px-6 font-montserrat text-[24px] font-medium uppercase tracking-[0.1em] ${
+        className={`mt-8 h-11 min-w-[166px] rounded-[8px] px-6 font-montserrat text-[14px] font-semibold uppercase tracking-[0.18em] sm:text-[15px] ${
           canSubmit && !isSubmitting && !isUploadingImage
             ? 'bg-[#dcc090] text-[#122a26] hover:bg-[#d3b67f]'
             : 'bg-[#d2d2d2] text-[#9d9d9d]'
