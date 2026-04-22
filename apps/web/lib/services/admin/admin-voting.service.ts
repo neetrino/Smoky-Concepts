@@ -117,20 +117,43 @@ class AdminVotingService {
         published: true,
         createdAt: true,
         updatedAt: true,
-        items: {
-          where: { deletedAt: null },
-          select: {
-            _count: {
-              select: { likes: true },
-            },
-          },
-        },
       },
     });
 
+    const votingIds = rows.map((row: (typeof rows)[number]) => row.id);
+    const itemRows =
+      votingIds.length > 0
+        ? await db.votingItem.findMany({
+            where: {
+              votingId: { in: votingIds },
+              deletedAt: null,
+            },
+            select: {
+              id: true,
+              votingId: true,
+              title: true,
+              imageUrl: true,
+              _count: {
+                select: { likes: true },
+              },
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+          })
+        : [];
+
+    const itemsByVoting = new Map<string, typeof itemRows>();
+    for (const item of itemRows) {
+      const current = itemsByVoting.get(item.votingId) || [];
+      current.push(item);
+      itemsByVoting.set(item.votingId, current);
+    }
+
     const data = rows.map((row: (typeof rows)[number]) => {
-      const itemCount = row.items.length;
-      const totalLikes = row.items.reduce(
+      const votingItems = itemsByVoting.get(row.id) || [];
+      const itemCount = votingItems.length;
+      const totalLikes = votingItems.reduce(
         (sum: number, it: { _count: { likes: number } }) => sum + it._count.likes,
         0,
       );
@@ -141,6 +164,12 @@ class AdminVotingService {
         published: row.published,
         itemCount,
         totalLikes,
+        items: votingItems.map((item: { id: string; title: string; imageUrl: string; _count: { likes: number } }) => ({
+          id: item.id,
+          title: item.title,
+          imageUrl: item.imageUrl,
+          likeCount: item._count.likes,
+        })),
         createdAt: row.createdAt.toISOString(),
         updatedAt: row.updatedAt.toISOString(),
       };

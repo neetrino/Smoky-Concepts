@@ -11,7 +11,10 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { logger } from '../../../lib/utils/logger';
 import { AdminSidebar } from '../components/AdminSidebar';
 
+import { VotingFormModal } from './components/VotingFormModal';
+import { useVotingActions } from './hooks/useVotingActions';
 import { useVotingList } from './hooks/useVotingList';
+import type { VotingItem } from './types';
 
 export default function VotingPage() {
   const { t } = useTranslation();
@@ -22,6 +25,22 @@ export default function VotingPage() {
   const [newVotingTitle, setNewVotingTitle] = useState('');
   const [savingVoting, setSavingVoting] = useState(false);
   const [busyVotingId, setBusyVotingId] = useState<string | null>(null);
+  const [expandedVotingId, setExpandedVotingId] = useState<string | null>(null);
+  const [selectedVotingId, setSelectedVotingId] = useState<string | null>(null);
+  const {
+    showAddModal,
+    showEditModal,
+    formData,
+    saving,
+    setShowAddModal,
+    setShowEditModal,
+    setFormData,
+    resetForm,
+    handleAddItem,
+    handleEditItem,
+    handleUpdateItem,
+    handleDeleteItem,
+  } = useVotingActions();
 
   useEffect(() => {
     if (!isLoading && (!isLoggedIn || !isAdmin)) {
@@ -45,13 +64,12 @@ export default function VotingPage() {
     setSavingVoting(true);
 
     try {
-      const response = await apiClient.post<{ data: { id: string } }>('/api/v1/admin/voting', {
+      await apiClient.post<{ data: { id: string } }>('/api/v1/admin/voting', {
         title,
       });
       setNewVotingTitle('');
       await fetchVotings();
       showToast(t('admin.voting.votingCreatedSuccess'), 'success');
-      router.push(`/admin/voting/${response.data.id}`);
     } catch (error: unknown) {
       logger.error('Error creating voting', { error });
       const message =
@@ -62,7 +80,7 @@ export default function VotingPage() {
     } finally {
       setSavingVoting(false);
     }
-  }, [fetchVotings, newVotingTitle, router, t]);
+  }, [fetchVotings, newVotingTitle, t]);
 
   const togglePublished = useCallback(
     async (id: string, published: boolean) => {
@@ -188,22 +206,36 @@ export default function VotingPage() {
                   <p className="text-sm text-gray-500">{t('admin.voting.noVotings')}</p>
                 </div>
               ) : (
-                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                <div className="space-y-4">
                   {votings.map((voting) => {
                     const disabled = busyVotingId === voting.id;
+                    const isExpanded = expandedVotingId === voting.id;
 
                     return (
-                      <article
-                        key={voting.id}
-                        className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <h2 className="text-lg font-semibold text-gray-900">{voting.title}</h2>
-                            <p className="mt-2 text-sm text-gray-500">
-                              {voting.itemCount} {t('admin.voting.choicesLabel')} · {voting.totalLikes}{' '}
-                              {t('admin.voting.likesLabel')}
-                            </p>
+                      <article key={voting.id} className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+                        <button
+                          type="button"
+                          className="flex w-full items-start justify-between gap-3 p-4 text-left sm:p-5"
+                          onClick={() => setExpandedVotingId((prev) => (prev === voting.id ? null : voting.id))}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className="mt-0.5 rounded-xl border border-gray-200 bg-gray-50 p-1.5 text-gray-700">
+                              <svg
+                                className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </span>
+                            <div>
+                              <h2 className="text-2xl font-semibold text-gray-900">{voting.title}</h2>
+                              <p className="mt-1 text-sm text-gray-500">
+                                {voting.itemCount} {t('admin.voting.choicesLabel')} · {voting.totalLikes}{' '}
+                                {t('admin.voting.likesLabel')}
+                              </p>
+                            </div>
                           </div>
                           <span
                             className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
@@ -212,39 +244,104 @@ export default function VotingPage() {
                           >
                             {voting.published ? t('admin.voting.statusLive') : t('admin.voting.statusDraft')}
                           </span>
-                        </div>
+                        </button>
 
-                        <div className="mt-4 flex items-center justify-between gap-3 border-t border-gray-100 pt-4">
-                          <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
-                            <input
-                              type="checkbox"
-                              className="h-4 w-4 rounded border-gray-300 text-teal-700 focus:ring-teal-600"
-                              checked={voting.published}
-                              disabled={disabled}
-                              onChange={() => togglePublished(voting.id, !voting.published)}
-                            />
-                            <span>{t('admin.voting.showOnHome')}</span>
-                          </label>
-                        </div>
+                        {isExpanded ? (
+                          <div className="border-t border-gray-100 p-4 sm:p-5">
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                              {voting.items.map((item) => (
+                                <div
+                                  key={item.id}
+                                  className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-4"
+                                >
+                                  <div className="h-28 overflow-hidden rounded-xl bg-gray-100">
+                                    <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover" />
+                                  </div>
+                                  <p className="mt-3 text-lg font-semibold text-gray-900">{item.title}</p>
+                                  <p className="text-sm text-gray-500">
+                                    {item.likeCount} {t('admin.voting.likesLabel')}
+                                  </p>
+                                  <div className="mt-3 flex gap-2">
+                                    <Button
+                                      variant="ghost"
+                                      className="flex-1"
+                                      onClick={() =>
+                                        handleEditItem({
+                                          id: item.id,
+                                          votingId: voting.id,
+                                          title: item.title,
+                                          imageUrl: item.imageUrl,
+                                          likeCount: item.likeCount,
+                                          topLiked: false,
+                                          createdAt: '',
+                                          updatedAt: '',
+                                        } satisfies VotingItem)
+                                      }
+                                    >
+                                      {t('admin.common.edit')}
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700"
+                                      onClick={() =>
+                                        handleDeleteItem(
+                                          {
+                                            id: item.id,
+                                            votingId: voting.id,
+                                            title: item.title,
+                                            imageUrl: item.imageUrl,
+                                            likeCount: item.likeCount,
+                                            topLiked: false,
+                                            createdAt: '',
+                                            updatedAt: '',
+                                          } satisfies VotingItem,
+                                          fetchVotings,
+                                        )
+                                      }
+                                    >
+                                      {t('admin.common.delete')}
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
 
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          <Button
-                            variant="primary"
-                            className="min-w-[8rem] flex-1"
-                            onClick={() => router.push(`/admin/voting/${voting.id}`)}
-                            disabled={disabled}
-                          >
-                            {t('admin.voting.manageChoices')}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                            onClick={() => deleteVoting(voting.id, voting.title)}
-                            disabled={disabled}
-                          >
-                            {t('admin.common.delete')}
-                          </Button>
-                        </div>
+                            <div className="mt-4 flex items-center justify-between gap-3 border-t border-gray-100 pt-4">
+                              <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+                                <input
+                                  type="checkbox"
+                                  className="h-4 w-4 rounded border-gray-300 text-teal-700 focus:ring-teal-600"
+                                  checked={voting.published}
+                                  disabled={disabled}
+                                  onChange={() => togglePublished(voting.id, !voting.published)}
+                                />
+                                <span>{t('admin.voting.showOnHome')}</span>
+                              </label>
+                              <div className="flex flex-wrap gap-2">
+                                <Button
+                                  variant="primary"
+                                  className="min-w-[8rem]"
+                                  onClick={() => {
+                                    resetForm();
+                                    setSelectedVotingId(voting.id);
+                                    setShowAddModal(true);
+                                  }}
+                                  disabled={disabled}
+                                >
+                                  {t('admin.voting.addChoice')}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                                  onClick={() => deleteVoting(voting.id, voting.title)}
+                                  disabled={disabled}
+                                >
+                                  {t('admin.common.delete')}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null}
                       </article>
                     );
                   })}
@@ -254,6 +351,38 @@ export default function VotingPage() {
           </div>
         </div>
       </div>
+
+      <VotingFormModal
+        isOpen={showAddModal}
+        mode="create"
+        formData={formData}
+        saving={saving}
+        onClose={() => {
+          setShowAddModal(false);
+          setSelectedVotingId(null);
+          resetForm();
+        }}
+        onFormDataChange={setFormData}
+        onSubmit={async () => {
+          if (!selectedVotingId) {
+            return;
+          }
+          await handleAddItem(selectedVotingId, fetchVotings);
+        }}
+      />
+
+      <VotingFormModal
+        isOpen={showEditModal}
+        mode="edit"
+        formData={formData}
+        saving={saving}
+        onClose={() => {
+          setShowEditModal(false);
+          resetForm();
+        }}
+        onFormDataChange={setFormData}
+        onSubmit={() => handleUpdateItem(fetchVotings)}
+      />
     </div>
   );
 }

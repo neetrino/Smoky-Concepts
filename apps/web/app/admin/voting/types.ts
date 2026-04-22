@@ -4,12 +4,20 @@ export interface VotingSummary {
   published: boolean;
   itemCount: number;
   totalLikes: number;
+  items: VotingSummaryItem[];
   createdAt: string;
   updatedAt: string;
 }
 
 export interface VotingListResponse {
   data: VotingSummary[];
+}
+
+export interface VotingSummaryItem {
+  id: string;
+  title: string;
+  imageUrl: string;
+  likeCount: number;
 }
 
 export interface VotingDetail {
