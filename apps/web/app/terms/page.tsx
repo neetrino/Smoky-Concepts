@@ -15,6 +15,70 @@ function getStringArray(value: unknown): string[] {
  */
 export default function TermsPage() {
   const { t } = useTranslation();
+  const intro = t('terms.intro');
+  const sectionsList = t('terms.sectionsList');
+  const hasStructuredPolicy = Array.isArray(sectionsList);
+
+  if (hasStructuredPolicy) {
+    return (
+      <div className="policy-page">
+        <div className="policy-page-inner">
+          <h1 className="text-4xl font-bold text-gray-900">{t('terms.title')}</h1>
+
+          <div className="mt-8 space-y-6">
+            <Card className="p-6 space-y-8">
+              {Array.isArray(intro) &&
+                intro.map((paragraph) => (
+                  <p key={paragraph} className="text-gray-600">
+                    {paragraph}
+                  </p>
+                ))}
+
+              {(
+                sectionsList as Array<{
+                  title: string;
+                  paragraphs?: string[];
+                  list?: string[];
+                  groups?: Array<{ title?: string; items: string[] }>;
+                }>
+              ).map((section) => (
+                <section key={section.title} className="space-y-3">
+                  <h2 className="text-2xl font-semibold text-gray-900">{section.title}</h2>
+
+                  {Array.isArray(section.paragraphs) &&
+                    section.paragraphs.map((paragraph) => (
+                      <p key={paragraph} className="text-gray-600">
+                        {paragraph}
+                      </p>
+                    ))}
+
+                  {Array.isArray(section.groups) &&
+                    section.groups.map((group) => (
+                      <div key={`${section.title}-${group.title || 'group'}`} className="space-y-2">
+                        {group.title ? <p className="text-gray-700 font-medium">{group.title}</p> : null}
+                        <ul className="ml-4 list-disc list-inside text-gray-600 space-y-1">
+                          {group.items.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+
+                  {Array.isArray(section.list) && section.list.length > 0 ? (
+                    <ul className="ml-4 list-disc list-inside text-gray-600 space-y-1">
+                      {section.list.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </section>
+              ))}
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const definitionItems = getStringArray(t('terms.useLicense.definitionItems'));
   const obligationItems = getStringArray(t('terms.accountRegistration.obligationItems'));
@@ -27,10 +91,6 @@ export default function TermsPage() {
     <div className="policy-page">
       <div className="policy-page-inner">
         <h1 className="text-4xl font-bold text-gray-900">{t('terms.title')}</h1>
-        <p className="text-gray-600">
-          {t('terms.lastUpdated')}{' '}
-          {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-        </p>
 
         <div className="mt-8 space-y-6">
           <Card className="p-6">

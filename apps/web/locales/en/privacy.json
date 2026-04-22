@@ -1,82 +1,174 @@
 {
   "title": "Privacy Policy",
-  "intro": {
-    "p1": "By visiting the website smokyconcepts.com (hereinafter referred to as the “Website”) and making purchases, you automatically consent to the collection, processing, and use of your personal data.",
-    "p2": "By \"Personal Data,\" we mean any information that allows or may allow us to directly or indirectly identify your identity, such as your name, surname, address, email, phone number, and other data (hereinafter referred to as \"Data\").",
-    "p3": "In this Privacy Policy, \"we,\" \"us,\" and \"our\" refer to Website (for more information, please visit the \"About Us\" section), while \"you,\" \"your,\" and \"yours\" refer to any individual who visits the Website or uses our services."
-  },
-  "sections": {
-    "collectedData": {
-      "title": "1. Collected Data",
-      "intro": "We may collect the following types of information:",
-      "bullets": {
-        "contact": "Contact information – name, surname, address, phone number, email address",
-        "purchase": "Purchase information – products purchased, payment methods",
-        "technical": "Technical information – device type, browser, operating system",
-        "cookies": "Cookies and tracking technologies – for website usage analysis"
-      }
+  "effectiveDateLabel": "Effective Date:",
+  "effectiveDate": "21.04.2026",
+  "lastUpdatedLabel": "Last Updated:",
+  "lastUpdated": "21.04.2026",
+  "intro": [
+    "Smoky Concepts (\"Smoky Concepts,\" \"we,\" \"our,\" or \"us\") is committed to protecting your personal information. This Privacy Policy explains how we collect, use, store, share, and protect your personal data when you visit our website, place an order, or otherwise interact with us."
+  ],
+  "sectionsList": [
+    {
+      "title": "1. What Information We Collect",
+      "groups": [
+        {
+          "title": "A. Information you provide directly",
+          "items": [
+            "Full name",
+            "Email address",
+            "Phone number",
+            "Billing and shipping address",
+            "Order details and purchase history",
+            "Messages submitted via contact forms, email, or social media",
+            "Customization details submitted for personalized orders",
+            "Marketing preferences"
+          ]
+        },
+        {
+          "title": "B. Information collected automatically",
+          "items": [
+            "When you use our website, we may automatically collect:",
+            "IP address",
+            "Browser type and version",
+            "Device type and operating system",
+            "Referring URLs",
+            "Pages viewed and time spent",
+            "Cookie identifiers and similar tracking data"
+          ]
+        },
+        {
+          "title": "C. Information from third parties",
+          "items": [
+            "We may receive information from:",
+            "Payment processors",
+            "Shipping and logistics providers",
+            "Analytics providers",
+            "Marketing and advertising platforms"
+          ]
+        }
+      ]
     },
-    "dataUsage": {
-      "title": "2. Use of Data",
-      "intro": "Collected data is never sold or provided to third parties for marketing purposes. It is used only for the following purposes:",
-      "bullets": {
-        "orders": "Processing and shipping orders",
-        "support": "Providing user support",
-        "improve": "Improving website functionality",
-        "legal": "Complying with legal requirements"
-      }
+    {
+      "title": "2. How We Use Your Information",
+      "paragraphs": ["We use your personal information to:"],
+      "list": [
+        "Process and fulfill your orders",
+        "Arrange shipping and delivery",
+        "Communicate with you about your orders, inquiries, or support requests",
+        "Handle returns, refunds, or complaints",
+        "Manage customization and personalized order requests",
+        "Improve our website, products, and services",
+        "Maintain website security and prevent fraud",
+        "Comply with legal, tax, and regulatory obligations",
+        "Send marketing communications where you have consented or where otherwise permitted"
+      ]
     },
-    "retention": {
-      "title": "3. Data Retention Periods",
-      "intro": "Your personal data is stored as follows:",
-      "bullets": {
-        "account": "User account data – as long as the account is active",
-        "history": "Purchase history – 5 years (to comply with tax and accounting regulations)",
-        "marketing": "Marketing data – 2 years or until the user opts out"
-      }
+    {
+      "title": "3. Legal Basis for Processing",
+      "paragraphs": ["We process your data on the following bases:"],
+      "list": [
+        "Contractual necessity — to fulfill your order and deliver your purchase",
+        "Legal obligation — to comply with applicable law, tax, and regulatory requirements",
+        "Legitimate interests — to operate, secure, and improve our business",
+        "Consent — where required, for marketing communications or non-essential cookies"
+      ]
     },
-    "security": {
-      "title": "4. Data Security",
-      "intro": "We implement appropriate technical and organizational measures to ensure the protection of your data, including:",
-      "bullets": {
-        "ssl": "SSL encryption – to secure payment and personal data transmission",
-        "access": "Access control – limited access to personal data",
-        "audits": "Regular audits – to detect potential security vulnerabilities"
-      }
+    {
+      "title": "4. How We Share Your Information",
+      "paragraphs": ["We do not sell your personal information. We may share data with:"],
+      "list": [
+        "Payment service providers",
+        "Shipping and courier partners",
+        "Website hosting and IT providers",
+        "Analytics and marketing tools",
+        "Customer support platforms",
+        "Legal, accounting, or professional advisers",
+        "Government authorities or law enforcement when required by law"
+      ],
+      "trailingParagraphs": [
+        "All third parties are permitted to use your data only as necessary to provide services to us."
+      ]
     },
-    "sharing": {
-      "title": "5. Sharing Data with Third Parties",
-      "intro": "We do not sell or provide your data to third parties, except for:",
-      "bullets": {
-        "shipping": "Shipping services – to ensure order delivery",
-        "payment": "Payment systems – for secure payment processing",
-        "law": "Law enforcement authorities – in cases required by law"
-      },
-      "outro": "All third parties are obligated to protect your data and cannot use it for other purposes."
+    {
+      "title": "5. Payments",
+      "paragraphs": [
+        "Payments are processed through our payment partners, supporting Visa, Mastercard, Apple Pay, and Idram.",
+        "We do not store full payment card details on our own servers. Payment data is handled by our secure third-party payment providers, subject to their own security and privacy practices."
+      ]
     },
-    "rights": {
-      "title": "6. User Rights",
-      "intro": "You have the right to:",
-      "bullets": {
-        "copy": "Receive a copy of your personal data",
-        "editDelete": "Edit or delete your data (through our website settings or customer support)",
-        "unsubscribe": "Opt-out of marketing emails (via the \"unsubscribe\" link in each email)",
-        "restrict": "Request that your data is not processed for specific purposes, except in cases required by law"
-      }
+    {
+      "title": "6. Cookies",
+      "paragraphs": [
+        "Our website may use cookies and similar technologies to support basic functionality, remember preferences, and improve your browsing experience. You can manage your cookie preferences through your browser settings at any time."
+      ]
     },
-    "cookies": {
-      "title": "7. Cookies Usage",
-      "intro": "Our website uses cookies to optimize user experience. We use:",
-      "bullets": {
-        "functional": "Functional cookies – to ensure proper website operation",
-        "analytics": "Analytical cookies – to understand user behavior and improve the website",
-        "marketing": "Marketing cookies (only with your consent) – to provide more relevant advertisements"
-      },
-      "outro": ""
+    {
+      "title": "7. Marketing Communications",
+      "paragraphs": [
+        "With your consent, we may send you product updates, launch announcements, offers, and brand news. You may unsubscribe at any time by clicking the unsubscribe link in any email or by contacting us at smokyconcepts@gmail.com."
+      ]
     },
-    "changes": {
-      "title": "8. Policy Changes",
-      "intro": "We reserve the right to make legally permitted changes to this page and the above sections. Updates will be posted on the Website."
+    {
+      "title": "8. Data Retention",
+      "paragraphs": [
+        "We retain your personal data only as long as necessary for the purposes described in this Policy, including fulfilling orders, providing customer support, complying with legal and tax obligations, and improving our services. Retention periods vary depending on the type of data and the purpose for which it was collected. When your data is no longer needed, we will delete or anonymize it securely."
+      ]
+    },
+    {
+      "title": "9. Data Security",
+      "paragraphs": [
+        "We use reasonable technical and organizational measures to protect your data, including secure hosting, access controls, and reputable third-party service providers. No method of electronic transmission or storage is 100% secure, and we cannot guarantee absolute security."
+      ]
+    },
+    {
+      "title": "10. International Data Transfers",
+      "paragraphs": [
+        "As we operate and expand globally, your data may be processed or stored outside Armenia. Where this occurs, we take reasonable steps to ensure appropriate safeguards are in place in accordance with applicable law."
+      ]
+    },
+    {
+      "title": "11. Your Rights",
+      "paragraphs": ["Depending on your location and applicable law, you may have the right to:"],
+      "list": [
+        "Access your personal data",
+        "Request correction of inaccurate data",
+        "Request deletion of your data",
+        "Restrict or object to certain processing",
+        "Withdraw consent at any time",
+        "Request data portability",
+        "Lodge a complaint with a relevant supervisory authority"
+      ],
+      "trailingParagraphs": [
+        "Customers in the European Union additionally benefit from rights under the General Data Protection Regulation (GDPR).",
+        "To exercise any of these rights, contact us at: smokyconcepts@gmail.com"
+      ]
+    },
+    {
+      "title": "12. Children's Privacy",
+      "paragraphs": [
+        "Our website is intended for users who have the legal capacity to enter into agreements in their country of residence. We do not knowingly collect personal data from children under the age of 13. If you believe a child has submitted personal information to us, please contact us immediately at smokyconcepts@gmail.com and we will take appropriate action."
+      ]
+    },
+    {
+      "title": "13. Third-Party Links",
+      "paragraphs": [
+        "Our website may contain links to third-party sites. We are not responsible for their privacy practices. We encourage you to review their policies independently."
+      ]
+    },
+    {
+      "title": "14. Changes to This Policy",
+      "paragraphs": [
+        "We may update this Privacy Policy periodically. Changes will be posted on this page with a revised \"Last Updated\" date. Continued use of our website after updates constitutes acceptance of the revised Policy."
+      ]
+    },
+    {
+      "title": "15. Contact Us",
+      "list": [
+        "Smoky Concepts",
+        "Email: smokyconcepts@gmail.com",
+        "Phone: +37443151551",
+        "Yerevan, Republic of Armenia"
+      ]
     }
-  }
+  ]
 }

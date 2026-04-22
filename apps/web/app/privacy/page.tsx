@@ -8,6 +8,80 @@ import { useTranslation } from '../../lib/i18n-client';
  */
 export default function PrivacyPage() {
   const { t } = useTranslation();
+  const intro = t('privacy.intro');
+  const sectionsList = t('privacy.sectionsList');
+  const hasStructuredPolicy = Array.isArray(sectionsList);
+
+  if (hasStructuredPolicy) {
+    return (
+      <div className="policy-page">
+        <div className="policy-page-inner">
+          <h1 className="text-4xl font-bold text-gray-900">{t('privacy.title')}</h1>
+
+          <div className="mt-8">
+            <Card className="p-6">
+              <div className="space-y-8">
+                {Array.isArray(intro) &&
+                  intro.map((paragraph) => (
+                    <section key={paragraph} className="space-y-3">
+                      <p className="text-gray-600">{paragraph}</p>
+                    </section>
+                  ))}
+
+                {(
+                  sectionsList as Array<{
+                    title: string;
+                    paragraphs?: string[];
+                    list?: string[];
+                    groups?: Array<{ title: string; items: string[] }>;
+                    trailingParagraphs?: string[];
+                  }>
+                ).map((section) => (
+                  <section key={section.title} className="space-y-3">
+                    <h2 className="text-2xl font-semibold text-gray-900">{section.title}</h2>
+
+                    {Array.isArray(section.paragraphs) &&
+                      section.paragraphs.map((paragraph) => (
+                        <p key={paragraph} className="text-gray-600">
+                          {paragraph}
+                        </p>
+                      ))}
+
+                    {Array.isArray(section.groups) &&
+                      section.groups.map((group) => (
+                        <div key={group.title} className="space-y-2">
+                          <p className="text-gray-700 font-medium">{group.title}</p>
+                          <ul className="ml-4 list-disc list-inside text-gray-600 space-y-1">
+                            {group.items.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+
+                    {Array.isArray(section.list) && section.list.length > 0 ? (
+                      <ul className="ml-4 list-disc list-inside text-gray-600 space-y-1">
+                        {section.list.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+
+                    {Array.isArray(section.trailingParagraphs) &&
+                      section.trailingParagraphs.map((paragraph) => (
+                        <p key={paragraph} className="text-gray-600">
+                          {paragraph}
+                        </p>
+                      ))}
+                  </section>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const sections = [
     {

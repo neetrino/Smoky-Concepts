@@ -15,14 +15,78 @@ type ReturnExchangePolicyContentProps = {
 export function ReturnExchangePolicyContent({ namespace }: ReturnExchangePolicyContentProps) {
   const { t } = useTranslation();
   const tp = (suffix: string) => t(`${namespace}.${suffix}`);
+  const structuredSections = tp('sections');
+  const structuredIntro = tp('intro');
+  const hasStructuredRefundPolicy = namespace === 'refund-policy' && Array.isArray(structuredSections);
+
+  if (hasStructuredRefundPolicy) {
+    return (
+      <>
+        <h1 className="text-4xl font-bold text-gray-900">{tp('title')}</h1>
+
+        <div className="mt-8 space-y-6">
+          <Card className="p-6 space-y-6">
+            {Array.isArray(structuredIntro) &&
+              structuredIntro.map((paragraph) => (
+                <p key={paragraph} className="text-gray-600">
+                  {paragraph}
+                </p>
+              ))}
+
+            {(
+              structuredSections as Array<{
+                title: string;
+                paragraphs?: string[];
+                list?: string[];
+                trailingParagraphs?: string[];
+              }>
+            ).map((section) => (
+              <section key={section.title}>
+                <h2 className="text-2xl font-semibold text-gray-900">{section.title}</h2>
+
+                {Array.isArray(section.paragraphs) &&
+                  section.paragraphs.map((paragraph) => (
+                    <p key={paragraph} className="mt-3 text-gray-600">
+                      {paragraph}
+                    </p>
+                  ))}
+
+                {Array.isArray(section.list) && section.list.length > 0 && (
+                  <ul className="mt-3 list-disc list-inside text-gray-600 ml-4 space-y-2">
+                    {section.list.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+
+                {Array.isArray(section.trailingParagraphs) &&
+                  section.trailingParagraphs.map((paragraph) => (
+                    <p key={paragraph} className="mt-3 text-gray-600">
+                      {paragraph}
+                    </p>
+                  ))}
+              </section>
+            ))}
+
+            <section>
+              <p className="text-gray-600">{tp('contact.name')}</p>
+              <p className="text-gray-600">
+                {tp('contact.emailLabel')} {tp('contact.email')}
+              </p>
+              <p className="text-gray-600">
+                {tp('contact.phoneLabel')} {tp('contact.phone')}
+              </p>
+              <p className="text-gray-600">{tp('contact.address')}</p>
+            </section>
+          </Card>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <h1 className="text-4xl font-bold text-gray-900">{tp('title')}</h1>
-      <p className="text-gray-600">
-        {tp('lastUpdated')}{' '}
-        {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-      </p>
 
       <div className="mt-8 space-y-6">
         <Card className="p-6 space-y-6">

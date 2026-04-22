@@ -1,43 +1,122 @@
 {
-  "title": "Return and Exchange Policy",
-  "lastUpdated": "Last updated:",
-  "intro": "We want you to be completely satisfied with your purchase. If for any reason your order does not meet your expectations, we are here to assist you with exchanges or returns.",
-  "exchange": {
-    "title": "1. Exchange",
-    "bullet1": "Purchased items (except custom orders) are eligible for exchange within 14 days.",
-    "bullet2": "The item must be unused, in its original condition, and in its original packaging.",
-    "bullet3": "An official receipt or proof of purchase is required for exchanges."
-  },
-  "productReturn": {
-    "title": "2. Returns",
-    "bullet1": "Purchased items (except custom orders) can be returned within 14 days.",
-    "bullet2": "The item must be unused, undamaged, and in its original packaging.",
-    "bullet3": "An official receipt or proof of purchase is required for returns.",
-    "bullet4": "If we mistakenly sent the wrong item, the customer may return it or exchange it for the correct product at no additional charge.",
-    "bullet5": "For security reasons, returned items must not contain any engravings or markings, such as \"Gold,\" \"Jewelry,\" or similar inscriptions."
-  },
-  "moneyRefund": {
-    "title": "3. Refunds",
-    "bullet1": "If the returned item meets the stated conditions, a refund will be issued using the same payment method used for the original purchase.",
-    "bullet2": "Refunds for card payments will be processed within up to 7 business days, depending on the bank’s processing time.",
-    "bullet3": "Shipping fees are non-refundable, except in cases where we have sent the wrong item."
-  },
-  "orderCancellation": {
-    "title": "4. Order Cancellation",
-    "bullet1": "Orders can be canceled before shipment.",
-    "bullet2": "If the order has already been shipped, cancellation is not possible."
-  },
-  "personalizedOrders": {
-    "title": "5. Personalized Orders",
-    "description": "Personalized items, including engraved and custom-made products, cannot be returned or exchanged."
-  },
-  "nonReturnable": {
-    "title": "6. Non-Returnable Items",
-    "bullet1": "Personalized orders (engraved, custom-made products)",
-    "bullet2": "Items containing engravings or markings (e.g., \"Gold,\" \"Jewelry\") due to security reasons"
-  },
-  "specialNote": {
-    "label": "Special Note:",
-    "body": "If your item arrives damaged or there is an issue during delivery, please contact us immediately so we can find the best solution."
+  "title": "Return and Refund Policy",
+  "effectiveDateLabel": "Effective Date:",
+  "effectiveDate": "21.04.2026",
+  "lastUpdatedLabel": "Last Updated:",
+  "lastUpdated": "21.04.2026",
+  "intro": [
+    "At Smoky Concepts, every product we create represents a standard of quality and craftsmanship we are genuinely proud of. We use premium and semi-premium materials — including leather, gold, silver, carbon fiber, wood, and metal — and many of our pieces are made to order or customized for individual customers.",
+    "Because of the nature of our products, we handle all refund and return requests on a case-by-case basis with care, fairness, and a genuine commitment to customer satisfaction."
+  ],
+  "sections": [
+    {
+      "title": "1. Our General Approach",
+      "paragraphs": [
+        "We do not operate a blanket \"no questions asked\" return policy, nor do we apply a rigid one-size-fits-all rule. Instead, we evaluate each situation individually based on:"
+      ],
+      "list": [
+        "The nature of the product (standard vs. custom/personalized)",
+        "The condition in which the item was received",
+        "The reason for the return or refund request",
+        "Supporting documentation provided (photos, descriptions)"
+      ],
+      "trailingParagraphs": [
+        "We ask that you contact us promptly and honestly, and we commit to responding with the same."
+      ]
+    },
+    {
+      "title": "2. When a Refund or Replacement Is Offered",
+      "paragraphs": [
+        "We will offer a refund, replacement, or exchange in the following situations:"
+      ],
+      "list": [
+        "Damaged on arrival — the item arrived physically damaged due to shipping or handling.",
+        "Manufacturing defect — the item has a verifiable defect in materials or craftsmanship that was not caused by the customer.",
+        "Wrong item received — you received a product materially different from what you ordered.",
+        "Significantly misrepresented product — the product is substantially different from its description or agreed specifications in a material way.",
+        "In these cases, we ask that you contact us within 7 days of receiving your order with photos and a description of the issue."
+      ]
+    },
+    {
+      "title": "3. Custom and Personalized Orders",
+      "paragraphs": [
+        "Custom-made and personalized items are crafted specifically for you. As a result:"
+      ],
+      "list": [
+        "Custom and personalized orders are not eligible for return or refund solely due to a change of mind.",
+        "Refunds or replacements for custom items are only considered in the cases listed in Section 2 above (damage, defect, or wrong item).",
+        "It is the customer's responsibility to ensure all customization details are accurate at the time of ordering. We are not liable for errors resulting from incorrect specifications submitted by the customer."
+      ]
+    },
+    {
+      "title": "4. Change of Mind",
+      "paragraphs": [
+        "We understand that purchasing a luxury item is a considered decision. However, because our products are premium, handcrafted, and often made to order:"
+      ],
+      "list": [
+        "We do not accept returns or offer refunds solely on the basis of a change of mind.",
+        "If you are unsure about a product before purchasing, we encourage you to contact us first — we are happy to answer questions, share additional photos, or provide further information before you commit."
+      ]
+    },
+    {
+      "title": "5. How to Request a Refund or Return",
+      "paragraphs": [
+        "To initiate a refund or return request:"
+      ],
+      "list": [
+        "Contact us at smokyconcepts@gmail.com or via website within 7 days of receiving your order.",
+        "Include your order number, a clear description of the issue, and supporting photos where applicable.",
+        "Our team will review your request and respond within 3–5 business days.",
+        "If your request is approved, we will provide instructions for returning the item (if applicable) and confirm the resolution — whether a refund, replacement, or exchange."
+      ]
+    },
+    {
+      "title": "6. Return Shipping",
+      "list": [
+        "If a return is approved due to a defect, damage, or our error, we will cover return shipping costs.",
+        "If a return is approved under other circumstances (at our discretion), the customer may be responsible for return shipping costs depending on the case.",
+        "Items must be returned in their original condition and packaging where possible. Items returned in damaged or used condition may not be eligible for a full refund."
+      ]
+    },
+    {
+      "title": "7. Refund Processing",
+      "list": [
+        "Approved refunds will be processed to your original payment method within 7–14 business days, depending on your payment provider.",
+        "We will notify you once the refund has been issued."
+      ]
+    },
+    {
+      "title": "8. Non-Returnable Items",
+      "paragraphs": [
+        "The following are generally not eligible for return or refund:"
+      ],
+      "list": [
+        "Custom or personalized items (unless defective or damaged)",
+        "Items returned without prior approval from us",
+        "Items that have been used, altered, or damaged by the customer",
+        "Items returned outside the applicable return window"
+      ]
+    },
+    {
+      "title": "9. Consumer Rights",
+      "paragraphs": [
+        "Nothing in this Refund Policy limits any statutory rights you may have under the laws of your country of residence. Customers located in the European Union retain all rights afforded under applicable EU consumer protection legislation."
+      ]
+    },
+    {
+      "title": "10. Contact Us",
+      "paragraphs": [
+        "For any refund, return, or product concern, please reach out to us directly:",
+        "We are committed to resolving every issue fairly and with respect for both sides."
+      ]
+    }
+  ],
+  "contact": {
+    "name": "Smoky Concepts",
+    "emailLabel": "Email:",
+    "email": "smokyconcepts@gmail.com",
+    "phoneLabel": "Phone:",
+    "phone": "+37443151551",
+    "address": "Yerevan, Republic of Armenia"
   }
 }
