@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Button, Card } from '@shop/ui';
+import { Button, Card, Input } from '@shop/ui';
 
 import { showToast } from '../../../components/Toast';
 import { apiClient } from '../../../lib/api-client';
@@ -11,7 +11,6 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { logger } from '../../../lib/utils/logger';
 import { AdminSidebar } from '../components/AdminSidebar';
 
-import { VotingCampaignModal } from './components/VotingCampaignModal';
 import { useVotingList } from './hooks/useVotingList';
 
 export default function VotingPage() {
@@ -20,8 +19,8 @@ export default function VotingPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { votings, loading, fetchVotings } = useVotingList();
-  const [showCampaignModal, setShowCampaignModal] = useState(false);
-  const [savingCampaign, setSavingCampaign] = useState(false);
+  const [newVotingTitle, setNewVotingTitle] = useState('');
+  const [savingVoting, setSavingVoting] = useState(false);
   const [busyVotingId, setBusyVotingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,47 +35,34 @@ export default function VotingPage() {
     }
   }, [fetchVotings, isAdmin, isLoggedIn]);
 
-  const analytics = useMemo(() => {
-    const totalItems = votings.reduce((sum, v) => sum + v.itemCount, 0);
-    const totalLikes = votings.reduce((sum, v) => sum + v.totalLikes, 0);
+  const handleCreateVoting = useCallback(async () => {
+    const title = newVotingTitle.trim();
+    if (!title) {
+      showToast(t('admin.voting.votingNameRequired'), 'warning');
+      return;
+    }
 
-    return {
-      totalVotings: votings.length,
-      totalItems,
-      totalLikes,
-    };
-  }, [votings]);
+    setSavingVoting(true);
 
-  const handleCreateVoting = useCallback(
-    async (title: string) => {
-      if (!title) {
-        showToast(t('admin.voting.votingNameRequired'), 'warning');
-        return;
-      }
-
-      setSavingCampaign(true);
-
-      try {
-        const response = await apiClient.post<{ data: { id: string } }>('/api/v1/admin/voting', {
-          title,
-        });
-        setShowCampaignModal(false);
-        await fetchVotings();
-        showToast(t('admin.voting.votingCreatedSuccess'), 'success');
-        router.push(`/admin/voting/${response.data.id}`);
-      } catch (error: unknown) {
-        logger.error('Error creating voting', { error });
-        const message =
-          error && typeof error === 'object' && 'data' in error
-            ? (error as { data?: { detail?: string } }).data?.detail
-            : t('admin.voting.errorCreatingVoting');
-        showToast(message || t('admin.voting.errorCreatingVoting'), 'error');
-      } finally {
-        setSavingCampaign(false);
-      }
-    },
-    [fetchVotings, router, t],
-  );
+    try {
+      const response = await apiClient.post<{ data: { id: string } }>('/api/v1/admin/voting', {
+        title,
+      });
+      setNewVotingTitle('');
+      await fetchVotings();
+      showToast(t('admin.voting.votingCreatedSuccess'), 'success');
+      router.push(`/admin/voting/${response.data.id}`);
+    } catch (error: unknown) {
+      logger.error('Error creating voting', { error });
+      const message =
+        error && typeof error === 'object' && 'data' in error
+          ? (error as { data?: { detail?: string } }).data?.detail
+          : t('admin.voting.errorCreatingVoting');
+      showToast(message || t('admin.voting.errorCreatingVoting'), 'error');
+    } finally {
+      setSavingVoting(false);
+    }
+  }, [fetchVotings, newVotingTitle, router, t]);
 
   const togglePublished = useCallback(
     async (id: string, published: boolean) => {
@@ -155,42 +141,44 @@ export default function VotingPage() {
             </svg>
             {t('admin.voting.backToAdmin')}
           </button>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{t('admin.voting.title')}</h1>
-              <p className="mt-2 text-sm text-gray-600">{t('admin.voting.subtitleList')}</p>
-            </div>
-            <Button
-              variant="primary"
-              onClick={() => setShowCampaignModal(true)}
-              className="flex items-center gap-2"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              {t('admin.voting.addVoting')}
-            </Button>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900">{t('admin.voting.title')}</h1>
+          <p className="mt-2 text-sm text-gray-600">{t('admin.voting.subtitleList')}</p>
         </div>
 
         <div className="flex flex-col gap-8 lg:flex-row">
           <AdminSidebar currentPath={pathname || '/admin/voting'} router={router} t={t} />
 
           <div className="min-w-0 flex-1 space-y-6">
-            <div className="grid gap-4 md:grid-cols-3">
-              <Card className="p-5">
-                <p className="text-sm font-medium text-gray-500">{t('admin.voting.totalVotings')}</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900">{analytics.totalVotings}</p>
-              </Card>
-              <Card className="p-5">
-                <p className="text-sm font-medium text-gray-500">{t('admin.voting.totalItemsAll')}</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900">{analytics.totalItems}</p>
-              </Card>
-              <Card className="p-5">
-                <p className="text-sm font-medium text-gray-500">{t('admin.voting.totalLikes')}</p>
-                <p className="mt-2 text-3xl font-bold text-gray-900">{analytics.totalLikes}</p>
-              </Card>
-            </div>
+            <Card className="p-4 sm:p-6">
+              <h2 className="text-lg font-semibold text-gray-900">{t('admin.voting.newVotingSection')}</h2>
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div className="flex-1">
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {t('admin.voting.votingNameField')}
+                  </label>
+                  <Input
+                    value={newVotingTitle}
+                    onChange={(e) => setNewVotingTitle(e.target.value)}
+                    placeholder={t('admin.voting.votingNamePlaceholder')}
+                    disabled={savingVoting}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        void handleCreateVoting();
+                      }
+                    }}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={() => void handleCreateVoting()}
+                  disabled={savingVoting || !newVotingTitle.trim()}
+                >
+                  {savingVoting ? t('admin.voting.creatingVoting') : t('admin.voting.createVoting')}
+                </Button>
+              </div>
+            </Card>
 
             <Card className="p-6">
               {loading ? (
@@ -242,7 +230,7 @@ export default function VotingPage() {
                         <div className="mt-4 flex flex-wrap gap-2">
                           <Button
                             variant="primary"
-                            className="flex-1 min-w-[8rem]"
+                            className="min-w-[8rem] flex-1"
                             onClick={() => router.push(`/admin/voting/${voting.id}`)}
                             disabled={disabled}
                           >
@@ -266,13 +254,6 @@ export default function VotingPage() {
           </div>
         </div>
       </div>
-
-      <VotingCampaignModal
-        isOpen={showCampaignModal}
-        saving={savingCampaign}
-        onClose={() => setShowCampaignModal(false)}
-        onSubmit={handleCreateVoting}
-      />
     </div>
   );
 }
