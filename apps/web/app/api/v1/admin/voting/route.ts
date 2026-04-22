@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const result = await adminService.getVotingItems();
+    const result = await adminService.listVotings();
     return NextResponse.json(result);
   } catch (error: unknown) {
     return createErrorResponse(error, req.url);
@@ -67,10 +67,9 @@ export async function POST(req: NextRequest) {
 
     const body = (await req.json()) as {
       title?: string;
-      imageUrl?: string;
     };
 
-    const result = await adminService.createVotingItem(body);
+    const result = await adminService.createVoting(body);
     return NextResponse.json(result, { status: 201 });
   } catch (error: unknown) {
     return createErrorResponse(error, req.url);

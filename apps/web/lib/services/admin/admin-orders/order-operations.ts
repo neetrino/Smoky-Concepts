@@ -25,7 +25,15 @@ export async function getOrders(filters: OrderFilters = {}) {
       take: limit,
       orderBy,
       include: {
-        items: true,
+        items: {
+          include: {
+            variant: {
+              select: {
+                attributes: true,
+              },
+            },
+          },
+        },
         user: {
           select: {
             id: true,

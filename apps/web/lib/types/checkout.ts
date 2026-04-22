@@ -9,6 +9,7 @@ export interface CheckoutData {
     quantity: number;
     /** Size catalog pick from PDP (optional) */
     sizeCatalogTitle?: string;
+    sizeCatalogVersion?: string;
     sizeCatalogImageUrl?: string;
     /** PDP text customize (optional; sanitized server-side) */
     customizePlain?: string;

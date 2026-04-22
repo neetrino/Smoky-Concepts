@@ -23,7 +23,7 @@ export interface AdminMenuItem {
   id: string;
   label: string;
   path: string;
-  icon: ReactNode;
+  icon?: ReactNode;
   isSubCategory?: boolean;
   /** Indented further under a sub-category (e.g. Sizes under Attributes). */
   isNestedSubCategory?: boolean;
@@ -115,8 +115,9 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
               {tabs.map((tab) => {
                 const isActive =
                   currentPath === tab.path ||
+                  (tab.path === '/' && currentPath === '/') ||
                   (tab.path === '/admin' && currentPath === '/admin') ||
-                  (tab.path !== '/admin' && currentPath.startsWith(tab.path));
+                  (tab.path !== '/' && tab.path !== '/admin' && currentPath.startsWith(tab.path));
 
                 return (
                   <button
@@ -128,7 +129,7 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
                     )} ${isActive ? adminDrawerRowActiveClass(theme) : adminDrawerRowInactiveClass(theme)}`}
                   >
                     <span className="flex items-center gap-3">
-                      <span className={adminDrawerRowIconClass(isActive, theme)}>{tab.icon}</span>
+                      {tab.icon ? <span className={adminDrawerRowIconClass(isActive, theme)}>{tab.icon}</span> : null}
                       {tab.label}
                     </span>
                     <svg

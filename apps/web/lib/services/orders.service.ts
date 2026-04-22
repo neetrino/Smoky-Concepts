@@ -135,6 +135,7 @@ class OrdersService {
         sku: string;
         imageUrl?: string;
         sizeCatalogTitle?: string;
+        sizeCatalogVersion?: string;
         sizeCatalogImageUrl?: string;
         customizePlain?: string | null;
         customizeHtml?: string | null;
@@ -156,6 +157,7 @@ class OrdersService {
               variantId: string;
               quantity: number;
               sizeCatalogTitle?: string;
+              sizeCatalogVersion?: string;
               sizeCatalogImageUrl?: string;
               customizePlain?: string;
               customizeHtml?: string;
@@ -253,6 +255,12 @@ class OrdersService {
             let sizeCatalogTitle =
               rawCatalogTitle.length > 0 && rawCatalogTitle.length <= SIZE_CATALOG_TITLE_MAX
                 ? rawCatalogTitle
+                : undefined;
+            const rawCatalogVersion =
+              typeof item.sizeCatalogVersion === 'string' ? item.sizeCatalogVersion.trim() : '';
+            const sizeCatalogVersion =
+              sizeCatalogTitle !== undefined && rawCatalogVersion.length > 0
+                ? rawCatalogVersion.slice(0, 32)
                 : undefined;
             let sizeCatalogImageUrl =
               sizeCatalogTitle !== undefined
@@ -364,6 +372,7 @@ class OrdersService {
               sku: variant.sku || '',
               imageUrl,
               sizeCatalogTitle,
+              sizeCatalogVersion,
               sizeCatalogImageUrl,
               customizePlain,
               customizeHtml,
@@ -457,6 +466,7 @@ class OrdersService {
                 total: item.price * item.quantity,
                 imageUrl: item.imageUrl,
                 sizeCatalogTitle: item.sizeCatalogTitle ?? null,
+                sizeCatalogVersion: item.sizeCatalogVersion ?? null,
                 sizeCatalogImageUrl: item.sizeCatalogImageUrl ?? null,
                 customizePlain: item.customizePlain ?? null,
                 customizeHtml: item.customizeHtml ?? null,
@@ -805,6 +815,7 @@ class OrdersService {
         const variantOptions = mergeSizeCatalogIntoVariantOptions(
           variantOptionsBase,
           item.sizeCatalogTitle,
+          item.sizeCatalogVersion,
           item.sizeCatalogImageUrl
         );
 
@@ -826,6 +837,7 @@ class OrdersService {
           total: Number(item.total),
           imageUrl: item.imageUrl || undefined,
           variantOptions,
+          sizeCatalogVersion: item.sizeCatalogVersion?.trim() || undefined,
           customizePlain: item.customizePlain?.trim() || undefined,
           customizeHtml: item.customizeHtml?.trim() || undefined,
         };

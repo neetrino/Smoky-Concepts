@@ -8,6 +8,8 @@ import { parseStoredCustomizeForOrderDisplay } from '@/lib/orders/parse-stored-c
 export type OrderCustomizeBlockProps = {
   customizeHtml?: string | null;
   customizePlain?: string | null;
+  sizeCatalogVersion?: string | null;
+  showVersion?: boolean;
   /** Tighter layout for admin order table cells */
   compact?: boolean;
   /** Hide the inner "Customization" title (e.g. when the parent card already has a heading). */
@@ -45,6 +47,8 @@ function FormatToggle({
 export function OrderCustomizeBlock({
   customizeHtml,
   customizePlain,
+  sizeCatalogVersion,
+  showVersion = false,
   compact = false,
   hideHeading = false,
 }: OrderCustomizeBlockProps) {
@@ -79,6 +83,7 @@ export function OrderCustomizeBlock({
   const valueCls = 'text-sm text-gray-900';
   const fieldLabelCls = compact ? 'text-sm text-gray-500 shrink-0' : 'text-xs text-gray-500 shrink-0';
   const rowCls = 'flex flex-row items-start gap-2';
+  const versionValue = sizeCatalogVersion?.trim() || '';
 
   return (
     <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
@@ -94,6 +99,12 @@ export function OrderCustomizeBlock({
           <div className={rowCls}>
             <dt className={fieldLabelCls}>{t('orders.itemDetails.customize_font')}</dt>
             <dd className={`${valueCls} min-w-0 flex-1`}>{fontLabel || '—'}</dd>
+          </div>
+        ) : null}
+        {showVersion && versionValue ? (
+          <div className={rowCls}>
+            <dt className={fieldLabelCls}>{t('orders.itemDetails.version')}</dt>
+            <dd className={`${valueCls} min-w-0 flex-1`}>{versionValue}</dd>
           </div>
         ) : null}
 

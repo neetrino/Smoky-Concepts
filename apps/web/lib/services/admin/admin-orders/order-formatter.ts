@@ -19,8 +19,38 @@ type VariantOptionFromAttributes = {
   } | null;
 };
 
+type OrderListVariantPreview = {
+  label: string;
+  imageUrl?: string;
+  colorLabel?: string;
+  colorHex?: string;
+};
+
 function getVariantOptions(attributes: unknown): VariantOptionFromAttributes[] {
   return Array.isArray(attributes) ? (attributes as VariantOptionFromAttributes[]) : [];
+}
+
+function getFirstColorHex(colors: unknown): string | undefined {
+  if (Array.isArray(colors)) {
+    const first = colors.find((item): item is string => typeof item === 'string' && item.trim().length > 0);
+    return first?.trim();
+  }
+
+  if (typeof colors === 'string') {
+    const trimmed = colors.trim();
+    if (!trimmed) return undefined;
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        const first = parsed.find((item): item is string => typeof item === 'string' && item.trim().length > 0);
+        return first?.trim();
+      }
+    } catch {
+      return undefined;
+    }
+  }
+
+  return undefined;
 }
 
 /**
@@ -41,7 +71,14 @@ export function formatOrderForList(order: {
   customerEmail: string | null;
   customerPhone: string | null;
   createdAt: Date;
-  items: Array<unknown>;
+  items: Array<{
+    sizeCatalogTitle?: string | null;
+    sizeCatalogVersion?: string | null;
+    sizeCatalogImageUrl?: string | null;
+    variant?: {
+      attributes?: unknown;
+    } | null;
+  }>;
   user?: {
     id: string;
     firstName: string | null;
@@ -50,9 +87,123 @@ export function formatOrderForList(order: {
     phone: string | null;
   } | null;
 }) {
+  const buildOrderVariantPreviews = (
+    items: Array<{
+      sizeCatalogTitle?: string | null;
+      sizeCatalogVersion?: string | null;
+      sizeCatalogImageUrl?: string | null;
+      variant?: {
+        attributes?: unknown;
+      } | null;
+    }>
+  ): { previews: OrderListVariantPreview[]; hasMore: number } => {
+    const previews: OrderListVariantPreview[] = [];
+
+    for (const item of items) {
+      const variantOptionsBase = getVariantOptions(item.variant?.attributes).map(formatVariantOption);
+      const variantOptions = mergeSizeCatalogIntoVariantOptions(
+        variantOptionsBase,
+        item.sizeCatalogTitle,
+        item.sizeCatalogVersion,
+        item.sizeCatalogImageUrl
+      );
+
+      const colorOption = variantOptions.find((opt) => {
+        const key = opt.attributeKey?.toLowerCase().trim();
+        return key === 'color' || key === 'colour';
+      });
+      const sizeOption = variantOptions.find((opt) => opt.attributeKey?.toLowerCase().trim() === 'size');
+
+      const colorLabel = (colorOption?.label || colorOption?.value || '').trim();
+      const sizeLabel = (sizeOption?.label || sizeOption?.value || '').trim();
+      const imageUrl = (sizeOption?.imageUrl || colorOption?.imageUrl || '').trim() || undefined;
+      const colorHex = getFirstColorHex(colorOption?.colors);
+
+      const label = colorLabel && sizeLabel ? `${colorLabel} / ${sizeLabel}` : colorLabel || sizeLabel;
+      if (!label) continue;
+
+      const nextPreview: OrderListVariantPreview = {
+        label,
+        ...(imageUrl ? { imageUrl } : {}),
+        ...(colorLabel ? { colorLabel } : {}),
+        ...(colorHex ? { colorHex } : {}),
+      };
+
+      const duplicate = previews.some(
+        (preview) =>
+          preview.label === nextPreview.label &&
+          preview.imageUrl === nextPreview.imageUrl &&
+          preview.colorHex === nextPreview.colorHex
+      );
+      if (!duplicate) {
+        previews.push(nextPreview);
+      }
+    }
+
+    if (previews.length <= 2) {
+      return { previews, hasMore: 0 };
+    }
+    return { previews: previews.slice(0, 2), hasMore: previews.length - 2 };
+  };
+
+  const buildOrderColorSizeSummary = (
+    items: Array<{
+      sizeCatalogTitle?: string | null;
+      sizeCatalogVersion?: string | null;
+      sizeCatalogImageUrl?: string | null;
+      variant?: {
+        attributes?: unknown;
+      } | null;
+    }>
+  ): string | null => {
+    const labels = items
+      .map((item) => {
+        const variantOptionsBase = getVariantOptions(item.variant?.attributes).map(formatVariantOption);
+        const variantOptions = mergeSizeCatalogIntoVariantOptions(
+          variantOptionsBase,
+          item.sizeCatalogTitle,
+          item.sizeCatalogVersion,
+          item.sizeCatalogImageUrl
+        );
+
+        let colorLabel: string | null = null;
+        let sizeLabel: string | null = null;
+
+        for (const option of variantOptions) {
+          const key = option.attributeKey?.toLowerCase().trim();
+          const value = (option.label || option.value || '').trim();
+          if (!value || !key) continue;
+
+          if ((key === 'color' || key === 'colour') && !colorLabel) {
+            colorLabel = value;
+          }
+          if (key === 'size' && !sizeLabel) {
+            sizeLabel = value;
+          }
+        }
+
+        if (colorLabel && sizeLabel) return `${colorLabel} / ${sizeLabel}`;
+        return colorLabel || sizeLabel || null;
+      })
+      .filter((label): label is string => Boolean(label && label.trim()));
+
+    if (labels.length === 0) {
+      return null;
+    }
+
+    const uniqueLabels = Array.from(new Set(labels));
+    if (uniqueLabels.length <= 2) {
+      return uniqueLabels.join(', ');
+    }
+
+    return `${uniqueLabels.slice(0, 2).join(', ')} +${uniqueLabels.length - 2}`;
+  };
+
   const customer = order.user || null;
   const firstName = customer?.firstName || '';
   const lastName = customer?.lastName || '';
+  const colorSizeSummary = buildOrderColorSizeSummary(order.items);
+  const { previews: colorSizePreviews, hasMore: colorSizePreviewsHasMore } = buildOrderVariantPreviews(order.items);
 
   return {
     id: order.id,
@@ -72,6 +223,9 @@ export function formatOrderForList(order: {
     customerLastName: lastName,
     customerId: customer?.id || null,
     itemsCount: order.items.length,
+    colorSizeSummary,
+    colorSizePreviews,
+    colorSizePreviewsHasMore,
     createdAt: order.createdAt.toISOString(),
   };
 }
@@ -112,6 +266,7 @@ export function formatOrderItem(item: {
   quantity: number | null;
   total: number | null;
   sizeCatalogTitle?: string | null;
+  sizeCatalogVersion?: string | null;
   sizeCatalogImageUrl?: string | null;
   customizePlain?: string | null;
   customizeHtml?: string | null;
@@ -140,6 +295,7 @@ export function formatOrderItem(item: {
   const variantOptions = mergeSizeCatalogIntoVariantOptions(
     variantOptionsBase,
     item.sizeCatalogTitle,
+    item.sizeCatalogVersion,
     item.sizeCatalogImageUrl
   );
 
@@ -154,6 +310,7 @@ export function formatOrderItem(item: {
     unitPrice,
     variantOptions,
     sizeCatalogTitle: item.sizeCatalogTitle?.trim() || null,
+    sizeCatalogVersion: item.sizeCatalogVersion?.trim() || null,
     sizeCatalogImageUrl: item.sizeCatalogImageUrl?.trim() || null,
     customizePlain: item.customizePlain?.trim() || null,
     customizeHtml: item.customizeHtml?.trim() || null,
@@ -201,6 +358,7 @@ export function formatOrderForDetail(order: {
     quantity: number | null;
     total: number | null;
     sizeCatalogTitle?: string | null;
+    sizeCatalogVersion?: string | null;
     sizeCatalogImageUrl?: string | null;
     customizePlain?: string | null;
     customizeHtml?: string | null;

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import {
   FOOTER_LINKS,
@@ -14,6 +15,11 @@ import { useTranslation } from '@/lib/i18n-client';
  * Main footer aligned with the Figma homepage design.
  */
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
+
   const { t } = useTranslation();
   return (
     <footer className="bg-[#122a26]">

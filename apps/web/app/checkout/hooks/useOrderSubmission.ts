@@ -28,6 +28,7 @@ export function useOrderSubmission({
 
       const items = cart.items.map((item: CartItem) => {
         const title = item.variant.sizeCatalogTitle?.trim();
+        const version = item.variant.sizeCatalogVersion?.trim();
         const img = item.variant.sizeCatalogImageUrl?.trim();
         const cPlain = item.variant.customizePlain?.trim();
         const cHtml = item.variant.customizeHtml?.trim();
@@ -39,6 +40,7 @@ export function useOrderSubmission({
           ...(title
             ? {
                 sizeCatalogTitle: title,
+                ...(version ? { sizeCatalogVersion: version } : {}),
                 ...(img ? { sizeCatalogImageUrl: img } : {}),
               }
             : {}),

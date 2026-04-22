@@ -7,6 +7,7 @@ export interface OrderItem {
   price: number;
   total: number;
   imageUrl?: string;
+  sizeCatalogVersion?: string | null;
   customizePlain?: string;
   customizeHtml?: string;
   variantOptions?: Array<{

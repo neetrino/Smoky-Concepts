@@ -116,7 +116,7 @@ export function VotingFormModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6">
         <h3 className="mb-4 text-lg font-semibold text-gray-900">
-          {isCreateMode ? t('admin.voting.addItem') : t('admin.voting.editItem')}
+          {isCreateMode ? t('admin.voting.addChoice') : t('admin.voting.editChoice')}
         </h3>
 
         <div className="space-y-4">
@@ -219,8 +219,8 @@ export function VotingFormModal({
                 ? t('admin.voting.creating')
                 : t('admin.voting.updating')
               : isCreateMode
-                ? t('admin.voting.createItem')
-                : t('admin.voting.updateItem')}
+                ? t('admin.voting.createChoice')
+                : t('admin.voting.updateChoice')}
           </Button>
           <Button variant="ghost" onClick={onClose} disabled={saving || uploading}>
             {t('admin.common.cancel')}

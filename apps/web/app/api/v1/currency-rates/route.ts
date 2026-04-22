@@ -8,7 +8,9 @@ export async function GET() {
   try {
     const settings = await adminService.getSettings();
     const rates = settings.currencyRates || {
-      USD: 1,
+      AMD: 1,
+      USD: 1 / 400,
+      RUB: 0.2,
     };
     
     return NextResponse.json(rates);
@@ -16,7 +18,9 @@ export async function GET() {
     console.error("❌ [CURRENCY RATES] Error:", error);
     // Return default rates on error
     return NextResponse.json({
-      USD: 1,
+      AMD: 1,
+      USD: 1 / 400,
+      RUB: 0.2,
     });
   }
 }

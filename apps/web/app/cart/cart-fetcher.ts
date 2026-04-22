@@ -28,6 +28,7 @@ function cartItemFromGuestSnapshot(item: GuestCartItem, index: number): CartItem
       sku: item.sku ?? '',
       sizeLabel: item.sizeLabel ?? null,
       sizeCatalogTitle: item.sizeCatalogTitle ?? null,
+      sizeCatalogVersion: item.sizeCatalogVersion ?? null,
       sizeCatalogImageUrl: item.sizeCatalogImageUrl ?? null,
       customizePlain: item.customizePlain ?? null,
       customizeHtml: item.customizeHtml ?? null,

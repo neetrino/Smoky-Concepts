@@ -1,18 +1,39 @@
 import type { AdminMenuItem } from '../../components/AdminMenuDrawer';
 
+/** Toggle when the "Filter by price" admin screen should be listed in the nav again. */
+export const ADMIN_MENU_SHOW_FILTER_BY_PRICE = false;
+
 /**
  * Unified admin navigation configuration.
  *
  * ԿԱՐԵՎՈՐ.
  * - Մենյուի բոլոր կետերը centrally պահում ենք այստեղ, որ բոլոր admin էջերում նույնը լինի։
  * - "Discounts" label-ը նույնն է ամեն տեղ, ուղիղ տանում է `/admin/quick-settings` էջ։
- * - "Delivery" կետը միշտ առկա է, այդ թվում Analytics և Filter by Price էջերում sidebar-ում։
+ * - "Delivery" կետը միշտ առկա է sidebar-ում (Analytics-ի հետ միասին)։
  * 
  * Note: This function returns menu items with translated labels.
  * Use getAdminMenuTabs(t) in client components where t is from useTranslation().
  */
 export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
-  return [
+  const translatedHomeLabel = t('admin.menu.home');
+  const homeLabel = translatedHomeLabel === 'admin.menu.home' ? 'Home' : translatedHomeLabel;
+
+  const tabs: AdminMenuItem[] = [
+  {
+    id: 'site-home',
+    label: homeLabel,
+    path: '/',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 10.5l9-7 9 7M5.25 8.75V20.25H18.75V8.75M9.75 20.25V14.25H14.25V20.25"
+        />
+      </svg>
+    ),
+  },
   {
     id: 'dashboard',
     label: t('admin.menu.dashboard'),
@@ -110,17 +131,6 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     label: t('admin.menu.sizes'),
     path: '/admin/sizes',
     isSubCategory: true,
-    isNestedSubCategory: true,
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4 8V6a2 2 0 012-2h2m8 0h2a2 2 0 012 2v2m0 8v2a2 2 0 01-2 2h-2m-8 0H6a2 2 0 01-2-2v-2M9 12h6"
-        />
-      </svg>
-    ),
   },
   {
     id: 'quick-settings',
@@ -234,6 +244,9 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     ),
   },
   ];
+  return ADMIN_MENU_SHOW_FILTER_BY_PRICE
+    ? tabs
+    : tabs.filter((item) => item.id !== 'price-filter-settings');
 }
 
 

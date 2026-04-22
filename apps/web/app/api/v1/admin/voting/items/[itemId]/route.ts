@@ -45,7 +45,7 @@ async function ensureAdmin(req: NextRequest) {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ itemId: string }> },
 ) {
   const adminError = await ensureAdmin(req);
 
@@ -54,8 +54,8 @@ export async function GET(
   }
 
   try {
-    const { id } = await params;
-    const item = await adminService.getVotingItemById(id);
+    const { itemId } = await params;
+    const item = await adminService.getVotingItemById(itemId);
 
     if (!item) {
       return NextResponse.json(
@@ -63,7 +63,7 @@ export async function GET(
           type: "https://api.shop.am/problems/not-found",
           title: "Voting item not found",
           status: 404,
-          detail: `Voting item with id '${id}' does not exist`,
+          detail: `Voting item with id '${itemId}' does not exist`,
           instance: req.url,
         },
         { status: 404 },
@@ -78,7 +78,7 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ itemId: string }> },
 ) {
   const adminError = await ensureAdmin(req);
 
@@ -87,13 +87,13 @@ export async function PUT(
   }
 
   try {
-    const { id } = await params;
+    const { itemId } = await params;
     const body = (await req.json()) as {
       title?: string;
       imageUrl?: string;
     };
 
-    const result = await adminService.updateVotingItem(id, body);
+    const result = await adminService.updateVotingItem(itemId, body);
     return NextResponse.json(result);
   } catch (error: unknown) {
     return createErrorResponse(error, req.url);
@@ -102,7 +102,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ itemId: string }> },
 ) {
   const adminError = await ensureAdmin(req);
 
@@ -111,8 +111,8 @@ export async function DELETE(
   }
 
   try {
-    const { id } = await params;
-    const result = await adminService.deleteVotingItem(id);
+    const { itemId } = await params;
+    const result = await adminService.deleteVotingItem(itemId);
     return NextResponse.json(result);
   } catch (error: unknown) {
     return createErrorResponse(error, req.url);

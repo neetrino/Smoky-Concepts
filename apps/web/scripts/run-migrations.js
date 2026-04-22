@@ -39,14 +39,40 @@ if (!process.env.DIRECT_URL && process.env.DATABASE_URL) {
   process.env.DIRECT_URL = process.env.DATABASE_URL;
 }
 
+function isLocalDatabase(url) {
+  if (!url) return false;
+  return (
+    url.includes('localhost') ||
+    url.includes('127.0.0.1') ||
+    url.includes('host.docker.internal')
+  );
+}
+
 process.chdir(dbPath);
+
+const dbUrl = process.env.DATABASE_URL || '';
+const isLocalDb = isLocalDatabase(dbUrl);
+const allowNonLocalMigrations = process.env.ALLOW_NON_LOCAL_DB_MIGRATIONS === 'true';
+const allowDbPushFallback = process.env.ALLOW_DB_PUSH_FALLBACK === 'true';
+
+if (!isLocalDb && !allowNonLocalMigrations) {
+  console.log('⏭️  Skipping automatic migrations for non-local database.');
+  console.log('   Set ALLOW_NON_LOCAL_DB_MIGRATIONS=true to enable.');
+  process.exit(0);
+}
 
 try {
   console.log('🔄 Attempting to deploy migrations...');
   execSync('npm run db:migrate:deploy', { stdio: 'inherit' });
   console.log('✅ Migrations deployed successfully');
 } catch (error) {
-  console.log('⚠️  Migration deploy failed, trying db:push...');
+  if (!allowDbPushFallback) {
+    console.log('⚠️  Migration deploy failed.');
+    console.log('   db:push fallback is disabled by default for safety.');
+    console.log('   Set ALLOW_DB_PUSH_FALLBACK=true to enable fallback.');
+    process.exit(0);
+  }
+  console.log('⚠️  Migration deploy failed, trying db:push fallback...');
   try {
     execSync('npm run db:push', { stdio: 'inherit' });
     console.log('✅ Database schema pushed successfully');
