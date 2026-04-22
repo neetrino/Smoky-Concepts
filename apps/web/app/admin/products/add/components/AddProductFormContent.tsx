@@ -60,6 +60,7 @@ interface AddProductFormContentProps {
   onDescriptionChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   onProductTypeChange: (type: 'simple' | 'variable') => void;
   onUploadImages: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
+  onUploadImageFiles: (files: File[]) => Promise<void>;
   onRemoveImage: (index: number) => void;
   onSetFeaturedImage: (index: number) => void;
   onCategoriesExpandedChange: (expanded: boolean) => void;
@@ -115,6 +116,7 @@ export function AddProductFormContent({
   onDescriptionChange,
   onProductTypeChange,
   onUploadImages,
+  onUploadImageFiles,
   onRemoveImage,
   onSetFeaturedImage,
   onCategoriesExpandedChange,
@@ -167,6 +169,7 @@ export function AddProductFormContent({
           imageUploadError={imageUploadError}
           fileInputRef={fileInputRef}
           onUploadImages={onUploadImages}
+          onUploadImageFiles={onUploadImageFiles}
           onRemoveImage={onRemoveImage}
           onSetFeaturedImage={onSetFeaturedImage}
         />

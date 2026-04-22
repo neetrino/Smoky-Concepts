@@ -462,16 +462,17 @@ export function ProductInfoAndActions({
 
   return (
     <>
-    <div className="max-w-[763px] min-w-0 w-full pt-1 xl:pt-36 2xl:pt-40">
-      <h1 className="font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
-        {productTitle}
-      </h1>
-
-      {productBadge && (
-        <div className="mt-3 inline-flex h-[18px] items-center rounded-[6px] bg-[#122a26] px-[7px] text-[12px] font-medium leading-none text-white">
-          {productBadge}
-        </div>
-      )}
+    <div className="max-w-[763px] min-w-0 w-full pt-0 xl:pt-24 2xl:pt-28">
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <h1 className="min-w-0 flex-1 truncate whitespace-nowrap font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
+          {productTitle}
+        </h1>
+        {productBadge && (
+          <div className="inline-flex h-[18px] shrink-0 items-center rounded-[6px] bg-[#122a26] px-[7px] text-[12px] font-medium leading-none text-white">
+            {productBadge}
+          </div>
+        )}
+      </div>
 
       {colorOptions.length > 0 && (
         <div className="mt-8">

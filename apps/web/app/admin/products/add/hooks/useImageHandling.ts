@@ -44,6 +44,7 @@ interface UseImageHandlingReturn {
   removeImageUrl: (index: number) => void;
   updateImageUrl: (index: number, url: string) => void;
   setFeaturedImage: (index: number) => void;
+  handleUploadImageFiles: (files: File[]) => Promise<void>;
   handleUploadImages: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   handleUploadVariantImage: (variantId: string, event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   handleUploadColorImages: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
@@ -66,6 +67,86 @@ export function useImageHandling({
   setColorImageTarget,
   t,
 }: UseImageHandlingProps): UseImageHandlingReturn {
+  const processAndUploadFiles = async (files: File[]): Promise<void> => {
+    if (files.length === 0) {
+      return;
+    }
+
+    console.log('📸 [UPLOAD] Starting upload of', files.length, 'image(s)');
+    setImageUploadLoading(true);
+    setImageUploadError(null);
+
+    try {
+      const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+      if (imageFiles.length === 0) {
+        setImageUploadError(t('admin.products.add.failedToProcessImages') || 'No valid image files selected');
+        return;
+      }
+
+      const uploadedImages: string[] = [];
+      const errors: string[] = [];
+
+      for (let index = 0; index < imageFiles.length; index += 1) {
+        const file = imageFiles[index];
+        try {
+          console.log(
+            `📸 [UPLOAD] Processing file ${index + 1}/${imageFiles.length}:`,
+            file.name,
+            `(${Math.round(file.size / 1024)}KB)`
+          );
+
+          const base64 = await processImageFile(file, {
+            maxSizeMB: 1.5,
+            maxWidthOrHeight: 1600,
+            useWebWorker: true,
+            fileType: getOutputFileType(file),
+            initialQuality: 0.85,
+          });
+
+          if (base64 && base64.trim()) {
+            uploadedImages.push(base64);
+          } else {
+            errors.push(`Failed to convert "${file.name}" to base64`);
+          }
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : 'Unknown error';
+          errors.push(`Error processing "${file.name}": ${message}`);
+        }
+      }
+
+      if (errors.length > 0) {
+        console.warn('⚠️ [UPLOAD] Errors during upload:', errors);
+        setImageUploadError(errors.join('; '));
+      }
+
+      if (uploadedImages.length === 0) {
+        setImageUploadError(t('admin.products.add.failedToProcessImages') || 'Failed to process images');
+        return;
+      }
+
+      const urls = await uploadImagesToR2(uploadedImages);
+      if (urls.length === 0) {
+        setImageUploadError(t('admin.products.add.failedToProcessImages') || 'Upload to storage failed');
+        return;
+      }
+
+      setImageUrls((prev) => {
+        const newImageUrls = [...prev, ...urls];
+        if (prev.length === 0 && newImageUrls.length > 0) {
+          setFeaturedImageIndex(0);
+          setMainProductImage(newImageUrls[0]);
+        }
+        return newImageUrls;
+      });
+    } catch (error: unknown) {
+      console.error('❌ [UPLOAD] Fatal error during upload:', error);
+      const message = error instanceof Error ? error.message : t('admin.products.add.failedToProcessImages');
+      setImageUploadError(message);
+    } finally {
+      setImageUploadLoading(false);
+    }
+  };
+
   const addImageUrl = () => {
     setImageUrls((prev) => [...prev, '']);
   };
@@ -131,100 +212,9 @@ export function useImageHandling({
 
   const handleUploadImages = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    if (files.length === 0) {
-      return;
-    }
-
-    console.log('📸 [UPLOAD] Starting upload of', files.length, 'image(s)');
-    setImageUploadLoading(true);
-    setImageUploadError(null);
-    try {
-      const uploadedImages: string[] = [];
-      const errors: string[] = [];
-
-      const filePromises = files.map(async (file, index) => {
-        try {
-          if (!file.type.startsWith('image/')) {
-            const errorMsg = `"${file.name}" is not an image file`;
-            console.warn(`⚠️ [UPLOAD] Skipping non-image file ${index + 1}/${files.length}:`, file.name);
-            return { success: false, error: errorMsg, index };
-          }
-
-          console.log(`📸 [UPLOAD] Processing file ${index + 1}/${files.length}:`, file.name, `(${Math.round(file.size / 1024)}KB)`);
-
-          const base64 = await processImageFile(file, {
-            maxSizeMB: 1.5,
-            maxWidthOrHeight: 1600,
-            useWebWorker: true,
-            fileType: getOutputFileType(file),
-            initialQuality: 0.85,
-          });
-
-          if (base64 && base64.trim()) {
-            console.log(`✅ [UPLOAD] Successfully processed file ${index + 1}/${files.length}:`, file.name);
-            return { success: true, base64, index };
-          } else {
-            const errorMsg = `Failed to convert "${file.name}" to base64`;
-            console.error(`❌ [UPLOAD] Empty base64 result for file ${index + 1}/${files.length}:`, file.name);
-            return { success: false, error: errorMsg, index };
-          }
-        } catch (error: any) {
-          const errorMsg = `Error processing "${file.name}": ${error?.message || 'Unknown error'}`;
-          console.error(`❌ [UPLOAD] Error processing file ${index + 1}/${files.length}:`, file.name, error);
-          return { success: false, error: errorMsg, index };
-        }
-      });
-
-      const results = await Promise.allSettled(filePromises);
-
-      results.forEach((result) => {
-        if (result.status === 'fulfilled') {
-          const fileResult = result.value;
-          if (fileResult.success && fileResult.base64) {
-            uploadedImages.push(fileResult.base64);
-          } else if (!fileResult.success && fileResult.error) {
-            errors.push(fileResult.error);
-          }
-        } else {
-          const errorMsg = `Failed to process file: ${result.reason?.message || 'Unknown error'}`;
-          errors.push(errorMsg);
-          console.error(`❌ [UPLOAD] Promise rejected:`, result.reason);
-        }
-      });
-
-      console.log('📸 [UPLOAD] Upload complete. Processed:', uploadedImages.length, 'of', files.length, 'files');
-      if (errors.length > 0) {
-        console.warn('⚠️ [UPLOAD] Errors during upload:', errors);
-        setImageUploadError(errors.join('; '));
-      }
-
-      if (uploadedImages.length === 0) {
-        setImageUploadError(t('admin.products.add.failedToProcessImages') || 'Failed to process images');
-        return;
-      }
-
-      const urls = await uploadImagesToR2(uploadedImages);
-      if (urls.length === 0) {
-        setImageUploadError(t('admin.products.add.failedToProcessImages') || 'Upload to storage failed');
-        return;
-      }
-
-      setImageUrls((prev) => {
-        const newImageUrls = [...prev, ...urls];
-        if (prev.length === 0 && newImageUrls.length > 0) {
-          setFeaturedImageIndex(0);
-          setMainProductImage(newImageUrls[0]);
-        }
-        return newImageUrls;
-      });
-    } catch (error: any) {
-      console.error('❌ [UPLOAD] Fatal error during upload:', error);
-      setImageUploadError(error?.message || t('admin.products.add.failedToProcessImages'));
-    } finally {
-      setImageUploadLoading(false);
-      if (event.target) {
-        event.target.value = '';
-      }
+    await processAndUploadFiles(files);
+    if (event.target) {
+      event.target.value = '';
     }
   };
 
@@ -344,6 +334,7 @@ export function useImageHandling({
     removeImageUrl,
     updateImageUrl,
     setFeaturedImage,
+    handleUploadImageFiles: processAndUploadFiles,
     handleUploadImages,
     handleUploadVariantImage,
     handleUploadColorImages,
