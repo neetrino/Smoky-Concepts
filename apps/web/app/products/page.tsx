@@ -1,5 +1,6 @@
 import { getStoredLanguage } from '../../lib/language';
 import { ProductsCatalogView } from './components/ProductsCatalogView';
+import { isClientSideCollectionFilterValue } from './components/catalogProductLabels';
 
 export const revalidate = 60;
 
@@ -120,11 +121,14 @@ interface ProductsPageProps {
  */
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = (searchParams ? await searchParams : {}) ?? {};
+  const categoryParam = typeof params.category === 'string' ? params.category : undefined;
+  const apiCategoryFilter =
+    categoryParam && !isClientSideCollectionFilterValue(categoryParam) ? categoryParam : undefined;
 
   const productsData = await getProducts(
     1,
     typeof params.search === 'string' ? params.search : undefined,
-    undefined,
+    apiCategoryFilter,
     9999
   );
 

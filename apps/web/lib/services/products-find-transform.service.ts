@@ -53,28 +53,34 @@ class ProductsFindTransformService {
     const categoryDiscountsSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "categoryDiscounts");
     const categoryDiscounts = categoryDiscountsSetting ? (categoryDiscountsSetting.value as Record<string, number>) || {} : {};
 
-    // When product.categories is empty but primaryCategoryId is set, fetch primary category for response
-    const primaryCategoryIds = [
+    // Build category fallback map from scalar category references on product.
+    // This keeps catalog/category filtering correct even when relation data is partial.
+    const fallbackCategoryIds = [
       ...new Set(
         products
-          .filter(
-            (p) =>
-              p.primaryCategoryId &&
-              (!Array.isArray(p.categories) || p.categories.length === 0)
-          )
-          .map((p) => p.primaryCategoryId as string)
+          .flatMap((p) => {
+            const relationCategoryIds = Array.isArray(p.categories)
+              ? p.categories.map((category) => category.id)
+              : [];
+            const scalarCategoryIds = Array.isArray(p.categoryIds) ? p.categoryIds : [];
+            const primaryCategoryId = p.primaryCategoryId ? [p.primaryCategoryId] : [];
+
+            return [...scalarCategoryIds, ...primaryCategoryId].filter(
+              (categoryId) => !relationCategoryIds.includes(categoryId)
+            );
+          })
       ),
     ];
-    const primaryCategories =
-      primaryCategoryIds.length > 0
+    const fallbackCategories =
+      fallbackCategoryIds.length > 0
         ? await db.category.findMany({
-            where: { id: { in: primaryCategoryIds } },
+            where: { id: { in: fallbackCategoryIds } },
             include: { translations: true },
           })
         : [];
     type CategoryOutput = { id: string; slug: string; title: string };
-    const primaryCategoryById = new Map<string, CategoryOutput>(
-      primaryCategories.map((cat: { id: string; translations?: Array<{ locale: string; slug: string; title: string }> }) => {
+    const fallbackCategoryById = new Map<string, CategoryOutput>(
+      fallbackCategories.map((cat: { id: string; translations?: Array<{ locale: string; slug: string; title: string }> }) => {
         const catTranslations = Array.isArray(cat.translations) ? cat.translations : [];
         const catTranslation =
           catTranslations.find((t: { locale: string }) => t.locale === lang) || catTranslations[0] || null;
@@ -226,8 +232,8 @@ class ProductsFindTransformService {
         finalPrice = originalPrice * (1 - appliedDiscount / 100);
       }
 
-      // Get categories with translations (relation first; fallback to primary category when relation is empty)
-      let categories = Array.isArray(product.categories)
+      // Merge relation categories with scalar category references to avoid missing memberships.
+      const relationCategories = Array.isArray(product.categories)
         ? product.categories.map((cat: { id: string; translations?: Array<{ locale: string; slug: string; title: string }> }) => {
             const catTranslations = Array.isArray(cat.translations) ? cat.translations : [];
             const catTranslation = catTranslations.find((t: { locale: string }) => t.locale === lang) || catTranslations[0] || null;
@@ -238,10 +244,16 @@ class ProductsFindTransformService {
             };
           })
         : [];
-      if (categories.length === 0 && product.primaryCategoryId) {
-        const primary: CategoryOutput | undefined = primaryCategoryById.get(product.primaryCategoryId);
-        if (primary) categories = [primary];
-      }
+
+      const relationCategoryIdSet = new Set(relationCategories.map((category) => category.id));
+      const scalarCategoryIds = Array.isArray(product.categoryIds) ? product.categoryIds : [];
+      const primaryCategoryId = product.primaryCategoryId ? [product.primaryCategoryId] : [];
+      const missingCategories = [...scalarCategoryIds, ...primaryCategoryId]
+        .filter((categoryId) => !relationCategoryIdSet.has(categoryId))
+        .map((categoryId) => fallbackCategoryById.get(categoryId))
+        .filter((category): category is CategoryOutput => Boolean(category));
+
+      const categories = [...relationCategories, ...missingCategories];
 
       const productImages = buildCatalogGalleryImages(product.media, variants);
 

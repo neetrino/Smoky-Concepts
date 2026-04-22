@@ -323,7 +323,13 @@ export function ProductInfoAndActions({
       ? 'pb-2.5 font-montserrat text-[15px] font-extrabold leading-none sm:text-[16px] md:text-[17px]'
       : 'pb-2.5 font-montserrat text-[14px] font-extrabold leading-none sm:text-[15px] md:text-[16px]';
 
-  const productBadge = product.labels?.[0]?.value || product.categories?.[0]?.title || null;
+  const productBadges = product.labels?.length
+    ? product.labels
+        .map((label) => label.value?.trim())
+        .filter((value): value is string => Boolean(value))
+    : product.categories
+        ?.map((category) => category.title?.trim())
+        .filter((value): value is string => Boolean(value)) ?? [];
   const productDetails = [
     product.brand?.name ?? null,
     activeColorOption ? `${t(language, 'product.color')}: ${activeColorOption.label}` : null,
@@ -467,9 +473,16 @@ export function ProductInfoAndActions({
         <h1 className="min-w-0 flex-1 truncate whitespace-nowrap font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
           {productTitle}
         </h1>
-        {productBadge && (
-          <div className="inline-flex h-[18px] shrink-0 items-center rounded-[6px] bg-[#122a26] px-[7px] text-[12px] font-medium leading-none text-white">
-            {productBadge}
+        {productBadges.length > 0 && (
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+            {productBadges.map((badge, index) => (
+              <div
+                key={`${badge}-${index}`}
+                className="inline-flex h-[18px] items-center rounded-[6px] bg-[#122a26] px-[7px] text-[12px] font-medium leading-none text-white"
+              >
+                {badge}
+              </div>
+            ))}
           </div>
         )}
       </div>

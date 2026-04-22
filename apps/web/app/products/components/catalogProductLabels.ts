@@ -7,6 +7,15 @@ const SECTION_NAME_BY_CATEGORY_SLUG: Record<string, string> = {
   premium: 'Premium',
 };
 
+const CLIENT_SIDE_COLLECTION_VALUES = new Set<string>([
+  'all',
+  'Classic',
+  'Special',
+  'Atelier',
+  'Premium',
+  ...Object.keys(SECTION_NAME_BY_CATEGORY_SLUG),
+]);
+
 const COLOR_PATTERNS: Array<{ label: string; pattern: RegExp }> = [
   { label: 'Forest Green', pattern: /(forest|green)/i },
   { label: 'Deep Red', pattern: /(deep|red|wine|burgundy)/i },
@@ -96,6 +105,28 @@ export function productMatchesCategoryFilter(
   }
 
   return false;
+}
+
+export function isClientSideCollectionFilterValue(selectedCollection: string): boolean {
+  return CLIENT_SIDE_COLLECTION_VALUES.has(selectedCollection);
+}
+
+export function resolveSectionLabelFromCollectionValue(
+  selectedCollection: string
+): string | null {
+  if (selectedCollection === 'all') {
+    return null;
+  }
+
+  if (SECTION_NAME_BY_CATEGORY_SLUG[selectedCollection]) {
+    return SECTION_NAME_BY_CATEGORY_SLUG[selectedCollection];
+  }
+
+  if (Object.values(SECTION_NAME_BY_CATEGORY_SLUG).includes(selectedCollection)) {
+    return selectedCollection;
+  }
+
+  return null;
 }
 
 export function getSectionLabel(product: CatalogProduct): string {
