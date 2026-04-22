@@ -76,6 +76,13 @@ class AdminService {
   createVoting = adminVotingService.createVoting.bind(adminVotingService);
   updateVoting = adminVotingService.updateVoting.bind(adminVotingService);
   deleteVoting = adminVotingService.deleteVoting.bind(adminVotingService);
+  // Backward-compatible aliases for legacy route names.
+  createVotingCategory = (
+    _votingId: string,
+    data: Parameters<typeof adminVotingService.createVoting>[0],
+  ) => adminVotingService.createVoting(data);
+  updateVotingCategory = adminVotingService.updateVoting.bind(adminVotingService);
+  deleteVotingCategory = adminVotingService.deleteVoting.bind(adminVotingService);
   getVotingItemById = adminVotingService.getVotingItemById.bind(adminVotingService);
   createVotingItem = adminVotingService.createVotingItem.bind(adminVotingService);
   updateVotingItem = adminVotingService.updateVotingItem.bind(adminVotingService);
