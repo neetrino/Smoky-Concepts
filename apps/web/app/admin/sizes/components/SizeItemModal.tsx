@@ -46,6 +46,21 @@ function normalizeCustomVersions(versions: string[]): string[] {
   return normalized;
 }
 
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+        return;
+      }
+      reject(new Error('Failed to read image'));
+    };
+    reader.onerror = () => reject(new Error('Failed to read image'));
+    reader.readAsDataURL(file);
+  });
+}
+
 function readStoredCustomVersions(): string[] {
   if (typeof window === 'undefined') {
     return [];
@@ -182,13 +197,16 @@ export function SizeItemModal({ modal, onClose, onSaved }: SizeItemModalProps) {
     }
     setUploading(true);
     try {
-      const base64 = await processImageFile(file, {
-        maxSizeMB: 2,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        fileType: getOutputFileType(file),
-        initialQuality: 0.8,
-      });
+      const shouldCompress = file.size > 900 * 1024;
+      const base64 = shouldCompress
+        ? await processImageFile(file, {
+            maxSizeMB: 1.2,
+            maxWidthOrHeight: 1280,
+            useWebWorker: true,
+            fileType: getOutputFileType(file),
+            initialQuality: 0.75,
+          })
+        : await readFileAsDataUrl(file);
       if (!base64) {
         showToast(t('admin.voting.imageUploadFailed'), 'error');
         return;
@@ -278,17 +296,28 @@ export function SizeItemModal({ modal, onClose, onSaved }: SizeItemModalProps) {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">{t('admin.sizes.imageUrl')}</label>
-            <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} disabled={saving || uploading} />
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-            <Button
-              type="button"
-              variant="secondary"
-              className="mt-2"
-              disabled={saving || uploading}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {uploading ? t('admin.attributes.valueModal.uploading') : t('admin.sizes.uploadImage')}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={saving || uploading}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {uploading ? t('admin.attributes.valueModal.uploading') : t('admin.sizes.uploadImage')}
+              </Button>
+              {imageUrl ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={saving || uploading}
+                  onClick={() => setImageUrl('')}
+                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                >
+                  {t('admin.voting.removeImage')}
+                </Button>
+              ) : null}
+            </div>
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">{t('admin.sizes.version')}</label>

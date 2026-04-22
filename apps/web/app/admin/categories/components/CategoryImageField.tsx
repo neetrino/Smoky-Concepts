@@ -2,7 +2,7 @@
 
 import type { ChangeEvent } from 'react';
 import { useRef, useState } from 'react';
-import { Button, Input } from '@shop/ui';
+import { Button } from '@shop/ui';
 import { apiClient } from '@/lib/api-client';
 import { processImageFile } from '@/lib/services/utils/image-utils';
 import { useTranslation } from '../../../../lib/i18n-client';
@@ -29,6 +29,21 @@ async function uploadCategoryImage(imageBase64: string): Promise<string | null> 
   });
 
   return response?.urls?.[0] ?? null;
+}
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+        return;
+      }
+      reject(new Error('Failed to read image'));
+    };
+    reader.onerror = () => reject(new Error('Failed to read image'));
+    reader.readAsDataURL(file);
+  });
 }
 
 interface CategoryImageFieldProps {
@@ -60,13 +75,16 @@ export function CategoryImageField({ value, disabled = false, onChange }: Catego
     setError(null);
 
     try {
-      const base64 = await processImageFile(file, {
-        maxSizeMB: 2,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        fileType: getOutputFileType(file),
-        initialQuality: 0.8,
-      });
+      const shouldCompress = file.size > 900 * 1024;
+      const base64 = shouldCompress
+        ? await processImageFile(file, {
+            maxSizeMB: 1.2,
+            maxWidthOrHeight: 1280,
+            useWebWorker: true,
+            fileType: getOutputFileType(file),
+            initialQuality: 0.75,
+          })
+        : await readFileAsDataUrl(file);
 
       if (!base64) {
         setError(t('admin.categories.imageUploadFailed'));
@@ -91,19 +109,7 @@ export function CategoryImageField({ value, disabled = false, onChange }: Catego
 
   return (
     <div className="space-y-3">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t('admin.categories.image')}
-        </label>
-        <Input
-          type="text"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder={t('admin.categories.imagePlaceholder')}
-          className="w-full"
-          disabled={disabled || uploading}
-        />
-      </div>
+      <label className="block text-sm font-medium text-gray-700">{t('admin.categories.image')}</label>
 
       <div className="flex items-center gap-3">
         <input
