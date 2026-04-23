@@ -2,7 +2,7 @@ import type { AdminTheme } from '@/app/admin/types/admin-theme.types';
 
 /** Desktop sidebar nav container */
 export function adminNavContainerClass(theme: AdminTheme): string {
-  const base = 'rounded-lg p-2 space-y-1 border';
+  const base = 'h-full overflow-y-auto border-r p-3 space-y-1';
   return theme === 'dark'
     ? `${base} bg-gray-900 border-gray-700`
     : `${base} bg-white border-gray-200`;

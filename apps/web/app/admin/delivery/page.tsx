@@ -8,6 +8,10 @@ import { apiClient } from '../../../lib/api-client';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
 import { useTranslation } from '../../../lib/i18n-client';
 import { getAdminMenuTABS } from '../admin-menu.config';
+import {
+  ADMIN_FIXED_SIDEBAR_CLASS,
+  ADMIN_FIXED_SIDEBAR_SPACER_CLASS,
+} from '../constants/adminShell.constants';
 import { getAdminSidebarNavIndentClass } from '../utils/adminMenuIndent';
 
 interface DeliveryLocation {
@@ -123,8 +127,8 @@ export default function DeliveryPage() {
             <AdminMenuDrawer tabs={adminTabs} currentPath="/admin/delivery" />
           </div>
           {/* Sidebar Navigation */}
-          <aside className="hidden lg:block lg:w-64 flex-shrink-0">
-            <nav className="bg-white border border-gray-200 rounded-lg p-2 space-y-1">
+          <aside className={ADMIN_FIXED_SIDEBAR_CLASS}>
+            <nav className="h-full space-y-1 overflow-y-auto border-r border-gray-200 bg-white p-3">
               {adminTabs.map((tab) => {
                 const isActive = pathname === tab.path || 
                   (tab.path === '/admin' && pathname === '/admin') ||
@@ -152,6 +156,7 @@ export default function DeliveryPage() {
               })}
             </nav>
           </aside>
+          <div className={ADMIN_FIXED_SIDEBAR_SPACER_CLASS} aria-hidden="true" />
 
           {/* Main Content */}
           <div className="flex-1 min-w-0">

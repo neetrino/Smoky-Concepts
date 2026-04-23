@@ -7,6 +7,10 @@ import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '@/lib/api-client';
 import { AdminMenuDrawer, type AdminMenuItem } from '@/components/AdminMenuDrawer';
 import { getAdminMenuTABS } from '../../admin-menu.config';
+import {
+  ADMIN_FIXED_SIDEBAR_CLASS,
+  ADMIN_FIXED_SIDEBAR_SPACER_CLASS,
+} from '../../constants/adminShell.constants';
 import { getAdminSidebarNavIndentClass } from '../../utils/adminMenuIndent';
 import { useTranslation } from '@/lib/i18n-client';
 
@@ -265,8 +269,8 @@ export default function PriceFilterSettingsPage() {
             <AdminMenuDrawer tabs={adminTabs} currentPath={currentPath} />
           </div>
           {/* Sidebar Navigation */}
-          <aside className="hidden lg:block lg:w-64 flex-shrink-0">
-            <nav className="bg-white border border-gray-200 rounded-lg p-2 space-y-1">
+          <aside className={ADMIN_FIXED_SIDEBAR_CLASS}>
+            <nav className="h-full space-y-1 overflow-y-auto border-r border-gray-200 bg-white p-3">
               {adminTabs.map((tab: AdminMenuItem) => {
                 const isActive = currentPath === tab.path || 
                   (tab.path === '/admin' && currentPath === '/admin') ||
@@ -294,6 +298,7 @@ export default function PriceFilterSettingsPage() {
               })}
             </nav>
           </aside>
+          <div className={ADMIN_FIXED_SIDEBAR_SPACER_CLASS} aria-hidden="true" />
 
           {/* Main Content */}
           <div className="flex-1 min-w-0">

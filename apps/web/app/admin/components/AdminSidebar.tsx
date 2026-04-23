@@ -10,6 +10,10 @@ import {
   adminNavItemActiveClass,
   adminNavItemInactiveClass,
 } from '../constants/adminMenuThemeClasses';
+import {
+  ADMIN_FIXED_SIDEBAR_CLASS,
+  ADMIN_FIXED_SIDEBAR_SPACER_CLASS,
+} from '../constants/adminShell.constants';
 import { useAdminTheme } from '../context/AdminThemeContext';
 import { AdminThemeToggleButton } from './AdminThemeToggleButton';
 import { getAdminSidebarNavIndentClass } from '../utils/adminMenuIndent';
@@ -29,7 +33,7 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
       <div className="lg:hidden mb-6">
         <AdminMenuDrawer tabs={adminTabs} currentPath={currentPath} />
       </div>
-      <aside className="hidden lg:block lg:w-64 flex-shrink-0">
+      <aside className={ADMIN_FIXED_SIDEBAR_CLASS}>
         <nav className={adminNavContainerClass(theme)}>
           {adminTabs.map((tab) => {
             const isActive =
@@ -58,6 +62,7 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
           </div>
         </nav>
       </aside>
+      <div className={ADMIN_FIXED_SIDEBAR_SPACER_CLASS} aria-hidden="true" />
     </>
   );
 }
