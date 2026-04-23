@@ -119,7 +119,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 pt-[3.75rem] pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <AdminShell>
           {/* General Settings */}

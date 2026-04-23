@@ -2,7 +2,7 @@
 export const ADMIN_THEME_STORAGE_KEY = 'smoky-admin-theme' as const;
 
 /** Outer wrapper for most admin pages (under AdminThemeProvider `.dark` ancestor) */
-export const ADMIN_PAGE_SHELL_CLASS = 'min-h-screen bg-gray-50 py-8' as const;
+export const ADMIN_PAGE_SHELL_CLASS = 'min-h-screen bg-gray-50 pt-[3.75rem] pb-8' as const;
 
 /** Fixed desktop sidebar pinned to the viewport's left edge */
 export const ADMIN_FIXED_SIDEBAR_CLASS =

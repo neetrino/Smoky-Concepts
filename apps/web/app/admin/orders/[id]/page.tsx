@@ -89,7 +89,7 @@ export default function AdminOrderDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 pt-[3.75rem] pb-8">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="text-center py-16">
             <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900" />
@@ -102,7 +102,7 @@ export default function AdminOrderDetailsPage() {
 
   if (error || !orderDetails) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 pt-[3.75rem] pb-8">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <AdminShell>
             <Card className="p-6 text-center text-red-600">
@@ -115,7 +115,7 @@ export default function AdminOrderDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 pt-[3.75rem] pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="hidden">
           <h1 className="text-3xl font-bold text-gray-900">
