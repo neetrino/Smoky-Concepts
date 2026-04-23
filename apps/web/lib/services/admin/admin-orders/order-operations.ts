@@ -112,8 +112,8 @@ export async function getOrderById(orderId: string) {
   const sizeCatalogTitles = Array.from(
     new Set(
       order.items
-        .map((item) => item.sizeCatalogTitle?.trim().toLocaleLowerCase() ?? '')
-        .filter((title) => title !== '')
+        .map((item: { sizeCatalogTitle: string | null }) => item.sizeCatalogTitle?.trim().toLocaleLowerCase() ?? '')
+        .filter((title: string) => title !== '')
     )
   );
   const sizeCatalogPriceByTitle = new Map<string, number>();
