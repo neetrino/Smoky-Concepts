@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../lib/api-client';
-import { getStoredLanguage, type LanguageCode } from '../../lib/language';
-import { CATALOG_SECTION_PAGE_SIZE } from '../../app/products/components/catalogProductLabels';
+import { type LanguageCode } from '../../lib/language';
+
+const RELATED_PRODUCTS_MAX = 12;
 
 interface RelatedProduct {
   id: string;
@@ -44,7 +45,7 @@ interface UseRelatedProductsProps {
 }
 
 /**
- * Fetches related products for the PDP — same page size as the catalog horizontal row (6).
+ * Fetches related products for the PDP — cap list to 12 items.
  */
 export function useRelatedProducts({ categorySlug, currentProductId, language }: UseRelatedProductsProps) {
   const [products, setProducts] = useState<RelatedProduct[]>([]);
@@ -56,7 +57,7 @@ export function useRelatedProducts({ categorySlug, currentProductId, language }:
         setLoading(true);
 
         const params: Record<string, string> = {
-          limit: String(CATALOG_SECTION_PAGE_SIZE + 8),
+          limit: String(RELATED_PRODUCTS_MAX + 8),
           lang: language,
         };
 
@@ -74,7 +75,7 @@ export function useRelatedProducts({ categorySlug, currentProductId, language }:
         });
 
         const filtered = response.data.filter((p) => p.id !== currentProductId);
-        setProducts(filtered.slice(0, CATALOG_SECTION_PAGE_SIZE));
+        setProducts(filtered.slice(0, RELATED_PRODUCTS_MAX));
       } catch (error) {
         console.error('[RelatedProducts] Error fetching related products:', error);
         setProducts([]);

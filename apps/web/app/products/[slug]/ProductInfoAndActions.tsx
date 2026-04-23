@@ -468,7 +468,7 @@ export function ProductInfoAndActions({
 
   return (
     <>
-    <div className="max-w-[763px] min-w-0 w-full pt-[clamp(2.75rem,7.5vw,11rem)]">
+    <div className="max-w-[763px] min-w-0 w-full pt-[clamp(3rem,7.8vw,11.25rem)]">
       <div className="flex min-w-0 items-start justify-between gap-3">
         <h1 className="min-w-0 flex-1 truncate whitespace-nowrap font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
           {productTitle}
