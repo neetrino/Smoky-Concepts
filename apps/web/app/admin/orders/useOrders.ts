@@ -170,6 +170,7 @@ export function useOrders() {
       console.log('✅ [ADMIN] Orders fetched:', response);
       setOrders(response.data || []);
       setMeta(response.meta || null);
+      setSelectedIds(new Set());
     } catch (err) {
       console.error('❌ [ADMIN] Error fetching orders:', err);
     } finally {

@@ -60,21 +60,21 @@ export function ProductsTable({
   const router = useRouter();
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden border-[#dcc090]/30 bg-white/90 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
       {loading ? (
         <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.products.loadingProducts')}</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#122a26] mx-auto mb-4"></div>
+          <p className="text-[#414141]/70">{t('admin.products.loadingProducts')}</p>
         </div>
       ) : sortedProducts.length === 0 ? (
         <div className="p-8 text-center">
-          <p className="text-gray-600">{t('admin.products.noProducts')}</p>
+          <p className="text-[#414141]/70">{t('admin.products.noProducts')}</p>
         </div>
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-[#dcc090]/25">
+              <thead className="bg-[#122a26]">
                 <tr>
                   <th className="px-4 py-3">
                     <input
@@ -84,11 +84,11 @@ export function ProductsTable({
                       onChange={toggleSelectAll}
                     />
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                     <button
                       type="button"
                       onClick={() => handleHeaderSort('title')}
-                      className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800"
+                      className="inline-flex items-center gap-1 text-[#dcc090] hover:text-white"
                     >
                       <span>{t('admin.products.product')}</span>
                       <span className="flex flex-col gap-0.5">
@@ -119,11 +119,11 @@ export function ProductsTable({
                       </span>
                     </button> 
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                     <button
                       type="button"
                       onClick={() => handleHeaderSort('stock')}
-                      className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800"
+                      className="inline-flex items-center gap-1 text-[#dcc090] hover:text-white"
                     >
                       <span>{t('admin.products.stock')}</span>
                       <span className="flex flex-col gap-0.5">
@@ -154,12 +154,12 @@ export function ProductsTable({
                       </span>
                     </button>
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                     <div className="flex items-start justify-between gap-3">
                       <button
                         type="button"
                         onClick={() => handleHeaderSort('price')}
-                        className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800"
+                        className="inline-flex items-center gap-1 text-[#dcc090] hover:text-white"
                       >
                         <span>{t('admin.products.price')}</span>
                         <span className="flex flex-col gap-0.5">
@@ -192,18 +192,18 @@ export function ProductsTable({
                       <span className="text-right">{t('admin.products.category')}</span>
                     </div>
                   </th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-center text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                     <span className="inline-flex items-center justify-center gap-2">
                       {t('admin.products.featured')}
                       <span className="text-gray-400 font-normal normal-case">/</span>
                       {t('admin.products.upcoming')}
                     </span>
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                     <button
                       type="button"
                       onClick={() => handleHeaderSort('createdAt')}
-                      className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800"
+                      className="inline-flex items-center gap-1 text-[#dcc090] hover:text-white"
                     >
                       <span>{t('admin.products.created')}</span>
                       <span className="flex flex-col gap-0.5">
@@ -234,14 +234,14 @@ export function ProductsTable({
                       </span>
                     </button>
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pl-6">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider pl-6">
                     {t('admin.products.actions')}
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-[#dcc090]/25">
                 {sortedProducts.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50">
+                  <tr key={product.id} className="hover:bg-[#dcc090]/10">
                     <td className="px-4 py-4">
                       <input
                         type="checkbox"
@@ -260,8 +260,8 @@ export function ProductsTable({
                           />
                         )}
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{product.title}</div>
-                          <div className="text-sm text-gray-500">{product.slug}</div>
+                          <div className="text-sm font-medium text-[#122a26]">{product.title}</div>
+                          <div className="text-sm text-[#414141]/55">{product.slug}</div>
                         </div>
                       </div>
                     </td>
@@ -271,15 +271,15 @@ export function ProductsTable({
                           {product.colorStocks.map((colorStock) => (
                             <div
                               key={colorStock.color}
-                              className="px-3 py-1 bg-gray-100 rounded-lg text-sm"
+                              className="px-3 py-1 bg-[#dcc090]/20 rounded-lg text-sm"
                             >
-                              <span className="font-medium text-gray-900">{colorStock.color}:</span>
-                              <span className="ml-1 text-gray-600">{colorStock.stock} {t('admin.products.pcs')}</span>
+                              <span className="font-medium text-[#122a26]">{colorStock.color}:</span>
+                              <span className="ml-1 text-[#414141]/65">{colorStock.stock} {t('admin.products.pcs')}</span>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-[#414141]/60">
                           {product.stock > 0 ? `${product.stock} ${t('admin.products.pcs')}` : `0 ${t('admin.products.pcs')}`}
                         </span>
                       )}
@@ -287,12 +287,12 @@ export function ProductsTable({
                     <td className="px-3 py-4 whitespace-nowrap">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex flex-col">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-[#122a26]">
                             {formatAdminUsdAmount(product.price)}
                           </div>
                           {(product.compareAtPrice && product.compareAtPrice > product.price) || 
                            (product.discountPercent && product.discountPercent > 0) ? (
-                            <div className="text-xs text-gray-500 line-through mt-0.5">
+                            <div className="text-xs text-[#414141]/50 line-through mt-0.5">
                               {formatAdminUsdAmount(
                                 product.compareAtPrice && product.compareAtPrice > product.price
                                   ? product.compareAtPrice
@@ -306,13 +306,13 @@ export function ProductsTable({
                             product.categories.map((category) => (
                               <span
                                 key={`${product.id}-${category}`}
-                                className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700"
+                                className="rounded-full bg-[#dcc090]/25 px-2.5 py-1 text-xs font-medium text-[#122a26]"
                               >
                                 {category}
                               </span>
                             ))
                           ) : (
-                            <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                            <span className="rounded-full bg-[#dcc090]/25 px-2.5 py-1 text-xs font-medium text-[#122a26]">
                               -
                             </span>
                           )}
@@ -323,14 +323,14 @@ export function ProductsTable({
                       <div className="inline-flex items-center justify-center gap-1">
                         <button
                           onClick={() => handleToggleFeatured(product.id, product.featured || false, product.title)}
-                          className="inline-flex items-center justify-center w-8 h-8 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                          className="inline-flex items-center justify-center w-8 h-8 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:ring-offset-2 rounded"
                           title={product.featured ? t('admin.products.clickToRemoveFeatured') : t('admin.products.clickToMarkFeatured')}
                         >
                           <svg
                             className={`w-6 h-6 transition-all duration-200 ${
                               product.featured
-                                ? 'fill-blue-500 text-blue-500 drop-shadow-sm'
-                                : 'fill-none stroke-blue-400 text-blue-400 opacity-50 hover:opacity-75'
+                                ? 'fill-[#122a26] text-[#122a26] drop-shadow-sm'
+                                : 'fill-none stroke-[#dcc090] text-[#dcc090] opacity-70 hover:opacity-100'
                             }`}
                             viewBox="0 0 24 24"
                             strokeWidth="1.5"
@@ -363,7 +363,7 @@ export function ProductsTable({
                         </button>
                       </div>
                     </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-[#414141]/60">
                       {new Date(product.createdAt).toLocaleDateString('hy-AM')}
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap text-sm font-medium">
@@ -372,7 +372,7 @@ export function ProductsTable({
                           variant="ghost"
                           size="sm"
                           onClick={() => router.push(`/admin/products/add?id=${product.id}`)}
-                          className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2"
+                          className="text-[#122a26] hover:text-[#122a26] hover:bg-[#dcc090]/15 px-2"
                           title={t('admin.products.edit')}
                           aria-label={t('admin.products.edit')}
                         >
@@ -384,7 +384,7 @@ export function ProductsTable({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDuplicateProduct(product.id)}
-                          className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 px-2"
+                          className="text-[#414141]/75 hover:text-[#122a26] hover:bg-[#dcc090]/15 px-2"
                           title={t('admin.products.duplicate')}
                           aria-label={t('admin.products.duplicate')}
                         >
@@ -409,10 +409,10 @@ export function ProductsTable({
                         <button
                           type="button"
                           onClick={() => handleTogglePublished(product.id, product.published, product.title)}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:ring-offset-2 ${
                             product.published
-                              ? 'bg-green-500'
-                              : 'bg-gray-300'
+                              ? 'bg-[#122a26]'
+                              : 'bg-[#414141]/25'
                           }`}
                           title={product.published ? t('admin.products.clickToDraft') : t('admin.products.clickToPublished')}
                           aria-label={product.published ? `${t('admin.products.published')} - ${t('admin.products.clickToDraft')}` : `${t('admin.products.draft')} - ${t('admin.products.clickToPublished')}`}
@@ -433,8 +433,8 @@ export function ProductsTable({
 
           {/* Pagination */}
           {meta && meta.totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-              <div className="text-sm text-gray-700">
+            <div className="px-6 py-4 border-t border-[#dcc090]/25 flex items-center justify-between">
+              <div className="text-sm text-[#414141]/75">
                 {t('admin.products.showingPage').replace('{page}', meta.page.toString()).replace('{totalPages}', meta.totalPages.toString()).replace('{total}', meta.total.toString())}
               </div>
               <div className="flex gap-2">

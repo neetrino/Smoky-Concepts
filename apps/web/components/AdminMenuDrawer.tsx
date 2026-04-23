@@ -27,6 +27,8 @@ export interface AdminMenuItem {
   isSubCategory?: boolean;
   /** Indented further under a sub-category (e.g. Sizes under Attributes). */
   isNestedSubCategory?: boolean;
+  /** ID of the parent menu item this belongs to (for collapsible groups). */
+  parentId?: string;
 }
 
 interface AdminMenuDrawerProps {
@@ -34,29 +36,43 @@ interface AdminMenuDrawerProps {
   currentPath: string;
 }
 
-/**
- * Renders a mobile-friendly admin hamburger menu that mirrors the desktop sidebar.
- */
 export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
   const router = useRouter();
   const { theme } = useAdminTheme();
   const [open, setOpen] = useState(false);
 
+  const parentIds = new Set(tabs.filter((tab) => tab.parentId).map((tab) => tab.parentId!));
+
+  const getInitialExpanded = () => {
+    const expanded = new Set<string>();
+    tabs.forEach((tab) => {
+      if (tab.parentId && currentPath.startsWith(tab.path)) {
+        expanded.add(tab.parentId);
+      }
+    });
+    return expanded;
+  };
+
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(getInitialExpanded);
+
   useEffect(() => {
     if (open) {
-      console.info('[AdminMenuDrawer] Locking body scroll for open drawer');
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
+    return () => { document.body.style.overflow = ''; };
   }, [open]);
 
+  const toggleGroup = (id: string) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) { next.delete(id); } else { next.add(id); }
+      return next;
+    });
+  };
+
   const handleNavigate = (path: string) => {
-    console.info('[AdminMenuDrawer] Navigating to admin path', { path });
     router.push(path);
     setOpen(false);
   };
@@ -65,10 +81,7 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
     <div className="lg:hidden">
       <button
         type="button"
-        onClick={() => {
-          console.info('[AdminMenuDrawer] Toggling drawer', { open: !open });
-          setOpen(true);
-        }}
+        onClick={() => setOpen(true)}
         className={adminDrawerTriggerClass(theme)}
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -80,16 +93,13 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
       {open && (
         <div
           className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm"
-          onClick={() => {
-            console.info('[AdminMenuDrawer] Closing drawer from backdrop');
-            setOpen(false);
-          }}
+          onClick={() => setOpen(false)}
         >
           <div
             className={adminDrawerPanelClass(theme)}
             role="dialog"
             aria-modal="true"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className={adminDrawerHeaderRowClass(theme)}>
               <p className={adminDrawerTitleClass(theme)}>Admin Navigation</p>
@@ -97,10 +107,7 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
                 <AdminThemeToggleButton variant="drawer" />
                 <button
                   type="button"
-                  onClick={() => {
-                    console.info('[AdminMenuDrawer] Closing drawer from close button');
-                    setOpen(false);
-                  }}
+                  onClick={() => setOpen(false)}
                   className={adminDrawerCloseButtonClass(theme)}
                   aria-label="Close admin menu"
                 >
@@ -113,33 +120,53 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
 
             <div className={adminDrawerListClass(theme)}>
               {tabs.map((tab) => {
+                // Hide children when parent is collapsed
+                if (tab.parentId && !expandedGroups.has(tab.parentId)) return null;
+
                 const isActive =
                   currentPath === tab.path ||
                   (tab.path === '/' && currentPath === '/') ||
                   (tab.path === '/admin' && currentPath === '/admin') ||
                   (tab.path !== '/' && tab.path !== '/admin' && currentPath.startsWith(tab.path));
 
+                const isParent = parentIds.has(tab.id);
+                const isExpanded = expandedGroups.has(tab.id);
+
                 return (
                   <button
                     key={tab.id}
                     type="button"
-                    onClick={() => handleNavigate(tab.path)}
-                    className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium ${getAdminDrawerNavIndentClass(
-                      tab
-                    )} ${isActive ? adminDrawerRowActiveClass(theme) : adminDrawerRowInactiveClass(theme)}`}
+                    onClick={() => {
+                      if (isParent) toggleGroup(tab.id);
+                      handleNavigate(tab.path);
+                    }}
+                    className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium ${getAdminDrawerNavIndentClass(tab)} ${isActive ? adminDrawerRowActiveClass(theme) : adminDrawerRowInactiveClass(theme)}`}
                   >
                     <span className="flex items-center gap-3">
-                      {tab.icon ? <span className={adminDrawerRowIconClass(isActive, theme)}>{tab.icon}</span> : null}
+                      {tab.icon ? (
+                        <span className={adminDrawerRowIconClass(isActive, theme)}>{tab.icon}</span>
+                      ) : null}
                       {tab.label}
                     </span>
-                    <svg
-                      className={adminDrawerChevronClass(isActive, theme)}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    {isParent ? (
+                      <svg
+                        className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''} ${adminDrawerChevronClass(isActive, theme)}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    ) : (
+                      <svg
+                        className={adminDrawerChevronClass(isActive, theme)}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    )}
                   </button>
                 );
               })}

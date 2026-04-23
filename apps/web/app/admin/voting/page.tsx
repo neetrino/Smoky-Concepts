@@ -134,8 +134,8 @@ export default function VotingPage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900" />
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-[#122a26]" />
+          <p className="text-[#414141]/70">{t('admin.common.loading')}</p>
         </div>
       </div>
     );
@@ -146,32 +146,17 @@ export default function VotingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#efefef] pt-[3.75rem] pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <button
-            type="button"
-            onClick={() => router.push('/admin')}
-            className="mb-4 flex items-center text-gray-600 transition-colors duration-200 hover:text-gray-900"
-          >
-            <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.voting.backToAdmin')}
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.voting.title')}</h1>
-          <p className="mt-2 text-sm text-gray-600">{t('admin.voting.subtitleList')}</p>
-        </div>
-
         <div className="flex flex-col gap-8 lg:flex-row">
           <AdminSidebar currentPath={pathname || '/admin/voting'} router={router} t={t} />
 
           <div className="min-w-0 flex-1 space-y-6">
-            <Card className="p-4 sm:p-6">
-              <h2 className="text-lg font-semibold text-gray-900">{t('admin.voting.newVotingSection')}</h2>
+            <Card className="border-[#dcc090]/30 bg-white/90 p-4 shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:p-6">
+              <h2 className="text-lg font-semibold text-[#122a26]">{t('admin.voting.newVotingSection')}</h2>
               <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
                 <div className="flex-1">
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label className="mb-1 block text-sm font-medium text-[#414141]/75">
                     {t('admin.voting.votingNameField')}
                   </label>
                   <Input
@@ -198,12 +183,12 @@ export default function VotingPage() {
               </div>
             </Card>
 
-            <Card className="p-6">
+            <Card className="border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
               {loading ? (
-                <div className="py-10 text-center text-sm text-gray-500">{t('admin.voting.loadingVotings')}</div>
+                <div className="py-10 text-center text-sm text-[#414141]/60">{t('admin.voting.loadingVotings')}</div>
               ) : votings.length === 0 ? (
                 <div className="py-10 text-center">
-                  <p className="text-sm text-gray-500">{t('admin.voting.noVotings')}</p>
+                  <p className="text-sm text-[#414141]/60">{t('admin.voting.noVotings')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -212,14 +197,14 @@ export default function VotingPage() {
                     const isExpanded = expandedVotingId === voting.id;
 
                     return (
-                      <article key={voting.id} className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+                      <article key={voting.id} className="rounded-2xl border border-[#dcc090]/30 bg-white/80 shadow-sm transition-colors hover:border-[#dcc090]">
                         <button
                           type="button"
                           className="flex w-full items-start justify-between gap-3 p-4 text-left sm:p-5"
                           onClick={() => setExpandedVotingId((prev) => (prev === voting.id ? null : voting.id))}
                         >
                           <div className="flex items-start gap-3">
-                            <span className="mt-0.5 rounded-xl border border-gray-200 bg-gray-50 p-1.5 text-gray-700">
+                            <span className="mt-0.5 rounded-xl border border-[#dcc090]/30 bg-[#dcc090]/15 p-1.5 text-[#122a26]">
                               <svg
                                 className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                                 fill="none"
@@ -230,8 +215,8 @@ export default function VotingPage() {
                               </svg>
                             </span>
                             <div>
-                              <h2 className="text-2xl font-semibold text-gray-900">{voting.title}</h2>
-                              <p className="mt-1 text-sm text-gray-500">
+                              <h2 className="text-2xl font-semibold text-[#122a26]">{voting.title}</h2>
+                              <p className="mt-1 text-sm text-[#414141]/60">
                                 {voting.itemCount} {t('admin.voting.choicesLabel')} · {voting.totalLikes}{' '}
                                 {t('admin.voting.likesLabel')}
                               </p>
@@ -239,7 +224,7 @@ export default function VotingPage() {
                           </div>
                           <span
                             className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                              voting.published ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700'
+                              voting.published ? 'bg-[#122a26] text-[#dcc090]' : 'bg-[#dcc090]/35 text-[#122a26]'
                             }`}
                           >
                             {voting.published ? t('admin.voting.statusLive') : t('admin.voting.statusDraft')}
@@ -247,18 +232,18 @@ export default function VotingPage() {
                         </button>
 
                         {isExpanded ? (
-                          <div className="border-t border-gray-100 p-4 sm:p-5">
+                          <div className="border-t border-[#dcc090]/25 p-4 sm:p-5">
                             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                               {voting.items.map((item) => (
                                 <div
                                   key={item.id}
-                                  className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-4"
+                                  className="overflow-hidden rounded-2xl border border-[#dcc090]/30 bg-white/80 p-4"
                                 >
-                                  <div className="h-28 overflow-hidden rounded-xl bg-gray-100">
+                                  <div className="h-28 overflow-hidden rounded-xl bg-[#dcc090]/15">
                                     <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover" />
                                   </div>
-                                  <p className="mt-3 text-lg font-semibold text-gray-900">{item.title}</p>
-                                  <p className="text-sm text-gray-500">
+                                  <p className="mt-3 text-lg font-semibold text-[#122a26]">{item.title}</p>
+                                  <p className="text-sm text-[#414141]/60">
                                     {item.likeCount} {t('admin.voting.likesLabel')}
                                   </p>
                                   <div className="mt-3 flex gap-2">
@@ -306,11 +291,11 @@ export default function VotingPage() {
                               ))}
                             </div>
 
-                            <div className="mt-4 flex items-center justify-between gap-3 border-t border-gray-100 pt-4">
-                              <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700">
+                            <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#dcc090]/25 pt-4">
+                              <label className="flex cursor-pointer items-center gap-2 text-sm text-[#414141]/75">
                                 <input
                                   type="checkbox"
-                                  className="h-4 w-4 rounded border-gray-300 text-teal-700 focus:ring-teal-600"
+                                  className="h-4 w-4 rounded border-[#dcc090]/40 text-[#122a26] focus:ring-[#dcc090]"
                                   checked={voting.published}
                                   disabled={disabled}
                                   onChange={() => togglePublished(voting.id, !voting.published)}

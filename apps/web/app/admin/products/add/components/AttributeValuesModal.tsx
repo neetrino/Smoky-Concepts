@@ -112,7 +112,7 @@ export function AttributeValuesModal({
                   type="checkbox"
                   checked={allSelected}
                   onChange={toggleSelectAll}
-                  className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-blue-500"
+                  className="h-4 w-4 rounded border-[#dcc090]/40 text-[#122a26] focus:ring-[#dcc090]"
                 />
                 <span className="text-sm font-medium text-gray-800">{labels.selectAll}</span>
                 {allSelected ? (
@@ -131,7 +131,7 @@ export function AttributeValuesModal({
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleId(value.id)}
-                      className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-blue-500"
+                      className="h-4 w-4 rounded border-[#dcc090]/40 text-[#122a26] focus:ring-[#dcc090]"
                     />
                     <ValueRowPreview value={value} />
                   </label>

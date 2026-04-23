@@ -14,7 +14,7 @@ import { ADMIN_CENTERED_LOADING_CLASS, ADMIN_PAGE_SHELL_CLASS } from './constant
 
 export default function AdminPanel() {
   const { t } = useTranslation();
-  const { isLoggedIn, isAdmin, isLoading, user } = useAuth();
+  const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -74,14 +74,6 @@ export default function AdminPanel() {
   return (
     <div className={ADMIN_PAGE_SHELL_CLASS}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.dashboard.title')}</h1>
-          <p className="text-gray-600 mt-2">
-            {t('admin.dashboard.welcome').replace('{name}', user?.firstName || t('admin.dashboard.title'))}
-          </p>
-        </div>
-
         <div className="flex flex-col lg:flex-row gap-8">
           <AdminSidebar currentPath={currentPath} router={router} t={t} />
 

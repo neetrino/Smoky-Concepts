@@ -71,7 +71,7 @@ export function VariantRowAttributeSelectors({
                 type="button"
                 onClick={() => openModal(attribute.id)}
                 disabled={attribute.values.length === 0}
-                className="flex w-full max-w-[280px] items-center justify-between gap-2 rounded-md  bg-white px-3 py-2 text-left text-sm font-medium text-gray-900 shadow-sm transition-colors hover:border-gray-400 hover:bg-gray-50 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-100"
+                className="flex w-full max-w-[280px] items-center justify-between gap-2 rounded-md bg-white px-3 py-2 text-left text-sm font-medium text-[#122a26] shadow-sm transition-colors hover:border-[#dcc090] hover:bg-[#dcc090]/10 focus:border-[#dcc090] focus:outline-none focus:ring-1 focus:ring-[#dcc090] disabled:cursor-not-allowed disabled:bg-[#dcc090]/15"
               >
                 <span className="min-w-0 flex-1 truncate">{attribute.title}</span>
                 <svg

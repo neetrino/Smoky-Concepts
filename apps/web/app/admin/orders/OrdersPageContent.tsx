@@ -5,6 +5,7 @@ import { useOrders } from './useOrders';
 import { OrdersFilters } from './components/OrdersFilters';
 import { BulkSelectionControls } from './components/BulkSelectionControls';
 import { OrdersTable } from './components/OrdersTable';
+import { AdminShell } from '../components/AdminShell';
 import { ADMIN_PAGE_SHELL_CLASS } from '../constants/adminShell.constants';
 
 export function OrdersPageContent() {
@@ -44,58 +45,47 @@ export function OrdersPageContent() {
   return (
     <div className={ADMIN_PAGE_SHELL_CLASS}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <button
-            onClick={() => router.push('/admin')}
-            className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.orders.backToAdmin')}
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.orders.title')}</h1>
-        </div>
+        <AdminShell>
+          <OrdersFilters
+            statusFilter={statusFilter}
+            paymentStatusFilter={paymentStatusFilter}
+            orderTypeFilter={orderTypeFilter}
+            searchQuery={searchQuery}
+            updateMessage={updateMessage}
+            setStatusFilter={setStatusFilter}
+            setPaymentStatusFilter={setPaymentStatusFilter}
+            setOrderTypeFilter={setOrderTypeFilter}
+            setSearchQuery={setSearchQuery}
+            setPage={setPage}
+            router={router}
+            searchParams={searchParams}
+          />
 
-        <OrdersFilters
-          statusFilter={statusFilter}
-          paymentStatusFilter={paymentStatusFilter}
-          orderTypeFilter={orderTypeFilter}
-          searchQuery={searchQuery}
-          updateMessage={updateMessage}
-          setStatusFilter={setStatusFilter}
-          setPaymentStatusFilter={setPaymentStatusFilter}
-          setOrderTypeFilter={setOrderTypeFilter}
-          setSearchQuery={setSearchQuery}
-          setPage={setPage}
-          router={router}
-          searchParams={searchParams}
-        />
+          <BulkSelectionControls
+            selectedCount={selectedIds.size}
+            onBulkDelete={handleBulkDelete}
+            bulkDeleting={bulkDeleting}
+          />
 
-        <BulkSelectionControls
-          selectedCount={selectedIds.size}
-          onBulkDelete={handleBulkDelete}
-          bulkDeleting={bulkDeleting}
-        />
-
-        <OrdersTable
-          orders={orders}
-          loading={loading}
-          selectedIds={selectedIds}
-          updatingStatuses={updatingStatuses}
-          updatingPaymentStatuses={updatingPaymentStatuses}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          page={page}
-          meta={meta}
-          onToggleSelect={toggleSelect}
-          onToggleSelectAll={toggleSelectAll}
-          onSort={handleSort}
-          onViewDetails={handleViewOrderDetails}
-          onStatusChange={handleStatusChange}
-          onPaymentStatusChange={handlePaymentStatusChange}
-          onPageChange={(newPage) => setPage(newPage)}
-        />
+          <OrdersTable
+            orders={orders}
+            loading={loading}
+            selectedIds={selectedIds}
+            updatingStatuses={updatingStatuses}
+            updatingPaymentStatuses={updatingPaymentStatuses}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            page={page}
+            meta={meta}
+            onToggleSelect={toggleSelect}
+            onToggleSelectAll={toggleSelectAll}
+            onSort={handleSort}
+            onViewDetails={handleViewOrderDetails}
+            onStatusChange={handleStatusChange}
+            onPaymentStatusChange={handlePaymentStatusChange}
+            onPageChange={(newPage) => setPage(newPage)}
+          />
+        </AdminShell>
       </div>
     </div>
   );

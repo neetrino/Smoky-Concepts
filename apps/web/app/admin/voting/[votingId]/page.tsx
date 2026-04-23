@@ -52,7 +52,7 @@ export default function VotingDetailPage() {
 
   if (!loading && !voting) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-[#efefef] pt-[3.75rem] pb-8">
         <div className="mx-auto max-w-lg px-4 text-center">
           <p className="text-gray-700">{t('admin.voting.votingNotFound')}</p>
           <Button variant="primary" className="mt-4" onClick={() => router.push('/admin/voting')}>
@@ -64,9 +64,9 @@ export default function VotingDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#efefef] pt-[3.75rem] pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
+        <div className="hidden">
           <button
             type="button"
             onClick={() => router.push('/admin/voting')}

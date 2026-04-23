@@ -2,7 +2,7 @@
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { ADMIN_PRICE_CURRENCY, amountToUsd, formatPriceInCurrency } from '../../../../lib/currency';
-import { getStatusColor, getPaymentStatusColor, getColorValue } from '../utils/orderUtils';
+import { getColorValue } from '../utils/orderUtils';
 import type { Order } from '../useOrders';
 
 interface OrderRowProps {
@@ -43,57 +43,62 @@ export function OrderRow({
   const previews = order.colorSizePreviews || [];
 
   return (
-    <tr className="hover:bg-gray-50">
-      <td className="px-4 py-4">
+    <tr className="group">
+      <td className="rounded-l-xl border-y border-l border-[#dcc090]/25 bg-white/95 px-3 py-3 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0] group-hover:shadow-[0_10px_22px_rgba(18,42,38,0.07)]">
         <input
           type="checkbox"
           aria-label={t('admin.orders.selectOrder').replace('{number}', order.number)}
           checked={selected}
           onChange={onToggleSelect}
+          className="h-4 w-4 rounded border-[#dcc090]/60 text-[#122a26] focus:ring-[#dcc090]"
         />
       </td>
       <td
-        className="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-gray-50"
+        className="cursor-pointer border-y border-[#dcc090]/25 bg-white/95 px-3 py-3 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0]"
         onClick={onViewDetails}
       >
-        <div className="text-sm font-medium text-gray-900">{order.number}</div>
+        <div className="inline-flex items-center rounded-full bg-[#122a26] px-2.5 py-1 text-xs font-bold text-[#dcc090]">
+          #{order.number}
+        </div>
       </td>
       <td
-        className="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-gray-50"
+        className="cursor-pointer border-y border-[#dcc090]/25 bg-white/95 px-3 py-3 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0]"
         onClick={onViewDetails}
       >
-        <div className="text-sm font-medium text-gray-900">
+        <div className="truncate text-sm font-bold text-[#122a26]">
           {[order.customerFirstName, order.customerLastName].filter(Boolean).join(' ') || t('admin.orders.unknownCustomer')}
         </div>
         {order.customerPhone && (
-          <div className="text-sm text-gray-500">{order.customerPhone}</div>
+          <div className="mt-0.5 truncate text-xs text-[#414141]/55">{order.customerPhone}</div>
         )}
-        <div className="mt-1 text-xs text-blue-600">{t('admin.orders.viewOrderDetails')}</div>
+        <div className="mt-1 inline-flex max-w-full rounded-full bg-[#dcc090]/18 px-2 py-0.5 text-[11px] font-semibold text-[#122a26] transition-colors group-hover:bg-[#dcc090]/35">
+          {t('admin.orders.viewOrderDetails')}
+        </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        {calculateTotalWithoutShipping()}
+      <td className="whitespace-nowrap border-y border-[#dcc090]/25 bg-white/95 px-3 py-3 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0]">
+        <span className="text-sm font-black text-[#122a26]">{calculateTotalWithoutShipping()}</span>
       </td>
-      <td className="px-6 py-4 text-sm text-gray-500">
+      <td className="border-y border-[#dcc090]/25 bg-white/95 px-3 py-3 text-xs text-[#414141]/60 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0]">
         {previews.length > 0 ? (
-          <div className="flex max-w-[260px] flex-wrap items-center gap-1.5">
+          <div className="flex max-w-full flex-wrap items-center gap-1">
             {previews.map((preview) => {
               const swatchColor = preview.colorHex || (preview.colorLabel ? getColorValue(preview.colorLabel) : undefined);
               return (
                 <span
                   key={`${order.id}-${preview.label}-${preview.imageUrl || ''}-${preview.colorHex || ''}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700"
+                  className="inline-flex max-w-full items-center gap-1 rounded-full border border-[#dcc090]/35 bg-[#dcc090]/12 px-2 py-1 text-[11px] font-medium text-[#414141]/75"
                   title={preview.label}
                 >
                   {preview.imageUrl ? (
                     <img
                       src={preview.imageUrl}
                       alt={preview.label}
-                      className="h-4 w-4 rounded border border-gray-300 object-cover"
+                      className="h-4 w-4 rounded border border-[#dcc090]/35 object-cover"
                     />
                   ) : null}
                   {swatchColor ? (
                     <span
-                      className="h-3.5 w-3.5 rounded-full border border-gray-300"
+                      className="h-3.5 w-3.5 rounded-full border border-[#dcc090]/35"
                       style={{ backgroundColor: swatchColor }}
                       aria-hidden="true"
                     />
@@ -103,7 +108,7 @@ export function OrderRow({
               );
             })}
             {order.colorSizePreviewsHasMore && order.colorSizePreviewsHasMore > 0 ? (
-              <span className="text-xs text-gray-500">+{order.colorSizePreviewsHasMore}</span>
+              <span className="text-xs text-[#414141]/55">+{order.colorSizePreviewsHasMore}</span>
             ) : null}
           </div>
         ) : (
@@ -112,18 +117,18 @@ export function OrderRow({
           </span>
         )}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="whitespace-nowrap border-y border-[#dcc090]/25 bg-white/95 px-3 py-3 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0]">
         <div className="flex items-center gap-2">
           {updatingStatus ? (
             <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-              <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#122a26]"></div>
+              <span className="text-xs text-[#414141]/55">{t('admin.orders.updating')}</span>
             </div>
           ) : (
             <select
               value={order.status}
               onChange={(e) => onStatusChange(e.target.value)}
-              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${getStatusColor(order.status)}`}
+              className="w-full cursor-pointer rounded-lg border border-[#dcc090]/40 bg-[#dcc090]/28 px-2 py-1.5 text-xs font-bold text-[#122a26] shadow-sm outline-none transition-all hover:border-[#dcc090] hover:bg-[#dcc090]/40 focus:ring-2 focus:ring-[#dcc090]"
             >
               <option value="pending">{t('admin.orders.pending')}</option>
               <option value="processing">{t('admin.orders.processing')}</option>
@@ -133,18 +138,18 @@ export function OrderRow({
           )}
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="whitespace-nowrap border-y border-[#dcc090]/25 bg-white/95 px-3 py-3 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0]">
         <div className="flex items-center gap-2">
           {updatingPaymentStatus ? (
             <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-              <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#122a26]"></div>
+              <span className="text-xs text-[#414141]/55">{t('admin.orders.updating')}</span>
             </div>
           ) : (
             <select
               value={order.paymentStatus}
               onChange={(e) => onPaymentStatusChange(e.target.value)}
-              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${getPaymentStatusColor(order.paymentStatus)}`}
+              className="w-full cursor-pointer rounded-lg border border-[#dcc090]/40 bg-[#dcc090]/28 px-2 py-1.5 text-xs font-bold text-[#122a26] shadow-sm outline-none transition-all hover:border-[#dcc090] hover:bg-[#dcc090]/40 focus:ring-2 focus:ring-[#dcc090]"
             >
               <option value="paid">{t('admin.orders.paid')}</option>
               <option value="pending">{t('admin.orders.pendingPayment')}</option>
@@ -153,7 +158,7 @@ export function OrderRow({
           )}
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="whitespace-nowrap rounded-r-xl border-y border-r border-[#dcc090]/25 bg-white/95 px-3 py-3 text-xs font-semibold text-[#414141]/60 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0] group-hover:shadow-[0_10px_22px_rgba(18,42,38,0.07)]">
         {new Date(order.createdAt).toLocaleDateString()}
       </td>
     </tr>

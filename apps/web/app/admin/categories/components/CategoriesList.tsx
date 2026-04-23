@@ -33,7 +33,7 @@ export function CategoriesList({ categories, onEdit, onDelete }: CategoriesListP
   }, [categories.length]);
 
   if (categoryTree.length === 0) {
-    return <p className="text-sm text-gray-500 py-2">{t('admin.categories.noCategories')}</p>;
+    return <p className="text-sm text-[#414141]/60 py-2">{t('admin.categories.noCategories')}</p>;
   }
 
   return (

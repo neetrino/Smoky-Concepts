@@ -163,7 +163,7 @@ export function VariantBuilder({
                             type="checkbox"
                             checked={enabled}
                             onChange={(e) => handleToggleAttributeEnabled(attribute.id, e.target.checked)}
-                            className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-blue-500"
+                            className="mt-1 h-4 w-4 rounded border-[#dcc090]/40 text-[#122a26] focus:ring-[#dcc090]"
                           />
                           <div className="min-w-0 flex-1">
                             <p className="font-medium text-gray-900">{attribute.title}</p>

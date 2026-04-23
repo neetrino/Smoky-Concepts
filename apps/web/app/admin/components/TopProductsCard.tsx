@@ -27,12 +27,13 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
   const router = useRouter();
 
   return (
-    <Card className="p-6">
+    <Card className="border border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">{t('admin.dashboard.topSellingProducts')}</h2>
+        <h2 className="text-xl font-black text-[#414141]">{t('admin.dashboard.topSellingProducts')}</h2>
         <Button
           variant="ghost"
           size="sm"
+          className="text-[#122a26] hover:bg-[#dcc090]/15 hover:text-[#122a26]"
           onClick={() => router.push('/admin/products')}
         >
           {t('admin.dashboard.viewAll')}
@@ -43,23 +44,23 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-16 bg-gray-200 rounded"></div>
+                <div className="h-16 rounded bg-[#dcc090]/30"></div>
               </div>
             ))}
           </div>
         ) : topProducts.length === 0 ? (
-          <div className="text-sm text-gray-600 text-center py-8">
+          <div className="py-8 text-center text-sm text-[#414141]/70">
             <p>{t('admin.dashboard.noSalesData')}</p>
           </div>
         ) : (
           topProducts.map((product, index) => (
             <div
               key={product.variantId}
-              className="flex items-center gap-4 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+              className="flex cursor-pointer items-center gap-4 rounded-lg border border-[#dcc090]/25 bg-white/70 p-3 transition-colors hover:border-[#dcc090] hover:bg-[#dcc090]/10"
               onClick={() => router.push(`/admin/products/${product.productId}`)}
             >
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-xs font-bold text-gray-500">
+                <div className="flex h-10 w-10 items-center justify-center rounded bg-[#122a26] text-xs font-black text-[#dcc090]">
                   {index + 1}
                 </div>
               </div>
@@ -73,14 +74,14 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{product.title}</p>
-                <p className="text-xs text-gray-600">SKU: {product.sku}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="truncate text-sm font-bold text-[#122a26]">{product.title}</p>
+                <p className="text-xs text-[#414141]/75">SKU: {product.sku}</p>
+                <p className="mt-1 text-xs text-[#414141]/55">
                   {t('admin.dashboard.sold').replace('{count}', product.totalQuantity.toString())} • {t('admin.dashboard.orders').replace('{count}', product.orderCount.toString())}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm font-black text-[#122a26]">
                   {formatCurrency(product.totalRevenue, ADMIN_PRICE_CURRENCY)}
                 </p>
               </div>

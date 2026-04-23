@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
@@ -22,7 +22,6 @@ export default function QuickSettingsPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
   const [globalDiscount, setGlobalDiscount] = useState<number>(0);
   const [discountLoading, setDiscountLoading] = useState(false);
   const [discountSaving, setDiscountSaving] = useState(false);
@@ -289,21 +288,12 @@ export default function QuickSettingsPage() {
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  // Get current path to highlight active tab
-  const [currentPath, setCurrentPath] = useState(pathname || '/admin/quick-settings');
-  
-  useEffect(() => {
-    if (pathname) {
-      setCurrentPath(pathname);
-    }
-  }, [pathname]);
-
   if (isLoading) {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#122a26] mx-auto mb-4"></div>
+          <p className="text-[#414141]/70">{t('admin.common.loading')}</p>
         </div>
       </div>
     );
@@ -315,8 +305,6 @@ export default function QuickSettingsPage() {
 
   return (
     <QuickSettingsContent
-      currentPath={currentPath}
-      router={router}
       t={t}
       globalDiscount={globalDiscount}
       setGlobalDiscount={setGlobalDiscount}

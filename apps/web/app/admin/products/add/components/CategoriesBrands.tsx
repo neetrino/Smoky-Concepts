@@ -165,7 +165,7 @@ export function CategoriesBrands({
                 onUseNewCategoryChange(false);
                 onNewCategoryNameChange('');
               }}
-              className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              className="w-4 h-4 text-[#122a26] border-[#dcc090]/40 focus:ring-[#dcc090]"
             />
             <label htmlFor="select-category" className="text-sm text-gray-700">
               {t('admin.products.add.selectExistingCategories')}
@@ -178,7 +178,7 @@ export function CategoriesBrands({
               name="category-mode"
               checked={useNewCategory}
               onChange={() => onUseNewCategoryChange(true)}
-              className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              className="w-4 h-4 text-[#122a26] border-[#dcc090]/40 focus:ring-[#dcc090]"
             />
             <label htmlFor="new-category" className="text-sm text-gray-700">
               {t('admin.products.add.addNewCategory')}
@@ -189,7 +189,7 @@ export function CategoriesBrands({
               <button
                 type="button"
                 onClick={() => onCategoriesExpandedChange(!categoriesExpanded)}
-                className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm flex items-center justify-between"
+                className="w-full px-3 py-2 text-left border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090] bg-white text-sm flex items-center justify-between"
               >
                 <span className="text-gray-700">
                   {categoryIds.length === 0
@@ -220,7 +220,7 @@ export function CategoriesBrands({
                             type="checkbox"
                             checked={categoryIds.includes(category.id)}
                             onChange={(e) => handleCategoryChange(category.id, e.target.checked)}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            className="w-4 h-4 text-[#122a26] border-[#dcc090]/40 rounded focus:ring-[#dcc090]"
                           />
                           <span className={`text-gray-700 ${category.isSubcategory ? 'text-xs' : 'text-sm font-semibold'}`}>
                             {category.title}
@@ -263,13 +263,13 @@ export function CategoriesBrands({
               {selectedCategories.map((category) => (
                 <span
                   key={category.id}
-                  className="inline-flex items-center gap-2 rounded-xl border border-blue-400 bg-white px-4 py-1.5 text-sm font-medium text-slate-900"
+                  className="inline-flex items-center gap-2 rounded-xl border border-[#dcc090] bg-white px-4 py-1.5 text-sm font-medium text-[#122a26]"
                 >
                   {category.title}
                   <button
                     type="button"
                     onClick={() => handleCategoryChange(category.id, false)}
-                    className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs text-white hover:bg-blue-700"
+                    className="flex h-5 w-5 items-center justify-center rounded-full bg-[#122a26] text-xs text-[#dcc090] hover:bg-[#18352f]"
                     aria-label={`Remove ${category.title}`}
                   >
                     ×

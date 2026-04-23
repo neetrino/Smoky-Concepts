@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { Button, Card, Input } from '@shop/ui';
 
 import { apiClient } from '@/lib/api-client';
 import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
@@ -36,29 +35,19 @@ export function SizeCatalogAdmin() {
     }
   }, [t]);
 
-  useEffect(() => {
-    void fetchCatalog();
-  }, [fetchCatalog]);
+  useEffect(() => { void fetchCatalog(); }, [fetchCatalog]);
 
   useEffect(() => {
-    if (categories.length === 0) {
-      setExpandedCategoryId(null);
-      return;
-    }
+    if (categories.length === 0) { setExpandedCategoryId(null); return; }
     setExpandedCategoryId((current) => {
-      if (current && categories.some((category) => category.id === current)) {
-        return current;
-      }
+      if (current && categories.some((c) => c.id === current)) return current;
       return categories[0]?.id ?? null;
     });
   }, [categories]);
 
   const handleAddCategory = async () => {
     const title = newCategoryTitle.trim();
-    if (!title) {
-      showToast(t('admin.sizes.titleRequired'), 'warning');
-      return;
-    }
+    if (!title) { showToast(t('admin.sizes.titleRequired'), 'warning'); return; }
     setSavingCategory(true);
     try {
       await apiClient.post(ADMIN_LIST_ENDPOINT, { title });
@@ -79,14 +68,9 @@ export function SizeCatalogAdmin() {
   };
 
   const saveEditCategory = async () => {
-    if (!editingCategoryId) {
-      return;
-    }
+    if (!editingCategoryId) return;
     const title = editingCategoryTitle.trim();
-    if (!title) {
-      showToast(t('admin.sizes.titleRequired'), 'warning');
-      return;
-    }
+    if (!title) { showToast(t('admin.sizes.titleRequired'), 'warning'); return; }
     try {
       await apiClient.patch(`/api/v1/admin/size-catalog/categories/${editingCategoryId}`, { title });
       setEditingCategoryId(null);
@@ -98,9 +82,7 @@ export function SizeCatalogAdmin() {
   };
 
   const deleteCategory = async (id: string) => {
-    if (!window.confirm(t('admin.sizes.deleteCategoryConfirm'))) {
-      return;
-    }
+    if (!window.confirm(t('admin.sizes.deleteCategoryConfirm'))) return;
     try {
       await apiClient.delete(`/api/v1/admin/size-catalog/categories/${id}`);
       showToast(t('admin.sizes.categoryDeleted'), 'success');
@@ -112,9 +94,7 @@ export function SizeCatalogAdmin() {
 
   const openItemModal = (categoryId: string, mode: 'create' | 'edit', item?: SizeCatalogItemDto) => {
     setItemModal({
-      open: true,
-      categoryId,
-      mode,
+      open: true, categoryId, mode,
       itemId: item?.id ?? null,
       title: item?.title ?? '',
       imageUrl: item?.imageUrl ?? '',
@@ -123,15 +103,7 @@ export function SizeCatalogAdmin() {
   };
 
   const openDuplicateModal = (categoryId: string, item: SizeCatalogItemDto) => {
-    setItemModal({
-      open: true,
-      categoryId,
-      mode: 'duplicate',
-      itemId: null,
-      title: item.title,
-      imageUrl: item.imageUrl,
-      version: item.version,
-    });
+    setItemModal({ open: true, categoryId, mode: 'duplicate', itemId: null, title: item.title, imageUrl: item.imageUrl, version: item.version });
   };
 
   const publishDraftItem = async (itemId: string) => {
@@ -145,9 +117,7 @@ export function SizeCatalogAdmin() {
   };
 
   const deleteItem = async (itemId: string) => {
-    if (!window.confirm(t('admin.sizes.deleteItemConfirm'))) {
-      return;
-    }
+    if (!window.confirm(t('admin.sizes.deleteItemConfirm'))) return;
     try {
       await apiClient.delete(`/api/v1/admin/size-catalog/items/${itemId}`);
       showToast(t('admin.sizes.itemDeleted'), 'success');
@@ -158,188 +128,219 @@ export function SizeCatalogAdmin() {
   };
 
   if (loading) {
-    return <p className="text-sm text-gray-600">{t('admin.sizes.loading')}</p>;
+    return (
+      <div className="py-10 text-center">
+        <div className="mx-auto mb-3 h-6 w-6 animate-spin rounded-full border-b-2 border-[#122a26]" />
+        <p className="text-sm text-[#414141]/55">{t('admin.sizes.loading')}</p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-8">
-      <Card className="p-4 sm:p-6">
-        <h2 className="text-lg font-semibold text-gray-900">{t('admin.sizes.newCategorySection')}</h2>
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+    <div className="space-y-5">
+      {/* New category card */}
+      <div className="overflow-hidden rounded-2xl border border-[#dcc090]/30 bg-white/90 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+        <div className="border-b border-[#dcc090]/20 bg-[#122a26] px-6 py-4">
+          <h2 className="text-base font-black uppercase tracking-[0.1em] text-[#dcc090]">
+            {t('admin.sizes.newCategorySection')}
+          </h2>
+        </div>
+        <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-end">
           <div className="flex-1">
-            <label className="mb-1 block text-sm font-medium text-gray-700">{t('admin.sizes.categoryTitle')}</label>
-            <Input
+            <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.08em] text-[#414141]/70">
+              {t('admin.sizes.categoryTitle')}
+            </label>
+            <input
               value={newCategoryTitle}
               onChange={(e) => setNewCategoryTitle(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') void handleAddCategory(); }}
               placeholder={t('admin.sizes.categoryTitlePlaceholder')}
               disabled={savingCategory}
+              className="w-full rounded-lg border border-[#dcc090]/35 bg-white px-3 py-2.5 text-sm text-[#122a26] placeholder-[#414141]/30 outline-none transition-all focus:border-[#dcc090] focus:ring-2 focus:ring-[#dcc090]/30 disabled:opacity-50"
             />
           </div>
-          <Button type="button" variant="primary" onClick={() => void handleAddCategory()} disabled={savingCategory}>
+          <button
+            type="button"
+            onClick={() => void handleAddCategory()}
+            disabled={savingCategory}
+            className="rounded-lg bg-[#122a26] px-5 py-2.5 text-sm font-bold text-[#dcc090] shadow-[0_4px_14px_rgba(18,42,38,0.15)] transition-all hover:bg-[#18352f] disabled:cursor-not-allowed disabled:opacity-50"
+          >
             {savingCategory ? t('admin.sizes.saving') : t('admin.sizes.createCategory')}
-          </Button>
+          </button>
         </div>
-      </Card>
+      </div>
 
+      {/* Categories list */}
       {categories.length === 0 ? (
-        <p className="text-sm text-gray-600">{t('admin.sizes.noCategories')}</p>
+        <div className="rounded-xl border border-dashed border-[#dcc090]/40 p-10 text-center">
+          <p className="text-sm text-[#414141]/50">{t('admin.sizes.noCategories')}</p>
+        </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-3">
           {categories.map((cat) => (
-            <Card key={cat.id} className="p-4 sm:p-6">
-              <div className="flex items-start gap-3">
+            <div
+              key={cat.id}
+              className="overflow-hidden rounded-2xl border border-[#dcc090]/25 bg-white/95 shadow-[0_4px_16px_rgba(18,42,38,0.05)]"
+            >
+              {/* Category header */}
+              <div className="flex items-center gap-3 px-5 py-4">
                 <button
                   type="button"
-                  onClick={() =>
-                    setExpandedCategoryId((current) => (current === cat.id ? null : cat.id))
-                  }
-                  className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-700 transition-colors hover:bg-gray-50"
+                  onClick={() => setExpandedCategoryId((cur) => (cur === cat.id ? null : cat.id))}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#dcc090]/35 bg-[#dcc090]/10 text-[#122a26] transition-all hover:bg-[#dcc090]/25"
                   aria-expanded={expandedCategoryId === cat.id}
-                  aria-label={cat.title}
                 >
                   <ChevronRight
-                    className={`h-5 w-5 transition-transform ${expandedCategoryId === cat.id ? 'rotate-90' : ''}`}
+                    className={`h-4 w-4 transition-transform duration-200 ${expandedCategoryId === cat.id ? 'rotate-90' : ''}`}
                     aria-hidden
                   />
                 </button>
+
                 <div className="min-w-0 flex-1">
                   {editingCategoryId === cat.id ? (
                     <div className="flex flex-wrap items-center gap-2">
-                      <Input
+                      <input
                         value={editingCategoryTitle}
                         onChange={(e) => setEditingCategoryTitle(e.target.value)}
-                        className="max-w-md"
+                        onKeyDown={(e) => { if (e.key === 'Enter') void saveEditCategory(); }}
+                        className="max-w-xs rounded-lg border border-[#dcc090]/35 bg-white px-3 py-2 text-sm text-[#122a26] outline-none focus:border-[#dcc090] focus:ring-2 focus:ring-[#dcc090]/30"
                       />
-                      <Button type="button" variant="primary" size="sm" onClick={() => void saveEditCategory()}>
-                        {t('admin.sizes.save')}
-                      </Button>
-                      <Button
+                      <button
                         type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => {
-                          setEditingCategoryId(null);
-                        }}
+                        onClick={() => void saveEditCategory()}
+                        className="rounded-lg bg-[#122a26] px-3 py-2 text-xs font-bold text-[#dcc090] transition-all hover:bg-[#18352f]"
+                      >
+                        {t('admin.sizes.save')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingCategoryId(null)}
+                        className="rounded-lg border border-[#dcc090]/30 px-3 py-2 text-xs font-bold text-[#414141]/70 transition-all hover:bg-[#dcc090]/10"
                       >
                         {t('admin.sizes.cancel')}
-                      </Button>
+                      </button>
                     </div>
                   ) : (
                     <button
                       type="button"
-                      onClick={() =>
-                        setExpandedCategoryId((current) => (current === cat.id ? null : cat.id))
-                      }
+                      onClick={() => setExpandedCategoryId((cur) => (cur === cat.id ? null : cat.id))}
                       className="text-left"
                     >
-                      <h3 className="text-xl font-semibold text-gray-900">{cat.title}</h3>
-                      {expandedCategoryId !== cat.id ? (
-                        <p className="mt-1 text-sm text-gray-500">
+                      <h3 className="text-sm font-black text-[#122a26]">{cat.title}</h3>
+                      {expandedCategoryId !== cat.id && (
+                        <p className="mt-0.5 text-xs text-[#414141]/45">
                           {cat.items[0]?.title ?? t('admin.sizes.noItems')}
                         </p>
-                      ) : null}
+                      )}
                     </button>
                   )}
                 </div>
-                {editingCategoryId !== cat.id ? (
+
+                {editingCategoryId !== cat.id && (
                   <div className="flex flex-wrap gap-2">
-                    <Button type="button" variant="secondary" size="sm" onClick={() => startEditCategory(cat)}>
+                    <button
+                      type="button"
+                      onClick={() => startEditCategory(cat)}
+                      className="rounded-lg border border-[#dcc090]/35 bg-[#dcc090]/10 px-3 py-1.5 text-xs font-bold text-[#122a26] transition-all hover:bg-[#dcc090]/25 hover:border-[#dcc090]"
+                    >
                       {t('admin.sizes.renameCategory')}
-                    </Button>
-                    <Button type="button" variant="secondary" size="sm" onClick={() => openItemModal(cat.id, 'create')}>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openItemModal(cat.id, 'create')}
+                      className="rounded-lg border border-[#dcc090]/35 bg-[#dcc090]/10 px-3 py-1.5 text-xs font-bold text-[#122a26] transition-all hover:bg-[#dcc090]/25 hover:border-[#dcc090]"
+                    >
                       {t('admin.sizes.addItem')}
-                    </Button>
-                    <Button type="button" variant="secondary" size="sm" onClick={() => void deleteCategory(cat.id)}>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void deleteCategory(cat.id)}
+                      className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700 transition-all hover:bg-red-100 hover:border-red-300"
+                    >
                       {t('admin.sizes.deleteCategory')}
-                    </Button>
+                    </button>
                   </div>
-                ) : null}
+                )}
               </div>
 
-              {expandedCategoryId === cat.id ? (
-                <div className="mt-6 grid gap-4 border-t border-gray-100 pt-4 sm:grid-cols-2 lg:grid-cols-3">
+              {/* Items grid */}
+              {expandedCategoryId === cat.id && (
+                <div className="border-t border-[#dcc090]/20 px-5 pb-5 pt-4">
                   {cat.items.length === 0 ? (
-                    <p className="text-sm text-gray-500">{t('admin.sizes.noItems')}</p>
+                    <p className="text-sm text-[#414141]/45">{t('admin.sizes.noItems')}</p>
                   ) : (
-                    cat.items.map((item) => (
-                      <div
-                        key={item.id}
-                        className={`flex gap-3 rounded-lg border bg-white p-3 shadow-sm ${
-                          item.published ? 'border-gray-200' : 'border-amber-300 bg-amber-50/40'
-                        }`}
-                      >
-                        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-gray-100">
-                          <img src={item.imageUrl} alt="" className="h-full w-full object-contain" />
-                          {item.version ? (
-                            <span className="absolute bottom-1 right-1 rounded-full bg-black/75 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">
-                              {item.version}
-                            </span>
-                          ) : null}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className="font-medium text-gray-900">{item.title}</p>
-                            {!item.published ? (
-                              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
-                                {t('admin.sizes.draftLabel')}
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {cat.items.map((item) => (
+                        <div
+                          key={item.id}
+                          className={`flex gap-3 rounded-xl border p-3 transition-all ${
+                            item.published
+                              ? 'border-[#dcc090]/20 bg-white'
+                              : 'border-amber-300/60 bg-amber-50/50'
+                          }`}
+                        >
+                          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-[#dcc090]/20 bg-[#dcc090]/5">
+                            <img src={item.imageUrl} alt="" className="h-full w-full object-contain" />
+                            {item.version && (
+                              <span className="absolute bottom-1 right-1 rounded-full bg-[#122a26]/85 px-1.5 py-0.5 text-[10px] font-bold uppercase text-[#dcc090]">
+                                {item.version}
                               </span>
-                            ) : null}
+                            )}
                           </div>
-                          <div className="mt-2 flex flex-wrap items-center gap-2">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => openItemModal(cat.id, 'edit', item)}
-                            >
-                              {t('admin.sizes.editItem')}
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              title={t('admin.sizes.duplicateItem')}
-                              aria-label={t('admin.sizes.duplicateItem')}
-                              onClick={() => openDuplicateModal(cat.id, item)}
-                              className="px-2"
-                            >
-                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                                <rect x="7" y="7" width="12" height="12" rx="2" strokeWidth={2} />
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M5 15H4a1 1 0 01-1-1V5a1 1 0 011-1h9a1 1 0 011 1v1"
-                                />
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M13 10v6M10 13h6"
-                                />
-                              </svg>
-                            </Button>
-                            {!item.published ? (
-                              <Button
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <p className="text-sm font-bold text-[#122a26]">{item.title}</p>
+                              {!item.published && (
+                                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                                  {t('admin.sizes.draftLabel')}
+                                </span>
+                              )}
+                            </div>
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              <button
                                 type="button"
-                                variant="primary"
-                                size="sm"
-                                onClick={() => void publishDraftItem(item.id)}
+                                onClick={() => openItemModal(cat.id, 'edit', item)}
+                                className="rounded-lg border border-[#dcc090]/35 bg-[#dcc090]/10 px-2.5 py-1 text-xs font-bold text-[#122a26] transition-all hover:bg-[#dcc090]/25"
                               >
-                                {t('admin.sizes.activateItem')}
-                              </Button>
-                            ) : null}
-                            <Button type="button" variant="secondary" size="sm" onClick={() => void deleteItem(item.id)}>
-                              {t('admin.sizes.deleteItem')}
-                            </Button>
+                                {t('admin.sizes.editItem')}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => openDuplicateModal(cat.id, item)}
+                                title={t('admin.sizes.duplicateItem')}
+                                className="rounded-lg border border-[#dcc090]/35 bg-[#dcc090]/10 px-2 py-1 text-[#122a26] transition-all hover:bg-[#dcc090]/25"
+                              >
+                                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                                  <rect x="7" y="7" width="12" height="12" rx="2" strokeWidth={2} />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15H4a1 1 0 01-1-1V5a1 1 0 011-1h9a1 1 0 011 1v1" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10v6M10 13h6" />
+                                </svg>
+                              </button>
+                              {!item.published && (
+                                <button
+                                  type="button"
+                                  onClick={() => void publishDraftItem(item.id)}
+                                  className="rounded-lg bg-[#122a26] px-2.5 py-1 text-xs font-bold text-[#dcc090] transition-all hover:bg-[#18352f]"
+                                >
+                                  {t('admin.sizes.activateItem')}
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => void deleteItem(item.id)}
+                                className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 transition-all hover:bg-red-100"
+                              >
+                                {t('admin.sizes.deleteItem')}
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      ))}
+                    </div>
                   )}
                 </div>
-              ) : null}
-            </Card>
+              )}
+            </div>
           ))}
         </div>
       )}

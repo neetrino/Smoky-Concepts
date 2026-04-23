@@ -47,10 +47,10 @@ export function OrdersTable({
 
   if (loading) {
     return (
-      <Card className="p-6">
+      <Card className="border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.orders.loadingOrders')}</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#122a26] mx-auto mb-4"></div>
+          <p className="text-[#414141]/70">{t('admin.orders.loadingOrders')}</p>
         </div>
       </Card>
     );
@@ -58,50 +58,61 @@ export function OrdersTable({
 
   if (orders.length === 0) {
     return (
-      <Card className="p-6">
+      <Card className="border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
         <div className="text-center py-8">
-          <p className="text-gray-600">{t('admin.orders.noOrders')}</p>
+          <p className="text-[#414141]/70">{t('admin.orders.noOrders')}</p>
         </div>
       </Card>
     );
   }
 
   return (
-    <Card className="p-6">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+    <Card className="overflow-hidden border-[#dcc090]/30 bg-white/85 p-2 shadow-[0_18px_50px_rgba(18,42,38,0.08)] sm:p-3">
+      <div className="rounded-[1.15rem]">
+        <table className="w-full table-fixed border-separate border-spacing-y-2">
+          <colgroup>
+            <col className="w-[4.5%]" />
+            <col className="w-[10%]" />
+            <col className="w-[23%]" />
+            <col className="w-[11%]" />
+            <col className="w-[13%]" />
+            <col className="w-[14%]" />
+            <col className="w-[14%]" />
+            <col className="w-[10.5%]" />
+          </colgroup>
+          <thead>
             <tr>
-              <th className="px-4 py-3">
+              <th className="rounded-l-xl bg-[#122a26] px-3 py-4 shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 <input
                   type="checkbox"
                   aria-label={t('admin.orders.selectAllOrders')}
                   checked={orders.length > 0 && orders.every(o => selectedIds.has(o.id))}
                   onChange={onToggleSelectAll}
+                  className="h-4 w-4 rounded border-[#dcc090]/60 bg-white text-[#122a26] focus:ring-[#dcc090]"
                 />
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 {t('admin.orders.orderNumber')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 {t('admin.orders.customer')}
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                className="cursor-pointer select-none bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)] transition-colors hover:bg-[#18352f]"
                 onClick={() => onSort('total')}
               >
                 <div className="flex items-center gap-1">
                   {t('admin.orders.total')}
                   <div className="flex flex-col">
                     <svg
-                      className={`w-3 h-3 ${sortBy === 'total' && sortOrder === 'asc' ? 'text-blue-600' : 'text-gray-400'}`}
+                      className={`w-3 h-3 ${sortBy === 'total' && sortOrder === 'asc' ? 'text-white' : 'text-[#dcc090]/60'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
                       <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                     </svg>
                     <svg
-                      className={`w-3 h-3 -mt-1 ${sortBy === 'total' && sortOrder === 'desc' ? 'text-blue-600' : 'text-gray-400'}`}
+                      className={`w-3 h-3 -mt-1 ${sortBy === 'total' && sortOrder === 'desc' ? 'text-white' : 'text-[#dcc090]/60'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -110,31 +121,31 @@ export function OrdersTable({
                   </div>
                 </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 {t('admin.orders.orderDetails.colorSize')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 {t('admin.orders.status')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 {t('admin.orders.payment')}
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
+                className="cursor-pointer select-none rounded-r-xl bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)] transition-colors hover:bg-[#18352f]"
                 onClick={() => onSort('createdAt')}
               >
                 <div className="flex items-center gap-1">
                   {t('admin.orders.date')}
                   <div className="flex flex-col">
                     <svg
-                      className={`w-3 h-3 ${sortBy === 'createdAt' && sortOrder === 'asc' ? 'text-blue-600' : 'text-gray-400'}`}
+                      className={`w-3 h-3 ${sortBy === 'createdAt' && sortOrder === 'asc' ? 'text-white' : 'text-[#dcc090]/60'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
                       <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                     </svg>
                     <svg
-                      className={`w-3 h-3 -mt-1 ${sortBy === 'createdAt' && sortOrder === 'desc' ? 'text-blue-600' : 'text-gray-400'}`}
+                      className={`w-3 h-3 -mt-1 ${sortBy === 'createdAt' && sortOrder === 'desc' ? 'text-white' : 'text-[#dcc090]/60'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -145,7 +156,7 @@ export function OrdersTable({
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody>
             {orders.map((order) => (
               <OrderRow
                 key={order.id}

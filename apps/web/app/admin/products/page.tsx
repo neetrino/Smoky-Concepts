@@ -7,8 +7,10 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ProductFilters } from './components/ProductFilters';
 import { ProductsTable } from './components/ProductsTable';
+import { BulkSelectionControls } from '../orders/components/BulkSelectionControls';
 import { useProductHandlers } from './hooks/useProductHandlers';
 import type { Product, ProductsResponse, Category } from './types';
+import { AdminShell } from '../components/AdminShell';
 import { ADMIN_CENTERED_LOADING_CLASS, ADMIN_PAGE_SHELL_CLASS } from '../constants/adminShell.constants';
 
 export default function ProductsPage() {
@@ -282,19 +284,9 @@ export default function ProductsPage() {
   return (
     <div className={ADMIN_PAGE_SHELL_CLASS}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <button
-            onClick={() => router.push('/admin')}
-            className="text-gray-600 hover:text-gray-900 mb-2 flex items-center text-sm"
-          >
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.products.backToAdmin')}
-          </button>
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('admin.products.title')}</h1>
-            {(search || selectedCategories.size > 0 || skuSearch || stockFilter !== 'all') && (
+        <AdminShell>
+          {(search || selectedCategories.size > 0 || skuSearch || stockFilter !== 'all') && (
+            <div className="mb-4 flex justify-end">
               <button
                 type="button"
                 onClick={handleClearFilters}
@@ -302,12 +294,9 @@ export default function ProductsPage() {
               >
                 {t('admin.products.clearAll')}
               </button>
-            )}
-          </div>
-        </div>
+            </div>
+          )}
 
-        <div>
-          <div className="min-w-0">
             <ProductFilters
               search={search}
               setSearch={setSearch}
@@ -325,11 +314,6 @@ export default function ProductsPage() {
               setMinPrice={setMinPrice}
               maxPrice={maxPrice}
               setMaxPrice={setMaxPrice}
-              selectedIds={selectedIds}
-              handleSearch={handlers.handleSearch}
-              handleBulkDelete={handlers.handleBulkDelete}
-              handleClearFilters={handleClearFilters}
-              bulkDeleting={bulkDeleting}
               setPage={setPage}
             />
 
@@ -337,7 +321,7 @@ export default function ProductsPage() {
             <div className="mb-6">
               <button
                 onClick={() => router.push('/admin/products/add')}
-                className="w-full px-4 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 font-medium text-sm"
+                className="w-full px-4 py-3 bg-[#122a26] text-[#dcc090] rounded-lg hover:bg-[#18352f] transition-colors flex items-center justify-center gap-2 font-medium text-sm"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -345,6 +329,15 @@ export default function ProductsPage() {
                 {t('admin.products.addNewProduct')}
               </button>
             </div>
+
+            <BulkSelectionControls
+              selectedCount={selectedIds.size}
+              onBulkDelete={handlers.handleBulkDelete}
+              bulkDeleting={bulkDeleting}
+              selectedLabel={t('admin.products.selectedProducts').replace('{count}', selectedIds.size.toString())}
+              deleteLabel={t('admin.products.deleteSelected')}
+              deletingLabel={t('admin.products.deleting')}
+            />
 
             {/* Products Table */}
             <ProductsTable
@@ -365,8 +358,7 @@ export default function ProductsPage() {
               page={page}
               setPage={setPage}
             />
-          </div>
-        </div>
+        </AdminShell>
       </div>
     </div>
   );

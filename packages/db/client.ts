@@ -2,12 +2,16 @@ import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as any;
 
+function isPostgresUrl(value: string) {
+  return value.startsWith('postgresql://') || value.startsWith('postgres://');
+}
+
 // Ensure UTF-8 encoding for PostgreSQL connection
 // This fixes encoding issues with Armenian and other UTF-8 characters
 const databaseUrl = process.env.DATABASE_URL || '';
 let urlWithEncoding = databaseUrl;
 
-if (!databaseUrl.includes('client_encoding')) {
+if (isPostgresUrl(databaseUrl) && !databaseUrl.includes('client_encoding')) {
   urlWithEncoding = databaseUrl.includes('?') 
     ? `${databaseUrl}&client_encoding=UTF8`
     : `${databaseUrl}?client_encoding=UTF8`;

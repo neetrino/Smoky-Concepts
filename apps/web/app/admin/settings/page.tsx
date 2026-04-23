@@ -6,6 +6,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import { AdminShell } from '../components/AdminShell';
 interface Settings {
   defaultCurrency?: string;
   globalDiscount?: number;
@@ -106,8 +107,8 @@ export default function SettingsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#122a26] mx-auto mb-4"></div>
+          <p className="text-[#414141]/70">{t('admin.common.loading')}</p>
         </div>
       </div>
     );
@@ -118,60 +119,48 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#efefef] pt-[3.75rem] pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <button
-            onClick={() => router.push('/admin')}
-            className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.settings.backToAdmin')}
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.settings.title')}</h1>
-        </div>
-
-        {/* General Settings */}
-        <Card className="p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.settings.generalSettings')}</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('admin.settings.siteName')}
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={t('admin.settings.siteNamePlaceholder')}
-              />
+        <AdminShell>
+          {/* General Settings */}
+          <Card className="mb-6 border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+            <h2 className="text-xl font-semibold text-[#122a26] mb-4">{t('admin.settings.generalSettings')}</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#414141]/75 mb-1">
+                  {t('admin.settings.siteName')}
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
+                  defaultValue={t('admin.settings.siteNamePlaceholder')}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#414141]/75 mb-1">
+                  {t('admin.settings.siteDescription')}
+                </label>
+                <textarea
+                  className="w-full px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
+                  rows={3}
+                  defaultValue={t('admin.settings.siteDescriptionPlaceholder')}
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('admin.settings.siteDescription')}
-              </label>
-              <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={3}
-                defaultValue={t('admin.settings.siteDescriptionPlaceholder')}
-              />
-            </div>
-          </div>
-        </Card>
+          </Card>
 
         {/* Payment Settings */}
-        <Card className="p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.settings.paymentSettings')}</h2>
+        <Card className="mb-6 border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+          <h2 className="text-xl font-semibold text-[#122a26] mb-4">{t('admin.settings.paymentSettings')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[#414141]/75 mb-1">
                 {t('admin.settings.defaultCurrency')}
               </label>
               <select 
                 value={settings.defaultCurrency || 'AMD'}
                 onChange={(e) => setSettings({ ...settings, defaultCurrency: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
               >
                 <option value="AMD">{t('admin.settings.amd')}</option>
                 <option value="USD">{t('admin.settings.usd')}</option>
@@ -185,30 +174,30 @@ export default function SettingsPage() {
                   defaultChecked
                   className="mr-2"
                 />
-                <span className="text-sm font-medium text-gray-700">{t('admin.settings.enableOnlinePayments')}</span>
+                <span className="text-sm font-medium text-[#414141]/75">{t('admin.settings.enableOnlinePayments')}</span>
               </label>
             </div>
           </div>
         </Card>
 
         {/* Currency Exchange Rates */}
-        <Card className="p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.settings.currencyRates')}</h2>
-          <p className="mb-4 text-sm text-gray-600">{t('admin.settings.currencyRatesDescription')}</p>
+        <Card className="mb-6 border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+          <h2 className="text-xl font-semibold text-[#122a26] mb-4">{t('admin.settings.currencyRates')}</h2>
+          <p className="mb-4 text-sm text-[#414141]/70">{t('admin.settings.currencyRatesDescription')}</p>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[#414141]/75 mb-1">
                 {t('admin.settings.baseCurrency')}
               </label>
               <input
                 type="number"
                 value={1}
                 disabled
-                className="w-full cursor-not-allowed rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-gray-600"
+                className="w-full cursor-not-allowed rounded-md border border-[#dcc090]/25 bg-[#dcc090]/15 px-3 py-2 text-[#414141]/60"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[#414141]/75 mb-1">
                 {t('admin.settings.rateToUSD')}
               </label>
               <input
@@ -226,11 +215,11 @@ export default function SettingsPage() {
                     },
                   }));
                 }}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border border-[#dcc090]/35 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[#414141]/75 mb-1">
                 {t('admin.settings.rateToRub')}
               </label>
               <input
@@ -248,30 +237,31 @@ export default function SettingsPage() {
                     },
                   }));
                 }}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border border-[#dcc090]/35 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
               />
             </div>
           </div>
-          <p className="mt-3 text-xs text-gray-500">{t('admin.settings.amdPrimaryNote')}</p>
+          <p className="mt-3 text-xs text-[#414141]/55">{t('admin.settings.amdPrimaryNote')}</p>
         </Card>
 
         {/* Actions */}
-        <div className="flex gap-4">
-          <Button
-            variant="primary"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? t('admin.settings.saving') : t('admin.settings.saveSettings')}
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/admin')}
-            disabled={saving}
-          >
-            {t('admin.settings.cancel')}
-          </Button>
-        </div>
+          <div className="flex gap-4">
+            <Button
+              variant="primary"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? t('admin.settings.saving') : t('admin.settings.saveSettings')}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => router.push('/admin')}
+              disabled={saving}
+            >
+              {t('admin.settings.cancel')}
+            </Button>
+          </div>
+        </AdminShell>
       </div>
     </div>
   );

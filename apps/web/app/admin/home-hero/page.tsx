@@ -2,10 +2,9 @@
 
 import type { ChangeEvent } from 'react';
 import { useCallback, useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { Button, Card } from '@shop/ui';
+import { useRouter } from 'next/navigation';
 
-import { AdminSidebar } from '../components/AdminSidebar';
+import { AdminShell } from '../components/AdminShell';
 import { HomeHeroSlideEditor } from './components/HomeHeroSlideEditor';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { apiClient } from '@/lib/api-client';
@@ -13,6 +12,7 @@ import { HOME_HERO_DEFAULT_SLIDES } from '@/lib/constants/home-hero.constants';
 import { useTranslation } from '@/lib/i18n-client';
 import { processImageFile } from '@/lib/services/utils/image-utils';
 import type { HomeHeroSlide } from '@/lib/types/home-hero.types';
+import { ADMIN_PAGE_SHELL_CLASS } from '../constants/adminShell.constants';
 
 const UPLOAD_IMAGES_ENDPOINT = '/api/v1/admin/home-hero/upload-images';
 
@@ -40,7 +40,6 @@ export default function AdminHomeHeroPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [slides, setSlides] = useState<HomeHeroSlide[]>([]);
@@ -144,10 +143,10 @@ export default function AdminHomeHeroPage() {
 
   if (isLoading || loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-[#efefef]">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900" />
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-[#122a26]" />
+          <p className="text-[#414141]/70">{t('admin.common.loading')}</p>
         </div>
       </div>
     );
@@ -158,48 +157,40 @@ export default function AdminHomeHeroPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className={ADMIN_PAGE_SHELL_CLASS}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <button
-            type="button"
-            onClick={() => router.push('/admin')}
-            className="mb-4 flex items-center text-gray-600 transition-colors duration-200 hover:text-gray-900"
-          >
-            <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.homeHero.back')}
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.homeHero.title')}</h1>
-          <p className="mt-2 text-sm text-gray-600">{t('admin.homeHero.subtitle')}</p>
-        </div>
-
-        <div className="flex flex-col gap-8 lg:flex-row">
-          <AdminSidebar currentPath={pathname ?? '/admin/home-hero'} router={router} t={t} />
-
-          <div className="min-w-0 flex-1">
+        <AdminShell>
+          <div className="space-y-6">
             {error ? (
-              <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
                 {error}
               </div>
             ) : null}
 
-            <Card className="p-6">
-              <div className="mb-4 flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setSlides((s) => [...s, createEmptySlide()])}
-                >
-                  {t('admin.homeHero.addSlide')}
-                </Button>
-                <Button type="button" variant="secondary" onClick={resetToDefaults}>
-                  {t('admin.homeHero.resetDefaults')}
-                </Button>
+            <div className="overflow-hidden rounded-2xl border border-[#dcc090]/30 bg-white/90 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#dcc090]/20 bg-[#122a26] px-6 py-4">
+                <h1 className="text-base font-black uppercase tracking-[0.1em] text-[#dcc090]">
+                  {t('admin.homeHero.title')}
+                </h1>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSlides((s) => [...s, createEmptySlide()])}
+                    className="rounded-lg border border-[#dcc090]/40 bg-[#dcc090]/15 px-4 py-2 text-xs font-bold text-[#dcc090] transition-all hover:bg-[#dcc090]/25 hover:border-[#dcc090]"
+                  >
+                    {t('admin.homeHero.addSlide')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetToDefaults}
+                    className="rounded-lg border border-[#dcc090]/40 bg-[#dcc090]/15 px-4 py-2 text-xs font-bold text-[#dcc090] transition-all hover:bg-[#dcc090]/25 hover:border-[#dcc090]"
+                  >
+                    {t('admin.homeHero.resetDefaults')}
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="p-6 space-y-3">
                 {slides.map((slide, index) => (
                   <HomeHeroSlideEditor
                     key={index}
@@ -216,14 +207,19 @@ export default function AdminHomeHeroPage() {
                 ))}
               </div>
 
-              <div className="mt-6 flex justify-end gap-2">
-                <Button type="button" variant="primary" onClick={() => void handleSave()} disabled={saving}>
+              <div className="flex justify-end border-t border-[#dcc090]/20 px-6 py-4">
+                <button
+                  type="button"
+                  onClick={() => void handleSave()}
+                  disabled={saving}
+                  className="rounded-lg bg-[#122a26] px-6 py-2.5 text-sm font-bold text-[#dcc090] shadow-[0_4px_14px_rgba(18,42,38,0.18)] transition-all hover:bg-[#18352f] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   {saving ? t('admin.common.saving') : t('admin.homeHero.save')}
-                </Button>
+                </button>
               </div>
-            </Card>
+            </div>
           </div>
-        </div>
+        </AdminShell>
       </div>
     </div>
   );

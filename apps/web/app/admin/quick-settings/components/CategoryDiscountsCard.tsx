@@ -1,6 +1,5 @@
 'use client';
 
-import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
 
 interface AdminCategory {
@@ -31,83 +30,89 @@ export function CategoryDiscountsCard({
   const { t } = useTranslation();
 
   return (
-    <Card className="p-6 mb-8 bg-white border-gray-200">
-      <div className="flex items-center justify-between mb-4">
+    <div className="overflow-hidden rounded-2xl border border-[#dcc090]/30 bg-white/90 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+      <div className="flex items-center justify-between border-b border-[#dcc090]/20 bg-[#122a26] px-6 py-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">{t('admin.quickSettings.categoryDiscounts')}</h2>
-          <p className="text-sm text-gray-600">{t('admin.quickSettings.categoryDiscountsSubtitle')}</p>
+          <h2 className="text-base font-black uppercase tracking-[0.1em] text-[#dcc090]">
+            {t('admin.quickSettings.categoryDiscounts')}
+          </h2>
+          <p className="mt-0.5 text-xs text-[#dcc090]/55">
+            {t('admin.quickSettings.categoryDiscountsSubtitle')}
+          </p>
         </div>
-        <Button
-          variant="primary"
+        <button
+          type="button"
           onClick={handleCategoryDiscountSave}
           disabled={categorySaving || categories.length === 0}
+          className="inline-flex items-center gap-2 rounded-lg bg-[#dcc090] px-5 py-2 text-sm font-bold text-[#122a26] shadow-[0_4px_14px_rgba(18,42,38,0.18)] transition-all hover:bg-[#e8d0a0] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {categorySaving ? (
-            <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span>{t('admin.quickSettings.saving')}</span>
-            </div>
+            <>
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-b-2 border-[#122a26]" />
+              {t('admin.quickSettings.saving')}
+            </>
           ) : (
             t('admin.quickSettings.save')
           )}
-        </Button>
+        </button>
       </div>
 
-      {categoriesLoading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.quickSettings.loadingCategories')}</p>
-        </div>
-      ) : categories.length === 0 ? (
-        <div className="text-center py-6 text-gray-600 border border-dashed border-gray-200 rounded">
-          {t('admin.quickSettings.noCategories')}
-        </div>
-      ) : (
-        <div className="max-h-[420px] overflow-y-auto divide-y divide-gray-100 border border-gray-100 rounded-lg">
-          {categories.map((category) => {
-            const currentValue = categoryDiscounts[category.id];
-            return (
-              <div
-                key={category.id}
-                className="flex items-center gap-4 px-4 py-3 bg-white hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {category.title || t('admin.quickSettings.untitledCategory')}
-                  </p>
-                  {category.parentId ? (
-                    <p className="text-xs text-gray-500">{t('admin.quickSettings.parentCategoryId').replace('{id}', category.parentId)}</p>
-                  ) : (
-                    <p className="text-xs text-gray-500">{t('admin.quickSettings.rootCategory')}</p>
-                  )}
+      <div className="p-5">
+        {categoriesLoading ? (
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#122a26] mb-4" />
+            <p className="text-sm text-[#414141]/70">{t('admin.quickSettings.loadingCategories')}</p>
+          </div>
+        ) : categories.length === 0 ? (
+          <div className="py-6 text-center text-sm text-[#414141]/70 border border-dashed border-[#dcc090]/35 rounded-xl">
+            {t('admin.quickSettings.noCategories')}
+          </div>
+        ) : (
+          <div className="max-h-[420px] overflow-y-auto divide-y divide-[#dcc090]/20 rounded-xl border border-[#dcc090]/25">
+            {categories.map((category) => {
+              const currentValue = categoryDiscounts[category.id];
+              return (
+                <div
+                  key={category.id}
+                  className="flex items-center gap-4 bg-white px-4 py-3 transition-colors hover:bg-[#dcc090]/10"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#122a26] truncate">
+                      {category.title || t('admin.quickSettings.untitledCategory')}
+                    </p>
+                    <p className="text-xs text-[#414141]/55">
+                      {category.parentId
+                        ? t('admin.quickSettings.parentCategoryId').replace('{id}', category.parentId)
+                        : t('admin.quickSettings.rootCategory')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      value={currentValue === undefined ? '' : currentValue}
+                      onChange={(e) => updateCategoryDiscountValue(category.id, e.target.value)}
+                      placeholder="0"
+                      className="w-24 rounded-lg border border-[#dcc090]/35 bg-white px-3 py-2 text-sm text-[#122a26] placeholder-[#414141]/30 outline-none transition-all focus:border-[#dcc090] focus:ring-2 focus:ring-[#dcc090]/30"
+                    />
+                    <span className="text-sm font-medium text-[#414141]/75">%</span>
+                    <button
+                      type="button"
+                      onClick={() => clearCategoryDiscount(category.id)}
+                      disabled={currentValue === undefined}
+                      className="rounded-lg border border-[#dcc090]/30 px-3 py-2 text-xs font-bold text-[#414141]/70 transition-all hover:border-[#dcc090]/50 hover:bg-[#dcc090]/10 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      {t('admin.quickSettings.clear')}
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={currentValue === undefined ? '' : currentValue}
-                    onChange={(e) => updateCategoryDiscountValue(category.id, e.target.value)}
-                    className="w-24"
-                    placeholder="0"
-                  />
-                  <span className="text-sm font-medium text-gray-700">%</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => clearCategoryDiscount(category.id)}
-                    disabled={currentValue === undefined}
-                  >
-                    {t('admin.quickSettings.clear')}
-                  </Button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
-

@@ -27,18 +27,18 @@ export function PeriodSelector({
   const { t } = useTranslation();
 
   return (
-    <Card className="p-6 mb-6 bg-white shadow-sm border border-gray-200 rounded-xl">
+    <Card className="mb-6 rounded-xl border border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">{t('admin.analytics.timePeriod')}</h2>
+        <h2 className="text-xl font-semibold text-[#122a26]">{t('admin.analytics.timePeriod')}</h2>
         {analytics && (
-          <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1.5 rounded-lg">
+          <div className="text-sm text-[#414141]/70 bg-[#dcc090]/15 px-3 py-1.5 rounded-lg">
             {formatDate(analytics.dateRange.start)} - {formatDate(analytics.dateRange.end)}
           </div>
         )}
       </div>
       <div className="flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[200px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[#414141]/75 mb-2">
             {t('admin.analytics.period')}
           </label>
           <select
@@ -50,7 +50,7 @@ export function PeriodSelector({
                 onEndDateChange('');
               }
             }}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
+            className="w-full px-4 py-2.5 border border-[#dcc090]/35 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090] transition-all bg-white"
           >
             <option value="day">{t('admin.analytics.today')}</option>
             <option value="week">{t('admin.analytics.last7Days')}</option>
@@ -62,25 +62,25 @@ export function PeriodSelector({
         {period === 'custom' && (
           <>
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#414141]/75 mb-2">
                 {t('admin.analytics.startDate')}
               </label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => onStartDateChange(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
+                className="w-full px-4 py-2.5 border border-[#dcc090]/35 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090] transition-all bg-white"
               />
             </div>
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#414141]/75 mb-2">
                 {t('admin.analytics.endDate')}
               </label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => onEndDateChange(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
+                className="w-full px-4 py-2.5 border border-[#dcc090]/35 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090] transition-all bg-white"
               />
             </div>
           </>

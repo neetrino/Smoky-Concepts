@@ -7,6 +7,10 @@ import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '@/lib/api-client';
 import { AdminMenuDrawer, type AdminMenuItem } from '@/components/AdminMenuDrawer';
 import { getAdminMenuTABS } from '../../admin-menu.config';
+import {
+  ADMIN_FIXED_SIDEBAR_CLASS,
+  ADMIN_FIXED_SIDEBAR_SPACER_CLASS,
+} from '../../constants/adminShell.constants';
 import { getAdminSidebarNavIndentClass } from '../../utils/adminMenuIndent';
 import { useTranslation } from '@/lib/i18n-client';
 
@@ -239,34 +243,15 @@ export default function PriceFilterSettingsPage() {
   const adminTabs = getAdminMenuTABS(t);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-[#efefef] pt-[3.75rem] pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => router.push('/admin')}
-            className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.common.backToAdmin')}
-          </button>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{t('admin.priceFilter.title')}</h1>
-              <p className="text-gray-600 mt-2">{t('admin.priceFilter.subtitle')}</p>
-            </div>
-          </div>
-        </div>
-
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:hidden mb-6">
             <AdminMenuDrawer tabs={adminTabs} currentPath={currentPath} />
           </div>
           {/* Sidebar Navigation */}
-          <aside className="hidden lg:block lg:w-64 flex-shrink-0">
-            <nav className="bg-white border border-gray-200 rounded-lg p-2 space-y-1">
+          <aside className={ADMIN_FIXED_SIDEBAR_CLASS}>
+            <nav className="h-full space-y-1 overflow-y-auto border-r border-[#dcc090]/25 bg-[#122a26] p-3">
               {adminTabs.map((tab: AdminMenuItem) => {
                 const isActive = currentPath === tab.path || 
                   (tab.path === '/admin' && currentPath === '/admin') ||
@@ -281,11 +266,11 @@ export default function PriceFilterSettingsPage() {
                       tab
                     )} ${
                       isActive
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                        ? 'bg-[#dcc090] text-[#122a26]'
+                        : 'text-[#dcc090]/75 hover:bg-white/5 hover:text-[#dcc090]'
                     }`}
                   >
-                    <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>
+                    <span className={`flex-shrink-0 ${isActive ? 'text-[#122a26]' : 'text-[#dcc090]/65'}`}>
                       {tab.icon}
                     </span>
                     <span className="text-left">{tab.label}</span>
@@ -294,6 +279,7 @@ export default function PriceFilterSettingsPage() {
               })}
             </nav>
           </aside>
+          <div className={ADMIN_FIXED_SIDEBAR_SPACER_CLASS} aria-hidden="true" />
 
           {/* Main Content */}
           <div className="flex-1 min-w-0">
@@ -329,14 +315,14 @@ export default function PriceFilterSettingsPage() {
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="bg-[#dcc090]/15 border border-[#dcc090]/30 rounded-lg p-4">
                     <div className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[#122a26] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <div className="text-sm text-blue-800">
+                      <div className="text-sm text-[#122a26]">
                         <p className="font-medium mb-1">{t('admin.priceFilter.howItWorks')}</p>
-                        <ul className="list-disc list-inside space-y-1 text-blue-700">
+                        <ul className="list-disc list-inside space-y-1 text-[#414141]/75">
                           <li>{t('admin.priceFilter.stepSizeControls')}</li>
                           <li>{t('admin.priceFilter.defaultRange')}</li>
                           <li>{t('admin.priceFilter.usersCanAdjust')}</li>
