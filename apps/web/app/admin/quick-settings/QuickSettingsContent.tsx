@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../lib/i18n-client';
 import { AdminShell } from '../components/AdminShell';
 import { GlobalDiscountCard } from './components/GlobalDiscountCard';
@@ -16,8 +15,6 @@ interface AdminCategory {
 }
 
 interface QuickSettingsContentProps {
-  currentPath: string;
-  router: ReturnType<typeof useRouter>;
   t: ReturnType<typeof useTranslation>['t'];
   globalDiscount: number;
   setGlobalDiscount: (value: number) => void;

@@ -59,7 +59,7 @@ export function ProductFilters({
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
-                handleSearch(e as any);
+                setPage(1);
               }
             }}
             placeholder={t('admin.products.searchPlaceholder')}
