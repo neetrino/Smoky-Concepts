@@ -23,6 +23,7 @@
     "subtotal": "Промежуточный итог",
     "discount": "Скидка",
     "shipping": "Доставка",
+    "collectionPrice": "Цена коллекции",
     "tax": "Налог",
     "total": "Итого",
     "loadingTotals": "Загрузка итогов..."
@@ -37,6 +38,7 @@
     "customization": "Персонализация",
     "customize_text": "Текст",
     "version": "Версия",
+    "collection_price": "Цена коллекции",
     "customize_font": "Шрифт",
     "customize_style": "Стиль",
     "customize_preview": "Предпросмотр",

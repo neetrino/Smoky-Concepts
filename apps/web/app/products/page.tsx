@@ -45,6 +45,7 @@ interface Product {
   defaultVariantId?: string | null;
   defaultVariantStock?: number;
   defaultSku?: string;
+  sizeLabel?: string | null;
 }
 
 interface ProductsResponse {
@@ -151,6 +152,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     defaultVariantId: p.defaultVariantId ?? null,
     defaultVariantStock: p.defaultVariantStock ?? 0,
     defaultSku: p.defaultSku ?? '',
+    sizeLabel: typeof p.sizeLabel === 'string' ? p.sizeLabel : null,
   }));
 
   return (

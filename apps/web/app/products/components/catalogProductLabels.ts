@@ -30,6 +30,7 @@ export interface CatalogProduct extends CatalogProductCardItem {
   }>;
   skus: string[];
   colors?: string[];
+  sizeLabel?: string | null;
 }
 
 /** Partial product payloads from API or legacy grids → full `CatalogProduct` for `ProductsCatalogCard`. */
@@ -48,6 +49,7 @@ export function toCatalogProduct(input: {
   categories?: Array<{ id: string; slug: string; title: string }>;
   skus?: string[];
   colors?: string[];
+  sizeLabel?: string | null;
 }): CatalogProduct {
   return {
     id: input.id,
@@ -64,6 +66,7 @@ export function toCatalogProduct(input: {
     categories: Array.isArray(input.categories) ? input.categories : [],
     skus: Array.isArray(input.skus) ? input.skus : [],
     colors: input.colors,
+    sizeLabel: input.sizeLabel ?? null,
   };
 }
 
@@ -154,6 +157,10 @@ export function getColorLabel(product: CatalogProduct): string {
 }
 
 export function getSizeLabel(product: CatalogProduct): string {
+  if (typeof product.sizeLabel === 'string' && product.sizeLabel.trim().length > 0) {
+    return product.sizeLabel.trim();
+  }
+
   const source = `${product.title} ${product.slug} ${product.skus.join(' ')}`;
 
   if (/compact|mini|small/i.test(source)) return 'Compact';

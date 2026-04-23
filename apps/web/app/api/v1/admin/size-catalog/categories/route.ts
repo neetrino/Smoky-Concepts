@@ -67,8 +67,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = (await req.json()) as { title?: string };
-    const result = await adminService.createSizeCatalogCategory({ title: body.title ?? "" });
+    const body = (await req.json()) as { title?: string; priceAmd?: number };
+    const result = await adminService.createSizeCatalogCategory({
+      title: body.title ?? "",
+      priceAmd: body.priceAmd,
+    });
     return NextResponse.json(result, { status: 201 });
   } catch (error: unknown) {
     return createErrorResponse(error, req.url);

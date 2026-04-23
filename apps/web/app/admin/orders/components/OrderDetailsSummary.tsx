@@ -2,7 +2,7 @@
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
-import { ADMIN_PRICE_CURRENCY, amountToUsd, formatPriceInCurrency } from '../../../../lib/currency';
+import { ADMIN_PRICE_CURRENCY, amountToUsd, formatStoredMoney } from '../../../../lib/currency';
 import type { OrderDetails } from '../useOrders';
 
 interface OrderDetailsSummaryProps {
@@ -75,10 +75,19 @@ export function OrderDetailsSummary({
           orderDetails.totals.currency || orderDetails.currency
         );
         const taxUsd = amountToUsd(orderDetails.totals.tax, orderDetails.totals.currency);
-        const totalUsd = subtotalUsd - discountUsd + shippingUsd + taxUsd;
-        return formatPriceInCurrency(totalUsd, ADMIN_PRICE_CURRENCY);
+        const collectionUsd = amountToUsd(
+          orderDetails.totals.collectionPriceAmount ?? orderDetails.collectionPriceAmount ?? 0,
+          'USD'
+        );
+        const totalUsd = subtotalUsd - discountUsd + shippingUsd + taxUsd + collectionUsd;
+        return formatStoredMoney(totalUsd, 'USD', ADMIN_PRICE_CURRENCY);
       })()
-    : formatCurrency(orderDetails.total, ADMIN_PRICE_CURRENCY, orderDetails.currency || 'USD');
+    : formatStoredMoney(
+        amountToUsd(orderDetails.total, orderDetails.currency || 'USD') +
+          amountToUsd(orderDetails.collectionPriceAmount ?? 0, 'USD'),
+        'USD',
+        ADMIN_PRICE_CURRENCY
+      );
 
   return (
     <Card className="p-4 md:p-5">

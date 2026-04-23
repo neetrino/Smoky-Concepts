@@ -6,6 +6,7 @@ import { ADMIN_PRODUCT_INPUT_CURRENCY, CURRENCIES } from '@/lib/currency';
 import { useTranslation } from '@/lib/i18n-client';
 import type { Category, Variant, ProductLabel, GeneratedVariant } from '../types';
 import type { CategoryAttribute } from '@/lib/category-attributes';
+import type { SizeCatalogCategoryDto } from '@/lib/types/size-catalog';
 import { BasicInformation } from './BasicInformation';
 import { ProductImages } from './ProductImages';
 import { CategoriesBrands } from './CategoriesBrands';
@@ -22,6 +23,8 @@ interface AddProductFormContentProps {
     descriptionHtml: string;
     categoryIds: string[];
     primaryCategoryId: string;
+    sizeCatalogCategoryId: string;
+    sizeCatalogCategoryTitle: string;
     imageUrls: string[];
     featuredImageIndex: number;
     labels: ProductLabel[];
@@ -39,6 +42,7 @@ interface AddProductFormContentProps {
     quantity: string;
   };
   categories: Category[];
+  sizeCatalogCategories: SizeCatalogCategoryDto[];
   isEditMode: boolean;
   loading: boolean;
   imageUploadLoading: boolean;
@@ -68,6 +72,7 @@ interface AddProductFormContentProps {
   onNewCategoryNameChange: (name: string) => void;
   onCategoryIdsChange: (ids: string[]) => void;
   onPrimaryCategoryIdChange: (id: string) => void;
+  onSizeCatalogCategoryChange: (categoryId: string, categoryTitle: string) => void;
   onCreateCategory: (name: string) => Promise<void>;
   onPriceChange: (value: string) => void;
   onCompareAtPriceChange: (value: string) => void;
@@ -95,6 +100,7 @@ export function AddProductFormContent({
   variableProductTypeAllowed,
   simpleProductData,
   categories,
+  sizeCatalogCategories,
   isEditMode,
   loading,
   imageUploadLoading,
@@ -124,6 +130,7 @@ export function AddProductFormContent({
   onNewCategoryNameChange,
   onCategoryIdsChange,
   onPrimaryCategoryIdChange,
+  onSizeCatalogCategoryChange,
   onCreateCategory,
   onPriceChange,
   onCompareAtPriceChange,
@@ -263,6 +270,9 @@ export function AddProductFormContent({
           onCategoryIdsChange={onCategoryIdsChange}
           onPrimaryCategoryIdChange={onPrimaryCategoryIdChange}
           onCreateCategory={onCreateCategory}
+          sizeCatalogCategories={sizeCatalogCategories}
+          selectedSizeCatalogCategoryId={formData.sizeCatalogCategoryId}
+          onSizeCatalogCategoryChange={onSizeCatalogCategoryChange}
           isClothingCategory={isClothingCategory}
           onVariantsUpdate={onVariantsUpdate}
         />

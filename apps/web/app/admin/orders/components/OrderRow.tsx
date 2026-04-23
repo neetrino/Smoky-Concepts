@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
-import { ADMIN_PRICE_CURRENCY, amountToUsd, formatPriceInCurrency } from '../../../../lib/currency';
+import { ADMIN_PRICE_CURRENCY, amountToUsd, formatStoredMoney } from '../../../../lib/currency';
 import { getColorValue } from '../utils/orderUtils';
 import type { Order } from '../useOrders';
 
@@ -27,17 +27,27 @@ export function OrderRow({
   onPaymentStatusChange,
 }: OrderRowProps) {
   const { t } = useTranslation();
+  const shippingUsd = amountToUsd(order.shippingAmount || 0, order.currency);
+  const shippingDisplay =
+    shippingUsd > 0 ? formatStoredMoney(shippingUsd, 'USD', ADMIN_PRICE_CURRENCY) : null;
 
-  const calculateTotalWithoutShipping = () => {
-    if (order.subtotal !== undefined && order.discountAmount !== undefined && order.taxAmount !== undefined) {
+  const calculateOrderTotal = () => {
+    const collectionUsd = amountToUsd(order.collectionPriceAmount || 0, 'USD');
+    if (
+      order.subtotal !== undefined &&
+      order.discountAmount !== undefined &&
+      order.shippingAmount !== undefined &&
+      order.taxAmount !== undefined
+    ) {
       const subtotalUsd = amountToUsd(order.subtotal, order.currency);
       const discountUsd = amountToUsd(order.discountAmount, order.currency);
+      const shippingUsd = amountToUsd(order.shippingAmount, order.currency);
       const taxUsd = amountToUsd(order.taxAmount, order.currency);
-      return formatPriceInCurrency(subtotalUsd - discountUsd + taxUsd, ADMIN_PRICE_CURRENCY);
+      const totalUsd = subtotalUsd - discountUsd + shippingUsd + taxUsd + collectionUsd;
+      return formatStoredMoney(totalUsd, 'USD', ADMIN_PRICE_CURRENCY);
     }
-    const totalUsd = amountToUsd(order.total, order.currency);
-    const shippingUsd = amountToUsd(order.shippingAmount || 0, order.currency);
-    return formatPriceInCurrency(totalUsd - shippingUsd, ADMIN_PRICE_CURRENCY);
+
+    return formatStoredMoney(amountToUsd(order.total, order.currency) + collectionUsd, 'USD', ADMIN_PRICE_CURRENCY);
   };
 
   const previews = order.colorSizePreviews || [];
@@ -76,7 +86,14 @@ export function OrderRow({
         </div>
       </td>
       <td className="whitespace-nowrap border-y border-[#dcc090]/25 bg-white/95 px-3 py-3 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0]">
-        <span className="text-sm font-black text-[#122a26]">{calculateTotalWithoutShipping()}</span>
+        <div className="flex flex-col">
+          <span className="text-sm font-black text-[#122a26]">{calculateOrderTotal()}</span>
+          {shippingDisplay ? (
+            <span className="text-xs text-[#414141]/60">
+              {t('orders.orderSummary.shipping')}: {shippingDisplay}
+            </span>
+          ) : null}
+        </div>
       </td>
       <td className="border-y border-[#dcc090]/25 bg-white/95 px-3 py-3 text-xs text-[#414141]/60 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0]">
         {previews.length > 0 ? (

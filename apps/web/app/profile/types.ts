@@ -38,6 +38,7 @@ export interface OrderItem {
   total: number;
   imageUrl?: string;
   sizeCatalogVersion?: string | null;
+  sizeCatalogCategoryPriceAmd?: number | null;
   customizePlain?: string;
   customizeHtml?: string;
   variantOptions?: Array<{
@@ -62,8 +63,10 @@ export interface OrderDetails {
     shipping: number;
     tax: number;
     total: number;
+    collectionPriceAmount?: number;
     currency: string;
   };
+  collectionPriceAmount?: number;
   customer?: {
     email?: string;
     phone?: string;
@@ -117,6 +120,7 @@ export interface OrderListItem {
   discountAmount?: number;
   shippingAmount?: number;
   taxAmount?: number;
+  collectionPriceAmount?: number;
   currency: string;
   itemsCount: number;
   createdAt: string;

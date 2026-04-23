@@ -23,6 +23,7 @@
     "subtotal": "Ենթագումար",
     "discount": "Զեղչ",
     "shipping": "Առաքում",
+    "collectionPrice": "Collection գին",
     "tax": "Հարկ",
     "total": "Ընդամենը",
     "loadingTotals": "Բեռնվում են գումարները..."
@@ -37,6 +38,7 @@
     "customization": "Անհատականացում",
     "customize_text": "Տեքստ",
     "version": "Տարբերակ",
+    "collection_price": "Collection գին",
     "customize_font": "Տառատեսակ",
     "customize_style": "Ձևաչափ",
     "customize_preview": "Նախադիտում",

@@ -75,25 +75,25 @@ function MobileMenuButton({
  */
 export function Header() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/admin')) {
-    return null;
-  }
+  const isAdminPath = pathname?.startsWith('/admin') ?? false;
 
   const [cartCount, setCartCount] = useState(0);
   const [cartReady, setCartReady] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    if (isAdminPath) return;
     void initializeCurrencyRates();
-  }, []);
+  }, [isAdminPath]);
 
   useEffect(() => {
+    if (isAdminPath) return;
     setCartCount(getCartCount());
     setCartReady(true);
     const handleCartUpdate = () => setCartCount(getCartCount());
     window.addEventListener('cart-updated', handleCartUpdate);
     return () => window.removeEventListener('cart-updated', handleCartUpdate);
-  }, []);
+  }, [isAdminPath]);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -107,6 +107,10 @@ export function Header() {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [mobileMenuOpen]);
+
+  if (isAdminPath) {
+    return null;
+  }
 
   const renderNavLinks = (
     className: string,

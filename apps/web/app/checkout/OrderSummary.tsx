@@ -25,6 +25,7 @@ interface OrderSummaryProps {
     subtotalDisplay: number;
     taxDisplay: number;
     shippingDisplay: number;
+    collectionPriceDisplay: number;
     totalDisplay: number;
   };
   shippingMethod: 'pickup' | 'delivery';
@@ -73,6 +74,12 @@ export function OrderSummary({
                     : t('checkout.shipping.enterRegion')}
             </span>
           </div>
+          {orderSummary.collectionPriceDisplay > 0 && (
+            <div className="flex justify-between text-gray-600">
+              <span>{t('checkout.summary.collectionPrice')}</span>
+              <span>{formatCheckoutUsd(orderSummary.collectionPriceDisplay)}</span>
+            </div>
+          )}
           <div className="border-t border-gray-200 pt-4">
             <div className="flex justify-between text-lg font-bold text-gray-900">
               <span>{t('checkout.summary.total')}</span>

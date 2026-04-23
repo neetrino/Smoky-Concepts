@@ -173,6 +173,9 @@ export function ProductsCatalogCard({
     : '-mt-4';
   const dotsGapClassName = compactLayout ? 'gap-1' : 'gap-[0.3125rem]';
   const dotsMarginClassName = compactLayout ? 'mb-1' : 'mb-3';
+  const sizeBadgeClassName = compactLayout
+    ? 'inline-flex items-center px-0 py-0 text-[0.625rem] font-semibold leading-tight text-[#122a26]'
+    : 'inline-flex items-center px-0 py-0 text-[0.75rem] font-semibold leading-tight text-[#122a26]';
 
   const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -273,11 +276,15 @@ export function ProductsCatalogCard({
           </h3>
         </Link>
 
-        <div className={compactLayout ? 'mt-0.5 flex items-center gap-1.5' : 'mt-2 flex items-center gap-2'}>
-          <span className={`font-medium leading-tight text-[#9d9d9d] ${metaTextClassName}`}>{sizeLabel}</span>
-          <span className={badgeClassNames}>
-            {categoryLabel}
-          </span>
+        <div
+          className={
+            compactLayout
+              ? 'mt-0.5 flex items-center gap-1'
+              : 'mt-2 flex items-center gap-1.5'
+          }
+        >
+          <span className={sizeBadgeClassName}>{sizeLabel}</span>
+          <span className={badgeClassNames}>{categoryLabel}</span>
         </div>
 
         <div className={compactLayout ? 'mt-2 flex items-center justify-between gap-2' : 'mt-5 flex items-center justify-between gap-3'}>

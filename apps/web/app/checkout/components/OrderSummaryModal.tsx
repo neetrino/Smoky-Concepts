@@ -11,6 +11,7 @@ interface OrderSummaryModalProps {
     subtotalDisplay: number;
     taxDisplay: number;
     shippingDisplay: number;
+    collectionPriceDisplay: number;
     totalDisplay: number;
   };
   shippingMethod: 'pickup' | 'delivery';
@@ -59,6 +60,12 @@ export function OrderSummaryModal({
         <span className="text-gray-600">{t('checkout.summary.shipping')}:</span>
         <span className="font-medium">{shippingDisplay}</span>
       </div>
+      {orderSummary.collectionPriceDisplay > 0 && (
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">{t('checkout.summary.collectionPrice')}:</span>
+          <span className="font-medium">{formatCheckoutUsd(orderSummary.collectionPriceDisplay)}</span>
+        </div>
+      )}
       <div className="flex justify-between text-sm">
         <span className="text-gray-600">{t('checkout.summary.tax')}:</span>
         <span className="font-medium">{formatCheckoutUsd(orderSummary.taxDisplay)}</span>

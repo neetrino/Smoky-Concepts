@@ -3,6 +3,15 @@ import { logger } from "../../utils/logger";
 import { processImageUrl, smartSplitUrls } from "../../utils/image-utils";
 import { parseVariantPrices } from "./variant-processor";
 
+function createSkuValidationError(detail: string) {
+  return {
+    status: 422,
+    type: "https://api.shop.am/problems/validation-error",
+    title: "Validation Error",
+    detail,
+  };
+}
+
 async function findVariant(
   variant: { id?: string; sku?: string },
   existingVariantIds: Set<string>,
@@ -34,7 +43,9 @@ async function findVariant(
         where: { sku: skuValue },
       });
       if (existingSkuVariant) {
-        throw new Error(`SKU "${skuValue}" already exists in another product. Please use a unique SKU.`);
+        throw createSkuValidationError(
+          `SKU "${skuValue}" already exists in another product. Please use a unique SKU.`
+        );
       }
     }
   }
@@ -97,7 +108,7 @@ async function createNewVariant(
       where: { sku: skuValue },
     });
     if (existingSkuCheck) {
-      throw new Error(`SKU "${skuValue}" already exists. Cannot create duplicate variant.`);
+      throw createSkuValidationError(`SKU "${skuValue}" already exists. Cannot create duplicate variant.`);
     }
   }
 

@@ -30,6 +30,7 @@ export async function getOrders(filters: OrderFilters = {}) {
             variant: {
               select: {
                 attributes: true,
+                price: true,
               },
             },
           },
@@ -108,7 +109,29 @@ export async function getOrderById(orderId: string) {
     };
   }
 
-  return formatOrderForDetail(order);
+  const sizeCatalogTitles = Array.from(
+    new Set(
+      order.items
+        .map((item) => item.sizeCatalogTitle?.trim().toLocaleLowerCase() ?? '')
+        .filter((title) => title !== '')
+    )
+  );
+  const sizeCatalogPriceByTitle = new Map<string, number>();
+  if (sizeCatalogTitles.length > 0) {
+    const categories = await db.sizeCatalogCategory.findMany({
+      select: { title: true, priceAmd: true },
+    });
+    for (const category of categories) {
+      const title = category.title.trim().toLocaleLowerCase();
+      if (!title || !sizeCatalogTitles.includes(title)) continue;
+      const existing = sizeCatalogPriceByTitle.get(title);
+      if (existing === undefined || category.priceAmd > existing) {
+        sizeCatalogPriceByTitle.set(title, category.priceAmd);
+      }
+    }
+  }
+
+  return formatOrderForDetail(order, sizeCatalogPriceByTitle);
 }
 
 

@@ -26,6 +26,7 @@ interface CheckoutModalsProps {
     subtotalDisplay: number;
     taxDisplay: number;
     shippingDisplay: number;
+    collectionPriceDisplay: number;
     totalDisplay: number;
   };
   loadingDeliveryPrice: boolean;

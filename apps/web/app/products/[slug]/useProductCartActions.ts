@@ -68,6 +68,8 @@ export function useProductCartActions({
                 title: selectedCatalogSize.title,
                 version: selectedCatalogSize.version,
                 imageUrl: selectedCatalogSize.imageUrl,
+                categoryTitle: selectedCatalogSize.categoryTitle,
+                categoryPriceAmd: selectedCatalogSize.categoryPriceAmd,
               }
             : null;
         const customSizeRequest =

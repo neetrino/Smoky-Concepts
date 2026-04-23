@@ -36,6 +36,7 @@ interface Product {
   defaultVariantId?: string | null;
   defaultVariantStock?: number;
   defaultSku?: string;
+  sizeLabel?: string | null;
 }
 
 type ViewMode = 'list' | 'grid-2' | 'grid-3';
@@ -64,6 +65,7 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
     categories: product.categories,
     skus: product.skus,
     colors: product.colors,
+    sizeLabel: product.sizeLabel ?? null,
   });
   const section = getSectionLabel(catalogProduct);
 

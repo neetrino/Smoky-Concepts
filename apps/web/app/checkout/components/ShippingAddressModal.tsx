@@ -25,6 +25,7 @@ interface ShippingAddressModalProps {
     subtotalDisplay: number;
     taxDisplay: number;
     shippingDisplay: number;
+    collectionPriceDisplay: number;
     totalDisplay: number;
   };
   shippingRegion?: string;

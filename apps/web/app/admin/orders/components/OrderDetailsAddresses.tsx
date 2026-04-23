@@ -67,7 +67,9 @@ export function OrderDetailsAddresses({ orderDetails }: OrderDetailsAddressesPro
     const hasCustomizeText = Boolean(item.customizeHtml?.trim() || item.customizePlain?.trim());
     const hasVersion = Boolean(item.sizeCatalogVersion?.trim());
     const hasSizeImage = Boolean(item.sizeCatalogImageUrl?.trim());
-    return hasCustomizeText || hasVersion || hasSizeImage;
+    const hasCollectionPrice =
+      typeof item.sizeCatalogCategoryPriceAmd === 'number' && item.sizeCatalogCategoryPriceAmd > 0;
+    return hasCustomizeText || hasVersion || hasSizeImage || hasCollectionPrice;
   });
   const hasCustomizeContent = itemsWithCustomize.length > 0 || customSizeDescription !== null;
 
@@ -204,6 +206,7 @@ export function OrderDetailsAddresses({ orderDetails }: OrderDetailsAddressesPro
                     customizeHtml={item.customizeHtml}
                     customizePlain={item.customizePlain}
                     sizeCatalogVersion={item.sizeCatalogVersion}
+                    sizeCatalogCategoryPriceAmd={item.sizeCatalogCategoryPriceAmd}
                     showVersion
                   />
                 </div>

@@ -17,6 +17,8 @@ interface UseProductFormHandlersProps {
     descriptionHtml: string;
     primaryCategoryId: string;
     categoryIds: string[];
+    sizeCatalogCategoryId: string;
+    sizeCatalogCategoryTitle: string;
     published: boolean;
     featured: boolean;
     upcoming: boolean;
@@ -121,6 +123,10 @@ export function useProductFormHandlers({
           price: priceUsd,
           stock: parseInt(simpleProductData.quantity) || 0,
           sku: simpleProductData.sku.trim(),
+          attributes: buildDefaultPricingAttributes({
+            categoryId: currentFormData.sizeCatalogCategoryId,
+            categoryTitle: currentFormData.sizeCatalogCategoryTitle,
+          }),
           published: true,
         };
         if (compareAtPriceUsd && compareAtPriceUsd > 0) {
@@ -153,7 +159,10 @@ export function useProductFormHandlers({
           compareAtPrice: defaultVariantCompareAtPriceUsd,
           stock: defaultVariantStock,
           sku: defaultVariantSku,
-          attributes: buildDefaultPricingAttributes(),
+          attributes: buildDefaultPricingAttributes({
+            categoryId: currentFormData.sizeCatalogCategoryId,
+            categoryTitle: currentFormData.sizeCatalogCategoryTitle,
+          }),
           published: true,
         });
         variantSkuSet.add(defaultVariantSku);

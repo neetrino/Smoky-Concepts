@@ -19,10 +19,12 @@ export function useOrderSummary({
         subtotalUsd: 0,
         taxUsd: 0,
         shippingUsd: 0,
+        collectionPriceUsd: 0,
         totalUsd: 0,
         subtotalDisplay: 0,
         taxDisplay: 0,
         shippingDisplay: 0,
+        collectionPriceDisplay: 0,
         totalDisplay: 0,
       };
     }
@@ -33,16 +35,25 @@ export function useOrderSummary({
     const taxUsd = amountToUsd(cart.totals.tax, cartMoneyCurrency);
     const shippingUsd =
       shippingMethod === 'delivery' && deliveryPrice !== null ? adminInputAmdToUsd(deliveryPrice) : 0;
-    const totalUsd = subtotalUsd - discountUsd + taxUsd + shippingUsd;
+    const collectionPriceUsd = cart.items.reduce((sum, item) => {
+      const priceAmd = item.variant.sizeCatalogCategoryPriceAmd;
+      if (typeof priceAmd !== 'number' || priceAmd <= 0) {
+        return sum;
+      }
+      return sum + adminInputAmdToUsd(priceAmd) * item.quantity;
+    }, 0);
+    const totalUsd = subtotalUsd - discountUsd + taxUsd + shippingUsd + collectionPriceUsd;
 
     return {
       subtotalUsd,
       taxUsd,
       shippingUsd,
+      collectionPriceUsd,
       totalUsd,
       subtotalDisplay: subtotalUsd,
       taxDisplay: taxUsd,
       shippingDisplay: shippingUsd,
+      collectionPriceDisplay: collectionPriceUsd,
       totalDisplay: totalUsd,
     };
   }, [cart, shippingMethod, deliveryPrice]);

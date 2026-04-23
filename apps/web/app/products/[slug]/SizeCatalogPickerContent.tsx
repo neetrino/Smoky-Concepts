@@ -3,6 +3,7 @@
 import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
+import { formatPriceInCurrency } from '@/lib/currency';
 
 interface SizeCatalogPickerContentProps {
   categories: SizeCatalogCategoryDto[];
@@ -67,6 +68,9 @@ export function SizeCatalogPickerContent({
             <h3 className="font-montserrat text-[22px] font-extrabold leading-none text-[#414141] sm:text-[24px]">
               {category.title}
             </h3>
+            <p className="mt-2 font-montserrat text-[14px] font-semibold text-[#414141]/75 sm:text-[15px]">
+              {formatPriceInCurrency(category.priceAmd, 'AMD')}
+            </p>
             <div className="mt-[36px] grid grid-cols-3 gap-x-2 gap-y-5 sm:gap-x-4 sm:gap-y-6 md:grid-cols-4 lg:grid-cols-7">
               {category.items.map((item) => (
                 <CatalogSizeCard
