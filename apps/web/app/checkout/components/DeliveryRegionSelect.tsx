@@ -49,7 +49,7 @@ export function DeliveryRegionSelect({
         </option>
         {locations.map((loc) => (
           <option key={loc.id} value={loc.id}>
-            {loc.country ? `${loc.city} (${loc.country})` : loc.city}
+            {loc.city}
           </option>
         ))}
       </select>
