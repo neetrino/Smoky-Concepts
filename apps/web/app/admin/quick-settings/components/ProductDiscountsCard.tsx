@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, Button, Input } from '@shop/ui';
-import { ADMIN_PRICE_CURRENCY } from '@/lib/currency';
+import { formatAdminUsdAmount } from '@/lib/currency';
 import { useTranslation } from '../../../../lib/i18n-client';
 
 export interface Product {
@@ -31,13 +31,7 @@ export function ProductDiscountsCard({
 }: ProductDiscountsCardProps) {
   const { t } = useTranslation();
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: ADMIN_PRICE_CURRENCY,
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  const formatPrice = (price: number) => formatAdminUsdAmount(price);
 
   return (
     <Card className="p-6 bg-white border-gray-200">

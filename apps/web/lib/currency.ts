@@ -8,7 +8,7 @@ export const CURRENCIES = {
 } as const;
 
 /** Admin reports/orders totals base display currency (stored data is mostly USD). */
-export const ADMIN_PRICE_CURRENCY = 'USD' as const;
+export const ADMIN_PRICE_CURRENCY = 'AMD' as const;
 /** Admin add/edit product form input currency. */
 export const ADMIN_PRODUCT_INPUT_CURRENCY = 'AMD' as const;
 
@@ -244,6 +244,11 @@ export function formatStoredMoney(
 ): string {
   const amountUsd = amountToUsd(amount, storedCurrency);
   return formatPriceInCurrency(usdToDisplayCurrency(amountUsd, displayCurrency), displayCurrency);
+}
+
+/** Format admin amounts that are stored in USD using admin display currency and live rates. */
+export function formatAdminUsdAmount(amountUsd: number): string {
+  return formatStoredMoney(amountUsd, 'USD', ADMIN_PRICE_CURRENCY);
 }
 
 export const STORE_PRICE_CURRENCY: CurrencyCode = DEFAULT_CURRENCY_CODE;

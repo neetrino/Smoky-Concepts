@@ -18,6 +18,11 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: 'Smoky Concepts',
   description: 'Smoky Concepts is a premium  shop.',
+  icons: {
+    icon: '/assets/home/Asset%202@4x-8.webp',
+    shortcut: '/assets/home/Asset%202@4x-8.webp',
+    apple: '/assets/home/Asset%202@4x-8.webp',
+  },
 };
 
 export default function RootLayout({

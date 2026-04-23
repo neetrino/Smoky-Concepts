@@ -167,7 +167,7 @@ export function Header() {
                   </span>
                 ) : null}
               </button>
-              <div className="ml-3 mt-0.5">
+              <div className="ml-3 mt-1.5">
                 <HeaderDesktopAccount />
               </div>
             </div>

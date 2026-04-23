@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { getStoredLanguage, type LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
 import { useRelatedProducts } from './hooks/useRelatedProducts';
@@ -28,7 +28,14 @@ const CATALOG_ROW_FLEX_CLASS = 'flex min-w-max gap-6';
  */
 export function RelatedProducts({ categorySlug, currentProductId }: RelatedProductsProps) {
   const [language, setLanguage] = useState<LanguageCode>('en');
+  const [currentPage, setCurrentPage] = useState(0);
+  const sectionScrollRef = useRef<HTMLDivElement | null>(null);
   const { products, loading } = useRelatedProducts({ categorySlug, currentProductId, language });
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(products.length / CATALOG_SECTION_PAGE_SIZE)),
+    [products.length]
+  );
 
   useEffect(() => {
     setLanguage(getStoredLanguage());
@@ -42,6 +49,40 @@ export function RelatedProducts({ categorySlug, currentProductId }: RelatedProdu
       window.removeEventListener('language-updated', handleLanguageUpdate);
     };
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [products.length, categorySlug, currentProductId]);
+
+  const handleSectionPageChange = (pageIndex: number) => {
+    const container = sectionScrollRef.current;
+    if (!container) {
+      return;
+    }
+
+    const maxScrollLeft = container.scrollWidth - container.clientWidth;
+    const targetScrollLeft =
+      pageIndex <= 0 || maxScrollLeft <= 0 || totalPages <= 1
+        ? 0
+        : (maxScrollLeft * pageIndex) / (totalPages - 1);
+
+    container.scrollTo({
+      left: targetScrollLeft,
+      behavior: 'smooth',
+    });
+    setCurrentPage(pageIndex);
+  };
+
+  const handleSectionScroll = () => {
+    const container = sectionScrollRef.current;
+    if (!container || totalPages <= 1) {
+      return;
+    }
+    const maxScrollLeft = container.scrollWidth - container.clientWidth;
+    const nextPage =
+      maxScrollLeft <= 0 ? 0 : Math.round((container.scrollLeft / maxScrollLeft) * (totalPages - 1));
+    setCurrentPage(nextPage);
+  };
 
   return (
     <section className="mt-20 w-full border-t border-[#e8e8e8] py-12 sm:py-16">
@@ -65,7 +106,7 @@ export function RelatedProducts({ categorySlug, currentProductId }: RelatedProdu
           <p className="text-lg text-[#9d9d9d]">{t(language, 'product.noRelatedProducts')}</p>
         </div>
       ) : (
-        <div className={CATALOG_ROW_SCROLL_CLASS}>
+        <div ref={sectionScrollRef} onScroll={handleSectionScroll} className={CATALOG_ROW_SCROLL_CLASS}>
           <div className={CATALOG_ROW_FLEX_CLASS}>
             {products.map((product, index) => {
               const catalogProduct = toCatalogProduct({
@@ -100,6 +141,22 @@ export function RelatedProducts({ categorySlug, currentProductId }: RelatedProdu
           </div>
         </div>
       )}
+
+      {!loading && products.length > 0 && totalPages > 1 ? (
+        <div className="mt-4 flex items-center justify-center gap-4">
+          {Array.from({ length: totalPages }).map((_, pageIndex) => (
+            <button
+              key={`related-page-${pageIndex}`}
+              type="button"
+              onClick={() => handleSectionPageChange(pageIndex)}
+              className={`h-2 w-[6.25rem] rounded-full transition-colors ${
+                currentPage === pageIndex ? 'bg-[#122a26]' : 'bg-[#d9d9d9]'
+              }`}
+              aria-label={`Open related products page ${pageIndex + 1}`}
+            />
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }
