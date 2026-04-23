@@ -122,33 +122,6 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-[#efefef] pt-[3.75rem] pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <AdminShell>
-          {/* General Settings */}
-          <Card className="mb-6 border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
-            <h2 className="text-xl font-semibold text-[#122a26] mb-4">{t('admin.settings.generalSettings')}</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[#414141]/75 mb-1">
-                  {t('admin.settings.siteName')}
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
-                  defaultValue={t('admin.settings.siteNamePlaceholder')}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[#414141]/75 mb-1">
-                  {t('admin.settings.siteDescription')}
-                </label>
-                <textarea
-                  className="w-full px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
-                  rows={3}
-                  defaultValue={t('admin.settings.siteDescriptionPlaceholder')}
-                />
-              </div>
-            </div>
-          </Card>
-
         {/* Payment Settings */}
         <Card className="mb-6 border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
           <h2 className="text-xl font-semibold text-[#122a26] mb-4">{t('admin.settings.paymentSettings')}</h2>
