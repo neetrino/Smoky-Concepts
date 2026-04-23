@@ -1,4 +1,6 @@
 const DEFAULT_PRICING_ATTRIBUTE_KEY = "__default_pricing__";
+const SIZE_CATALOG_CATEGORY_ID_ATTRIBUTE_KEY = "__size_catalog_category_id__";
+const SIZE_CATALOG_CATEGORY_TITLE_ATTRIBUTE_KEY = "__size_catalog_category_title__";
 
 interface VariantAttributesEntry {
   attributeKey?: unknown;
@@ -8,8 +10,32 @@ interface VariantLike {
   attributes?: unknown;
 }
 
-export function buildDefaultPricingAttributes(): Array<{ attributeKey: string; value: string }> {
-  return [{ attributeKey: DEFAULT_PRICING_ATTRIBUTE_KEY, value: "true" }];
+export function buildDefaultPricingAttributes(sizeCatalogSelection?: {
+  categoryId?: string | null;
+  categoryTitle?: string | null;
+}): Array<{ attributeKey: string; value: string }> {
+  const attributes: Array<{ attributeKey: string; value: string }> = [
+    { attributeKey: DEFAULT_PRICING_ATTRIBUTE_KEY, value: "true" },
+  ];
+
+  const categoryId = sizeCatalogSelection?.categoryId?.trim();
+  const categoryTitle = sizeCatalogSelection?.categoryTitle?.trim();
+
+  if (categoryId) {
+    attributes.push({
+      attributeKey: SIZE_CATALOG_CATEGORY_ID_ATTRIBUTE_KEY,
+      value: categoryId,
+    });
+  }
+
+  if (categoryTitle) {
+    attributes.push({
+      attributeKey: SIZE_CATALOG_CATEGORY_TITLE_ATTRIBUTE_KEY,
+      value: categoryTitle,
+    });
+  }
+
+  return attributes;
 }
 
 export function isDefaultPricingVariant(variant: VariantLike | null | undefined): boolean {
@@ -29,5 +55,36 @@ export function isDefaultPricingVariant(variant: VariantLike | null | undefined)
     const entry = item as VariantAttributesEntry;
     return entry.attributeKey === DEFAULT_PRICING_ATTRIBUTE_KEY;
   });
+}
+
+export function extractSizeCatalogSelectionFromAttributes(
+  attributes: unknown
+): { categoryId: string | null; categoryTitle: string | null } {
+  if (!Array.isArray(attributes)) {
+    return { categoryId: null, categoryTitle: null };
+  }
+
+  let categoryId: string | null = null;
+  let categoryTitle: string | null = null;
+
+  attributes.forEach((item) => {
+    if (!item || typeof item !== "object") {
+      return;
+    }
+
+    const entry = item as { attributeKey?: unknown; value?: unknown };
+    if (typeof entry.attributeKey !== "string" || typeof entry.value !== "string") {
+      return;
+    }
+
+    if (entry.attributeKey === SIZE_CATALOG_CATEGORY_ID_ATTRIBUTE_KEY) {
+      categoryId = entry.value.trim() || null;
+    }
+    if (entry.attributeKey === SIZE_CATALOG_CATEGORY_TITLE_ATTRIBUTE_KEY) {
+      categoryTitle = entry.value.trim() || null;
+    }
+  });
+
+  return { categoryId, categoryTitle };
 }
 

@@ -55,6 +55,7 @@
     "items": "Items",
     "subtotal": "Subtotal",
     "shipping": "Shipping",
+    "collectionPrice": "Collection Price",
     "tax": "Tax",
     "total": "Total"
   },

@@ -11,7 +11,10 @@ function guestLineKey(line: GuestCartItem): string {
   const c = line.customSizeRequest
     ? `${line.customSizeRequest.name.trim()}::${line.customSizeRequest.phone.trim()}::${line.customSizeRequest.email.trim()}::${line.customSizeRequest.description.trim()}`
     : '';
-  return `${v}::${p}::${h}::${c}`;
+  const s = line.sizeCatalogTitle?.trim() ?? '';
+  const sv = line.sizeCatalogVersion?.trim() ?? '';
+  const cp = String(line.sizeCatalogCategoryPriceAmd ?? 0);
+  return `${v}::${s}::${sv}::${cp}::${p}::${h}::${c}`;
 }
 
 function readGuestCart(): GuestCartItem[] {
@@ -112,7 +115,15 @@ export function buildGuestCartLineSnapshot(
   displayPrice: number,
   originalPrice: number | null,
   productTitle: string,
-  sizeCatalog?: { title: string; version: string; imageUrl: string } | null,
+  sizeCatalog?:
+    | {
+        title: string;
+        version: string;
+        imageUrl: string;
+        categoryTitle: string;
+        categoryPriceAmd: number;
+      }
+    | null,
   customize?: { plain: string; html: string | null } | null,
   customSizeRequest?: {
     name: string;
@@ -126,6 +137,11 @@ export function buildGuestCartLineSnapshot(
   const trimmedTitle = sizeCatalog?.title?.trim() ?? '';
   const trimmedVersion = sizeCatalog?.version?.trim() ?? '';
   const trimmedImg = sizeCatalog?.imageUrl?.trim() ?? '';
+  const trimmedCategoryTitle = sizeCatalog?.categoryTitle?.trim() ?? '';
+  const normalizedCategoryPriceAmd =
+    sizeCatalog != null && Number.isFinite(sizeCatalog.categoryPriceAmd)
+      ? Math.max(0, Math.round(sizeCatalog.categoryPriceAmd))
+      : 0;
   const plain = customize?.plain?.trim() ?? '';
   const html = customize?.html?.trim() ?? '';
   const customRequest =
@@ -155,6 +171,8 @@ export function buildGuestCartLineSnapshot(
     sizeCatalogTitle: trimmedTitle !== '' ? trimmedTitle : null,
     sizeCatalogVersion: trimmedTitle !== '' && trimmedVersion !== '' ? trimmedVersion : null,
     sizeCatalogImageUrl: trimmedTitle !== '' && trimmedImg !== '' ? trimmedImg : null,
+    sizeCatalogCategoryTitle: trimmedTitle !== '' && trimmedCategoryTitle !== '' ? trimmedCategoryTitle : null,
+    sizeCatalogCategoryPriceAmd: trimmedTitle !== '' ? normalizedCategoryPriceAmd : null,
     customizePlain: plain !== '' ? plain : null,
     customizeHtml: html !== '' ? html : null,
     customSizeRequest: customRequest,

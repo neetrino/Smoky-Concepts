@@ -4,11 +4,13 @@ import { useMemo } from 'react';
 import { useTranslation } from '@/lib/i18n-client';
 import { getCustomizeFontLabelForCssStack } from '@/app/products/[slug]/constants/customize-google-fonts';
 import { parseStoredCustomizeForOrderDisplay } from '@/lib/orders/parse-stored-customize-for-order-display';
+import { formatPriceInCurrency } from '@/lib/currency';
 
 export type OrderCustomizeBlockProps = {
   customizeHtml?: string | null;
   customizePlain?: string | null;
   sizeCatalogVersion?: string | null;
+  sizeCatalogCategoryPriceAmd?: number | null;
   showVersion?: boolean;
   /** Tighter layout for admin order table cells */
   compact?: boolean;
@@ -48,6 +50,7 @@ export function OrderCustomizeBlock({
   customizeHtml,
   customizePlain,
   sizeCatalogVersion,
+  sizeCatalogCategoryPriceAmd,
   showVersion = false,
   compact = false,
   hideHeading = false,
@@ -56,6 +59,14 @@ export function OrderCustomizeBlock({
 
   const html = customizeHtml?.trim() ?? '';
   const plain = customizePlain?.trim() ?? '';
+  const versionValue = sizeCatalogVersion?.trim() || '';
+  const collectionPriceAmd =
+    typeof sizeCatalogCategoryPriceAmd === 'number' && sizeCatalogCategoryPriceAmd > 0
+      ? Math.round(sizeCatalogCategoryPriceAmd)
+      : 0;
+  const hasRenderableContent = Boolean(
+    html || plain || collectionPriceAmd > 0 || (showVersion && versionValue)
+  );
 
   const parsed = useMemo(() => {
     if (!html) {
@@ -64,7 +75,7 @@ export function OrderCustomizeBlock({
     return parseStoredCustomizeForOrderDisplay(html);
   }, [html]);
 
-  if (!html && !plain) {
+  if (!hasRenderableContent) {
     return null;
   }
 
@@ -83,7 +94,6 @@ export function OrderCustomizeBlock({
   const valueCls = 'text-sm text-gray-900';
   const fieldLabelCls = compact ? 'text-sm text-gray-500 shrink-0' : 'text-xs text-gray-500 shrink-0';
   const rowCls = 'flex flex-row items-start gap-2';
-  const versionValue = sizeCatalogVersion?.trim() || '';
 
   return (
     <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
@@ -105,6 +115,14 @@ export function OrderCustomizeBlock({
           <div className={rowCls}>
             <dt className={fieldLabelCls}>{t('orders.itemDetails.version')}</dt>
             <dd className={`${valueCls} min-w-0 flex-1`}>{versionValue}</dd>
+          </div>
+        ) : null}
+        {collectionPriceAmd > 0 ? (
+          <div className={rowCls}>
+            <dt className={fieldLabelCls}>{t('orders.itemDetails.collection_price')}</dt>
+            <dd className={`${valueCls} min-w-0 flex-1`}>
+              {formatPriceInCurrency(collectionPriceAmd, 'AMD')}
+            </dd>
           </div>
         ) : null}
 

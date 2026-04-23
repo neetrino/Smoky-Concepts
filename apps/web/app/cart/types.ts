@@ -11,6 +11,8 @@ export interface CartItem {
     sizeCatalogTitle?: string | null;
     sizeCatalogVersion?: string | null;
     sizeCatalogImageUrl?: string | null;
+    sizeCatalogCategoryTitle?: string | null;
+    sizeCatalogCategoryPriceAmd?: number | null;
     /** PDP customize (optional) */
     customizePlain?: string | null;
     customizeHtml?: string | null;
@@ -74,6 +76,8 @@ export interface GuestCartItem {
   sizeCatalogTitle?: string | null;
   sizeCatalogVersion?: string | null;
   sizeCatalogImageUrl?: string | null;
+  sizeCatalogCategoryTitle?: string | null;
+  sizeCatalogCategoryPriceAmd?: number | null;
   customizePlain?: string | null;
   customizeHtml?: string | null;
   customSizeRequest?: {

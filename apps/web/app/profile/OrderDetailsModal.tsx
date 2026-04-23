@@ -29,11 +29,34 @@ export function OrderDetailsModal({
     formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
 
   const orderMoneyCurrency = selectedOrder.totals?.currency ?? 'USD';
+  const collectionPriceUsd = amountToUsd(
+    selectedOrder.totals?.collectionPriceAmount ?? selectedOrder.collectionPriceAmount ?? 0,
+    'USD',
+  );
+  const subtotalWithoutCollectionUsd = selectedOrder.totals
+    ? Math.max(0, amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency) - collectionPriceUsd)
+    : 0;
 
   const getAttributeLabel = (key: string): string => {
-    if (key === 'color' || key === 'colour') return t('profile.orderDetails.color');
-    if (key === 'size') return t('profile.orderDetails.size');
+    const attributeType = getAttributeType(key);
+    if (attributeType === 'color') return t('profile.orderDetails.color');
+    if (attributeType === 'size') return t('profile.orderDetails.size');
+    if (attributeType === 'category') return t('orders.itemDetails.category');
     return key.charAt(0).toUpperCase() + key.slice(1);
+  };
+  const getAttributeType = (key: string): 'category' | 'size' | 'color' | 'other' => {
+    const normalizedKey = key.toLowerCase().trim();
+    if (normalizedKey === '__size_catalog_category_title__' || normalizedKey === 'category') return 'category';
+    if (normalizedKey === 'size') return 'size';
+    if (normalizedKey === 'color' || normalizedKey === 'colour') return 'color';
+    return 'other';
+  };
+  const getOptionPriority = (key: string): number => {
+    const attributeType = getAttributeType(key);
+    if (attributeType === 'category') return 0;
+    if (attributeType === 'size') return 1;
+    if (attributeType === 'color') return 2;
+    return 3;
   };
 
   const getColorsArray = (colors: any): string[] => {
@@ -125,6 +148,11 @@ export function OrderDetailsModal({
                     <div className="space-y-4">
                       {selectedOrder.items.map((item, index) => {
                         const allOptions = item.variantOptions || [];
+                        const orderedOptions = [...allOptions].sort(
+                          (left, right) =>
+                            getOptionPriority(left.attributeKey || '') -
+                            getOptionPriority(right.attributeKey || ''),
+                        );
                         
                         return (
                           <div key={index} className="flex gap-4 pb-4 border-b border-gray-200 last:border-0">
@@ -143,11 +171,10 @@ export function OrderDetailsModal({
                               {/* Display all variation options */}
                               {allOptions.length > 0 && (
                                 <div className="flex flex-wrap gap-3 mt-2 mb-2">
-                                  {allOptions.map((opt, optIndex) => {
+                                  {orderedOptions.map((opt, optIndex) => {
                                     if (!opt.attributeKey || !opt.value) return null;
                                     
-                                    const attributeKey = opt.attributeKey.toLowerCase().trim();
-                                    const isColor = attributeKey === 'color' || attributeKey === 'colour';
+                                    const isColor = getAttributeType(opt.attributeKey) === 'color';
                                     const displayLabel = opt.label || opt.value;
                                     const hasImage = opt.imageUrl && opt.imageUrl.trim() !== '';
                                     const colors = getColorsArray(opt.colors);
@@ -185,11 +212,15 @@ export function OrderDetailsModal({
                                 </div>
                               )}
 
-                              {(item.customizeHtml?.trim() || item.customizePlain?.trim()) && (
+                              {(item.customizeHtml?.trim() ||
+                                item.customizePlain?.trim() ||
+                                (typeof item.sizeCatalogCategoryPriceAmd === 'number' &&
+                                  item.sizeCatalogCategoryPriceAmd > 0)) && (
                                 <div className="mt-3">
                                   <OrderCustomizeBlock
                                     customizeHtml={item.customizeHtml}
                                     customizePlain={item.customizePlain}
+                                    sizeCatalogCategoryPriceAmd={item.sizeCatalogCategoryPriceAmd}
                                   />
                                 </div>
                               )}
@@ -218,7 +249,7 @@ export function OrderDetailsModal({
                           <div className="flex justify-between text-gray-600">
                             <span>{t('profile.orderDetails.subtotal')}</span>
                             <span>
-                              {formatOrderMoneyUsd(amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency))}
+                              {formatOrderMoneyUsd(subtotalWithoutCollectionUsd)}
                             </span>
                           </div>
                           {selectedOrder.totals.discount > 0 && (
@@ -251,15 +282,22 @@ export function OrderDetailsModal({
                               {formatOrderMoneyUsd(amountToUsd(selectedOrder.totals.tax, orderMoneyCurrency))}
                             </span>
                           </div>
+                          {collectionPriceUsd > 0 && (
+                            <div className="flex justify-between text-gray-600">
+                              <span>{t('orders.itemDetails.collection_price')}</span>
+                              <span>{formatOrderMoneyUsd(collectionPriceUsd)}</span>
+                            </div>
+                          )}
                           <div className="border-t border-gray-200 pt-4">
                             <div className="flex justify-between text-lg font-bold text-gray-900">
                               <span>{t('profile.orderDetails.total')}</span>
                               <span>
                                 {formatOrderMoneyUsd(
-                                  amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency) -
+                                  subtotalWithoutCollectionUsd -
                                     amountToUsd(selectedOrder.totals.discount, orderMoneyCurrency) +
                                     amountToUsd(selectedOrder.totals.shipping, orderMoneyCurrency) +
-                                    amountToUsd(selectedOrder.totals.tax, orderMoneyCurrency),
+                                    amountToUsd(selectedOrder.totals.tax, orderMoneyCurrency) +
+                                    collectionPriceUsd,
                                 )}
                               </span>
                             </div>

@@ -19,10 +19,29 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
     formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
 
   const allOptions = item.variantOptions || [];
+  const getAttributeType = (key: string): 'category' | 'size' | 'color' | 'other' => {
+    const normalizedKey = key.toLowerCase().trim();
+    if (normalizedKey === '__size_catalog_category_title__' || normalizedKey === 'category') return 'category';
+    if (normalizedKey === 'size') return 'size';
+    if (normalizedKey === 'color' || normalizedKey === 'colour') return 'color';
+    return 'other';
+  };
+  const getOptionPriority = (key: string): number => {
+    const attributeType = getAttributeType(key);
+    if (attributeType === 'category') return 0;
+    if (attributeType === 'size') return 1;
+    if (attributeType === 'color') return 2;
+    return 3;
+  };
+  const orderedOptions = [...allOptions].sort(
+    (left, right) => getOptionPriority(left.attributeKey || '') - getOptionPriority(right.attributeKey || ''),
+  );
 
   const getAttributeLabel = (key: string): string => {
-    if (key === 'color' || key === 'colour') return t('orders.itemDetails.color');
-    if (key === 'size') return t('orders.itemDetails.size');
+    const attributeType = getAttributeType(key);
+    if (attributeType === 'color') return t('orders.itemDetails.color');
+    if (attributeType === 'size') return t('orders.itemDetails.size');
+    if (attributeType === 'category') return t('orders.itemDetails.category');
     return key.charAt(0).toUpperCase() + key.slice(1);
   };
 
@@ -61,11 +80,10 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
 
         {allOptions.length > 0 && (
           <div className="flex flex-wrap gap-3 mt-2 mb-2">
-            {allOptions.map((opt, optIndex) => {
+            {orderedOptions.map((opt, optIndex) => {
               if (!opt.attributeKey || !opt.value) return null;
 
-              const attributeKey = opt.attributeKey.toLowerCase().trim();
-              const isColor = attributeKey === 'color' || attributeKey === 'colour';
+              const isColor = getAttributeType(opt.attributeKey) === 'color';
               const displayLabel = opt.label || opt.value;
               const hasImage = opt.imageUrl && opt.imageUrl.trim() !== '';
               const colors = getColorsArray(opt.colors);
@@ -101,11 +119,15 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
           </div>
         )}
 
-        {(item.customizeHtml?.trim() || item.customizePlain?.trim()) && (
+        {(item.customizeHtml?.trim() ||
+          item.customizePlain?.trim() ||
+          (typeof item.sizeCatalogCategoryPriceAmd === 'number' &&
+            item.sizeCatalogCategoryPriceAmd > 0)) && (
           <div className="mt-3">
             <OrderCustomizeBlock
               customizeHtml={item.customizeHtml}
               customizePlain={item.customizePlain}
+              sizeCatalogCategoryPriceAmd={item.sizeCatalogCategoryPriceAmd}
             />
           </div>
         )}

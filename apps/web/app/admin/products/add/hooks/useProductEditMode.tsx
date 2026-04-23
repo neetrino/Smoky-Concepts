@@ -2,7 +2,10 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import { cleanImageUrls } from '@/lib/services/utils/image-utils';
-import { isDefaultPricingVariant } from '@/lib/default-pricing-variant';
+import {
+  extractSizeCatalogSelectionFromAttributes,
+  isDefaultPricingVariant,
+} from '@/lib/default-pricing-variant';
 import { convertPrice, initializeCurrencyRates } from '@/lib/currency';
 import { DEFAULT_SIMPLE_PRODUCT_DATA } from '../constants/defaultSimpleProductData.constants';
 import type { ProductData } from '../types';
@@ -68,6 +71,8 @@ export function useProductEditMode({
           descriptionHtml: product.descriptionHtml || '',
           primaryCategoryId: product.primaryCategoryId || '',
           categoryIds: product.categoryIds || [],
+          sizeCatalogCategoryId: '',
+          sizeCatalogCategoryTitle: '',
           published: product.published ?? false,
           featured: product.featured ?? false,
           upcoming: product.upcoming ?? false,
@@ -106,6 +111,12 @@ export function useProductEditMode({
         } else {
           const defaultPricingVariant = variants.find((variant) => isDefaultPricingVariant(variant));
           const selectableVariants = variants.filter((variant) => !isDefaultPricingVariant(variant));
+          const sizeCatalogSelection = extractSizeCatalogSelectionFromAttributes(defaultPricingVariant?.attributes);
+          setFormData((prev: unknown) => ({
+            ...(typeof prev === 'object' && prev !== null ? prev : {}),
+            sizeCatalogCategoryId: sizeCatalogSelection.categoryId || '',
+            sizeCatalogCategoryTitle: sizeCatalogSelection.categoryTitle || '',
+          }));
 
           if (selectableVariants.length === 0) {
             const source: VariantItem = defaultPricingVariant ?? variants[0];

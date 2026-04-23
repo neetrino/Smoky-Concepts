@@ -49,8 +49,11 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     }
 
     const { categoryId } = await context.params;
-    const body = (await req.json()) as { title?: string };
-    const result = await adminService.updateSizeCatalogCategory(categoryId, { title: body.title });
+    const body = (await req.json()) as { title?: string; priceAmd?: number };
+    const result = await adminService.updateSizeCatalogCategory(categoryId, {
+      title: body.title,
+      priceAmd: body.priceAmd,
+    });
     return NextResponse.json(result);
   } catch (error: unknown) {
     return createErrorResponse(error, req.url);

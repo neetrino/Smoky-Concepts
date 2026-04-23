@@ -12,6 +12,9 @@ function normalizeSizeItemVersion(value: string | undefined, fallback = ""): str
 
 function mapItem(row: {
   id: string;
+  categoryId: string;
+  categoryTitle: string;
+  categoryPriceAmd: number;
   title: string;
   imageUrl: string;
   version?: string | null;
@@ -20,6 +23,9 @@ function mapItem(row: {
 }): SizeCatalogItemDto {
   return {
     id: row.id,
+    categoryId: row.categoryId,
+    categoryTitle: row.categoryTitle,
+    categoryPriceAmd: row.categoryPriceAmd,
     title: row.title,
     imageUrl: row.imageUrl,
     version: normalizeSizeItemVersion(row.version ?? undefined),
@@ -31,6 +37,7 @@ function mapItem(row: {
 type SizeCategoryRow = {
   id: string;
   title: string;
+  priceAmd: number;
   position: number;
   items: Array<{
     id: string;
@@ -47,13 +54,62 @@ function isStorefrontSizeItem(item: { published?: boolean | null }): boolean {
   return item.published !== false;
 }
 
+function getNormalizedCategoryTitle(value: string): string {
+  return value.trim().toLocaleLowerCase();
+}
+
+/**
+ * Storefront picker should not render duplicate titled sections with conflicting prices.
+ * Merge by normalized title and keep the highest configured price.
+ */
+function mergeStorefrontCategoriesByTitle(rows: SizeCategoryRow[]): SizeCategoryRow[] {
+  const mergedByTitle = new Map<string, SizeCategoryRow>();
+  for (const row of rows) {
+    const key = getNormalizedCategoryTitle(row.title);
+    const existing = mergedByTitle.get(key);
+    if (!existing) {
+      mergedByTitle.set(key, { ...row, items: [...row.items] });
+      continue;
+    }
+
+    mergedByTitle.set(key, {
+      ...existing,
+      title: existing.title || row.title,
+      priceAmd: Math.max(existing.priceAmd, row.priceAmd),
+      position: Math.min(existing.position, row.position),
+      items: [...existing.items, ...row.items].sort((a, b) => a.position - b.position),
+    });
+  }
+
+  return Array.from(mergedByTitle.values()).sort((a, b) => a.position - b.position);
+}
+
 function mapCategory(row: SizeCategoryRow): SizeCatalogCategoryDto {
   return {
     id: row.id,
     title: row.title,
+    priceAmd: row.priceAmd,
     position: row.position,
-    items: row.items.map(mapItem),
+    items: row.items.map((item) =>
+      mapItem({
+        ...item,
+        categoryId: row.id,
+        categoryTitle: row.title,
+        categoryPriceAmd: row.priceAmd,
+      })
+    ),
   };
+}
+
+function normalizeCategoryPriceAmd(value: number | undefined, fallback = 0): number {
+  if (value === undefined) {
+    return fallback;
+  }
+  if (!Number.isFinite(value)) {
+    return fallback;
+  }
+  const rounded = Math.round(value);
+  return rounded >= 0 ? rounded : 0;
 }
 
 class AdminSizeCatalogService {
@@ -74,7 +130,7 @@ class AdminSizeCatalogService {
     }));
 
     return {
-      data: forStorefront.map(mapCategory),
+      data: mergeStorefrontCategoriesByTitle(forStorefront).map(mapCategory),
     };
   }
 
@@ -94,7 +150,7 @@ class AdminSizeCatalogService {
     };
   }
 
-  async createCategory(data: { title: string }): Promise<{ data: SizeCatalogCategoryDto }> {
+  async createCategory(data: { title: string; priceAmd?: number }): Promise<{ data: SizeCatalogCategoryDto }> {
     const title = data.title.trim();
     if (!title) {
       throw {
@@ -110,12 +166,15 @@ class AdminSizeCatalogService {
       select: { position: true },
     });
 
+    const priceAmd = normalizeCategoryPriceAmd(data.priceAmd, 0);
+
     const created = await db.sizeCatalogCategory.create({
       data: {
         title,
+        priceAmd,
         position: (last?.position ?? -1) + 1,
       },
-      include: { items: true },
+      include: { items: { orderBy: { position: "asc" } } },
     });
 
     return { data: mapCategory(created) };
@@ -123,7 +182,7 @@ class AdminSizeCatalogService {
 
   async updateCategory(
     categoryId: string,
-    data: { title?: string }
+    data: { title?: string; priceAmd?: number }
   ): Promise<{ data: SizeCatalogCategoryDto }> {
     const existing = await db.sizeCatalogCategory.findUnique({
       where: { id: categoryId },
@@ -149,9 +208,11 @@ class AdminSizeCatalogService {
       };
     }
 
+    const priceAmd = normalizeCategoryPriceAmd(data.priceAmd, existing.priceAmd);
+
     const updated = await db.sizeCatalogCategory.update({
       where: { id: categoryId },
-      data: { title },
+      data: { title, priceAmd },
       include: { items: { orderBy: { position: "asc" } } },
     });
 
@@ -224,9 +285,23 @@ class AdminSizeCatalogService {
         published,
         position: (last?.position ?? -1) + 1,
       },
+      include: {
+        category: {
+          select: {
+            title: true,
+            priceAmd: true,
+          },
+        },
+      },
     });
 
-    return { data: mapItem(created) };
+    return {
+      data: mapItem({
+        ...created,
+        categoryTitle: created.category.title,
+        categoryPriceAmd: created.category.priceAmd,
+      }),
+    };
   }
 
   async updateItem(
@@ -265,9 +340,23 @@ class AdminSizeCatalogService {
     const updated = await db.sizeCatalogItem.update({
       where: { id: itemId },
       data: { title, imageUrl, version: hasVersion ? version : undefined, published },
+      include: {
+        category: {
+          select: {
+            title: true,
+            priceAmd: true,
+          },
+        },
+      },
     });
 
-    return { data: mapItem(updated) };
+    return {
+      data: mapItem({
+        ...updated,
+        categoryTitle: updated.category.title,
+        categoryPriceAmd: updated.category.priceAmd,
+      }),
+    };
   }
 
   async deleteItem(itemId: string): Promise<void> {

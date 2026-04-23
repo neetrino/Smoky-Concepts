@@ -21,6 +21,50 @@ function getVariantOptions(attributes: unknown): VariantOptionFromAttributes[] {
   return Array.isArray(attributes) ? (attributes as VariantOptionFromAttributes[]) : [];
 }
 
+function extractSizeLabelFromProductVariants(params: {
+  defaultPricingVariant: { attributes?: unknown } | null;
+  selectableVariants: Array<{ attributes?: unknown }>;
+}): string | null {
+  const defaultAttributes = Array.isArray(params.defaultPricingVariant?.attributes)
+    ? params.defaultPricingVariant?.attributes
+    : [];
+
+  const sizeCatalogEntry = defaultAttributes.find((item) => {
+    if (!item || typeof item !== "object") {
+      return false;
+    }
+    const entry = item as { attributeKey?: unknown };
+    return entry.attributeKey === "__size_catalog_category_title__";
+  }) as { value?: unknown } | undefined;
+
+  if (typeof sizeCatalogEntry?.value === "string" && sizeCatalogEntry.value.trim()) {
+    return sizeCatalogEntry.value.trim();
+  }
+
+  for (const variant of params.selectableVariants) {
+    const options = getVariantOptions(variant.attributes);
+    const sizeOption = options.find((option) => {
+      if (option.attributeValue?.attribute?.key) {
+        return option.attributeValue.attribute.key === "size";
+      }
+      return option.attributeKey === "size";
+    });
+
+    if (!sizeOption) {
+      continue;
+    }
+
+    const sizeFromAttributeValue =
+      sizeOption.attributeValue?.translations?.[0]?.label || sizeOption.attributeValue?.value;
+    const normalizedSize = (sizeFromAttributeValue || sizeOption.value || "").trim();
+    if (normalizedSize) {
+      return normalizedSize;
+    }
+  }
+
+  return null;
+}
+
 /**
  * Get "Out of Stock" translation for a given language
  */
@@ -106,6 +150,10 @@ class ProductsFindTransformService {
         (item) => !isDefaultPricingVariant(item as { attributes?: unknown })
       );
       const defaultVariant = defaultPricingVariant || variants[0] || null;
+      const sizeLabel = extractSizeLabelFromProductVariants({
+        defaultPricingVariant: defaultPricingVariant as { attributes?: unknown } | null,
+        selectableVariants: selectableVariants as Array<{ attributes?: unknown }>,
+      });
       const stockSourceVariants = selectableVariants.length > 0 ? selectableVariants : variants;
 
       // Get all unique colors from ALL variants with imageUrl and colors hex (support both new and old format)
@@ -266,6 +314,7 @@ class ProductsFindTransformService {
         defaultVariantId: defaultVariant?.id ?? null,
         defaultVariantStock: defaultVariant?.stock ?? 0,
         defaultSku: defaultVariant?.sku?.trim() ?? "",
+        sizeLabel,
         categories,
         skus: (selectableVariants.length > 0 ? selectableVariants : variants)
           .map((item) => item.sku?.trim() || "")

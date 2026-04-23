@@ -91,9 +91,17 @@ export function CultureVotingCard({
           className={`mt-1.5 flex min-h-[1.75rem] shrink-0 items-center gap-2 sm:mt-2.5 ${showEarlyAccess ? 'justify-between' : 'justify-end'}`}
         >
           {showEarlyAccess ? (
-            <span className="whitespace-nowrap rounded-md border border-[#dcc090] px-1.5 py-0.5 text-xs font-bold leading-none text-[#dcc090]">
+            <button
+              type="button"
+              onClick={() => onToggleLike(id, likedByCurrentUser)}
+              disabled={pending}
+              className={`whitespace-nowrap rounded-md border border-[#dcc090] px-2 py-1 text-xs font-extrabold leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10 ${
+                pending ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+              }`}
+              aria-label={`Toggle like for ${title}`}
+            >
               {earlyAccessLabel}
-            </span>
+            </button>
           ) : null}
           <button
             type="button"

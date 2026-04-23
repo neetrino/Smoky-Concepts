@@ -1,5 +1,6 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@prisma/client";
+import { adminInputAmdToUsd } from "@/lib/currency";
 import type { CheckoutData } from "../types/checkout";
 import {
   mergeSizeCatalogIntoVariantOptions,
@@ -45,6 +46,15 @@ type VariantOptionFromAttributes = {
     colors?: unknown;
   };
 };
+
+function normalizeSizeCatalogTitleLookup(value: string | null | undefined): string {
+  if (typeof value !== 'string') return '';
+  return value
+    .trim()
+    .replace(/\s*\(v\d+\)\s*$/i, '')
+    .replace(/\s+/g, ' ')
+    .toLocaleLowerCase();
+}
 
 function getVariantOptions(attributes: unknown): VariantOptionFromAttributes[] {
   return Array.isArray(attributes) ? (attributes as VariantOptionFromAttributes[]) : [];
@@ -137,6 +147,7 @@ class OrdersService {
         sizeCatalogTitle?: string;
         sizeCatalogVersion?: string;
         sizeCatalogImageUrl?: string;
+        sizeCatalogCategoryPriceAmd?: number;
         customizePlain?: string | null;
         customizeHtml?: string | null;
         customSizeRequest?: {
@@ -159,6 +170,7 @@ class OrdersService {
               sizeCatalogTitle?: string;
               sizeCatalogVersion?: string;
               sizeCatalogImageUrl?: string;
+              sizeCatalogCategoryPriceAmd?: number;
               customizePlain?: string;
               customizeHtml?: string;
               customSizeRequest?: {
@@ -266,6 +278,12 @@ class OrdersService {
               sizeCatalogTitle !== undefined
                 ? sanitizeCheckoutImageUrl(item.sizeCatalogImageUrl)
                 : undefined;
+            const sizeCatalogCategoryPriceAmd =
+              sizeCatalogTitle !== undefined &&
+              typeof item.sizeCatalogCategoryPriceAmd === "number" &&
+              Number.isFinite(item.sizeCatalogCategoryPriceAmd)
+                ? Math.max(0, Math.round(item.sizeCatalogCategoryPriceAmd))
+                : 0;
 
             if (rawCustomRequest) {
               const name = typeof rawCustomRequest.name === 'string' ? rawCustomRequest.name.trim() : '';
@@ -374,6 +392,7 @@ class OrdersService {
               sizeCatalogTitle,
               sizeCatalogVersion,
               sizeCatalogImageUrl,
+              sizeCatalogCategoryPriceAmd,
               customizePlain,
               customizeHtml,
               customSizeRequest: customSizeRequest ?? null,
@@ -399,7 +418,10 @@ class OrdersService {
       }
 
       // Calculate totals
-      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const subtotal = cartItems.reduce((sum, item) => {
+        const addonUsd = adminInputAmdToUsd(item.sizeCatalogCategoryPriceAmd ?? 0);
+        return sum + (item.price + addonUsd) * item.quantity;
+      }, 0);
       const discountAmount = 0; // TODO: Implement discount/coupon logic
       // Use provided shipping amount from frontend (calculated from delivery API), or 0 if not provided
       const shippingAmount = providedShippingAmount !== undefined ? Number(providedShippingAmount) : 0;
@@ -457,13 +479,16 @@ class OrdersService {
             notes: customRequestNotes,
             items: {
               create: cartItems.map((item) => ({
+                // Size-collection surcharge is applied to each unit price.
+                price: item.price + adminInputAmdToUsd(item.sizeCatalogCategoryPriceAmd ?? 0),
                 variantId: item.variantId,
                 productTitle: item.productTitle,
                 variantTitle: item.variantTitle,
                 sku: item.sku,
                 quantity: item.quantity,
-                price: item.price,
-                total: item.price * item.quantity,
+                total:
+                  (item.price + adminInputAmdToUsd(item.sizeCatalogCategoryPriceAmd ?? 0)) *
+                  item.quantity,
                 imageUrl: item.imageUrl,
                 sizeCatalogTitle: item.sizeCatalogTitle ?? null,
                 sizeCatalogVersion: item.sizeCatalogVersion ?? null,
@@ -680,6 +705,31 @@ class OrdersService {
       },
       orderBy: { createdAt: "desc" },
     });
+    const sizeCatalogTitles = Array.from(
+      new Set(
+        orders.flatMap((order: { items: Array<{ sizeCatalogTitle: string | null }> }) =>
+          order.items
+            .map((item: { sizeCatalogTitle: string | null }) =>
+              normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle)
+            )
+            .filter((title: string) => title !== '')
+        )
+      )
+    );
+    const sizeCatalogPriceByTitle = new Map<string, number>();
+    if (sizeCatalogTitles.length > 0) {
+      const categories = await db.sizeCatalogCategory.findMany({
+        select: { title: true, priceAmd: true },
+      });
+      for (const category of categories) {
+        const title = normalizeSizeCatalogTitleLookup(category.title);
+        if (!title || !sizeCatalogTitles.includes(title)) continue;
+        const existing = sizeCatalogPriceByTitle.get(title);
+        if (existing === undefined || category.priceAmd > existing) {
+          sizeCatalogPriceByTitle.set(title, category.priceAmd);
+        }
+      }
+    }
 
     return {
       data: orders.map((order: {
@@ -695,8 +745,19 @@ class OrdersService {
         taxAmount: number;
         currency: string;
         createdAt: Date;
-        items: Array<{ id: string }>;
+        items: Array<{ id: string; quantity: number | null; sizeCatalogTitle: string | null }>;
       }) => ({
+        collectionPriceAmount: Number(
+          order.items
+            .reduce((sum, item) => {
+              const normalizedTitle = normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle);
+              if (!normalizedTitle) return sum;
+              const surchargeAmd = sizeCatalogPriceByTitle.get(normalizedTitle) ?? 0;
+              const quantity = item.quantity ?? 0;
+              return sum + adminInputAmdToUsd(surchargeAmd) * quantity;
+            }, 0)
+            .toFixed(2)
+        ),
         id: order.id,
         number: order.number,
         status: order.status,
@@ -743,6 +804,28 @@ class OrdersService {
         title: "Order not found",
         detail: `Order with number '${orderNumber}' not found`,
       };
+    }
+
+    const sizeCatalogTitles = Array.from(
+      new Set(
+        order.items
+          .map((item: OrderItemWithVariant) => normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle))
+          .filter((title: string) => title !== '')
+      )
+    );
+    const sizeCatalogPriceByTitle = new Map<string, number>();
+    if (sizeCatalogTitles.length > 0) {
+      const categories = await db.sizeCatalogCategory.findMany({
+        select: { title: true, priceAmd: true },
+      });
+      for (const category of categories) {
+        const title = normalizeSizeCatalogTitleLookup(category.title);
+        if (!title || !sizeCatalogTitles.includes(title)) continue;
+        const existing = sizeCatalogPriceByTitle.get(title);
+        if (existing === undefined || category.priceAmd > existing) {
+          sizeCatalogPriceByTitle.set(title, category.priceAmd);
+        }
+      }
     }
 
     // Parse shipping address if it's a JSON string
@@ -827,6 +910,10 @@ class OrdersService {
           variantOptions,
         });
 
+        const normalizedTitle = normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle);
+        const sizeCatalogCategoryPriceAmd =
+          normalizedTitle !== '' ? (sizeCatalogPriceByTitle.get(normalizedTitle) ?? null) : null;
+
         return {
           variantId: item.variantId || '',
           productTitle: item.productTitle,
@@ -838,6 +925,7 @@ class OrdersService {
           imageUrl: item.imageUrl || undefined,
           variantOptions,
           sizeCatalogVersion: item.sizeCatalogVersion?.trim() || undefined,
+          sizeCatalogCategoryPriceAmd,
           customizePlain: item.customizePlain?.trim() || undefined,
           customizeHtml: item.customizeHtml?.trim() || undefined,
         };
@@ -848,8 +936,26 @@ class OrdersService {
         shipping: Number(order.shippingAmount),
         tax: Number(order.taxAmount),
         total: Number(order.total),
+        collectionPriceAmount: Number(
+          order.items
+            .reduce((sum: number, item: OrderItemWithVariant) => {
+              const normalizedTitle = normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle);
+              const surchargeAmd = normalizedTitle !== '' ? (sizeCatalogPriceByTitle.get(normalizedTitle) ?? 0) : 0;
+              return sum + adminInputAmdToUsd(surchargeAmd) * item.quantity;
+            }, 0)
+            .toFixed(2)
+        ),
         currency: order.currency,
       },
+      collectionPriceAmount: Number(
+        order.items
+          .reduce((sum: number, item: OrderItemWithVariant) => {
+            const normalizedTitle = normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle);
+            const surchargeAmd = normalizedTitle !== '' ? (sizeCatalogPriceByTitle.get(normalizedTitle) ?? 0) : 0;
+            return sum + adminInputAmdToUsd(surchargeAmd) * item.quantity;
+          }, 0)
+          .toFixed(2)
+      ),
       customer: {
         email: order.customerEmail || undefined,
         phone: order.customerPhone || undefined,

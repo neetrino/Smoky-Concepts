@@ -5,7 +5,6 @@ import { Card } from '@shop/ui';
 import {
   ADMIN_PRICE_CURRENCY,
   amountToUsd,
-  formatPriceInCurrency,
   formatStoredMoney,
 } from '../../../../lib/currency';
 import type { OrderDetails } from '../useOrders';
@@ -67,8 +66,12 @@ export function OrderDetailsTotals({
                 const discountUsd = amountToUsd(orderDetails.totals.discount, orderDetails.totals.currency);
                 const shippingUsd = amountToUsd(orderDetails.totals.shipping, storedTotalsCurrency);
                 const taxUsd = amountToUsd(orderDetails.totals.tax, orderDetails.totals.currency);
-                const totalUsd = subtotalUsd - discountUsd + shippingUsd + taxUsd;
-                return formatPriceInCurrency(totalUsd, ADMIN_PRICE_CURRENCY);
+                const collectionUsd = amountToUsd(
+                  orderDetails.totals?.collectionPriceAmount ?? orderDetails.collectionPriceAmount ?? 0,
+                  'USD'
+                );
+                const totalUsd = subtotalUsd - discountUsd + shippingUsd + taxUsd + collectionUsd;
+                return formatStoredMoney(totalUsd, 'USD', ADMIN_PRICE_CURRENCY);
               })()}
             </span>
           </div>

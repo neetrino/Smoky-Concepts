@@ -97,6 +97,7 @@ export function ProfileOrders({
               <div className="text-right ml-4">
                 <p className="text-lg font-bold text-gray-900">
                   {(() => {
+                    const collectionUsd = amountToUsd(order.collectionPriceAmount || 0, 'USD');
                     if (
                       order.subtotal !== undefined &&
                       order.discountAmount !== undefined &&
@@ -105,11 +106,11 @@ export function ProfileOrders({
                       const subtotalUsd = amountToUsd(order.subtotal, order.currency);
                       const discountUsd = amountToUsd(order.discountAmount, order.currency);
                       const taxUsd = amountToUsd(order.taxAmount, order.currency);
-                      return formatOrderMoneyUsd(subtotalUsd - discountUsd + taxUsd);
+                      return formatOrderMoneyUsd(subtotalUsd - discountUsd + taxUsd + collectionUsd);
                     }
                     const totalUsd = amountToUsd(order.total, order.currency);
                     const shippingUsd = amountToUsd(order.shippingAmount || 0, order.currency);
-                    return formatOrderMoneyUsd(totalUsd - shippingUsd);
+                    return formatOrderMoneyUsd(totalUsd - shippingUsd + collectionUsd);
                   })()}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">{t('profile.dashboard.viewDetails')}</p>

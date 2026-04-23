@@ -96,29 +96,35 @@ export async function createAndSubmitPayload({
       }
       
       router.push('/admin/products');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [ADMIN] Error saving product:', err);
       
       let errorMessage = isEditMode ? 'Չհաջողվեց թարմացնել ապրանքը' : 'Չհաջողվեց ստեղծել ապրանքը';
+      const apiError = err as {
+        data?: { detail?: string };
+        response?: { data?: { detail?: string } };
+        message?: string;
+      };
       
-      if (err?.data?.detail) {
-        errorMessage = err.data.detail;
-      } else if (err?.response?.data?.detail) {
-        errorMessage = err.response.data.detail;
-      } else if (err?.message) {
-        if (err.message.includes('<!DOCTYPE') || err.message.includes('<html')) {
-          const mongoErrorMatch = err.message.match(/MongoServerError[^<]+/);
+      if (apiError.data?.detail) {
+        errorMessage = apiError.data.detail;
+      } else if (apiError.response?.data?.detail) {
+        errorMessage = apiError.response.data.detail;
+      } else if (apiError.message) {
+        if (apiError.message.includes('<!DOCTYPE') || apiError.message.includes('<html')) {
+          const mongoErrorMatch = apiError.message.match(/MongoServerError[^<]+/);
           if (mongoErrorMatch) {
             errorMessage = `Տվյալների բազայի սխալ: ${mongoErrorMatch[0]}`;
           } else {
             errorMessage = 'Տվյալների բազայի սխալ: SKU-ն արդեն օգտագործված է կամ այլ սխալ:';
           }
         } else {
-          errorMessage = err.message;
+          errorMessage = apiError.message;
         }
       }
-      
-      throw err;
+
+      alert(errorMessage);
+      return;
     } finally {
       setLoading(false);
     }

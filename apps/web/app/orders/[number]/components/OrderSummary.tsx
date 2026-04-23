@@ -27,6 +27,11 @@ export function OrderSummary({
   const storedCurrency = order.totals.currency;
 
   const subtotalUsd = amountToUsd(order.totals.subtotal, storedCurrency);
+  const collectionPriceUsd = amountToUsd(
+    order.totals.collectionPriceAmount ?? order.collectionPriceAmount ?? 0,
+    'USD',
+  );
+  const subtotalWithoutCollectionUsd = Math.max(0, subtotalUsd - collectionPriceUsd);
 
   const discountUsd =
     order.totals.discount > 0 ? amountToUsd(order.totals.discount, storedCurrency) : 0;
@@ -40,7 +45,8 @@ export function OrderSummary({
 
   const taxUsd = amountToUsd(order.totals.tax, storedCurrency);
 
-  const totalUsd = subtotalUsd - discountUsd + shippingUsd + taxUsd;
+  const totalUsd =
+    subtotalWithoutCollectionUsd - discountUsd + shippingUsd + taxUsd + collectionPriceUsd;
 
   const shippingDisplay =
     order.shippingMethod === 'pickup'
@@ -60,7 +66,7 @@ export function OrderSummary({
           <>
             <div className="flex justify-between text-gray-600">
               <span>{t('orders.orderSummary.subtotal')}</span>
-              <span>{formatOrderMoneyUsd(subtotalUsd)}</span>
+              <span>{formatOrderMoneyUsd(subtotalWithoutCollectionUsd)}</span>
             </div>
             {order.totals.discount > 0 && (
               <div className="flex justify-between text-gray-600">
@@ -72,6 +78,12 @@ export function OrderSummary({
               <span>{t('orders.orderSummary.shipping')}</span>
               <span>{shippingDisplay}</span>
             </div>
+            {collectionPriceUsd > 0 && (
+              <div className="flex justify-between text-gray-600">
+                <span>{t('orders.orderSummary.collectionPrice')}</span>
+                <span>{formatOrderMoneyUsd(collectionPriceUsd)}</span>
+              </div>
+            )}
             <div className="border-t border-gray-200 pt-4">
               <div className="flex justify-between text-lg font-bold text-gray-900">
                 <span>{t('orders.orderSummary.total')}</span>

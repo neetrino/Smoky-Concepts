@@ -43,6 +43,7 @@ export function useOrderSubmission({
         const title = item.variant.sizeCatalogTitle?.trim();
         const version = item.variant.sizeCatalogVersion?.trim();
         const img = item.variant.sizeCatalogImageUrl?.trim();
+        const categoryPriceAmd = item.variant.sizeCatalogCategoryPriceAmd;
         const cPlain = item.variant.customizePlain?.trim();
         const cHtml = item.variant.customizeHtml?.trim();
         const customSizeRequest = item.variant.customSizeRequest;
@@ -55,6 +56,9 @@ export function useOrderSubmission({
                 sizeCatalogTitle: title,
                 ...(version ? { sizeCatalogVersion: version } : {}),
                 ...(img ? { sizeCatalogImageUrl: img } : {}),
+                ...(typeof categoryPriceAmd === 'number' && categoryPriceAmd >= 0
+                  ? { sizeCatalogCategoryPriceAmd: Math.round(categoryPriceAmd) }
+                  : {}),
               }
             : {}),
           ...(cPlain || cHtml

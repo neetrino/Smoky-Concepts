@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { mergeSizeCatalogIntoVariantOptions } from "@/lib/orders/merge-size-catalog-into-variant-options";
+import { adminInputAmdToUsd } from "@/lib/currency";
 
 type VariantOptionFromAttributes = {
   attributeKey?: string | null;
@@ -72,11 +73,15 @@ export function formatOrderForList(order: {
   customerPhone: string | null;
   createdAt: Date;
   items: Array<{
+    price?: number | null;
+    total?: number | null;
+    quantity?: number | null;
     sizeCatalogTitle?: string | null;
     sizeCatalogVersion?: string | null;
     sizeCatalogImageUrl?: string | null;
     variant?: {
       attributes?: unknown;
+      price?: number | null;
     } | null;
   }>;
   user?: {
@@ -204,6 +209,21 @@ export function formatOrderForList(order: {
   const lastName = customer?.lastName || '';
   const colorSizeSummary = buildOrderColorSizeSummary(order.items);
   const { previews: colorSizePreviews, hasMore: colorSizePreviewsHasMore } = buildOrderVariantPreviews(order.items);
+  const collectionPriceAmount = Number(
+    order.items
+      .reduce((sum, item) => {
+        const quantity = Number(item.quantity ?? 0);
+        const itemTotal = Number(item.total ?? 0);
+        const variantBasePrice = Number(item.variant?.price ?? 0);
+        if (!Number.isFinite(quantity) || !Number.isFinite(itemTotal) || !Number.isFinite(variantBasePrice)) {
+          return sum;
+        }
+        const baseTotal = variantBasePrice * quantity;
+        const collectionSurcharge = Math.max(0, itemTotal - baseTotal);
+        return sum + collectionSurcharge;
+      }, 0)
+      .toFixed(2)
+  );
 
   return {
     id: order.id,
@@ -216,6 +236,7 @@ export function formatOrderForList(order: {
     discountAmount: order.discountAmount,
     shippingAmount: order.shippingAmount,
     taxAmount: order.taxAmount,
+    collectionPriceAmount,
     currency: order.currency || 'USD',
     customerEmail: customer?.email || order.customerEmail || '',
     customerPhone: customer?.phone || order.customerPhone || '',
@@ -273,6 +294,7 @@ export function formatOrderItem(item: {
   variant?: {
     id: string;
     sku: string | null;
+    price?: number | string | null;
     attributes?: unknown;
     product?: {
       id: string;
@@ -281,7 +303,7 @@ export function formatOrderItem(item: {
       }>;
     } | null;
   } | null;
-}) {
+}, sizeCatalogPriceByTitle?: Map<string, number>) {
   const variant = item.variant;
   const product = variant?.product;
   const translations = product && Array.isArray(product.translations) ? product.translations : [];
@@ -298,6 +320,19 @@ export function formatOrderItem(item: {
     item.sizeCatalogVersion,
     item.sizeCatalogImageUrl
   );
+  const normalizedTitle = item.sizeCatalogTitle?.trim().toLocaleLowerCase() ?? '';
+  const mappedCollectionPriceAmd =
+    normalizedTitle !== '' ? (sizeCatalogPriceByTitle?.get(normalizedTitle) ?? null) : null;
+  const variantBasePriceUsd = Number(variant?.price ?? Number.NaN);
+  const usdPerAmd = adminInputAmdToUsd(1);
+  const inferredCollectionPriceAmd =
+    Number.isFinite(variantBasePriceUsd) &&
+    quantity > 0 &&
+    Number.isFinite(usdPerAmd) &&
+    usdPerAmd > 0
+      ? Math.max(0, Math.round((unitPrice - variantBasePriceUsd) / usdPerAmd))
+      : null;
+  const sizeCatalogCategoryPriceAmd = mappedCollectionPriceAmd ?? inferredCollectionPriceAmd;
 
   return {
     id: item.id,
@@ -312,6 +347,7 @@ export function formatOrderItem(item: {
     sizeCatalogTitle: item.sizeCatalogTitle?.trim() || null,
     sizeCatalogVersion: item.sizeCatalogVersion?.trim() || null,
     sizeCatalogImageUrl: item.sizeCatalogImageUrl?.trim() || null,
+    sizeCatalogCategoryPriceAmd,
     customizePlain: item.customizePlain?.trim() || null,
     customizeHtml: item.customizeHtml?.trim() || null,
   };
@@ -384,11 +420,22 @@ export function formatOrderForDetail(order: {
     cardLast4: string | null;
     cardBrand: string | null;
   }>;
-}) {
+}, sizeCatalogPriceByTitle?: Map<string, number>) {
   const user = order.user;
   const payments = Array.isArray(order.payments) ? order.payments : [];
   const primaryPayment = payments[0] || null;
-  const formattedItems = order.items.map(formatOrderItem);
+  const formattedItems = order.items.map((item) =>
+    formatOrderItem(item, sizeCatalogPriceByTitle)
+  );
+  const collectionPriceAmount = Number(
+    formattedItems
+      .reduce((sum, item) => {
+        const surchargeAmd = item.sizeCatalogCategoryPriceAmd ?? 0;
+        const quantity = item.quantity ?? 0;
+        return sum + adminInputAmdToUsd(surchargeAmd) * quantity;
+      }, 0)
+      .toFixed(2)
+  );
 
   return {
     id: order.id,
@@ -404,8 +451,10 @@ export function formatOrderForDetail(order: {
       shipping: Number(order.shippingAmount || 0),
       tax: Number(order.taxAmount || 0),
       total: Number(order.total || 0),
+      collectionPriceAmount,
       currency: order.currency || "USD",
     },
+    collectionPriceAmount,
     customerEmail: order.customerEmail || user?.email || undefined,
     customerPhone: order.customerPhone || user?.phone || undefined,
     billingAddress: order.billingAddress || null,

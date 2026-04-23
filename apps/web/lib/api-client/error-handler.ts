@@ -55,10 +55,44 @@ export function createApiError(
   errorText: string,
   errorData: unknown
 ): ApiError {
-  const errorMessage = 
-    (errorData && typeof errorData === 'object' && 'detail' in errorData ? String(errorData.detail) : '') ||
-    (errorData && typeof errorData === 'object' && 'message' in errorData ? String(errorData.message) : '') ||
-    (errorText ? String(errorText) : '') ||
+  const getReadableValue = (value: unknown): string => {
+    if (typeof value === 'string') {
+      return value.trim();
+    }
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+    if (Array.isArray(value)) {
+      const parts = value
+        .map((item) => getReadableValue(item))
+        .filter((item) => item.length > 0);
+      return parts.join(', ');
+    }
+    if (value && typeof value === 'object') {
+      try {
+        const compact = JSON.stringify(value);
+        return compact === '{}' ? '' : compact;
+      } catch {
+        return '';
+      }
+    }
+    return '';
+  };
+
+  const errorObject = errorData && typeof errorData === 'object'
+    ? (errorData as Record<string, unknown>)
+    : null;
+
+  const detailMessage = getReadableValue(errorObject?.detail);
+  const messageMessage = getReadableValue(errorObject?.message);
+  const errorsMessage = getReadableValue(errorObject?.errors);
+  const fallbackText = errorText.trim();
+
+  const errorMessage =
+    detailMessage ||
+    messageMessage ||
+    errorsMessage ||
+    fallbackText ||
     `API Error: ${response.status} ${response.statusText}`;
   
   return new ApiError(

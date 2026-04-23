@@ -11,6 +11,7 @@ export interface CheckoutData {
     sizeCatalogTitle?: string;
     sizeCatalogVersion?: string;
     sizeCatalogImageUrl?: string;
+    sizeCatalogCategoryPriceAmd?: number;
     /** PDP text customize (optional; sanitized server-side) */
     customizePlain?: string;
     customizeHtml?: string;

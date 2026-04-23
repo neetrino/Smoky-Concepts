@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useRef, type SetStateAction } from 'react';
+import { Suspense, useEffect, useRef, useState, type SetStateAction } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../../lib/i18n-client';
@@ -18,6 +18,7 @@ import { isClothingCategory as checkIsClothingCategory, generateSlug } from './u
 import { AdminShell } from '../../components/AdminShell';
 import { buildSelectedAttributeValueIdsMap } from '@/lib/category-attributes';
 import type { CategoryAttribute } from '@/lib/category-attributes';
+import type { SizeCatalogCategoryDto } from '@/lib/types/size-catalog';
 import type { Category } from './types';
 
 function AddProductPageContent() {
@@ -30,6 +31,7 @@ function AddProductPageContent() {
   const attributePoolSeededForProductRef = useRef<string | null>(null);
 
   const formState = useProductFormState();
+  const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
 
   useProductDataLoading({
     isLoggedIn,
@@ -83,6 +85,27 @@ function AddProductPageContent() {
 
     void loadGlobalAttributes();
   }, [isLoggedIn, isAdmin, formState.setCategoryAttributes]);
+
+  useEffect(() => {
+    if (!isLoggedIn || !isAdmin) {
+      setSizeCatalogCategories([]);
+      return;
+    }
+
+    const loadSizeCatalogCategories = async () => {
+      try {
+        const response = await apiClient.get<{ data: SizeCatalogCategoryDto[] }>(
+          '/api/v1/admin/size-catalog/categories'
+        );
+        setSizeCatalogCategories(Array.isArray(response.data) ? response.data : []);
+      } catch (error: unknown) {
+        console.error('❌ [ADMIN] Failed to load size catalog categories:', error);
+        setSizeCatalogCategories([]);
+      }
+    };
+
+    void loadSizeCatalogCategories();
+  }, [isLoggedIn, isAdmin]);
 
   /** Edit mode: seed checkbox pool once from loaded variants (do not sync on every variant edit). */
   useEffect(() => {
@@ -271,6 +294,7 @@ function AddProductPageContent() {
             productType={formState.productType}
             simpleProductData={formState.simpleProductData}
             categories={formState.categories}
+            sizeCatalogCategories={sizeCatalogCategories}
             isEditMode={isEditMode}
             loading={formState.loading}
             imageUploadLoading={formState.imageUploadLoading}
@@ -301,6 +325,13 @@ function AddProductPageContent() {
             onNewCategoryNameChange={formState.setNewCategoryName}
             onCategoryIdsChange={(ids) => formState.setFormData((prev) => ({ ...prev, categoryIds: ids }))}
             onPrimaryCategoryIdChange={(id) => formState.setFormData((prev) => ({ ...prev, primaryCategoryId: id }))}
+            onSizeCatalogCategoryChange={(categoryId, categoryTitle) =>
+              formState.setFormData((prev) => ({
+                ...prev,
+                sizeCatalogCategoryId: categoryId,
+                sizeCatalogCategoryTitle: categoryTitle,
+              }))
+            }
             onCreateCategory={handleCreateCategory}
             onPriceChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, price: value }))}
             onCompareAtPriceChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, compareAtPrice: value }))}

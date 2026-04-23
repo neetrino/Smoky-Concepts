@@ -13,6 +13,8 @@ export function useProductFormState() {
     descriptionHtml: '',
     primaryCategoryId: '',
     categoryIds: [] as string[],
+    sizeCatalogCategoryId: '',
+    sizeCatalogCategoryTitle: '',
     published: false,
     featured: false,
     upcoming: false,
