@@ -60,6 +60,33 @@ function getVariantOptions(attributes: unknown): VariantOptionFromAttributes[] {
   return Array.isArray(attributes) ? (attributes as VariantOptionFromAttributes[]) : [];
 }
 
+function resolveCollectionSurchargeUsd(
+  item: {
+    quantity: number | null;
+    total?: number | null;
+    sizeCatalogTitle?: string | null;
+    variant?: { price?: number | null } | null;
+  },
+  sizeCatalogPriceByTitle: Map<string, number>
+): number {
+  const quantity = Math.max(0, Number(item.quantity ?? 0));
+  if (quantity === 0) return 0;
+
+  const normalizedTitle = normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle);
+  const mappedSurchargeAmd = normalizedTitle !== '' ? (sizeCatalogPriceByTitle.get(normalizedTitle) ?? 0) : 0;
+  if (mappedSurchargeAmd > 0) {
+    return adminInputAmdToUsd(mappedSurchargeAmd) * quantity;
+  }
+
+  const itemTotal = Number(item.total ?? Number.NaN);
+  const variantBasePrice = Number(item.variant?.price ?? Number.NaN);
+  if (!Number.isFinite(itemTotal) || !Number.isFinite(variantBasePrice)) {
+    return 0;
+  }
+  const baseTotal = variantBasePrice * quantity;
+  return Math.max(0, itemTotal - baseTotal);
+}
+
 // Media type helper
 type MediaItem = string | { url?: string; src?: string } | unknown;
 
@@ -700,7 +727,15 @@ class OrdersService {
     const orders = await db.order.findMany({
       where: { userId },
       include: {
-        items: true,
+        items: {
+          include: {
+            variant: {
+              select: {
+                price: true,
+              },
+            },
+          },
+        },
         payments: true,
       },
       orderBy: { createdAt: "desc" },
@@ -745,16 +780,18 @@ class OrdersService {
         taxAmount: number;
         currency: string;
         createdAt: Date;
-        items: Array<{ id: string; quantity: number | null; sizeCatalogTitle: string | null }>;
+        items: Array<{
+          id: string;
+          quantity: number | null;
+          total: number | null;
+          sizeCatalogTitle: string | null;
+          variant?: { price?: number | null } | null;
+        }>;
       }) => ({
         collectionPriceAmount: Number(
           order.items
             .reduce((sum, item) => {
-              const normalizedTitle = normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle);
-              if (!normalizedTitle) return sum;
-              const surchargeAmd = sizeCatalogPriceByTitle.get(normalizedTitle) ?? 0;
-              const quantity = item.quantity ?? 0;
-              return sum + adminInputAmdToUsd(surchargeAmd) * quantity;
+              return sum + resolveCollectionSurchargeUsd(item, sizeCatalogPriceByTitle);
             }, 0)
             .toFixed(2)
         ),
@@ -939,9 +976,7 @@ class OrdersService {
         collectionPriceAmount: Number(
           order.items
             .reduce((sum: number, item: OrderItemWithVariant) => {
-              const normalizedTitle = normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle);
-              const surchargeAmd = normalizedTitle !== '' ? (sizeCatalogPriceByTitle.get(normalizedTitle) ?? 0) : 0;
-              return sum + adminInputAmdToUsd(surchargeAmd) * item.quantity;
+              return sum + resolveCollectionSurchargeUsd(item, sizeCatalogPriceByTitle);
             }, 0)
             .toFixed(2)
         ),
@@ -950,9 +985,7 @@ class OrdersService {
       collectionPriceAmount: Number(
         order.items
           .reduce((sum: number, item: OrderItemWithVariant) => {
-            const normalizedTitle = normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle);
-            const surchargeAmd = normalizedTitle !== '' ? (sizeCatalogPriceByTitle.get(normalizedTitle) ?? 0) : 0;
-            return sum + adminInputAmdToUsd(surchargeAmd) * item.quantity;
+            return sum + resolveCollectionSurchargeUsd(item, sizeCatalogPriceByTitle);
           }, 0)
           .toFixed(2)
       ),
