@@ -1,4 +1,4 @@
-import { ADMIN_PRICE_CURRENCY } from '@/lib/currency';
+import { ADMIN_PRICE_CURRENCY, formatStoredMoney } from '@/lib/currency';
 
 /**
  * Dashboard utility functions
@@ -8,11 +8,7 @@ import { ADMIN_PRICE_CURRENCY } from '@/lib/currency';
  * Formats currency amount
  */
 export function formatCurrency(amount: number, currency: string = ADMIN_PRICE_CURRENCY): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
-  }).format(amount);
+  return formatStoredMoney(amount, currency, ADMIN_PRICE_CURRENCY);
 }
 
 /**
