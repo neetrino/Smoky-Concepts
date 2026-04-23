@@ -1,5 +1,26 @@
 /** @type {import('next').NextConfig} */
 const path = require('path');
+const fs = require('fs');
+
+function loadRootEnv() {
+  const root = path.resolve(__dirname, '../..');
+  const envFiles = ['.env.local', '.env'];
+
+  for (const file of envFiles) {
+    const envPath = path.join(root, file);
+    if (!fs.existsSync(envPath)) continue;
+
+    const content = fs.readFileSync(envPath, 'utf8');
+    for (const line of content.split(/\r?\n/)) {
+      const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+      if (!match || process.env[match[1]] !== undefined) continue;
+
+      process.env[match[1]] = match[2].replace(/^["']|["']$/g, '').trim();
+    }
+  }
+}
+
+loadRootEnv();
 
 const nextConfig = {
   reactStrictMode: true,
