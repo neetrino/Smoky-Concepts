@@ -7,6 +7,7 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ProductFilters } from './components/ProductFilters';
 import { ProductsTable } from './components/ProductsTable';
+import { BulkSelectionControls } from '../orders/components/BulkSelectionControls';
 import { useProductHandlers } from './hooks/useProductHandlers';
 import type { Product, ProductsResponse, Category } from './types';
 import { AdminShell } from '../components/AdminShell';
@@ -313,11 +314,6 @@ export default function ProductsPage() {
               setMinPrice={setMinPrice}
               maxPrice={maxPrice}
               setMaxPrice={setMaxPrice}
-              selectedIds={selectedIds}
-              handleSearch={handlers.handleSearch}
-              handleBulkDelete={handlers.handleBulkDelete}
-              handleClearFilters={handleClearFilters}
-              bulkDeleting={bulkDeleting}
               setPage={setPage}
             />
 
@@ -333,6 +329,15 @@ export default function ProductsPage() {
                 {t('admin.products.addNewProduct')}
               </button>
             </div>
+
+            <BulkSelectionControls
+              selectedCount={selectedIds.size}
+              onBulkDelete={handlers.handleBulkDelete}
+              bulkDeleting={bulkDeleting}
+              selectedLabel={t('admin.products.selectedProducts').replace('{count}', selectedIds.size.toString())}
+              deleteLabel={t('admin.products.deleteSelected')}
+              deletingLabel={t('admin.products.deleting')}
+            />
 
             {/* Products Table */}
             <ProductsTable
