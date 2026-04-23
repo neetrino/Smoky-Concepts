@@ -148,21 +148,6 @@ export default function VotingPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <button
-            type="button"
-            onClick={() => router.push('/admin')}
-            className="mb-4 flex items-center text-gray-600 transition-colors duration-200 hover:text-gray-900"
-          >
-            <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.voting.backToAdmin')}
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.voting.title')}</h1>
-          <p className="mt-2 text-sm text-gray-600">{t('admin.voting.subtitleList')}</p>
-        </div>
-
         <div className="flex flex-col gap-8 lg:flex-row">
           <AdminSidebar currentPath={pathname || '/admin/voting'} router={router} t={t} />
 

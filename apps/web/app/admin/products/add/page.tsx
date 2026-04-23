@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { apiClient } from '../../../../lib/api-client';
-import { PageHeader } from './components/PageHeader';
 import { AddProductFormContent } from './components/AddProductFormContent';
 import { useProductFormState } from './hooks/useProductFormState';
 import { useProductDataLoading } from './hooks/useProductDataLoading';
@@ -267,8 +266,6 @@ function AddProductPageContent() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <AdminShell>
-          <PageHeader isEditMode={isEditMode} />
-
           <AddProductFormContent
             formData={formState.formData}
             productType={formState.productType}

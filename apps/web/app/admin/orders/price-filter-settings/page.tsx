@@ -245,25 +245,6 @@ export default function PriceFilterSettingsPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => router.push('/admin')}
-            className="text-gray-600 hover:text-gray-900 mb-4 flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.common.backToAdmin')}
-          </button>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{t('admin.priceFilter.title')}</h1>
-              <p className="text-gray-600 mt-2">{t('admin.priceFilter.subtitle')}</p>
-            </div>
-          </div>
-        </div>
-
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:hidden mb-6">
             <AdminMenuDrawer tabs={adminTabs} currentPath={currentPath} />

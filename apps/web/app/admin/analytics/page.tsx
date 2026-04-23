@@ -6,7 +6,6 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card } from '@shop/ui';
 import { useTranslation } from '../../../lib/i18n-client';
 import { useAnalytics } from './hooks/useAnalytics';
-import { AnalyticsHeader } from './components/AnalyticsHeader';
 import { AdminSidebar } from './components/AdminSidebar';
 import { PeriodSelector } from './components/PeriodSelector';
 import { StatsCards } from './components/StatsCards';
@@ -57,8 +56,6 @@ export default function AnalyticsPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <AnalyticsHeader />
-
         <div className="flex flex-col lg:flex-row gap-8">
           <AdminSidebar t={t} />
 

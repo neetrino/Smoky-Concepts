@@ -66,7 +66,7 @@ export default function VotingDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
+        <div className="hidden">
           <button
             type="button"
             onClick={() => router.push('/admin/voting')}

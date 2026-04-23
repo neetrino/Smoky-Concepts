@@ -283,19 +283,9 @@ export default function ProductsPage() {
   return (
     <div className={ADMIN_PAGE_SHELL_CLASS}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <button
-            onClick={() => router.push('/admin')}
-            className="text-gray-600 hover:text-gray-900 mb-2 flex items-center text-sm"
-          >
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.products.backToAdmin')}
-          </button>
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('admin.products.title')}</h1>
-            {(search || selectedCategories.size > 0 || skuSearch || stockFilter !== 'all') && (
+        <AdminShell>
+          {(search || selectedCategories.size > 0 || skuSearch || stockFilter !== 'all') && (
+            <div className="mb-4 flex justify-end">
               <button
                 type="button"
                 onClick={handleClearFilters}
@@ -303,11 +293,9 @@ export default function ProductsPage() {
               >
                 {t('admin.products.clearAll')}
               </button>
-            )}
-          </div>
-        </div>
+            </div>
+          )}
 
-        <AdminShell>
             <ProductFilters
               search={search}
               setSearch={setSearch}

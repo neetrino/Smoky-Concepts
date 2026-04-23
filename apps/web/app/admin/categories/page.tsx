@@ -7,7 +7,6 @@ import { Card, Button } from '@shop/ui';
 import { useTranslation } from '../../../lib/i18n-client';
 import { useCategories } from './hooks/useCategories';
 import { useCategoryActions } from './hooks/useCategoryActions';
-import { CategoriesHeader } from './components/CategoriesHeader';
 import { AdminSidebar } from './components/AdminSidebar';
 import { CategoriesList } from './components/CategoriesList';
 import { AddCategoryModal } from './components/AddCategoryModal';
@@ -62,8 +61,6 @@ export default function CategoriesPage() {
   return (
     <div className={ADMIN_PAGE_SHELL_CLASS}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <CategoriesHeader />
-
         <div className="flex flex-col lg:flex-row gap-8">
           <AdminSidebar t={t} />
 

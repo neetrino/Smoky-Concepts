@@ -66,12 +66,6 @@ export function QuickSettingsContent({
   return (
     <div className={ADMIN_PAGE_SHELL_CLASS}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.quickSettings.title')}</h1>
-          <p className="text-gray-600 mt-2">{t('admin.quickSettings.subtitle')}</p>
-        </div>
-
         <div className="flex flex-col lg:flex-row gap-8">
           <AdminSidebar currentPath={currentPath} router={router} t={t} />
 

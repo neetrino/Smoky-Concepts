@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Card } from '@shop/ui';
 
 import { apiClient } from '../../../../lib/api-client';
@@ -15,7 +15,6 @@ import type { OrderDetails } from '../useOrders';
 
 export default function AdminOrderDetailsPage() {
   const { t } = useTranslation();
-  const router = useRouter();
   const params = useParams<{ id: string }>();
   const orderId = Array.isArray(params?.id) ? params.id[0] : params?.id;
 
@@ -105,15 +104,6 @@ export default function AdminOrderDetailsPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          <button
-            onClick={() => router.push('/admin/orders')}
-            className="mb-4 flex items-center text-gray-600 hover:text-gray-900"
-          >
-            <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('admin.orders.backToAdmin')}
-          </button>
           <AdminShell>
             <Card className="p-6 text-center text-red-600">
               {error || t('admin.orders.orderDetails.failedToLoad')}
@@ -127,17 +117,7 @@ export default function AdminOrderDetailsPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <button
-          onClick={() => router.push('/admin/orders')}
-          className="mb-4 flex items-center text-gray-600 hover:text-gray-900"
-        >
-          <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          {t('admin.orders.backToAdmin')}
-        </button>
-
-        <div className="mb-6">
+        <div className="hidden">
           <h1 className="text-3xl font-bold text-gray-900">
             {t('admin.orders.orderDetails.title')} — {orderDetails.number}
           </h1>

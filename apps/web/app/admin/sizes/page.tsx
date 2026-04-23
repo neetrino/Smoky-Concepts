@@ -39,11 +39,6 @@ export default function AdminSizesPage() {
   return (
     <div className={ADMIN_PAGE_SHELL_CLASS}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t('admin.sizes.title')}</h1>
-          <p className="mt-2 text-sm text-gray-600">{t('admin.sizes.subtitle')}</p>
-        </div>
-
         <div className="flex flex-col gap-8 lg:flex-row">
           <AdminSidebar t={t} />
 
