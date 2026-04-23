@@ -243,7 +243,7 @@ export default function PriceFilterSettingsPage() {
   const adminTabs = getAdminMenuTABS(t);
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-[3.75rem] pb-8">
+    <div className="min-h-screen bg-[#efefef] pt-[3.75rem] pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:hidden mb-6">
@@ -251,7 +251,7 @@ export default function PriceFilterSettingsPage() {
           </div>
           {/* Sidebar Navigation */}
           <aside className={ADMIN_FIXED_SIDEBAR_CLASS}>
-            <nav className="h-full space-y-1 overflow-y-auto border-r border-gray-200 bg-white p-3">
+            <nav className="h-full space-y-1 overflow-y-auto border-r border-[#dcc090]/25 bg-[#122a26] p-3">
               {adminTabs.map((tab: AdminMenuItem) => {
                 const isActive = currentPath === tab.path || 
                   (tab.path === '/admin' && currentPath === '/admin') ||
@@ -266,11 +266,11 @@ export default function PriceFilterSettingsPage() {
                       tab
                     )} ${
                       isActive
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                        ? 'bg-[#dcc090] text-[#122a26]'
+                        : 'text-[#dcc090]/75 hover:bg-white/5 hover:text-[#dcc090]'
                     }`}
                   >
-                    <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500'}`}>
+                    <span className={`flex-shrink-0 ${isActive ? 'text-[#122a26]' : 'text-[#dcc090]/65'}`}>
                       {tab.icon}
                     </span>
                     <span className="text-left">{tab.label}</span>

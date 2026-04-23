@@ -263,7 +263,7 @@ function AddProductPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-[3.75rem] pb-8">
+    <div className="min-h-screen bg-[#efefef] pt-[3.75rem] pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <AdminShell>
           <AddProductFormContent
@@ -331,7 +331,7 @@ export default function AddProductPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-[#efefef] flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
             <p className="text-sm text-gray-600">Loading...</p>
