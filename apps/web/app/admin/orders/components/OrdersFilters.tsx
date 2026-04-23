@@ -90,14 +90,14 @@ export function OrdersFilters({
   };
 
   return (
-    <Card className="p-4 mb-6">
+    <Card className="mb-6 border-[#dcc090]/30 bg-white/90 p-4 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <div className="inline-flex rounded-full bg-gray-100 p-1 text-xs">
+        <div className="inline-flex rounded-full bg-[#dcc090]/20 p-1 text-xs">
           <button
             type="button"
             onClick={() => handleOrderTypeChange('all')}
             className={`px-3 py-1 rounded-full transition-all ${
-              orderTypeFilter === 'all' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              orderTypeFilter === 'all' ? 'bg-[#122a26] text-[#dcc090] shadow-sm' : 'text-[#414141]/70 hover:text-[#122a26]'
             }`}
           >
             {t('admin.orders.allOrders')}
@@ -106,7 +106,7 @@ export function OrdersFilters({
             type="button"
             onClick={() => handleOrderTypeChange('orders')}
             className={`px-3 py-1 rounded-full transition-all ${
-              orderTypeFilter === 'orders' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              orderTypeFilter === 'orders' ? 'bg-[#122a26] text-[#dcc090] shadow-sm' : 'text-[#414141]/70 hover:text-[#122a26]'
             }`}
           >
             {t('admin.orders.ordersOnly')}
@@ -115,7 +115,7 @@ export function OrdersFilters({
             type="button"
             onClick={() => handleOrderTypeChange('custom')}
             className={`px-3 py-1 rounded-full transition-all ${
-              orderTypeFilter === 'custom' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              orderTypeFilter === 'custom' ? 'bg-[#122a26] text-[#dcc090] shadow-sm' : 'text-[#414141]/70 hover:text-[#122a26]'
             }`}
           >
             {t('admin.orders.customOrders')}
@@ -124,7 +124,7 @@ export function OrdersFilters({
             type="button"
             onClick={() => handleOrderTypeChange('new')}
             className={`px-3 py-1 rounded-full transition-all ${
-              orderTypeFilter === 'new' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              orderTypeFilter === 'new' ? 'bg-[#122a26] text-[#dcc090] shadow-sm' : 'text-[#414141]/70 hover:text-[#122a26]'
             }`}
           >
             {t('admin.orders.newOrders')}
@@ -134,7 +134,7 @@ export function OrdersFilters({
 
       <div className="flex gap-4 items-center flex-wrap">
         <select
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
           value={statusFilter}
           onChange={(e) => handleStatusChange(e.target.value)}
         >
@@ -145,7 +145,7 @@ export function OrdersFilters({
           <option value="cancelled">{t('admin.orders.cancelled')}</option>
         </select>
         <select
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
           value={paymentStatusFilter}
           onChange={(e) => handlePaymentStatusChange(e.target.value)}
         >
@@ -157,7 +157,7 @@ export function OrdersFilters({
         <input
           type="text"
           placeholder={t('admin.orders.searchPlaceholder')}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-[200px]"
+          className="px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090] flex-1 min-w-[200px]"
           value={searchQuery}
           onChange={(e) => handleSearchChange(e.target.value)}
         />
@@ -165,7 +165,7 @@ export function OrdersFilters({
           <div
             className={`px-4 py-2 rounded-md text-sm ${
               updateMessage.type === 'success'
-                ? 'bg-green-100 text-green-800'
+                ? 'bg-[#122a26]/10 text-[#122a26]'
                 : 'bg-red-100 text-red-800'
             }`}
           >

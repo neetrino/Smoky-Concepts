@@ -47,8 +47,8 @@ export default function CategoriesPage() {
     return (
       <div className={ADMIN_CENTERED_LOADING_CLASS}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#122a26] mx-auto mb-4" />
+          <p className="text-[#414141]/70">{t('admin.common.loading')}</p>
         </div>
       </div>
     );
@@ -66,9 +66,9 @@ export default function CategoriesPage() {
 
           {/* Main Content */}
           <div className="flex-1 min-w-0">
-            <Card className="p-6">
+            <Card className="border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">{t('admin.categories.title')}</h2>
+                <h2 className="text-xl font-semibold text-[#122a26]">{t('admin.categories.title')}</h2>
                 <Button
                   variant="primary"
                   onClick={() => {
@@ -86,8 +86,8 @@ export default function CategoriesPage() {
 
               {loading ? (
                 <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto mb-2"></div>
-                  <p className="text-sm text-gray-600">{t('admin.categories.loadingCategories')}</p>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#122a26] mx-auto mb-2"></div>
+                  <p className="text-sm text-[#414141]/70">{t('admin.categories.loadingCategories')}</p>
                 </div>
               ) : (
                 <CategoriesList

@@ -91,7 +91,7 @@ export function HomeHeroSlideEditor({
                   </div>
                 )}
               </div>
-              <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 self-start rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-blue-600 transition-colors hover:bg-gray-50 hover:text-blue-800">
+              <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 self-start rounded-md border border-[#dcc090]/30 bg-white px-3 py-2 text-sm text-[#122a26] transition-colors hover:bg-[#dcc090]/15">
                 <input
                   type="file"
                   accept="image/*"
@@ -111,7 +111,7 @@ export function HomeHeroSlideEditor({
               type="text"
               value={slide.title}
               onChange={(e) => onUpdate({ title: e.target.value })}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-[#dcc090]/35 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
             />
           </div>
           <div className="sm:col-span-2">
@@ -122,7 +122,7 @@ export function HomeHeroSlideEditor({
               value={slide.description}
               onChange={(e) => onUpdate({ description: e.target.value })}
               rows={3}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-[#dcc090]/35 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
             />
           </div>
         </div>

@@ -31,11 +31,11 @@ export function CategoryDiscountsCard({
   const { t } = useTranslation();
 
   return (
-    <Card className="p-6 mb-8 bg-white border-gray-200">
+    <Card className="mb-8 border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">{t('admin.quickSettings.categoryDiscounts')}</h2>
-          <p className="text-sm text-gray-600">{t('admin.quickSettings.categoryDiscountsSubtitle')}</p>
+          <h2 className="text-xl font-semibold text-[#122a26]">{t('admin.quickSettings.categoryDiscounts')}</h2>
+          <p className="text-sm text-[#414141]/70">{t('admin.quickSettings.categoryDiscountsSubtitle')}</p>
         </div>
         <Button
           variant="primary"
@@ -55,30 +55,30 @@ export function CategoryDiscountsCard({
 
       {categoriesLoading ? (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.quickSettings.loadingCategories')}</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#122a26] mx-auto mb-4"></div>
+          <p className="text-[#414141]/70">{t('admin.quickSettings.loadingCategories')}</p>
         </div>
       ) : categories.length === 0 ? (
-        <div className="text-center py-6 text-gray-600 border border-dashed border-gray-200 rounded">
+        <div className="text-center py-6 text-[#414141]/70 border border-dashed border-[#dcc090]/35 rounded">
           {t('admin.quickSettings.noCategories')}
         </div>
       ) : (
-        <div className="max-h-[420px] overflow-y-auto divide-y divide-gray-100 border border-gray-100 rounded-lg">
+        <div className="max-h-[420px] overflow-y-auto divide-y divide-[#dcc090]/20 border border-[#dcc090]/25 rounded-lg">
           {categories.map((category) => {
             const currentValue = categoryDiscounts[category.id];
             return (
               <div
                 key={category.id}
-                className="flex items-center gap-4 px-4 py-3 bg-white hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-4 px-4 py-3 bg-white hover:bg-[#dcc090]/10 transition-colors"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p className="text-sm font-medium text-[#122a26] truncate">
                     {category.title || t('admin.quickSettings.untitledCategory')}
                   </p>
                   {category.parentId ? (
-                    <p className="text-xs text-gray-500">{t('admin.quickSettings.parentCategoryId').replace('{id}', category.parentId)}</p>
+                    <p className="text-xs text-[#414141]/55">{t('admin.quickSettings.parentCategoryId').replace('{id}', category.parentId)}</p>
                   ) : (
-                    <p className="text-xs text-gray-500">{t('admin.quickSettings.rootCategory')}</p>
+                    <p className="text-xs text-[#414141]/55">{t('admin.quickSettings.rootCategory')}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export function CategoryDiscountsCard({
                     className="w-24"
                     placeholder="0"
                   />
-                  <span className="text-sm font-medium text-gray-700">%</span>
+                  <span className="text-sm font-medium text-[#414141]/75">%</span>
                   <Button
                     variant="ghost"
                     size="sm"

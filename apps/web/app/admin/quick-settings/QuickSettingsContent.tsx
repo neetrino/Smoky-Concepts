@@ -72,11 +72,11 @@ export function QuickSettingsContent({
           {/* Main Content */}
           <div className="flex-1 min-w-0">
             {/* Quick Settings - Discount Management */}
-            <Card className="p-6 mb-8 bg-white border-gray-200">
+            <Card className="mb-8 border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">{t('admin.quickSettings.quickSettingsTitle')}</h2>
-                  <p className="text-sm text-gray-600 mt-1">{t('admin.quickSettings.quickSettingsSubtitle')}</p>
+                  <h2 className="text-xl font-semibold text-[#122a26]">{t('admin.quickSettings.quickSettingsTitle')}</h2>
+                  <p className="text-sm text-[#414141]/70 mt-1">{t('admin.quickSettings.quickSettingsSubtitle')}</p>
                 </div>
               </div>
 

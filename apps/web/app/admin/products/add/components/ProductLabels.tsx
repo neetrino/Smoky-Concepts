@@ -46,7 +46,7 @@ export function ProductLabels({ labels, onAddLabel, onRemoveLabel, onUpdateLabel
                     {t('admin.products.add.type')} *
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
                     value={label.type}
                     onChange={(e) => onUpdateLabel(index, 'type', e.target.value as 'text' | 'percentage')}
                     required
@@ -72,7 +72,7 @@ export function ProductLabels({ labels, onAddLabel, onRemoveLabel, onUpdateLabel
                     className="w-full"
                   />
                   {label.type === 'percentage' && (
-                    <p className="mt-1 text-xs text-blue-600 font-medium">{t('admin.products.add.percentageAutoUpdateHint')}</p>
+                    <p className="mt-1 text-xs text-[#122a26] font-medium">{t('admin.products.add.percentageAutoUpdateHint')}</p>
                   )}
                 </div>
 
@@ -82,7 +82,7 @@ export function ProductLabels({ labels, onAddLabel, onRemoveLabel, onUpdateLabel
                     {t('admin.products.add.position')} *
                   </label>
                   <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
                     value={label.position}
                     onChange={(e) => onUpdateLabel(index, 'position', e.target.value)}
                     required

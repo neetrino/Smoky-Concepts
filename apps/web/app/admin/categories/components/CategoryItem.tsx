@@ -16,7 +16,7 @@ export function CategoryItem({ category, parentCategory, onEdit, onDelete }: Cat
 
   return (
     <div
-      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+      className="flex items-center justify-between p-3 bg-white/70 rounded-lg border border-[#dcc090]/25 hover:bg-[#dcc090]/10 hover:border-[#dcc090] transition-colors"
       style={{ paddingLeft: `${16 + category.level * 24}px` }}
     >
       <div className="flex flex-1 items-center gap-3">
@@ -24,22 +24,22 @@ export function CategoryItem({ category, parentCategory, onEdit, onDelete }: Cat
           <img
             src={category.imageUrl}
             alt={category.title}
-            className="h-12 w-12 rounded-lg border border-gray-200 bg-white object-cover"
+            className="h-12 w-12 rounded-lg border border-[#dcc090]/30 bg-white object-cover"
           />
         ) : null}
         <div>
           <div className="flex items-center gap-2">
-          <div className="text-sm font-medium text-gray-900">{category.title}</div>
+          <div className="text-sm font-medium text-[#122a26]">{category.title}</div>
           {category.requiresSizes && (
-            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+            <span className="text-xs bg-[#dcc090]/35 text-[#122a26] px-2 py-0.5 rounded">
               Sizes
             </span>
           )}
           </div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-xs text-[#414141]/55 mt-1">
             {category.slug}
             {parentCategory && (
-              <span className="ml-2 text-gray-400">
+              <span className="ml-2 text-[#414141]/45">
                 → Parent: {parentCategory.title}
               </span>
             )}
@@ -51,7 +51,7 @@ export function CategoryItem({ category, parentCategory, onEdit, onDelete }: Cat
           variant="ghost"
           size="sm"
           onClick={() => onEdit(category)}
-          className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+          className="text-[#122a26] hover:text-[#122a26] hover:bg-[#dcc090]/15"
         >
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

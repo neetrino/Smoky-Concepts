@@ -52,7 +52,7 @@ export function AddCategoryModal({
             <select
               value={formData.parentId}
               onChange={(e) => onFormDataChange({ ...formData, parentId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
             >
               <option value="">{t('admin.categories.rootCategory')}</option>
               {categories
@@ -70,7 +70,7 @@ export function AddCategoryModal({
                 type="checkbox"
                 checked={formData.requiresSizes}
                 onChange={(e) => onFormDataChange({ ...formData, requiresSizes: e.target.checked })}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-[#122a26] border-[#dcc090]/40 rounded focus:ring-[#dcc090]"
               />
               <span className="text-sm text-gray-700">
                 {t('admin.categories.requiresSizes')}

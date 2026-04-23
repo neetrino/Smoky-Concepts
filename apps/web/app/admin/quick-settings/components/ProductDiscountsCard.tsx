@@ -34,20 +34,20 @@ export function ProductDiscountsCard({
   const formatPrice = (price: number) => formatAdminUsdAmount(price);
 
   return (
-    <Card className="p-6 bg-white border-gray-200">
+    <Card className="border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('admin.quickSettings.productDiscounts')}</h2>
-        <p className="text-sm text-gray-600">{t('admin.quickSettings.productDiscountsSubtitle')}</p>
+        <h2 className="text-xl font-semibold text-[#122a26] mb-2">{t('admin.quickSettings.productDiscounts')}</h2>
+        <p className="text-sm text-[#414141]/70">{t('admin.quickSettings.productDiscountsSubtitle')}</p>
       </div>
 
       {productsLoading ? (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.quickSettings.loadingProducts')}</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#122a26] mx-auto mb-4"></div>
+          <p className="text-[#414141]/70">{t('admin.quickSettings.loadingProducts')}</p>
         </div>
       ) : products.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-600">{t('admin.quickSettings.noProducts')}</p>
+          <p className="text-[#414141]/70">{t('admin.quickSettings.noProducts')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -61,7 +61,7 @@ export function ProductDiscountsCard({
             return (
               <div
                 key={product.id}
-                className="flex items-center gap-4 p-4 border-2 border-blue-300 rounded-lg hover:bg-blue-50 transition-colors bg-blue-50/30"
+                className="flex items-center gap-4 p-4 border border-[#dcc090]/30 rounded-lg hover:bg-[#dcc090]/10 transition-colors bg-white/70"
               >
                 {product.image && (
                   <div className="flex-shrink-0">
@@ -73,14 +73,14 @@ export function ProductDiscountsCard({
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-gray-900 truncate">{product.title}</h3>
+                  <h3 className="text-sm font-medium text-[#122a26] truncate">{product.title}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     {currentDiscount > 0 && originalPrice > 0 ? (
                       <>
-                        <span className="text-xs font-semibold text-blue-600 select-none">
+                        <span className="text-xs font-semibold text-[#122a26] select-none">
                           {formatPrice(discountedPrice)}
                         </span>
-                        <span className="text-xs text-gray-400 line-through select-none">
+                        <span className="text-xs text-[#414141]/45 line-through select-none">
                           {formatPrice(originalPrice)}
                         </span>
                         <span className="text-xs text-red-600 font-medium">
@@ -88,7 +88,7 @@ export function ProductDiscountsCard({
                         </span>
                       </>
                     ) : (
-                      <span className="text-xs text-gray-500 select-none">
+                      <span className="text-xs text-[#414141]/60 select-none">
                         {originalPrice > 0 ? formatPrice(originalPrice) : 'N/A'}
                       </span>
                     )}
@@ -117,7 +117,7 @@ export function ProductDiscountsCard({
                     className="w-20"
                     placeholder="0"
                   />
-                  <span className="text-sm font-medium text-gray-700 w-6">%</span>
+                  <span className="text-sm font-medium text-[#414141]/75 w-6">%</span>
                   <Button
                     variant="primary"
                     size="sm"

@@ -43,7 +43,7 @@ export function OrderRow({
   const previews = order.colorSizePreviews || [];
 
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-[#dcc090]/10">
       <td className="px-4 py-4">
         <input
           type="checkbox"
@@ -53,27 +53,27 @@ export function OrderRow({
         />
       </td>
       <td
-        className="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-gray-50"
+        className="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-[#dcc090]/10"
         onClick={onViewDetails}
       >
-        <div className="text-sm font-medium text-gray-900">{order.number}</div>
+        <div className="text-sm font-medium text-[#122a26]">{order.number}</div>
       </td>
       <td
-        className="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-gray-50"
+        className="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-[#dcc090]/10"
         onClick={onViewDetails}
       >
-        <div className="text-sm font-medium text-gray-900">
+        <div className="text-sm font-medium text-[#122a26]">
           {[order.customerFirstName, order.customerLastName].filter(Boolean).join(' ') || t('admin.orders.unknownCustomer')}
         </div>
         {order.customerPhone && (
-          <div className="text-sm text-gray-500">{order.customerPhone}</div>
+          <div className="text-sm text-[#414141]/55">{order.customerPhone}</div>
         )}
-        <div className="mt-1 text-xs text-blue-600">{t('admin.orders.viewOrderDetails')}</div>
+        <div className="mt-1 text-xs text-[#122a26]">{t('admin.orders.viewOrderDetails')}</div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#122a26]">
         {calculateTotalWithoutShipping()}
       </td>
-      <td className="px-6 py-4 text-sm text-gray-500">
+      <td className="px-6 py-4 text-sm text-[#414141]/60">
         {previews.length > 0 ? (
           <div className="flex max-w-[260px] flex-wrap items-center gap-1.5">
             {previews.map((preview) => {
@@ -81,19 +81,19 @@ export function OrderRow({
               return (
                 <span
                   key={`${order.id}-${preview.label}-${preview.imageUrl || ''}-${preview.colorHex || ''}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#dcc090]/30 bg-white px-2 py-1 text-xs text-[#414141]/75"
                   title={preview.label}
                 >
                   {preview.imageUrl ? (
                     <img
                       src={preview.imageUrl}
                       alt={preview.label}
-                      className="h-4 w-4 rounded border border-gray-300 object-cover"
+                      className="h-4 w-4 rounded border border-[#dcc090]/35 object-cover"
                     />
                   ) : null}
                   {swatchColor ? (
                     <span
-                      className="h-3.5 w-3.5 rounded-full border border-gray-300"
+                      className="h-3.5 w-3.5 rounded-full border border-[#dcc090]/35"
                       style={{ backgroundColor: swatchColor }}
                       aria-hidden="true"
                     />
@@ -103,7 +103,7 @@ export function OrderRow({
               );
             })}
             {order.colorSizePreviewsHasMore && order.colorSizePreviewsHasMore > 0 ? (
-              <span className="text-xs text-gray-500">+{order.colorSizePreviewsHasMore}</span>
+              <span className="text-xs text-[#414141]/55">+{order.colorSizePreviewsHasMore}</span>
             ) : null}
           </div>
         ) : (
@@ -116,14 +116,14 @@ export function OrderRow({
         <div className="flex items-center gap-2">
           {updatingStatus ? (
             <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-              <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#122a26]"></div>
+              <span className="text-xs text-[#414141]/55">{t('admin.orders.updating')}</span>
             </div>
           ) : (
             <select
               value={order.status}
               onChange={(e) => onStatusChange(e.target.value)}
-              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${getStatusColor(order.status)}`}
+              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-[#dcc090] cursor-pointer ${getStatusColor(order.status)}`}
             >
               <option value="pending">{t('admin.orders.pending')}</option>
               <option value="processing">{t('admin.orders.processing')}</option>
@@ -137,14 +137,14 @@ export function OrderRow({
         <div className="flex items-center gap-2">
           {updatingPaymentStatus ? (
             <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-              <span className="text-xs text-gray-500">{t('admin.orders.updating')}</span>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#122a26]"></div>
+              <span className="text-xs text-[#414141]/55">{t('admin.orders.updating')}</span>
             </div>
           ) : (
             <select
               value={order.paymentStatus}
               onChange={(e) => onPaymentStatusChange(e.target.value)}
-              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${getPaymentStatusColor(order.paymentStatus)}`}
+              className={`px-2 py-1 text-xs font-medium rounded-md border-0 focus:outline-none focus:ring-2 focus:ring-[#dcc090] cursor-pointer ${getPaymentStatusColor(order.paymentStatus)}`}
             >
               <option value="paid">{t('admin.orders.paid')}</option>
               <option value="pending">{t('admin.orders.pendingPayment')}</option>
@@ -153,7 +153,7 @@ export function OrderRow({
           )}
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#414141]/60">
         {new Date(order.createdAt).toLocaleDateString()}
       </td>
     </tr>

@@ -166,8 +166,8 @@ export default function UsersPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#122a26] mx-auto mb-4"></div>
+          <p className="text-[#414141]/70">{t('admin.common.loading')}</p>
         </div>
       </div>
     );
@@ -192,7 +192,7 @@ export default function UsersPage() {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <AdminShell>
           {/* Search */}
-          <Card className="p-4 mb-6">
+          <Card className="mb-6 border-[#dcc090]/30 bg-white/90 p-4 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
             <form onSubmit={handleSearch} className="flex flex-col gap-4">
             <div className="flex gap-4">
               <Input
@@ -209,10 +209,10 @@ export default function UsersPage() {
 
             {/* Admin / Customer filter */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-semibold text-[#414141]/65 uppercase tracking-wide">
                 {t('admin.users.adminCustomer')}
               </span>
-              <div className="inline-flex rounded-full bg-gray-100 p-1 text-xs">
+              <div className="inline-flex rounded-full bg-[#dcc090]/20 p-1 text-xs">
                 <button
                   type="button"
                   onClick={() => {
@@ -222,8 +222,8 @@ export default function UsersPage() {
                   }}
                   className={`px-3 py-1 rounded-full transition-all ${
                     roleFilter === 'all'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-[#122a26] text-[#dcc090] shadow-sm'
+                      : 'text-[#414141]/70 hover:text-[#122a26]'
                   }`}
                 >
                   {t('admin.users.all')}
@@ -237,8 +237,8 @@ export default function UsersPage() {
                   }}
                   className={`px-3 py-1 rounded-full transition-all ${
                     roleFilter === 'admin'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-[#122a26] text-[#dcc090] shadow-sm'
+                      : 'text-[#414141]/70 hover:text-[#122a26]'
                   }`}
                 >
                   {t('admin.users.admins')}
@@ -252,8 +252,8 @@ export default function UsersPage() {
                   }}
                   className={`px-3 py-1 rounded-full transition-all ${
                     roleFilter === 'customer'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-[#122a26] text-[#dcc090] shadow-sm'
+                      : 'text-[#414141]/70 hover:text-[#122a26]'
                   }`}
                 >
                   {t('admin.users.customers')}
@@ -264,21 +264,21 @@ export default function UsersPage() {
           </Card>
 
           {/* Users Table */}
-          <Card className="p-6">
+          <Card className="border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-              <p className="text-gray-600">{t('admin.users.loadingUsers')}</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#122a26] mx-auto mb-4"></div>
+              <p className="text-[#414141]/70">{t('admin.users.loadingUsers')}</p>
             </div>
           ) : filteredUsers.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600">{t('admin.users.noUsers')}</p>
+              <p className="text-[#414141]/70">{t('admin.users.noUsers')}</p>
             </div>
           ) : (
             <>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-[#dcc090]/25">
+                  <thead className="bg-[#122a26]">
                     <tr>
                       <th className="px-4 py-3">
                         <input
@@ -288,29 +288,29 @@ export default function UsersPage() {
                           onChange={toggleSelectAll}
                         />
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                         {t('admin.users.user')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                         {t('admin.users.contact')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                         {t('admin.users.orders')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                         {t('admin.users.roles')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                         {t('admin.users.status')}
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                         {t('admin.users.created')}
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white divide-y divide-[#dcc090]/25">
                     {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
+                      <tr key={user.id} className="hover:bg-[#dcc090]/10">
                         <td className="px-4 py-4">
                           <input
                             type="checkbox"
@@ -320,18 +320,18 @@ export default function UsersPage() {
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-[#122a26]">
                             {user.firstName} {user.lastName}
                           </div>
-                          <div className="text-sm text-gray-500">{user.id}</div>
+                          <div className="text-sm text-[#414141]/55">{user.id}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{user.email}</div>
+                          <div className="text-sm text-[#122a26]">{user.email}</div>
                           {user.phone && (
-                            <div className="text-sm text-gray-500">{user.phone}</div>
+                            <div className="text-sm text-[#414141]/55">{user.phone}</div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#122a26]">
                           {user.ordersCount ?? 0}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -339,7 +339,7 @@ export default function UsersPage() {
                             {user.roles?.map((role) => (
                               <span
                                 key={role}
-                                className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
+                                className="px-2 py-1 text-xs font-medium bg-[#dcc090]/35 text-[#122a26] rounded-full"
                               >
                                 {role}
                               </span>
@@ -358,8 +358,8 @@ export default function UsersPage() {
                             }
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                               user.blocked
-                                ? 'bg-gray-300 focus:ring-gray-400'
-                                : 'bg-green-500 focus:ring-green-500'
+                                ? 'bg-[#414141]/25 focus:ring-[#414141]/40'
+                                : 'bg-[#122a26] focus:ring-[#dcc090]'
                             }`}
                             title={user.blocked ? t('admin.users.clickToActivate') : t('admin.users.clickToBlock')}
                             role="switch"
@@ -372,7 +372,7 @@ export default function UsersPage() {
                             />
                           </button>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#414141]/60">
                           {new Date(user.createdAt).toLocaleDateString()}
                         </td>
                       </tr>
@@ -384,7 +384,7 @@ export default function UsersPage() {
               {/* Pagination */}
               {meta && meta.totalPages > 1 && (
                 <div className="mt-6 flex items-center justify-between">
-                  <div className="text-sm text-gray-700">
+                  <div className="text-sm text-[#414141]/75">
                     {t('admin.users.showingPage').replace('{page}', meta.page.toString()).replace('{totalPages}', meta.totalPages.toString()).replace('{total}', meta.total.toString())}
                   </div>
                   <div className="flex gap-2">
@@ -406,7 +406,7 @@ export default function UsersPage() {
                 </div>
               )}
               <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm text-gray-700">{t('admin.users.selectedUsers').replace('{count}', selectedIds.size.toString())}</div>
+                <div className="text-sm text-[#414141]/75">{t('admin.users.selectedUsers').replace('{count}', selectedIds.size.toString())}</div>
                 <Button
                   variant="outline"
                   onClick={handleBulkDelete}
