@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { amountToUsd, catalogPriceToUsd } from '../../../lib/currency';
+import { adminInputAmdToUsd, amountToUsd } from '../../../lib/currency';
 import type { Cart } from '../types';
 
 interface UseOrderSummaryProps {
@@ -32,7 +32,7 @@ export function useOrderSummary({
     const discountUsd = amountToUsd(cart.totals.discount, cartMoneyCurrency);
     const taxUsd = amountToUsd(cart.totals.tax, cartMoneyCurrency);
     const shippingUsd =
-      shippingMethod === 'delivery' && deliveryPrice !== null ? catalogPriceToUsd(deliveryPrice) : 0;
+      shippingMethod === 'delivery' && deliveryPrice !== null ? adminInputAmdToUsd(deliveryPrice) : 0;
     const totalUsd = subtotalUsd - discountUsd + taxUsd + shippingUsd;
 
     return {

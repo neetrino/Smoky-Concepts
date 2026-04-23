@@ -1,8 +1,9 @@
 'use client';
 
 import { Button } from '@shop/ui';
+import { useCurrency } from '../../components/hooks/useCurrency';
 import { useTranslation } from '../../lib/i18n-client';
-import { formatPriceInCurrency } from '../../lib/currency';
+import { convertPrice, formatPriceInCurrency } from '../../lib/currency';
 
 interface Cart {
   id: string;
@@ -27,7 +28,7 @@ interface OrderSummaryProps {
     totalDisplay: number;
   };
   shippingMethod: 'pickup' | 'delivery';
-  shippingCity: string | undefined;
+  shippingRegion: string | undefined;
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
   error: string | null;
@@ -39,7 +40,7 @@ export function OrderSummary({
   cart,
   orderSummary,
   shippingMethod,
-  shippingCity,
+  shippingRegion,
   loadingDeliveryPrice,
   deliveryPrice,
   error,
@@ -47,6 +48,9 @@ export function OrderSummary({
   onPlaceOrder,
 }: OrderSummaryProps) {
   const { t } = useTranslation();
+  const displayCurrency = useCurrency();
+  const formatCheckoutUsd = (amountUsd: number) =>
+    formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
 
   return (
     <div className="lg:col-span-1">
@@ -55,7 +59,7 @@ export function OrderSummary({
         <div className="space-y-4 mb-6">
           <div className="flex justify-between text-gray-600">
             <span>{t('checkout.summary.subtotal')}</span>
-            <span>{formatPriceInCurrency(orderSummary.subtotalDisplay)}</span>
+            <span>{formatCheckoutUsd(orderSummary.subtotalDisplay)}</span>
           </div>
           <div className="flex justify-between text-gray-600">
             <span>{t('checkout.summary.shipping')}</span>
@@ -65,15 +69,15 @@ export function OrderSummary({
                 : loadingDeliveryPrice
                   ? t('checkout.shipping.loading')
                   : deliveryPrice !== null
-                    ? formatPriceInCurrency(orderSummary.shippingDisplay) + (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
-                    : t('checkout.shipping.enterCity')}
+                    ? formatCheckoutUsd(orderSummary.shippingDisplay) + (shippingRegion ? ` (${shippingRegion})` : ` (${t('checkout.shipping.delivery')})`)
+                    : t('checkout.shipping.enterRegion')}
             </span>
           </div>
           <div className="border-t border-gray-200 pt-4">
             <div className="flex justify-between text-lg font-bold text-gray-900">
               <span>{t('checkout.summary.total')}</span>
               <span>
-                {formatPriceInCurrency(orderSummary.totalDisplay)}
+                {formatCheckoutUsd(orderSummary.totalDisplay)}
               </span>
             </div>
           </div>

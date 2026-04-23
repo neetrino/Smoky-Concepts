@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { Card, Button } from '@shop/ui';
+import { useCurrency } from '../../../../components/hooks/useCurrency';
 import { dispatchCartDrawerOpen } from '../../../cart/constants';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { amountToUsd, catalogPriceToUsd, formatPriceInCurrency } from '../../../../lib/currency';
+import { adminInputAmdToUsd, amountToUsd, convertPrice, formatPriceInCurrency } from '../../../../lib/currency';
 import type { Order } from '../types';
 
 interface OrderSummaryProps {
@@ -19,6 +20,10 @@ export function OrderSummary({
   loadingShipping,
 }: OrderSummaryProps) {
   const { t } = useTranslation();
+  const displayCurrency = useCurrency();
+  const formatOrderMoneyUsd = (amountUsd: number) =>
+    formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
+
   const storedCurrency = order.totals.currency;
 
   const subtotalUsd = amountToUsd(order.totals.subtotal, storedCurrency);
@@ -30,7 +35,7 @@ export function OrderSummary({
     order.shippingMethod === 'pickup'
       ? 0
       : calculatedShipping !== null
-        ? catalogPriceToUsd(calculatedShipping)
+        ? adminInputAmdToUsd(calculatedShipping)
         : amountToUsd(order.totals.shipping, storedCurrency);
 
   const taxUsd = amountToUsd(order.totals.tax, storedCurrency);
@@ -42,8 +47,10 @@ export function OrderSummary({
       ? t('checkout.shipping.freePickup')
       : loadingShipping
         ? t('checkout.shipping.loading')
-        : formatPriceInCurrency(shippingUsd, 'USD') +
-          (order.shippingAddress?.city ? ` (${order.shippingAddress.city})` : '');
+        : formatOrderMoneyUsd(shippingUsd) +
+          (order.shippingAddress?.city || order.shippingAddress?.state
+            ? ` (${order.shippingAddress.city || order.shippingAddress.state})`
+            : '');
 
   return (
     <Card className="p-6 sticky top-4">
@@ -53,12 +60,12 @@ export function OrderSummary({
           <>
             <div className="flex justify-between text-gray-600">
               <span>{t('orders.orderSummary.subtotal')}</span>
-              <span>{formatPriceInCurrency(subtotalUsd, 'USD')}</span>
+              <span>{formatOrderMoneyUsd(subtotalUsd)}</span>
             </div>
             {order.totals.discount > 0 && (
               <div className="flex justify-between text-gray-600">
                 <span>{t('orders.orderSummary.discount')}</span>
-                <span>-{formatPriceInCurrency(discountUsd, 'USD')}</span>
+                <span>-{formatOrderMoneyUsd(discountUsd)}</span>
               </div>
             )}
             <div className="flex justify-between text-gray-600">
@@ -68,7 +75,7 @@ export function OrderSummary({
             <div className="border-t border-gray-200 pt-4">
               <div className="flex justify-between text-lg font-bold text-gray-900">
                 <span>{t('orders.orderSummary.total')}</span>
-                <span>{formatPriceInCurrency(totalUsd, 'USD')}</span>
+                <span>{formatOrderMoneyUsd(totalUsd)}</span>
               </div>
             </div>
           </>

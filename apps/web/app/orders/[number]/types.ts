@@ -41,9 +41,11 @@ export interface Order {
   shippingAddress?: {
     firstName?: string;
     lastName?: string;
+    address?: string;
     addressLine1?: string;
     addressLine2?: string;
     city?: string;
+    state?: string;
     postalCode?: string;
     countryCode?: string;
     phone?: string;

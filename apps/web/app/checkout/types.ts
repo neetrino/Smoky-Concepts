@@ -8,7 +8,8 @@ export type CheckoutFormData = {
   shippingMethod: 'pickup' | 'delivery';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   shippingAddress?: string;
-  shippingCity?: string;
+  /** Admin delivery location id (order stores region label in shippingAddress.state) */
+  shippingRegion?: string;
   cardNumber?: string;
   cardExpiry?: string;
   cardCvv?: string;

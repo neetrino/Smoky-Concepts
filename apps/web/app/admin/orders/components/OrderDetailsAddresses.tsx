@@ -88,16 +88,22 @@ export function OrderDetailsAddresses({ orderDetails }: OrderDetailsAddressesPro
               <span className="font-medium">{t('admin.orders.orderDetails.shippingMethod')}</span>{' '}
               {t('checkout.shipping.delivery')}
             </div>
-            {(orderDetails.shippingAddress.address || orderDetails.shippingAddress.addressLine1) && (
+            {orderDetails.shippingAddress.state && (
               <div>
-                <span className="font-medium">{t('checkout.form.address')}:</span>{' '}
-                {orderDetails.shippingAddress.address || orderDetails.shippingAddress.addressLine1}
-                {orderDetails.shippingAddress.addressLine2 && `, ${orderDetails.shippingAddress.addressLine2}`}
+                <span className="font-medium">{t('checkout.form.region')}:</span>{' '}
+                {orderDetails.shippingAddress.state}
               </div>
             )}
             {orderDetails.shippingAddress.city && (
               <div>
                 <span className="font-medium">{t('checkout.form.city')}:</span> {orderDetails.shippingAddress.city}
+              </div>
+            )}
+            {(orderDetails.shippingAddress.address || orderDetails.shippingAddress.addressLine1) && (
+              <div>
+                <span className="font-medium">{t('checkout.form.address')}:</span>{' '}
+                {orderDetails.shippingAddress.address || orderDetails.shippingAddress.addressLine1}
+                {orderDetails.shippingAddress.addressLine2 && `, ${orderDetails.shippingAddress.addressLine2}`}
               </div>
             )}
             {orderDetails.shippingAddress.postalCode && (

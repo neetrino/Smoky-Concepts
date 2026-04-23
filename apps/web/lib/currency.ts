@@ -160,6 +160,14 @@ export function convertPrice(price: number, fromCurrency: CurrencyCode, toCurren
   return amdAmount * toRate;
 }
 
+/**
+ * AMD amounts from admin forms (products, delivery zones). Uses the same live rates as storefront display.
+ * Do not use {@link amountToUsd} with AMD for this — that path uses legacy fixed 400 ֏/USD for old DB rows.
+ */
+export function adminInputAmdToUsd(amountAmd: number): number {
+  return convertPrice(amountAmd, ADMIN_PRODUCT_INPUT_CURRENCY, 'USD');
+}
+
 function legacyDramToUsd(amount: number): number {
   return amount / LEGACY_AMD_PER_USD;
 }

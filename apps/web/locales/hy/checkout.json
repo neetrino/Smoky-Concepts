@@ -11,6 +11,7 @@
     "email": "Էլ. փոստ",
     "phone": "Հեռախոս",
     "address": "Հասցե",
+    "region": "Մարզ",
     "city": "Քաղաք",
     "postalCode": "Փոստային կոդ",
     "phoneNumber": "Հեռախոսահամար",
@@ -22,6 +23,8 @@
   "placeholders": {
     "phone": "+374XXXXXXXX",
     "address": "Փողոց, բնակարան, սենյակ և այլն",
+    "region": "Մարզ",
+    "selectRegion": "Ընտրել մարզը",
     "city": "Քաղաք",
     "postalCode": "Փոստային կոդ",
     "cardNumber": "1234 5678 9012 3456",
@@ -36,7 +39,7 @@
     "deliveryDescription": "Մենք կառաքենք ձեր պատվերը ձեր հասցեին",
     "freePickup": "Անվճար (Խանութից)",
     "loading": "Բեռնվում է...",
-    "enterCity": "Մուտքագրել քաղաք"
+    "enterRegion": "Մուտքագրել մարզը"
   },
   "payment": {
     "cashOnDelivery": "Կանխիկ առաքման ժամանակ",
@@ -84,6 +87,7 @@
     "selectPaymentMethod": "Խնդրում ենք ընտրել վճարման եղանակ",
     "addressRequired": "Հասցեն պարտադիր է առաքման համար",
     "cityRequired": "Քաղաքը պարտադիր է առաքման համար",
+    "regionRequired": "Մարզը պարտադիր է առաքման համար",
     "postalCodeRequired": "Փոստային կոդը պարտադիր է առաքման համար",
     "phoneRequiredDelivery": "Հեռախոսահամարը պարտադիր է առաքման համար",
     "invalidPhoneFormat": "Անվավեր հեռախոսահամարի ձևաչափ",

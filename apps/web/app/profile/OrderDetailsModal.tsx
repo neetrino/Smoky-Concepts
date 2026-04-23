@@ -1,6 +1,7 @@
 import { Button, Card } from '@shop/ui';
 import { OrderCustomizeBlock } from '@/components/orders/OrderCustomizeBlock';
-import { amountToUsd, formatPriceInCurrency, formatStoredMoney } from '../../lib/currency';
+import { useCurrency } from '../../components/hooks/useCurrency';
+import { amountToUsd, convertPrice, formatPriceInCurrency, formatStoredMoney } from '../../lib/currency';
 import { getStatusColor, getPaymentStatusColor, getColorValue } from './utils';
 import type { OrderDetails } from './types';
 
@@ -23,6 +24,10 @@ export function OrderDetailsModal({
   onReOrder,
   t,
 }: OrderDetailsModalProps) {
+  const displayCurrency = useCurrency();
+  const formatOrderMoneyUsd = (amountUsd: number) =>
+    formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
+
   const orderMoneyCurrency = selectedOrder.totals?.currency ?? 'USD';
 
   const getAttributeLabel = (key: string): string => {
@@ -192,8 +197,8 @@ export function OrderDetailsModal({
                               <p className="text-sm text-gray-600">{t('profile.orderDetails.sku')}: {item.sku}</p>
                               <p className="text-sm text-gray-600 mt-2">
                                 {t('profile.orderDetails.quantity')}: {item.quantity} ×{' '}
-                                {formatPriceInCurrency(amountToUsd(item.price, orderMoneyCurrency), 'USD')} ={' '}
-                                {formatPriceInCurrency(amountToUsd(item.total, orderMoneyCurrency), 'USD')}
+                                {formatOrderMoneyUsd(amountToUsd(item.price, orderMoneyCurrency))} ={' '}
+                                {formatOrderMoneyUsd(amountToUsd(item.total, orderMoneyCurrency))}
                               </p>
                             </div>
                           </div>
@@ -213,10 +218,7 @@ export function OrderDetailsModal({
                           <div className="flex justify-between text-gray-600">
                             <span>{t('profile.orderDetails.subtotal')}</span>
                             <span>
-                              {formatPriceInCurrency(
-                                amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency),
-                                'USD'
-                              )}
+                              {formatOrderMoneyUsd(amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency))}
                             </span>
                           </div>
                           {selectedOrder.totals.discount > 0 && (
@@ -224,10 +226,7 @@ export function OrderDetailsModal({
                               <span>{t('profile.orderDetails.discount')}</span>
                               <span>
                                 -
-                                {formatPriceInCurrency(
-                                  amountToUsd(selectedOrder.totals.discount, orderMoneyCurrency),
-                                  'USD'
-                                )}
+                                {formatOrderMoneyUsd(amountToUsd(selectedOrder.totals.discount, orderMoneyCurrency))}
                               </span>
                             </div>
                           )}
@@ -236,7 +235,11 @@ export function OrderDetailsModal({
                             <span>
                               {selectedOrder.shippingMethod === 'pickup'
                                 ? t('checkout.shipping.freePickup')
-                                : formatStoredMoney(selectedOrder.totals.shipping, orderMoneyCurrency) +
+                                : formatStoredMoney(
+                                    selectedOrder.totals.shipping,
+                                    orderMoneyCurrency,
+                                    displayCurrency,
+                                  ) +
                                   (selectedOrder.shippingAddress?.city
                                     ? ` (${selectedOrder.shippingAddress.city})`
                                     : '')}
@@ -245,19 +248,18 @@ export function OrderDetailsModal({
                           <div className="flex justify-between text-gray-600">
                             <span>{t('profile.orderDetails.tax')}</span>
                             <span>
-                              {formatPriceInCurrency(amountToUsd(selectedOrder.totals.tax, orderMoneyCurrency), 'USD')}
+                              {formatOrderMoneyUsd(amountToUsd(selectedOrder.totals.tax, orderMoneyCurrency))}
                             </span>
                           </div>
                           <div className="border-t border-gray-200 pt-4">
                             <div className="flex justify-between text-lg font-bold text-gray-900">
                               <span>{t('profile.orderDetails.total')}</span>
                               <span>
-                                {formatPriceInCurrency(
+                                {formatOrderMoneyUsd(
                                   amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency) -
                                     amountToUsd(selectedOrder.totals.discount, orderMoneyCurrency) +
                                     amountToUsd(selectedOrder.totals.shipping, orderMoneyCurrency) +
                                     amountToUsd(selectedOrder.totals.tax, orderMoneyCurrency),
-                                  'USD'
                                 )}
                               </span>
                             </div>
@@ -288,14 +290,25 @@ export function OrderDetailsModal({
                             {selectedOrder.shippingAddress.firstName && selectedOrder.shippingAddress.lastName && (
                               <p>{selectedOrder.shippingAddress.firstName} {selectedOrder.shippingAddress.lastName}</p>
                             )}
-                            {selectedOrder.shippingAddress.addressLine1 && <p>{selectedOrder.shippingAddress.addressLine1}</p>}
-                            {selectedOrder.shippingAddress.addressLine2 && <p>{selectedOrder.shippingAddress.addressLine2}</p>}
+                            {selectedOrder.shippingAddress.state && (
+                              <p>
+                                {t('profile.orderDetails.region')}: {selectedOrder.shippingAddress.state}
+                              </p>
+                            )}
                             {selectedOrder.shippingAddress.city && (
                               <p>
                                 {selectedOrder.shippingAddress.city}
                                 {selectedOrder.shippingAddress.postalCode && `, ${selectedOrder.shippingAddress.postalCode}`}
                               </p>
                             )}
+                            {(selectedOrder.shippingAddress.addressLine1 ||
+                              selectedOrder.shippingAddress.address) && (
+                              <p>
+                                {selectedOrder.shippingAddress.addressLine1 ||
+                                  selectedOrder.shippingAddress.address}
+                              </p>
+                            )}
+                            {selectedOrder.shippingAddress.addressLine2 && <p>{selectedOrder.shippingAddress.addressLine2}</p>}
                             {selectedOrder.shippingAddress.countryCode && <p>{selectedOrder.shippingAddress.countryCode}</p>}
                             {selectedOrder.shippingAddress.phone && <p className="mt-2">{t('profile.orderDetails.phone')}: {selectedOrder.shippingAddress.phone}</p>}
                           </div>

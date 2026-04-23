@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStoredLanguage } from '../../lib/language';
@@ -7,6 +7,7 @@ import { useTranslation } from '../../lib/i18n-client';
 import { usePaymentMethods } from './utils/payment-methods';
 import { useCheckoutSchema } from './utils/validation-schema';
 import { useDeliveryPrice } from './hooks/useDeliveryPrice';
+import { useDeliveryLocations } from './hooks/useDeliveryLocations';
 import { useCart } from './hooks/useCart';
 import { useUserProfile } from './hooks/useUserProfile';
 import { useOrderSubmission } from './hooks/useOrderSubmission';
@@ -41,7 +42,7 @@ export function useCheckout() {
       shippingMethod: 'delivery',
       paymentMethod: 'cash_on_delivery',
       shippingAddress: '',
-      shippingCity: '',
+      shippingRegion: '',
       cardNumber: '',
       cardExpiry: '',
       cardCvv: '',
@@ -51,16 +52,30 @@ export function useCheckout() {
 
   const paymentMethod = watch('paymentMethod');
   const shippingMethod = watch('shippingMethod');
-  const shippingCity = watch('shippingCity');
+  const shippingRegion = watch('shippingRegion');
 
-  const { deliveryPrice, loadingDeliveryPrice } = useDeliveryPrice(shippingMethod, shippingCity);
+  const { deliveryLocations, loadingDeliveryLocations } = useDeliveryLocations();
+
+  const activeDeliveryLocation = useMemo(
+    () => deliveryLocations.find((l) => l.id === shippingRegion),
+    [deliveryLocations, shippingRegion],
+  );
+
+  const shippingRegionSummary = activeDeliveryLocation?.city ?? shippingRegion ?? '';
+
+  const { deliveryPrice, loadingDeliveryPrice } = useDeliveryPrice(
+    shippingMethod,
+    activeDeliveryLocation?.city,
+    activeDeliveryLocation?.country,
+  );
   const { cart, loading, fetchCart } = useCart();
-  useUserProfile(isLoggedIn, isLoading, setValue);
+  useUserProfile(isLoggedIn, isLoading, setValue, deliveryLocations);
 
   const { submitOrder } = useOrderSubmission({
     cart,
     deliveryPrice,
     setError,
+    deliveryLocations,
   });
 
   const { orderSummary } = useOrderSummary({
@@ -92,9 +107,9 @@ export function useCheckout() {
     
     const formData = watch();
     const hasShippingAddress = formData.shippingAddress && formData.shippingAddress.trim().length > 0;
-    const hasShippingCity = formData.shippingCity && formData.shippingCity.trim().length > 0;
+    const hasShippingRegion = formData.shippingRegion && formData.shippingRegion.trim().length > 0;
 
-    if (!hasShippingAddress || !hasShippingCity) {
+    if (!hasShippingAddress || !hasShippingRegion) {
       setError(t('checkout.errors.fillShippingAddress'));
       const shippingSection = document.querySelector('[data-shipping-section]');
       if (shippingSection) {
@@ -129,6 +144,8 @@ export function useCheckout() {
     setShowCardModal,
     deliveryPrice,
     loadingDeliveryPrice,
+    deliveryLocations,
+    loadingDeliveryLocations,
     // Form
     register,
     handleSubmit,
@@ -139,7 +156,8 @@ export function useCheckout() {
     // Computed
     paymentMethod,
     shippingMethod,
-    shippingCity,
+    shippingRegion,
+    shippingRegionSummary,
     paymentMethods,
     orderSummary,
     // Actions

@@ -4,6 +4,7 @@ import { UseFormRegister, UseFormSetValue, UseFormHandleSubmit, FieldErrors } fr
 import { ShippingAddressModal } from './components/ShippingAddressModal';
 import { CardDetailsModal } from './components/CardDetailsModal';
 import { CheckoutFormData, Cart } from './types';
+import type { DeliveryLocationOption } from './hooks/useDeliveryLocations';
 
 interface CheckoutModalsProps {
   showShippingModal: boolean;
@@ -17,7 +18,9 @@ interface CheckoutModalsProps {
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
-  shippingCity: string | undefined;
+  shippingRegion: string | undefined;
+  deliveryLocations: DeliveryLocationOption[];
+  loadingDeliveryLocations: boolean;
   cart: Cart | null;
   orderSummary: {
     subtotalDisplay: number;
@@ -44,7 +47,9 @@ export function CheckoutModals({
   isSubmitting,
   shippingMethod,
   paymentMethod,
-  shippingCity,
+  shippingRegion,
+  deliveryLocations,
+  loadingDeliveryLocations,
   cart,
   orderSummary,
   loadingDeliveryPrice,
@@ -67,7 +72,9 @@ export function CheckoutModals({
         paymentMethod={paymentMethod}
         cart={cart}
         orderSummary={orderSummary}
-        shippingCity={shippingCity}
+        shippingRegion={shippingRegion}
+        deliveryLocations={deliveryLocations}
+        loadingDeliveryLocations={loadingDeliveryLocations}
         loadingDeliveryPrice={loadingDeliveryPrice}
         deliveryPrice={deliveryPrice}
         onSubmit={onSubmit}
@@ -83,7 +90,7 @@ export function CheckoutModals({
         isSubmitting={isSubmitting}
         paymentMethod={paymentMethod}
         shippingMethod={shippingMethod}
-        shippingCity={shippingCity}
+        shippingRegion={shippingRegion}
         cart={cart}
         orderSummary={orderSummary}
         loadingDeliveryPrice={loadingDeliveryPrice}

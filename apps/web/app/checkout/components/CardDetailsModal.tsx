@@ -18,7 +18,7 @@ interface CardDetailsModalProps {
   isSubmitting: boolean;
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   shippingMethod: 'pickup' | 'delivery';
-  shippingCity?: string;
+  shippingRegion?: string;
   cart: Cart | null;
   orderSummary: {
     subtotalDisplay: number;
@@ -43,7 +43,7 @@ export function CardDetailsModal({
   isSubmitting,
   paymentMethod,
   shippingMethod,
-  shippingCity,
+  shippingRegion,
   cart,
   orderSummary,
   loadingDeliveryPrice,
@@ -141,7 +141,7 @@ export function CardDetailsModal({
             cart={cart}
             orderSummary={orderSummary}
             shippingMethod={shippingMethod}
-            shippingCity={shippingCity}
+            shippingRegion={shippingRegion}
             loadingDeliveryPrice={loadingDeliveryPrice}
             deliveryPrice={deliveryPrice}
           />

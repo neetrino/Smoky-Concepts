@@ -1,19 +1,32 @@
 import { useRouter } from 'next/navigation';
+import { adminInputAmdToUsd } from '../../../lib/currency';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearGuestCart } from '../checkoutUtils';
 import type { CheckoutFormData, Cart, CartItem } from '../types';
+import type { DeliveryLocationOption } from './useDeliveryLocations';
 
 interface UseOrderSubmissionProps {
   cart: Cart | null;
   deliveryPrice: number | null;
   setError: (error: string | null) => void;
+  deliveryLocations: DeliveryLocationOption[];
+}
+
+function regionLabelForOrder(value: string, locations: DeliveryLocationOption[]): string {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return '';
+  }
+  const loc = locations.find((l) => l.id === trimmed);
+  return loc ? loc.city.trim() : trimmed;
 }
 
 export function useOrderSubmission({
   cart,
   deliveryPrice,
   setError,
+  deliveryLocations,
 }: UseOrderSubmissionProps) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -65,16 +78,18 @@ export function useOrderSubmission({
         };
       });
 
-      const shippingAddress = data.shippingMethod === 'delivery' && 
-        data.shippingAddress && 
-        data.shippingCity
-        ? {
-            address: data.shippingAddress,
-            city: data.shippingCity,
-          }
-        : undefined;
+      const shippingAddress =
+        data.shippingMethod === 'delivery' &&
+        data.shippingAddress?.trim() &&
+        data.shippingRegion?.trim()
+          ? {
+              address: data.shippingAddress.trim(),
+              state: regionLabelForOrder(data.shippingRegion, deliveryLocations),
+            }
+          : undefined;
 
-      const shippingAmount = data.shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
+      const shippingAmount =
+        data.shippingMethod === 'delivery' && deliveryPrice !== null ? adminInputAmdToUsd(deliveryPrice) : 0;
 
       const response = await apiClient.post<{
         order: {

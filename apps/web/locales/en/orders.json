@@ -15,6 +15,7 @@
   },
   "shippingAddress": {
     "title": "Shipping Address",
+    "region": "Region (marz): {region}",
     "phone": "Phone: {phone}"
   },
   "orderSummary": {

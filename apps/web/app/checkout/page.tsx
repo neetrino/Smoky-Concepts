@@ -32,7 +32,9 @@ export default function CheckoutPage() {
     setValue,
     paymentMethod,
     shippingMethod,
-    shippingCity,
+    shippingRegionSummary,
+    deliveryLocations,
+    loadingDeliveryLocations,
     paymentMethods,
     orderSummary,
     handlePlaceOrder,
@@ -87,6 +89,8 @@ export default function CheckoutPage() {
             setLogoErrors={setLogoErrors}
             error={error}
             setError={setError}
+            deliveryLocations={deliveryLocations}
+            loadingDeliveryLocations={loadingDeliveryLocations}
           />
 
           {/* Order Summary */}
@@ -94,7 +98,7 @@ export default function CheckoutPage() {
             cart={cart}
             orderSummary={orderSummary}
             shippingMethod={shippingMethod}
-            shippingCity={shippingCity}
+            shippingRegion={shippingRegionSummary}
             loadingDeliveryPrice={loadingDeliveryPrice}
             deliveryPrice={deliveryPrice}
             error={error}
@@ -122,7 +126,9 @@ export default function CheckoutPage() {
         isSubmitting={isSubmitting}
         shippingMethod={shippingMethod}
         paymentMethod={paymentMethod}
-        shippingCity={shippingCity}
+        shippingRegion={shippingRegionSummary}
+        deliveryLocations={deliveryLocations}
+        loadingDeliveryLocations={loadingDeliveryLocations}
         cart={cart}
         orderSummary={orderSummary}
         loadingDeliveryPrice={loadingDeliveryPrice}

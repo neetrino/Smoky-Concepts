@@ -3,11 +3,13 @@ import { UseFormSetValue } from 'react-hook-form';
 import { apiClient } from '../../../lib/api-client';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import type { CheckoutFormData } from '../types';
+import type { DeliveryLocationOption } from './useDeliveryLocations';
 
 export function useUserProfile(
   isLoggedIn: boolean,
   isLoading: boolean,
-  setValue: UseFormSetValue<CheckoutFormData>
+  setValue: UseFormSetValue<CheckoutFormData>,
+  deliveryLocations: DeliveryLocationOption[],
 ) {
   const { user } = useAuth();
 
@@ -78,9 +80,18 @@ export function useUserProfile(
                   : defaultAddress.addressLine1;
                 setValue('shippingAddress', fullAddress);
               }
-              
-              if (defaultAddress.city) {
-                setValue('shippingCity', defaultAddress.city);
+
+              const stateTrim = defaultAddress.state?.trim();
+              if (stateTrim && deliveryLocations.length > 0) {
+                const byId = deliveryLocations.find((l) => l.id === stateTrim);
+                const byCity =
+                  byId ??
+                  deliveryLocations.find(
+                    (l) => l.city.toLowerCase() === stateTrim.toLowerCase(),
+                  );
+                if (byCity) {
+                  setValue('shippingRegion', byCity.id);
+                }
               }
             }
           }
@@ -91,6 +102,6 @@ export function useUserProfile(
     }
     
     loadUserProfile();
-  }, [isLoggedIn, isLoading, user?.id, setValue]);
+  }, [isLoggedIn, isLoading, user?.id, setValue, deliveryLocations]);
 }
 

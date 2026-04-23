@@ -15,6 +15,7 @@
   },
   "shippingAddress": {
     "title": "Адрес доставки",
+    "region": "Область (марз): {region}",
     "phone": "Телефон: {phone}"
   },
   "orderSummary": {

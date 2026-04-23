@@ -1,22 +1,27 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../../lib/api-client';
 
+/**
+ * Uses the delivery API `city` + `country` query params (admin delivery location).
+ */
 export function useDeliveryPrice(
   shippingMethod: 'pickup' | 'delivery',
-  shippingCity: string | undefined
+  city: string | undefined,
+  country: string | undefined,
 ) {
   const [deliveryPrice, setDeliveryPrice] = useState<number | null>(null);
   const [loadingDeliveryPrice, setLoadingDeliveryPrice] = useState(false);
 
   useEffect(() => {
     const fetchDeliveryPrice = async () => {
-      if (shippingMethod === 'delivery' && shippingCity && shippingCity.trim().length > 0) {
+      const countryNorm = (country && country.trim().length > 0 ? country.trim() : 'Armenia');
+      if (shippingMethod === 'delivery' && city && city.trim().length > 0) {
         setLoadingDeliveryPrice(true);
         try {
           const response = await apiClient.get<{ price: number }>('/api/v1/delivery/price', {
             params: {
-              city: shippingCity.trim(),
-              country: 'Armenia',
+              city: city.trim(),
+              country: countryNorm,
             },
           });
           setDeliveryPrice(response.price);
@@ -35,7 +40,7 @@ export function useDeliveryPrice(
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [shippingCity, shippingMethod]);
+  }, [city, country, shippingMethod]);
 
   return { deliveryPrice, loadingDeliveryPrice };
 }
