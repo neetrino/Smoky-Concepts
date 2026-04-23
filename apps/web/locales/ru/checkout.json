@@ -11,7 +11,7 @@
     "email": "Электронная почта",
     "phone": "Телефон",
     "address": "Адрес",
-    "region": "Область (марз)",
+    "region": "Область",
     "city": "Город",
     "postalCode": "Почтовый индекс",
     "phoneNumber": "Номер телефона",
@@ -23,8 +23,8 @@
   "placeholders": {
     "phone": "+374XXXXXXXX",
     "address": "Улица, квартира, офис и т.д.",
-    "region": "Область / марз",
-    "selectRegion": "Выберите область (марз)",
+    "region": "Область",
+    "selectRegion": "Выберите область",
     "city": "Город",
     "postalCode": "Почтовый индекс",
     "cardNumber": "1234 5678 9012 3456",
@@ -39,7 +39,7 @@
     "deliveryDescription": "Мы доставим ваш заказ по вашему адресу",
     "freePickup": "Бесплатно (Самовывоз)",
     "loading": "Загрузка...",
-    "enterRegion": "Введите область (марз)"
+    "enterRegion": "Введите область"
   },
   "payment": {
     "cashOnDelivery": "Наложенный платеж",
@@ -87,7 +87,7 @@
     "selectPaymentMethod": "Пожалуйста, выберите способ оплаты",
     "addressRequired": "Адрес обязателен для доставки",
     "cityRequired": "Город обязателен для доставки",
-    "regionRequired": "Область (марз) обязательна для доставки",
+    "regionRequired": "Область обязательна для доставки",
     "postalCodeRequired": "Почтовый индекс обязателен для доставки",
     "phoneRequiredDelivery": "Номер телефона обязателен для доставки",
     "invalidPhoneFormat": "Неверный формат номера телефона",

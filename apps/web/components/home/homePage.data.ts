@@ -238,3 +238,4 @@ export const FOOTER_SOCIALS = [
 ] as const;
 
 export const NEETRINO_PARTNER_HREF = 'https://neetrino.com/' as const;
+export const GAZZAR_STUDIO_HREF = 'https://gazzarstudio.com/studio' as const;

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   FOOTER_LINKS,
   FOOTER_SOCIALS,
+  GAZZAR_STUDIO_HREF,
   HOME_ASSET_PATHS,
   NEETRINO_PARTNER_HREF,
 } from './home/homePage.data';
@@ -64,13 +65,19 @@ export function Footer() {
           <div className="order-3 flex flex-col items-center gap-4 lg:order-3 lg:items-end lg:text-right">
             <p className="text-sm font-extrabold">{t('home.homepage.footer.designedBy')}</p>
             <div className="flex w-full flex-col items-center gap-8 lg:items-end">
-              <div className="relative h-12 w-24">
+              <a
+                href={GAZZAR_STUDIO_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative h-12 w-24 transition-opacity hover:opacity-80"
+                aria-label="Gazzar Studio"
+              >
                 <img
                   src={HOME_ASSET_PATHS.studioLogo}
                   alt="Gazar Studio"
                   className="h-full w-full object-contain object-center lg:object-right"
                 />
-              </div>
+              </a>
               <div className="mt-2 flex max-w-[10rem] translate-x-1 flex-col items-center self-end sm:translate-x-2 lg:items-end">
                 <p className="mb-2 text-sm font-extrabold lg:-translate-x-6">{t('home.homepage.footer.createdBy')}</p>
                 <a
