@@ -9,6 +9,7 @@ import { ProductFilters } from './components/ProductFilters';
 import { ProductsTable } from './components/ProductsTable';
 import { useProductHandlers } from './hooks/useProductHandlers';
 import type { Product, ProductsResponse, Category } from './types';
+import { AdminShell } from '../components/AdminShell';
 import { ADMIN_CENTERED_LOADING_CLASS, ADMIN_PAGE_SHELL_CLASS } from '../constants/adminShell.constants';
 
 export default function ProductsPage() {
@@ -306,8 +307,7 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        <div>
-          <div className="min-w-0">
+        <AdminShell>
             <ProductFilters
               search={search}
               setSearch={setSearch}
@@ -365,8 +365,7 @@ export default function ProductsPage() {
               page={page}
               setPage={setPage}
             />
-          </div>
-        </div>
+        </AdminShell>
       </div>
     </div>
   );

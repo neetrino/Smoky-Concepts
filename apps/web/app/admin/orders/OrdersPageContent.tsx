@@ -5,6 +5,7 @@ import { useOrders } from './useOrders';
 import { OrdersFilters } from './components/OrdersFilters';
 import { BulkSelectionControls } from './components/BulkSelectionControls';
 import { OrdersTable } from './components/OrdersTable';
+import { AdminShell } from '../components/AdminShell';
 import { ADMIN_PAGE_SHELL_CLASS } from '../constants/adminShell.constants';
 
 export function OrdersPageContent() {
@@ -57,45 +58,47 @@ export function OrdersPageContent() {
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.orders.title')}</h1>
         </div>
 
-        <OrdersFilters
-          statusFilter={statusFilter}
-          paymentStatusFilter={paymentStatusFilter}
-          orderTypeFilter={orderTypeFilter}
-          searchQuery={searchQuery}
-          updateMessage={updateMessage}
-          setStatusFilter={setStatusFilter}
-          setPaymentStatusFilter={setPaymentStatusFilter}
-          setOrderTypeFilter={setOrderTypeFilter}
-          setSearchQuery={setSearchQuery}
-          setPage={setPage}
-          router={router}
-          searchParams={searchParams}
-        />
+        <AdminShell>
+          <OrdersFilters
+            statusFilter={statusFilter}
+            paymentStatusFilter={paymentStatusFilter}
+            orderTypeFilter={orderTypeFilter}
+            searchQuery={searchQuery}
+            updateMessage={updateMessage}
+            setStatusFilter={setStatusFilter}
+            setPaymentStatusFilter={setPaymentStatusFilter}
+            setOrderTypeFilter={setOrderTypeFilter}
+            setSearchQuery={setSearchQuery}
+            setPage={setPage}
+            router={router}
+            searchParams={searchParams}
+          />
 
-        <BulkSelectionControls
-          selectedCount={selectedIds.size}
-          onBulkDelete={handleBulkDelete}
-          bulkDeleting={bulkDeleting}
-        />
+          <BulkSelectionControls
+            selectedCount={selectedIds.size}
+            onBulkDelete={handleBulkDelete}
+            bulkDeleting={bulkDeleting}
+          />
 
-        <OrdersTable
-          orders={orders}
-          loading={loading}
-          selectedIds={selectedIds}
-          updatingStatuses={updatingStatuses}
-          updatingPaymentStatuses={updatingPaymentStatuses}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          page={page}
-          meta={meta}
-          onToggleSelect={toggleSelect}
-          onToggleSelectAll={toggleSelectAll}
-          onSort={handleSort}
-          onViewDetails={handleViewOrderDetails}
-          onStatusChange={handleStatusChange}
-          onPaymentStatusChange={handlePaymentStatusChange}
-          onPageChange={(newPage) => setPage(newPage)}
-        />
+          <OrdersTable
+            orders={orders}
+            loading={loading}
+            selectedIds={selectedIds}
+            updatingStatuses={updatingStatuses}
+            updatingPaymentStatuses={updatingPaymentStatuses}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            page={page}
+            meta={meta}
+            onToggleSelect={toggleSelect}
+            onToggleSelectAll={toggleSelectAll}
+            onSort={handleSort}
+            onViewDetails={handleViewOrderDetails}
+            onStatusChange={handleStatusChange}
+            onPaymentStatusChange={handlePaymentStatusChange}
+            onPageChange={(newPage) => setPage(newPage)}
+          />
+        </AdminShell>
       </div>
     </div>
   );

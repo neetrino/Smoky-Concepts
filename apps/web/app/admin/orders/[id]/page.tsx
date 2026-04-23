@@ -10,6 +10,7 @@ import { ADMIN_PRICE_CURRENCY, formatAdminOrderAmount } from '../../../../lib/cu
 import { OrderDetailsSummary } from '../components/OrderDetailsSummary';
 import { OrderDetailsAddresses } from '../components/OrderDetailsAddresses';
 import { OrderDetailsItems } from '../components/OrderDetailsItems';
+import { AdminShell } from '../../components/AdminShell';
 import type { OrderDetails } from '../useOrders';
 
 export default function AdminOrderDetailsPage() {
@@ -113,7 +114,11 @@ export default function AdminOrderDetailsPage() {
             </svg>
             {t('admin.orders.backToAdmin')}
           </button>
-          <Card className="p-6 text-center text-red-600">{error || t('admin.orders.orderDetails.failedToLoad')}</Card>
+          <AdminShell>
+            <Card className="p-6 text-center text-red-600">
+              {error || t('admin.orders.orderDetails.failedToLoad')}
+            </Card>
+          </AdminShell>
         </div>
       </div>
     );
@@ -138,24 +143,26 @@ export default function AdminOrderDetailsPage() {
           </h1>
         </div>
 
-        <div className="space-y-6">
-          <OrderDetailsSummary
-            orderDetails={orderDetails}
-            currency={ADMIN_PRICE_CURRENCY}
-            formatCurrency={formatCurrency}
-            updatingStatus={updatingStatus}
-            updatingPaymentStatus={updatingPaymentStatus}
-            onStatusChange={handleStatusChange}
-            onPaymentStatusChange={handlePaymentStatusChange}
-          />
-          <OrderDetailsAddresses
-            orderDetails={orderDetails}
-          />
-          <OrderDetailsItems
-            orderDetails={orderDetails}
-            formatCurrency={formatCurrency}
-          />
-        </div>
+        <AdminShell>
+          <div className="space-y-6">
+            <OrderDetailsSummary
+              orderDetails={orderDetails}
+              currency={ADMIN_PRICE_CURRENCY}
+              formatCurrency={formatCurrency}
+              updatingStatus={updatingStatus}
+              updatingPaymentStatus={updatingPaymentStatus}
+              onStatusChange={handleStatusChange}
+              onPaymentStatusChange={handlePaymentStatusChange}
+            />
+            <OrderDetailsAddresses
+              orderDetails={orderDetails}
+            />
+            <OrderDetailsItems
+              orderDetails={orderDetails}
+              formatCurrency={formatCurrency}
+            />
+          </div>
+        </AdminShell>
       </div>
     </div>
   );

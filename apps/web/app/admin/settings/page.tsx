@@ -6,6 +6,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import { AdminShell } from '../components/AdminShell';
 interface Settings {
   defaultCurrency?: string;
   globalDiscount?: number;
@@ -133,32 +134,33 @@ export default function SettingsPage() {
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.settings.title')}</h1>
         </div>
 
-        {/* General Settings */}
-        <Card className="p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.settings.generalSettings')}</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('admin.settings.siteName')}
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={t('admin.settings.siteNamePlaceholder')}
-              />
+        <AdminShell>
+          {/* General Settings */}
+          <Card className="p-6 mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.settings.generalSettings')}</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('admin.settings.siteName')}
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  defaultValue={t('admin.settings.siteNamePlaceholder')}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('admin.settings.siteDescription')}
+                </label>
+                <textarea
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={3}
+                  defaultValue={t('admin.settings.siteDescriptionPlaceholder')}
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('admin.settings.siteDescription')}
-              </label>
-              <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={3}
-                defaultValue={t('admin.settings.siteDescriptionPlaceholder')}
-              />
-            </div>
-          </div>
-        </Card>
+          </Card>
 
         {/* Payment Settings */}
         <Card className="p-6 mb-6">
@@ -256,22 +258,23 @@ export default function SettingsPage() {
         </Card>
 
         {/* Actions */}
-        <div className="flex gap-4">
-          <Button
-            variant="primary"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? t('admin.settings.saving') : t('admin.settings.saveSettings')}
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/admin')}
-            disabled={saving}
-          >
-            {t('admin.settings.cancel')}
-          </Button>
-        </div>
+          <div className="flex gap-4">
+            <Button
+              variant="primary"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? t('admin.settings.saving') : t('admin.settings.saveSettings')}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => router.push('/admin')}
+              disabled={saving}
+            >
+              {t('admin.settings.cancel')}
+            </Button>
+          </div>
+        </AdminShell>
       </div>
     </div>
   );

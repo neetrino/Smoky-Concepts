@@ -6,6 +6,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import { AdminShell } from '../components/AdminShell';
 import { ADMIN_PAGE_SHELL_CLASS } from '../constants/adminShell.constants';
 
 interface User {
@@ -202,9 +203,10 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold text-gray-900">{t('admin.users.title')}</h1>
         </div>
 
-        {/* Search */}
-        <Card className="p-4 mb-6">
-          <form onSubmit={handleSearch} className="flex flex-col gap-4">
+        <AdminShell>
+          {/* Search */}
+          <Card className="p-4 mb-6">
+            <form onSubmit={handleSearch} className="flex flex-col gap-4">
             <div className="flex gap-4">
               <Input
                 type="text"
@@ -271,11 +273,11 @@ export default function UsersPage() {
                 </button>
               </div>
             </div>
-          </form>
-        </Card>
+            </form>
+          </Card>
 
-        {/* Users Table */}
-        <Card className="p-6">
+          {/* Users Table */}
+          <Card className="p-6">
           {loading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
@@ -428,7 +430,8 @@ export default function UsersPage() {
               </div>
             </>
           )}
-        </Card>
+          </Card>
+        </AdminShell>
       </div>
     </div>
   );

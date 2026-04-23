@@ -16,6 +16,7 @@ import { useLabelManagement } from './hooks/useLabelManagement';
 import { useProductFormHandlers } from './hooks/useProductFormHandlers';
 import { useProductFormCallbacks } from './hooks/useProductFormCallbacks';
 import { isClothingCategory as checkIsClothingCategory, generateSlug } from './utils/productUtils';
+import { AdminShell } from '../../components/AdminShell';
 import { buildSelectedAttributeValueIdsMap } from '@/lib/category-attributes';
 import type { CategoryAttribute } from '@/lib/category-attributes';
 import type { Category } from './types';
@@ -265,7 +266,7 @@ function AddProductPageContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div>
+        <AdminShell>
           <PageHeader isEditMode={isEditMode} />
 
           <AddProductFormContent
@@ -323,7 +324,7 @@ function AddProductPageContent() {
             generateSlug={generateSlug}
             handleSubmit={handleSubmit}
           />
-        </div>
+        </AdminShell>
       </div>
     </div>
   );
