@@ -1,9 +1,8 @@
 'use client';
 
-import { Card } from '@shop/ui';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../lib/i18n-client';
-import { AdminSidebar } from './components/AdminSidebar';
+import { AdminShell } from '../components/AdminShell';
 import { GlobalDiscountCard } from './components/GlobalDiscountCard';
 import { QuickInfoCard } from './components/QuickInfoCard';
 import { CategoryDiscountsCard } from './components/CategoryDiscountsCard';
@@ -41,8 +40,6 @@ interface QuickSettingsContentProps {
 }
 
 export function QuickSettingsContent({
-  currentPath,
-  router,
   t,
   globalDiscount,
   setGlobalDiscount,
@@ -66,21 +63,17 @@ export function QuickSettingsContent({
   return (
     <div className={ADMIN_PAGE_SHELL_CLASS}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <AdminSidebar currentPath={currentPath} router={router} t={t} />
-
-          {/* Main Content */}
-          <div className="flex-1 min-w-0">
-            {/* Quick Settings - Discount Management */}
-            <Card className="mb-8 border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-xl font-semibold text-[#122a26]">{t('admin.quickSettings.quickSettingsTitle')}</h2>
-                  <p className="text-sm text-[#414141]/70 mt-1">{t('admin.quickSettings.quickSettingsSubtitle')}</p>
-                </div>
+        <AdminShell>
+          <div className="space-y-5">
+            {/* Global discount + info */}
+            <div className="overflow-hidden rounded-2xl border border-[#dcc090]/30 bg-white/90 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+              <div className="border-b border-[#dcc090]/20 bg-[#122a26] px-6 py-4">
+                <h2 className="text-base font-black uppercase tracking-[0.1em] text-[#dcc090]">
+                  {t('admin.quickSettings.quickSettingsTitle')}
+                </h2>
+                <p className="mt-0.5 text-xs text-[#dcc090]/55">{t('admin.quickSettings.quickSettingsSubtitle')}</p>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-4 p-5 md:grid-cols-2">
                 <GlobalDiscountCard
                   globalDiscount={globalDiscount}
                   setGlobalDiscount={setGlobalDiscount}
@@ -88,10 +81,9 @@ export function QuickSettingsContent({
                   discountSaving={discountSaving}
                   handleDiscountSave={handleDiscountSave}
                 />
-
                 <QuickInfoCard />
               </div>
-            </Card>
+            </div>
 
             <CategoryDiscountsCard
               categories={categories}
@@ -112,7 +104,7 @@ export function QuickSettingsContent({
               savingProductId={savingProductId}
             />
           </div>
-        </div>
+        </AdminShell>
       </div>
     </div>
   );

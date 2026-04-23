@@ -3,11 +3,10 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
-import { Card, Button } from '@shop/ui';
 import { useTranslation } from '../../../lib/i18n-client';
 import { useCategories } from './hooks/useCategories';
 import { useCategoryActions } from './hooks/useCategoryActions';
-import { AdminSidebar } from './components/AdminSidebar';
+import { AdminShell } from '../components/AdminShell';
 import { CategoriesList } from './components/CategoriesList';
 import { AddCategoryModal } from './components/AddCategoryModal';
 import { EditCategoryModal } from './components/EditCategoryModal';
@@ -61,46 +60,42 @@ export default function CategoriesPage() {
   return (
     <div className={ADMIN_PAGE_SHELL_CLASS}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <AdminSidebar t={t} />
+        <AdminShell>
+          <div className="overflow-hidden rounded-2xl border border-[#dcc090]/30 bg-white/90 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+            <div className="flex items-center justify-between border-b border-[#dcc090]/20 bg-[#122a26] px-6 py-4">
+              <h2 className="text-base font-black uppercase tracking-[0.1em] text-[#dcc090]">
+                {t('admin.categories.title')}
+              </h2>
+              <button
+                type="button"
+                onClick={() => { resetForm(); setShowAddModal(true); }}
+                className="flex items-center gap-2 rounded-lg border border-[#dcc090]/40 bg-[#dcc090]/15 px-4 py-2 text-xs font-bold text-[#dcc090] transition-all hover:bg-[#dcc090]/25 hover:border-[#dcc090]"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                {t('admin.categories.addCategory')}
+              </button>
+            </div>
 
-          {/* Main Content */}
-          <div className="flex-1 min-w-0">
-            <Card className="border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-[#122a26]">{t('admin.categories.title')}</h2>
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    resetForm();
-                    setShowAddModal(true);
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  {t('admin.categories.addCategory')}
-                </Button>
-              </div>
-
+            <div className="p-6">
               {loading ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#122a26] mx-auto mb-2"></div>
-                  <p className="text-sm text-[#414141]/70">{t('admin.categories.loadingCategories')}</p>
+                <div className="py-8 text-center">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#122a26] mx-auto mb-3" />
+                  <p className="text-sm text-[#414141]/60">{t('admin.categories.loadingCategories')}</p>
                 </div>
               ) : (
                 <CategoriesList
                   categories={categories}
                   onEdit={handleEditCategory}
-                  onDelete={(categoryId, categoryTitle) => 
+                  onDelete={(categoryId, categoryTitle) =>
                     handleDeleteCategory(categoryId, categoryTitle, fetchCategories)
                   }
                 />
               )}
-            </Card>
+            </div>
           </div>
-        </div>
+        </AdminShell>
       </div>
 
       <AddCategoryModal
@@ -108,10 +103,7 @@ export default function CategoriesPage() {
         formData={formData}
         categories={categories}
         saving={saving}
-        onClose={() => {
-          setShowAddModal(false);
-          resetForm();
-        }}
+        onClose={() => { setShowAddModal(false); resetForm(); }}
         onFormDataChange={setFormData}
         onSubmit={() => handleAddCategory(fetchCategories)}
       />
@@ -122,14 +114,10 @@ export default function CategoriesPage() {
         formData={formData}
         categories={categories}
         saving={saving}
-        onClose={() => {
-          setShowEditModal(false);
-          resetForm();
-        }}
+        onClose={() => { setShowEditModal(false); resetForm(); }}
         onFormDataChange={setFormData}
         onSubmit={() => handleUpdateCategory(fetchCategories)}
       />
-
     </div>
   );
 }

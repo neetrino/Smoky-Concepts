@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@shop/ui';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../../lib/i18n-client';
 
@@ -42,16 +41,14 @@ export function QuickInfoCard() {
       </div>
 
       <div className="mt-4 pt-4 border-t border-[#dcc090]/25">
-        <Button
-          variant="ghost"
-          size="sm"
+        <button
+          type="button"
           onClick={() => router.push('/admin/settings')}
-          className="w-full"
+          className="w-full rounded-lg border border-[#dcc090]/30 py-2 text-sm font-bold text-[#414141]/70 transition-all hover:border-[#dcc090]/50 hover:bg-[#dcc090]/10"
         >
           {t('admin.quickSettings.moreSettings')}
-        </Button>
+        </button>
       </div>
     </div>
   );
 }
-

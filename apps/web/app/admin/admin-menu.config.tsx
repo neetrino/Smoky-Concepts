@@ -99,6 +99,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     label: t('admin.menu.categories'),
     path: '/admin/categories',
     isSubCategory: true,
+    parentId: 'products',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -115,6 +116,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     label: t('admin.menu.attributes'),
     path: '/admin/attributes',
     isSubCategory: true,
+    parentId: 'products',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -131,6 +133,17 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     label: t('admin.menu.sizes'),
     path: '/admin/sizes',
     isSubCategory: true,
+    parentId: 'products',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 7h18M3 7a2 2 0 00-2 2v6a2 2 0 002 2h18a2 2 0 002-2V9a2 2 0 00-2-2M3 7V5m18 2V5M7 7v2m4-2v4m4-4v2"
+        />
+      </svg>
+    ),
   },
   {
     id: 'quick-settings',
