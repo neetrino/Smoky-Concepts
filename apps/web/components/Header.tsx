@@ -141,7 +141,7 @@ export function Header() {
             <button
               type="button"
               onClick={() => dispatchCartDrawerOpen()}
-              className="relative inline-flex h-6 w-6 items-center justify-center"
+              className="relative inline-flex h-6 w-6 items-center justify-center md:hidden"
               aria-label="Open cart"
             >
               <img src={HOME_ASSET_PATHS.bagIcon} alt="" className="h-6 w-5 object-contain" aria-hidden />
@@ -154,7 +154,22 @@ export function Header() {
             <div className="hidden items-center gap-2 md:flex">
               <CurrencySwitcherHeader />
               <LanguageSwitcherHeader />
-              <HeaderDesktopAccount />
+              <button
+                type="button"
+                onClick={() => dispatchCartDrawerOpen()}
+                className="relative inline-flex h-6 w-6 items-center justify-center"
+                aria-label="Open cart"
+              >
+                <img src={HOME_ASSET_PATHS.bagIcon} alt="" className="h-6 w-5 object-contain" aria-hidden />
+                {cartReady && cartCount > 0 ? (
+                  <span className="absolute -right-2 -top-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dcc090] px-1 text-[0.55rem] font-bold text-[#122a26]">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                ) : null}
+              </button>
+              <div className="ml-3 mt-0.5">
+                <HeaderDesktopAccount />
+              </div>
             </div>
             <MobileMenuButton open={mobileMenuOpen} onToggle={() => setMobileMenuOpen((v) => !v)} />
           </div>
