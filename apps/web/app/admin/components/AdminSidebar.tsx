@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
 import { getAdminMenuTABS } from '../admin-menu.config';
 import {
   adminNavContainerClass,
-  adminNavDividerClass,
   adminNavIconClass,
   adminNavItemActiveClass,
   adminNavItemInactiveClass,
@@ -16,7 +16,6 @@ import {
   ADMIN_FIXED_SIDEBAR_SPACER_CLASS,
 } from '../constants/adminShell.constants';
 import { useAdminTheme } from '../context/AdminThemeContext';
-import { AdminThemeToggleButton } from './AdminThemeToggleButton';
 import { getAdminSidebarNavIndentClass } from '../utils/adminMenuIndent';
 
 interface AdminSidebarProps {
@@ -72,6 +71,17 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
       </div>
       <aside className={ADMIN_FIXED_SIDEBAR_CLASS}>
         <nav className={adminNavContainerClass(theme)}>
+          <Link
+            href="/"
+            className="mb-4 inline-flex items-center rounded-md px-2 py-2 ml-2"
+            aria-label="Go to home page"
+          >
+            <img
+              src="/assets/home/Logo%20Full.png"
+              alt="Home"
+              className="h-7 w-auto max-w-[120px] object-contain"
+            />
+          </Link>
           {adminTabs.map((tab) => {
             // Hide children when parent is collapsed
             if (tab.parentId && !expandedGroups.has(tab.parentId)) return null;
@@ -115,9 +125,6 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
               </button>
             );
           })}
-          <div className={adminNavDividerClass(theme)}>
-            <AdminThemeToggleButton variant="sidebar" />
-          </div>
         </nav>
       </aside>
       <div className={ADMIN_FIXED_SIDEBAR_SPACER_CLASS} aria-hidden="true" />

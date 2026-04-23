@@ -33,9 +33,6 @@ export function OrderDetailsModal({
     selectedOrder.totals?.collectionPriceAmount ?? selectedOrder.collectionPriceAmount ?? 0,
     'USD',
   );
-  const subtotalWithoutCollectionUsd = selectedOrder.totals
-    ? Math.max(0, amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency) - collectionPriceUsd)
-    : 0;
 
   const getAttributeLabel = (key: string): string => {
     const attributeType = getAttributeType(key);
@@ -249,7 +246,9 @@ export function OrderDetailsModal({
                           <div className="flex justify-between text-gray-600">
                             <span>{t('profile.orderDetails.subtotal')}</span>
                             <span>
-                              {formatOrderMoneyUsd(subtotalWithoutCollectionUsd)}
+                              {formatOrderMoneyUsd(
+                                amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency),
+                              )}
                             </span>
                           </div>
                           {selectedOrder.totals.discount > 0 && (
@@ -293,7 +292,7 @@ export function OrderDetailsModal({
                               <span>{t('profile.orderDetails.total')}</span>
                               <span>
                                 {formatOrderMoneyUsd(
-                                  subtotalWithoutCollectionUsd -
+                                  amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency) -
                                     amountToUsd(selectedOrder.totals.discount, orderMoneyCurrency) +
                                     amountToUsd(selectedOrder.totals.shipping, orderMoneyCurrency) +
                                     amountToUsd(selectedOrder.totals.tax, orderMoneyCurrency) +

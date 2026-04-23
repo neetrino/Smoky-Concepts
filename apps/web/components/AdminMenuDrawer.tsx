@@ -2,8 +2,8 @@
 
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { AdminThemeToggleButton } from '@/app/admin/components/AdminThemeToggleButton';
 import {
   adminDrawerChevronClass,
   adminDrawerCloseButtonClass,
@@ -13,7 +13,6 @@ import {
   adminDrawerRowActiveClass,
   adminDrawerRowIconClass,
   adminDrawerRowInactiveClass,
-  adminDrawerTitleClass,
   adminDrawerTriggerClass,
 } from '@/app/admin/constants/adminMenuThemeClasses';
 import { useAdminTheme } from '@/app/admin/context/AdminThemeContext';
@@ -102,9 +101,19 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className={adminDrawerHeaderRowClass(theme)}>
-              <p className={adminDrawerTitleClass(theme)}>Admin Navigation</p>
-              <div className="flex flex-shrink-0 items-center gap-2">
-                <AdminThemeToggleButton variant="drawer" />
+              <Link
+                href="/"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center pl-2"
+                aria-label="Go to home page"
+              >
+                <img
+                  src="/assets/home/Logo%20Full.png"
+                  alt="Home"
+                  className="h-7 w-auto max-w-[120px] object-contain"
+                />
+              </Link>
+              <div className="flex flex-shrink-0 items-center">
                 <button
                   type="button"
                   onClick={() => setOpen(false)}

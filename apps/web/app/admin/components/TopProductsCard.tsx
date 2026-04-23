@@ -2,7 +2,6 @@
 
 import { Card, Button } from '@shop/ui';
 import { useRouter } from 'next/navigation';
-import { ADMIN_PRICE_CURRENCY } from '@/lib/currency';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatCurrency } from '../utils/dashboardUtils';
 
@@ -82,7 +81,7 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
               </div>
               <div className="text-right">
                 <p className="text-sm font-black text-[#122a26]">
-                  {formatCurrency(product.totalRevenue, ADMIN_PRICE_CURRENCY)}
+                  {formatCurrency(product.totalRevenue, 'USD')}
                 </p>
               </div>
             </div>

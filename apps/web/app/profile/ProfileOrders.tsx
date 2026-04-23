@@ -101,16 +101,17 @@ export function ProfileOrders({
                     if (
                       order.subtotal !== undefined &&
                       order.discountAmount !== undefined &&
+                      order.shippingAmount !== undefined &&
                       order.taxAmount !== undefined
                     ) {
                       const subtotalUsd = amountToUsd(order.subtotal, order.currency);
                       const discountUsd = amountToUsd(order.discountAmount, order.currency);
+                      const shippingUsd = amountToUsd(order.shippingAmount, order.currency);
                       const taxUsd = amountToUsd(order.taxAmount, order.currency);
-                      return formatOrderMoneyUsd(subtotalUsd - discountUsd + taxUsd + collectionUsd);
+                      return formatOrderMoneyUsd(subtotalUsd - discountUsd + shippingUsd + taxUsd + collectionUsd);
                     }
                     const totalUsd = amountToUsd(order.total, order.currency);
-                    const shippingUsd = amountToUsd(order.shippingAmount || 0, order.currency);
-                    return formatOrderMoneyUsd(totalUsd - shippingUsd + collectionUsd);
+                    return formatOrderMoneyUsd(totalUsd + collectionUsd);
                   })()}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">{t('profile.dashboard.viewDetails')}</p>

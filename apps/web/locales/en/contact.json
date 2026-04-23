@@ -16,7 +16,7 @@
     "emailLabel": "Email:"
   },
   "headquarter": {
-    "title": "Headquarters:",
+    "title": "working hours",
     "hours": {
       "weekdays": "Monday - Friday: 9:00-20:00",
       "saturday": "Saturday: 11:00 - 15:00"
