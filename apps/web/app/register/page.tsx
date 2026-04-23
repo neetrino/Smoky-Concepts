@@ -120,7 +120,7 @@ export default function RegisterPage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Card className="p-8">
+      <Card className="p-8 bg-[#DCC090]/20">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('register.title')}</h1>
         <p className="text-gray-600 mb-8">{t('register.subtitle')}</p>
 
@@ -282,7 +282,7 @@ export default function RegisterPage() {
           )}
           <Button 
             variant="primary" 
-            className="w-full"
+            className="w-full rounded-xl bg-[#DCC090] text-gray-900 hover:bg-[#c9ad7f]"
             type="submit"
             disabled={isSubmitting || isLoading}
           >
@@ -293,7 +293,7 @@ export default function RegisterPage() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             {t('register.form.alreadyHaveAccount')}{' '}
-            <Link href="/login" className="text-blue-600 hover:underline font-medium">
+            <Link href="/login" className="text-[#DCC090] hover:text-[#c9ad7f] hover:underline font-medium">
               {t('register.form.signIn')}
             </Link>
           </p>
