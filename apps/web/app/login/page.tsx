@@ -65,8 +65,8 @@ function LoginPageContent() {
   }, [isLoggedIn, isLoading, redirectTo, router]);
 
   return (
-    <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Card className="p-8">
+    <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12 r">
+      <Card className="p-8 bg-[#DCC090]/20 ">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('login.title')}</h1>
         <p className="text-gray-600 mb-8">{t('login.subtitle')}</p>
 
@@ -141,7 +141,7 @@ function LoginPageContent() {
           </div>
           <Button 
             variant="primary" 
-            className="w-full"
+            className="w-full rounded-xl bg-[#DCC090] text-gray-900 hover:bg-[#c9ad7f]"
             type="submit"
             disabled={isSubmitting || isLoading}
           >
@@ -152,7 +152,7 @@ function LoginPageContent() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             {t('login.form.noAccount')}{' '}
-            <Link href="/register" className="text-blue-600 hover:underline font-medium">
+            <Link href="/register" className="text-[#DCC090] hover:text-[#c9ad7f] hover:underline font-medium">
               {t('login.form.signUp')}
             </Link>
           </p>
@@ -166,7 +166,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Card className="p-8">
+        <Card className="p-8 bg-[#DCC090]/20">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
             <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>

@@ -15,6 +15,8 @@ import {
   getSizeLabel,
   productMatchesCategoryFilter,
   shouldNudgeCatalogProductImage,
+  isClientSideCollectionFilterValue,
+  resolveSectionLabelFromCollectionValue,
 } from './catalogProductLabels';
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
@@ -76,6 +78,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   const selectedColor = searchParams.get('color') ?? 'all';
   const selectedSort = (searchParams.get('sort') as SortOption | null) ?? 'default';
   const isCategoryFilteredView = selectedCollection !== 'all';
+  const selectedSectionTitle = resolveSectionLabelFromCollectionValue(selectedCollection);
 
   useEffect(() => {
     setSelectedSize(searchParams.get('size') ?? 'all');
@@ -111,11 +114,14 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   }, [products]);
 
   const visibleProducts = useMemo(() => {
+    const shouldApplyClientCategoryFilter = isClientSideCollectionFilterValue(selectedCollection);
     const filtered = products.filter((product) => {
       const colorLabel = getColorLabel(product);
       const sizeLabel = getSizeLabel(product);
 
-      if (!productMatchesCategoryFilter(product, selectedCollection)) return false;
+      if (shouldApplyClientCategoryFilter && !productMatchesCategoryFilter(product, selectedCollection)) {
+        return false;
+      }
       if (selectedColor !== 'all' && colorLabel !== selectedColor) return false;
       if (selectedSize !== 'all' && sizeLabel !== selectedSize) return false;
 
@@ -168,7 +174,12 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   }, [sectionItemsByTitle]);
 
   const sections = useMemo(() => {
-    return SECTION_ORDER.map((title) => {
+    const orderedSectionTitles =
+      selectedCollection !== 'all' && selectedSectionTitle
+        ? [selectedSectionTitle]
+        : SECTION_ORDER;
+
+    return orderedSectionTitles.map((title) => {
       const items = sectionItemsByTitle[title] ?? [];
       if (items.length === 0) {
         return null;
@@ -186,7 +197,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
         pageItems: items.slice(startIndex, startIndex + ITEMS_PER_SECTION_PAGE),
       };
     }).filter((section): section is NonNullable<typeof section> => Boolean(section));
-  }, [sectionItemsByTitle, sectionPages]);
+  }, [sectionItemsByTitle, sectionPages, selectedCollection, selectedSectionTitle]);
 
   const updateQuery = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());

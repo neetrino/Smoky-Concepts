@@ -15,6 +15,7 @@
   },
   "shippingAddress": {
     "title": "Առաքման հասցե",
+    "region": "Մարզ: {region}",
     "phone": "Հեռախոս: {phone}"
   },
   "orderSummary": {

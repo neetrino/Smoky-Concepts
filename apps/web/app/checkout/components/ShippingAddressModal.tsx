@@ -6,7 +6,9 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { ContactInformation } from './ContactInformation';
 import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
+import { DeliveryRegionSelect } from './DeliveryRegionSelect';
 import { CheckoutFormData, Cart } from '../types';
+import type { DeliveryLocationOption } from '../hooks/useDeliveryLocations';
 
 interface ShippingAddressModalProps {
   isOpen: boolean;
@@ -25,7 +27,9 @@ interface ShippingAddressModalProps {
     shippingDisplay: number;
     totalDisplay: number;
   };
-  shippingCity?: string;
+  shippingRegion?: string;
+  deliveryLocations: DeliveryLocationOption[];
+  loadingDeliveryLocations: boolean;
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
   onSubmit: (data: CheckoutFormData) => void;
@@ -43,7 +47,9 @@ export function ShippingAddressModal({
   paymentMethod,
   cart,
   orderSummary,
-  shippingCity,
+  shippingRegion,
+  deliveryLocations,
+  loadingDeliveryLocations,
   loadingDeliveryPrice,
   deliveryPrice,
   onSubmit,
@@ -104,16 +110,6 @@ export function ShippingAddressModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Input
-                    label={t('checkout.form.city')}
-                    type="text"
-                    placeholder={t('checkout.placeholders.city')}
-                    {...register('shippingCity')}
-                    error={errors.shippingCity?.message}
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div>
-                  <Input
                     label={t('checkout.form.address')}
                     type="text"
                     placeholder={t('checkout.placeholders.address')}
@@ -122,13 +118,21 @@ export function ShippingAddressModal({
                     disabled={isSubmitting}
                   />
                 </div>
+                <DeliveryRegionSelect
+                  register={register}
+                  error={errors.shippingRegion?.message}
+                  disabled={isSubmitting}
+                  locations={deliveryLocations}
+                  loading={loadingDeliveryLocations}
+                />
               </div>
             </div>
 
-            {(errors.shippingAddress || errors.shippingCity) && (
+            {(errors.shippingAddress || errors.shippingRegion) && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-sm text-red-600">
-                  {errors.shippingAddress?.message || errors.shippingCity?.message}
+                  {errors.shippingAddress?.message ||
+                    errors.shippingRegion?.message}
                 </p>
               </div>
             )}
@@ -160,7 +164,7 @@ export function ShippingAddressModal({
               cart={cart}
               orderSummary={orderSummary}
               shippingMethod={shippingMethod}
-              shippingCity={shippingCity}
+              shippingRegion={shippingRegion}
               loadingDeliveryPrice={loadingDeliveryPrice}
               deliveryPrice={deliveryPrice}
             />
@@ -200,7 +204,7 @@ export function ShippingAddressModal({
               cart={cart}
               orderSummary={orderSummary}
               shippingMethod={shippingMethod}
-              shippingCity={shippingCity}
+              shippingRegion={shippingRegion}
               loadingDeliveryPrice={loadingDeliveryPrice}
               deliveryPrice={deliveryPrice}
             />

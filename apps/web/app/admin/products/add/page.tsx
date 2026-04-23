@@ -161,6 +161,7 @@ function AddProductPageContent() {
     addImageUrl,
     removeImageUrl,
     setFeaturedImage,
+    handleUploadImageFiles,
     handleUploadImages,
     handleUploadVariantImage,
   } = useImageHandling({
@@ -294,6 +295,7 @@ function AddProductPageContent() {
             variableProductTypeAllowed={formState.variableProductTypeAllowed}
             onProductTypeChange={handleProductTypeChange}
             onUploadImages={handleUploadImages}
+            onUploadImageFiles={handleUploadImageFiles}
             onRemoveImage={removeImageUrl}
             onSetFeaturedImage={setFeaturedImage}
             onCategoriesExpandedChange={formState.setCategoriesExpanded}

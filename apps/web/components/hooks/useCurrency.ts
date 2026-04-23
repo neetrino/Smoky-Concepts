@@ -9,7 +9,7 @@ import { getStoredCurrency } from '../../lib/currency';
  * Storefront display currency synced with localStorage.
  */
 export function useCurrency(): CurrencyCode {
-  const [currency, setCurrency] = useState<CurrencyCode>('USD');
+  const [currency, setCurrency] = useState<CurrencyCode>(() => getStoredCurrency());
 
   useEffect(() => {
     const syncCurrency = () => setCurrency(getStoredCurrency());

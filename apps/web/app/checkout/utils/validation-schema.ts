@@ -17,7 +17,7 @@ export function useCheckoutSchema() {
       message: t('checkout.errors.selectPaymentMethod'),
     }),
     shippingAddress: z.string().optional(),
-    shippingCity: z.string().optional(),
+    shippingRegion: z.string().optional(),
     cardNumber: z.string().optional(),
     cardExpiry: z.string().optional(),
     cardCvv: z.string().optional(),
@@ -32,12 +32,12 @@ export function useCheckoutSchema() {
     path: ['shippingAddress'],
   }).refine((data) => {
     if (data.shippingMethod === 'delivery') {
-      return data.shippingCity && data.shippingCity.trim().length > 0;
+      return data.shippingRegion && data.shippingRegion.trim().length > 0;
     }
     return true;
   }, {
-    message: t('checkout.errors.cityRequired'),
-    path: ['shippingCity'],
+    message: t('checkout.errors.regionRequired'),
+    path: ['shippingRegion'],
   }).refine((data) => {
     if (data.paymentMethod === 'arca' || data.paymentMethod === 'idram') {
       return data.cardNumber && data.cardNumber.replace(/\s/g, '').length >= 13;

@@ -22,14 +22,19 @@ export function ShippingAddress({ shippingAddress }: ShippingAddressProps) {
         {shippingAddress.firstName && shippingAddress.lastName && (
           <p>{shippingAddress.firstName} {shippingAddress.lastName}</p>
         )}
-        {shippingAddress.addressLine1 && <p>{shippingAddress.addressLine1}</p>}
-        {shippingAddress.addressLine2 && <p>{shippingAddress.addressLine2}</p>}
+        {shippingAddress.state && (
+          <p>{t('orders.shippingAddress.region').replace('{region}', shippingAddress.state)}</p>
+        )}
         {shippingAddress.city && (
           <p>
             {shippingAddress.city}
             {shippingAddress.postalCode && `, ${shippingAddress.postalCode}`}
           </p>
         )}
+        {(shippingAddress.addressLine1 || shippingAddress.address) && (
+          <p>{shippingAddress.addressLine1 || shippingAddress.address}</p>
+        )}
+        {shippingAddress.addressLine2 && <p>{shippingAddress.addressLine2}</p>}
         {shippingAddress.countryCode && <p>{shippingAddress.countryCode}</p>}
         {shippingAddress.phone && (
           <p className="mt-2">

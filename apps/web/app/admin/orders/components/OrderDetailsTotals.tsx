@@ -49,7 +49,9 @@ export function OrderDetailsTotals({
             {orderDetails.shippingMethod === 'pickup'
               ? t('checkout.shipping.freePickup')
               : formatStoredMoney(orderDetails.totals.shipping, storedTotalsCurrency, ADMIN_PRICE_CURRENCY) +
-                (orderDetails.shippingAddress?.city ? ` (${orderDetails.shippingAddress.city})` : '')}
+                (orderDetails.shippingAddress?.city || orderDetails.shippingAddress?.state
+                  ? ` (${orderDetails.shippingAddress.city || orderDetails.shippingAddress.state})`
+                  : '')}
           </span>
         </div>
         <div className="flex justify-between text-sm text-gray-700">

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button, Card } from '@shop/ui';
-import { amountToUsd, formatPriceInCurrency } from '../../lib/currency';
+import { useCurrency } from '../../components/hooks/useCurrency';
+import { amountToUsd, convertPrice, formatPriceInCurrency } from '../../lib/currency';
 import { getStatusColor, getPaymentStatusColor } from './utils';
 import type { OrderListItem } from './types';
 
@@ -28,6 +29,10 @@ export function ProfileOrders({
   onOrderClick,
   t,
 }: ProfileOrdersProps) {
+  const displayCurrency = useCurrency();
+  const formatOrderMoneyUsd = (amountUsd: number) =>
+    formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
+
   if (ordersLoading) {
     return (
       <Card className="p-6">
@@ -100,11 +105,11 @@ export function ProfileOrders({
                       const subtotalUsd = amountToUsd(order.subtotal, order.currency);
                       const discountUsd = amountToUsd(order.discountAmount, order.currency);
                       const taxUsd = amountToUsd(order.taxAmount, order.currency);
-                      return formatPriceInCurrency(subtotalUsd - discountUsd + taxUsd, 'USD');
+                      return formatOrderMoneyUsd(subtotalUsd - discountUsd + taxUsd);
                     }
                     const totalUsd = amountToUsd(order.total, order.currency);
                     const shippingUsd = amountToUsd(order.shippingAmount || 0, order.currency);
-                    return formatPriceInCurrency(totalUsd - shippingUsd, 'USD');
+                    return formatOrderMoneyUsd(totalUsd - shippingUsd);
                   })()}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">{t('profile.dashboard.viewDetails')}</p>

@@ -1,8 +1,9 @@
 'use client';
 
 import { OrderCustomizeBlock } from '@/components/orders/OrderCustomizeBlock';
+import { useCurrency } from '../../../../components/hooks/useCurrency';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { amountToUsd, formatPriceInCurrency } from '../../../../lib/currency';
+import { amountToUsd, convertPrice, formatPriceInCurrency } from '../../../../lib/currency';
 import { getColorValue } from '../utils/color-helpers';
 import type { OrderItem as OrderItemType } from '../types';
 
@@ -13,6 +14,9 @@ interface OrderItemProps {
 
 export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
   const { t } = useTranslation();
+  const displayCurrency = useCurrency();
+  const formatOrderMoneyUsd = (amountUsd: number) =>
+    formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
 
   const allOptions = item.variantOptions || [];
 
@@ -38,8 +42,8 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
 
   const priceUsd = amountToUsd(item.price, orderTotalsCurrency);
   const totalUsd = amountToUsd(item.total, orderTotalsCurrency);
-  const itemPriceDisplay = formatPriceInCurrency(priceUsd, 'USD');
-  const itemTotalDisplay = formatPriceInCurrency(totalUsd, 'USD');
+  const itemPriceDisplay = formatOrderMoneyUsd(priceUsd);
+  const itemTotalDisplay = formatOrderMoneyUsd(totalUsd);
 
   return (
     <div className="flex gap-4 pb-4 border-b border-gray-200 last:border-0">

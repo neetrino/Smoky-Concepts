@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button, Card } from '@shop/ui';
-import { amountToUsd, formatPriceInCurrency } from '../../lib/currency';
+import { useCurrency } from '../../components/hooks/useCurrency';
+import { amountToUsd, convertPrice, formatPriceInCurrency } from '../../lib/currency';
 import { getStatusColor, getPaymentStatusColor } from './utils';
 import type { DashboardData, ProfileTab } from './types';
 
@@ -19,6 +20,10 @@ export function ProfileDashboard({
   onOrderClick,
   t,
 }: ProfileDashboardProps) {
+  const displayCurrency = useCurrency();
+  const formatOrderMoneyUsd = (amountUsd: number) =>
+    formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
+
   if (dashboardLoading) {
     return (
       <div className="text-center py-12">
@@ -61,7 +66,7 @@ export function ProfileDashboard({
             <div className="min-w-0 flex-1 overflow-hidden">
               <p className="text-sm font-medium text-gray-600">{t('profile.dashboard.totalSpent')}</p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1 break-words overflow-wrap-anywhere">
-                {formatPriceInCurrency(dashboardData.stats.totalSpent, 'USD')}
+                {formatOrderMoneyUsd(dashboardData.stats.totalSpent)}
               </p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -166,11 +171,11 @@ export function ProfileDashboard({
                           const subtotalUsd = amountToUsd(order.subtotal, order.currency);
                           const discountUsd = amountToUsd(order.discountAmount, order.currency);
                           const taxUsd = amountToUsd(order.taxAmount, order.currency);
-                          return formatPriceInCurrency(subtotalUsd - discountUsd + taxUsd, 'USD');
+                          return formatOrderMoneyUsd(subtotalUsd - discountUsd + taxUsd);
                         }
                         const totalUsd = amountToUsd(order.total, order.currency);
                         const shippingUsd = amountToUsd(order.shippingAmount || 0, order.currency);
-                        return formatPriceInCurrency(totalUsd - shippingUsd, 'USD');
+                        return formatOrderMoneyUsd(totalUsd - shippingUsd);
                       })()}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">{t('profile.dashboard.viewDetails')}</p>

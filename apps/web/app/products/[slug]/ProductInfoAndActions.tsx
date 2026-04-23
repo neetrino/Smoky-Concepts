@@ -323,7 +323,13 @@ export function ProductInfoAndActions({
       ? 'pb-2.5 font-montserrat text-[15px] font-extrabold leading-none sm:text-[16px] md:text-[17px]'
       : 'pb-2.5 font-montserrat text-[14px] font-extrabold leading-none sm:text-[15px] md:text-[16px]';
 
-  const productBadge = product.labels?.[0]?.value || product.categories?.[0]?.title || null;
+  const productBadges = product.labels?.length
+    ? product.labels
+        .map((label) => label.value?.trim())
+        .filter((value): value is string => Boolean(value))
+    : product.categories
+        ?.map((category) => category.title?.trim())
+        .filter((value): value is string => Boolean(value)) ?? [];
   const productDetails = [
     product.brand?.name ?? null,
     activeColorOption ? `${t(language, 'product.color')}: ${activeColorOption.label}` : null,
@@ -462,16 +468,24 @@ export function ProductInfoAndActions({
 
   return (
     <>
-    <div className="max-w-[763px] min-w-0 w-full pt-1 xl:pt-36 2xl:pt-40">
-      <h1 className="font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
-        {productTitle}
-      </h1>
-
-      {productBadge && (
-        <div className="mt-3 inline-flex h-[18px] items-center rounded-[6px] bg-[#122a26] px-[7px] text-[12px] font-medium leading-none text-white">
-          {productBadge}
-        </div>
-      )}
+    <div className="max-w-[763px] min-w-0 w-full pt-0 xl:pt-24 2xl:pt-28">
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <h1 className="min-w-0 flex-1 truncate whitespace-nowrap font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
+          {productTitle}
+        </h1>
+        {productBadges.length > 0 && (
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+            {productBadges.map((badge, index) => (
+              <div
+                key={`${badge}-${index}`}
+                className="inline-flex h-[18px] items-center rounded-[6px] bg-[#122a26] px-[7px] text-[12px] font-medium leading-none text-white"
+              >
+                {badge}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {colorOptions.length > 0 && (
         <div className="mt-8">

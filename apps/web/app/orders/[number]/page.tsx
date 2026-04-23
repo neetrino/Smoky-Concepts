@@ -31,8 +31,12 @@ export default function OrderPage() {
       const response = await apiClient.get<Order>(`/api/v1/orders/${params.number}`);
       setOrder(response);
       
-      if (response.shippingMethod === 'delivery' && response.shippingAddress?.city) {
-        fetchShippingPrice(response.shippingAddress.city);
+      const deliveryLocation =
+        response.shippingMethod === 'delivery'
+          ? response.shippingAddress?.city || response.shippingAddress?.state
+          : null;
+      if (deliveryLocation) {
+        fetchShippingPrice(deliveryLocation);
       } else {
         setCalculatedShipping(null);
       }

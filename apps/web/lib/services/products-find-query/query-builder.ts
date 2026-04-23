@@ -72,6 +72,7 @@ async function buildCategoryFilter(
   const categoryConditions = allCategoryIds.flatMap((catId: string) => [
     { primaryCategoryId: catId },
     { categoryIds: { has: catId } },
+    { categories: { some: { id: catId } } },
   ]);
   
   if (existingWhere.OR) {

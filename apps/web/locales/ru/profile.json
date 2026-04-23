@@ -153,6 +153,7 @@
     "pickup": "Самовывоз",
     "notSpecified": "Не указано",
     "deliveryAddress": "Адрес доставки",
+    "region": "Область (марз)",
     "phone": "Телефон",
     "color": "Цвет",
     "size": "Размер",

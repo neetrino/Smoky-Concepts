@@ -258,7 +258,7 @@ export function CustomizeSizeModal({
                 onChange={(e) => setSizeSearchQuery(e.target.value)}
                 placeholder={t(language, 'product.size_catalog_search_placeholder')}
                 autoComplete="off"
-                className="h-12 w-full rounded-[6px] border-0 bg-white px-[18px] font-montserrat text-[18px] font-medium text-[#414141] shadow-[0px_4px_22.5px_rgba(0,0,0,0.1)] outline-none placeholder:text-[#9d9d9d] focus-visible:ring-2 focus-visible:ring-[#dcc090]/40"
+                className="h-11 w-full rounded-[6px] border-0 bg-white px-4 font-montserrat text-[15px] font-medium text-[#414141] shadow-[0px_4px_22.5px_rgba(0,0,0,0.1)] outline-none placeholder:text-[#9d9d9d] focus-visible:ring-2 focus-visible:ring-[#dcc090]/40 sm:text-[16px]"
               />
             </div>
           ) : null}
