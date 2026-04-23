@@ -16,10 +16,6 @@ export function BulkSelectionControls({
 }: BulkSelectionControlsProps) {
   const { t } = useTranslation();
 
-  if (selectedCount === 0) {
-    return null;
-  }
-
   return (
     <Card className="p-4 mb-6">
       <div className="flex items-center justify-between">
@@ -29,7 +25,7 @@ export function BulkSelectionControls({
         <Button
           variant="outline"
           onClick={onBulkDelete}
-          disabled={bulkDeleting}
+          disabled={bulkDeleting || selectedCount === 0}
         >
           {bulkDeleting ? t('admin.orders.deleting') : t('admin.orders.deleteSelected')}
         </Button>

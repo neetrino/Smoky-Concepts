@@ -67,27 +67,38 @@ export function OrdersTable({
   }
 
   return (
-    <Card className="border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-[#dcc090]/25">
-          <thead className="bg-[#122a26]">
+    <Card className="overflow-hidden border-[#dcc090]/30 bg-white/85 p-2 shadow-[0_18px_50px_rgba(18,42,38,0.08)] sm:p-3">
+      <div className="rounded-[1.15rem]">
+        <table className="w-full table-fixed border-separate border-spacing-y-2">
+          <colgroup>
+            <col className="w-[4.5%]" />
+            <col className="w-[10%]" />
+            <col className="w-[23%]" />
+            <col className="w-[11%]" />
+            <col className="w-[13%]" />
+            <col className="w-[14%]" />
+            <col className="w-[14%]" />
+            <col className="w-[10.5%]" />
+          </colgroup>
+          <thead>
             <tr>
-              <th className="px-4 py-3">
+              <th className="rounded-l-xl bg-[#122a26] px-3 py-4 shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 <input
                   type="checkbox"
                   aria-label={t('admin.orders.selectAllOrders')}
                   checked={orders.length > 0 && orders.every(o => selectedIds.has(o.id))}
                   onChange={onToggleSelectAll}
+                  className="h-4 w-4 rounded border-[#dcc090]/60 bg-white text-[#122a26] focus:ring-[#dcc090]"
                 />
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
+              <th className="bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 {t('admin.orders.orderNumber')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
+              <th className="bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 {t('admin.orders.customer')}
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider cursor-pointer hover:bg-white/5 select-none"
+                className="cursor-pointer select-none bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)] transition-colors hover:bg-[#18352f]"
                 onClick={() => onSort('total')}
               >
                 <div className="flex items-center gap-1">
@@ -110,17 +121,17 @@ export function OrdersTable({
                   </div>
                 </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
+              <th className="bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 {t('admin.orders.orderDetails.colorSize')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
+              <th className="bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 {t('admin.orders.status')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
+              <th className="bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)]">
                 {t('admin.orders.payment')}
               </th>
               <th
-                className="px-6 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider cursor-pointer hover:bg-white/5 select-none"
+                className="cursor-pointer select-none rounded-r-xl bg-[#122a26] px-3 py-4 text-left text-[11px] font-black uppercase tracking-[0.1em] text-[#dcc090] shadow-[0_10px_24px_rgba(18,42,38,0.12)] transition-colors hover:bg-[#18352f]"
                 onClick={() => onSort('createdAt')}
               >
                 <div className="flex items-center gap-1">
@@ -145,7 +156,7 @@ export function OrdersTable({
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-[#dcc090]/25">
+          <tbody>
             {orders.map((order) => (
               <OrderRow
                 key={order.id}
