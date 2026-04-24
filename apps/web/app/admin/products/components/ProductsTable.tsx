@@ -199,6 +199,9 @@ export function ProductsTable({
                       {t('admin.products.upcoming')}
                     </span>
                   </th>
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider pl-6">
+                    {t('admin.products.actions')}
+                  </th>
                   <th className="px-3 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider">
                     <button
                       type="button"
@@ -234,9 +237,6 @@ export function ProductsTable({
                       </span>
                     </button>
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-[#dcc090] uppercase tracking-wider pl-6">
-                    {t('admin.products.actions')}
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-[#dcc090]/25">
@@ -259,10 +259,7 @@ export function ProductsTable({
                             className="h-12 w-12 rounded object-cover mr-3"
                           />
                         )}
-                        <div>
-                          <div className="text-sm font-medium text-[#122a26]">{product.title}</div>
-                          <div className="text-sm text-[#414141]/55">{product.slug}</div>
-                        </div>
+                        <div className="text-sm font-medium text-[#122a26]">{product.title}</div>
                       </div>
                     </td>
                     <td className="px-3 py-4">
@@ -363,10 +360,7 @@ export function ProductsTable({
                         </button>
                       </div>
                     </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-sm text-[#414141]/60">
-                      {new Date(product.createdAt).toLocaleDateString('hy-AM')}
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium pl-6">
                       <div className="flex items-center gap-1 flex-wrap">
                         <Button
                           variant="ghost"
@@ -424,6 +418,9 @@ export function ProductsTable({
                           />
                         </button>
                       </div>
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-[#414141]/60">
+                      {new Date(product.createdAt).toLocaleDateString('hy-AM')}
                     </td>
                   </tr>
                 ))}

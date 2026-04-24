@@ -27,7 +27,7 @@ export default function DeliveryPage() {
           <h1 className="text-4xl font-bold text-gray-900">{t('delivery.title')}</h1>
 
           <div className="mt-8">
-            <Card className="p-6">
+            <Card variant="glass" className="p-6">
               <div className="space-y-8">
                 {Array.isArray(intro) &&
                   intro.map((paragraph) => (
@@ -84,7 +84,7 @@ export default function DeliveryPage() {
       
       <div className="space-y-6">
         {/* Delivery Information */}
-        <Card className="p-6">
+        <Card variant="glass" className="p-6">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('delivery.deliveryInformation.title')}</h2>
           <div className="space-y-4 text-gray-700">
             {shippingData.methods.map((method) => {
@@ -144,7 +144,7 @@ export default function DeliveryPage() {
         </Card>
 
         {/* Return Policy */}
-        <Card className="p-6">
+        <Card variant="glass" className="p-6">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('delivery.returnPolicy.title')}</h2>
           <div className="space-y-4 text-gray-700">
             <div>
@@ -202,7 +202,7 @@ export default function DeliveryPage() {
         </Card>
 
         {/* Contact Information */}
-        <Card className="p-6">
+        <Card variant="glass" className="p-6">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('delivery.contact.title')}</h2>
           <p className="text-gray-600 mb-4">
             {t('delivery.contact.description')}

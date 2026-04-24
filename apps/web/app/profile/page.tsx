@@ -63,9 +63,13 @@ function ProfilePageContent() {
 
   if (authLoading || loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
-          <p className="text-gray-600">{t('profile.common.loadingProfile')}</p>
+      <div className="min-h-screen bg-white pb-8 pt-[3.75rem]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-xl border border-gray-200 bg-white p-12 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+            <div className="text-center">
+              <p className="text-gray-600">{t('profile.common.loadingProfile')}</p>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -126,108 +130,110 @@ function ProfilePageContent() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col lg:flex-row gap-8">
-        <ProfileHeader
-          profile={profile}
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          t={t}
-        />
+    <div className="min-h-screen bg-white pb-8 pt-[3.75rem]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-8 lg:flex-row">
+          <ProfileHeader
+            profile={profile}
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            t={t}
+          />
 
-        {/* Main Content */}
-        <div className="flex-1 min-w-0">
-          {/* Alert messages */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
-          {success && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm text-green-600">{success}</p>
-            </div>
-          )}
+          {/* Main Content — white panel on gray page shell */}
+          <div className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:p-8 lg:min-h-[min(70vh,720px)]">
+            {/* Alert messages */}
+            {error && (
+              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+            {success && (
+              <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
+                <p className="text-sm text-green-600">{success}</p>
+              </div>
+            )}
 
-          {/* Dashboard Tab */}
-          {activeTab === 'dashboard' && (
-            <ProfileDashboard
-              dashboardData={dashboardData}
-              dashboardLoading={dashboardLoading}
-              onTabChange={handleTabChange}
-              onOrderClick={handleOrderClick}
-              t={t}
-            />
-          )}
+            {/* Dashboard Tab */}
+            {activeTab === 'dashboard' && (
+              <ProfileDashboard
+                dashboardData={dashboardData}
+                dashboardLoading={dashboardLoading}
+                onTabChange={handleTabChange}
+                onOrderClick={handleOrderClick}
+                t={t}
+              />
+            )}
 
-          {/* Personal Information Tab */}
-          {activeTab === 'personal' && (
-            <ProfilePersonalInfo
-              personalInfo={personalInfo}
-              setPersonalInfo={setPersonalInfo}
-              savingPersonal={savingPersonal}
-              onSave={handleSavePersonalInfo}
-              profile={profile}
-              t={t}
-            />
-          )}
+            {/* Personal Information Tab */}
+            {activeTab === 'personal' && (
+              <ProfilePersonalInfo
+                personalInfo={personalInfo}
+                setPersonalInfo={setPersonalInfo}
+                savingPersonal={savingPersonal}
+                onSave={handleSavePersonalInfo}
+                profile={profile}
+                t={t}
+              />
+            )}
 
-          {/* Addresses Tab */}
-          {activeTab === 'addresses' && (
-            <ProfileAddresses
-              profile={profile}
-              showAddressForm={showAddressForm}
-              setShowAddressForm={setShowAddressForm}
-              editingAddress={editingAddress}
-              addressForm={addressForm}
-              setAddressForm={setAddressForm}
-              savingAddress={savingAddress}
-              onSave={handleSaveAddress}
-              onDelete={handleDeleteAddress}
-              onSetDefault={handleSetDefaultAddress}
-              onEdit={handleEditAddress}
-              onResetForm={resetAddressForm}
-              t={t}
-            />
-          )}
+            {/* Addresses Tab */}
+            {activeTab === 'addresses' && (
+              <ProfileAddresses
+                profile={profile}
+                showAddressForm={showAddressForm}
+                setShowAddressForm={setShowAddressForm}
+                editingAddress={editingAddress}
+                addressForm={addressForm}
+                setAddressForm={setAddressForm}
+                savingAddress={savingAddress}
+                onSave={handleSaveAddress}
+                onDelete={handleDeleteAddress}
+                onSetDefault={handleSetDefaultAddress}
+                onEdit={handleEditAddress}
+                onResetForm={resetAddressForm}
+                t={t}
+              />
+            )}
 
-          {/* Orders Tab */}
-          {activeTab === 'orders' && (
-            <ProfileOrders
-              orders={orders}
-              ordersLoading={ordersLoading}
-              ordersPage={ordersPage}
-              setOrdersPage={setOrdersPage}
-              ordersMeta={ordersMeta}
-              onOrderClick={handleOrderClick}
-              t={t}
-            />
-          )}
+            {/* Orders Tab */}
+            {activeTab === 'orders' && (
+              <ProfileOrders
+                orders={orders}
+                ordersLoading={ordersLoading}
+                ordersPage={ordersPage}
+                setOrdersPage={setOrdersPage}
+                ordersMeta={ordersMeta}
+                onOrderClick={handleOrderClick}
+                t={t}
+              />
+            )}
 
-          {/* Password Tab */}
-          {activeTab === 'password' && (
-            <ProfilePassword
-              passwordForm={passwordForm}
-              setPasswordForm={setPasswordForm}
-              savingPassword={savingPassword}
-              onSave={handleChangePassword}
-              t={t}
-            />
-          )}
+            {/* Password Tab */}
+            {activeTab === 'password' && (
+              <ProfilePassword
+                passwordForm={passwordForm}
+                setPasswordForm={setPasswordForm}
+                savingPassword={savingPassword}
+                onSave={handleChangePassword}
+                t={t}
+              />
+            )}
 
-          {/* Order Details Modal */}
-          {selectedOrder && (
-            <OrderDetailsModal
-              selectedOrder={selectedOrder}
-              orderDetailsLoading={orderDetailsLoading}
-              orderDetailsError={orderDetailsError}
-              isReordering={isReordering}
-              onClose={() => setSelectedOrder(null)}
-              onReOrder={handleReOrder}
-              t={t}
-            />
-          )}
+            {/* Order Details Modal */}
+            {selectedOrder && (
+              <OrderDetailsModal
+                selectedOrder={selectedOrder}
+                orderDetailsLoading={orderDetailsLoading}
+                orderDetailsError={orderDetailsError}
+                isReordering={isReordering}
+                onClose={() => setSelectedOrder(null)}
+                onReOrder={handleReOrder}
+                t={t}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -236,13 +242,19 @@ function ProfilePageContent() {
 
 export default function ProfilePage() {
   return (
-    <Suspense fallback={
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
-          <p className="text-gray-600">Loading profile...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white pb-8 pt-[3.75rem]">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="rounded-xl border border-gray-200 bg-white p-12 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+              <div className="text-center">
+                <p className="text-gray-600">Loading profile...</p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <ProfilePageContent />
     </Suspense>
   );

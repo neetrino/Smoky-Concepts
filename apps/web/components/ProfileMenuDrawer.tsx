@@ -24,7 +24,6 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
 
   useEffect(() => {
     if (open) {
-      console.info('[ProfileMenuDrawer] Locking body scroll');
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -36,7 +35,6 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
   }, [open]);
 
   const handleSelect = (tabId: string) => {
-    console.info('[ProfileMenuDrawer] Selecting tab', { tabId });
     onSelect(tabId);
     setOpen(false);
   };
@@ -46,10 +44,9 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
       <button
         type="button"
         onClick={() => {
-          console.info('[ProfileMenuDrawer] Opening drawer');
           setOpen(true);
         }}
-        className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold uppercase tracking-wide text-gray-800 shadow-sm"
+        className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold uppercase tracking-wide text-[#122a26] shadow-[0_4px_14px_rgba(18,42,38,0.08)]"
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6H20M4 12H16M4 18H12" />
@@ -61,12 +58,11 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
         <div
           className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm"
           onClick={() => {
-            console.info('[ProfileMenuDrawer] Closing drawer from backdrop');
             setOpen(false);
           }}
         >
           <div
-            className="h-full min-h-screen w-1/2 min-w-[16rem] max-w-full bg-white flex flex-col shadow-2xl"
+            className="flex h-full min-h-screen w-1/2 min-w-[16rem] max-w-full flex-col bg-white shadow-2xl"
             role="dialog"
             aria-modal="true"
             onClick={(event) => event.stopPropagation()}
@@ -87,10 +83,9 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
               <button
                 type="button"
                 onClick={() => {
-                  console.info('[ProfileMenuDrawer] Closing drawer from button');
                   setOpen(false);
                 }}
-                className="h-10 w-10 rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
+                className="h-10 w-10 rounded-full border border-gray-200 text-[#414141]/70 hover:border-[#dcc090]/50 hover:text-[#122a26]"
                 aria-label="Close profile menu"
               >
                 <svg className="mx-auto h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -99,21 +94,25 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
+            <div className="flex-1 divide-y divide-gray-100 overflow-y-auto">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => handleSelect(tab.id)}
                   className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium ${
-                    activeTab === tab.id ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50'
+                    activeTab === tab.id
+                      ? 'bg-[#dcc090] text-[#122a26]'
+                      : 'text-[#414141] hover:bg-[#dcc090]/10'
                   }`}
                 >
                   <span className="flex items-center gap-3">
-                    <span className={activeTab === tab.id ? 'text-white' : 'text-gray-500'}>{tab.icon}</span>
+                    <span className={activeTab === tab.id ? 'text-[#122a26]' : 'text-[#414141]/55'}>
+                      {tab.icon}
+                    </span>
                     {tab.label}
                   </span>
                   <svg
-                    className={`w-4 h-4 ${activeTab === tab.id ? 'text-white' : 'text-gray-400'}`}
+                    className={`h-4 w-4 ${activeTab === tab.id ? 'text-[#122a26]' : 'text-[#414141]/45'}`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"

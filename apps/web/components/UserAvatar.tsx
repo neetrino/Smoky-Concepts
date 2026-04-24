@@ -38,7 +38,7 @@ export function UserAvatar({
     } else if (lastInitial) {
       return lastInitial;
     }
-    return '?';
+    return '';
   };
 
   // Size classes
