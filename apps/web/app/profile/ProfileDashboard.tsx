@@ -29,7 +29,10 @@ export function ProfileDashboard({
     'border border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)] transition-all duration-200 hover:-translate-y-1 hover:border-[#dcc090] hover:shadow-[0_14px_34px_rgba(18,42,38,0.12)]';
   const statLabelClassName = 'text-sm font-semibold uppercase tracking-[0.08em] text-[#414141]/70';
   const statValueClassName = 'mt-1 text-2xl font-black text-[#122a26]';
-  const statIconWrapClassName = 'flex h-12 w-12 items-center justify-center rounded-full bg-[#122a26] text-[#dcc090]';
+  const statIconWrapClassName =
+    'flex h-12 w-12 items-center justify-center rounded-full border border-[#dcc090]/40 bg-white text-[#122a26]';
+  const quickActionIconWrapClassName =
+    'flex h-10 w-10 items-center justify-center rounded-full border border-[#dcc090]/40 bg-white text-[#122a26]';
 
   if (dashboardLoading) {
     return (
@@ -205,7 +208,7 @@ export function ProfileDashboard({
             className="h-auto justify-start py-4"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#122a26] text-[#dcc090]">
+              <div className={quickActionIconWrapClassName}>
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
@@ -219,7 +222,7 @@ export function ProfileDashboard({
             className="h-auto justify-start py-4"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#122a26] text-[#dcc090]">
+              <div className={quickActionIconWrapClassName}>
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -234,7 +237,7 @@ export function ProfileDashboard({
               className="h-auto w-full justify-start py-4"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#122a26] text-[#dcc090]">
+                <div className={quickActionIconWrapClassName}>
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>

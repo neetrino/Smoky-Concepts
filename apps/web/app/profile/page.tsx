@@ -63,9 +63,13 @@ function ProfilePageContent() {
 
   if (authLoading || loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <p className="text-gray-600">{t('profile.common.loadingProfile')}</p>
+      <div className="min-h-screen bg-white pb-8 pt-[3.75rem]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-xl border border-gray-200 bg-white p-12 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+            <div className="text-center">
+              <p className="text-gray-600">{t('profile.common.loadingProfile')}</p>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -126,7 +130,7 @@ function ProfilePageContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#efefef] pb-8 pt-[3.75rem]">
+    <div className="min-h-screen bg-white pb-8 pt-[3.75rem]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8 lg:flex-row">
           <ProfileHeader
@@ -137,8 +141,8 @@ function ProfilePageContent() {
             t={t}
           />
 
-          {/* Main Content */}
-          <div className="min-w-0 flex-1">
+          {/* Main Content — white panel on gray page shell */}
+          <div className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:p-8 lg:min-h-[min(70vh,720px)]">
             {/* Alert messages */}
             {error && (
               <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
@@ -240,10 +244,12 @@ export default function ProfilePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#efefef] pb-8 pt-[3.75rem]">
-          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <p className="text-gray-600">Loading profile...</p>
+        <div className="min-h-screen bg-white pb-8 pt-[3.75rem]">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="rounded-xl border border-gray-200 bg-white p-12 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
+              <div className="text-center">
+                <p className="text-gray-600">Loading profile...</p>
+              </div>
             </div>
           </div>
         </div>

@@ -49,20 +49,20 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, t }: Prof
 
         {/* Sidebar Navigation */}
         <aside className="hidden lg:block">
-          <nav className="space-y-1 rounded-lg border border-[#dcc090]/25 bg-[#122a26] p-2">
+          <nav className="space-y-1 rounded-xl border border-gray-200 bg-white p-2 shadow-[0_8px_30px_rgba(18,42,38,0.06)]">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
+                className={`flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-all ${
                   activeTab === tab.id
                     ? 'bg-[#dcc090] text-[#122a26]'
-                    : 'text-[#dcc090]/75 hover:bg-white/5 hover:text-[#dcc090]'
+                    : 'text-[#414141] hover:bg-[#dcc090]/12 hover:text-[#122a26]'
                 }`}
               >
                 <span
                   className={`flex-shrink-0 ${
-                    activeTab === tab.id ? 'text-[#122a26]' : 'text-[#dcc090]/65'
+                    activeTab === tab.id ? 'text-[#122a26]' : 'text-[#414141]/55'
                   }`}
                 >
                   {tab.icon}
