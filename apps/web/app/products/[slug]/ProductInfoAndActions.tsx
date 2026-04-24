@@ -372,7 +372,7 @@ export function ProductInfoAndActions({
     if (activeTab === 'customize') {
       return (
         <div className="flex max-w-[763px] flex-col gap-2.5">
-          <p className="font-montserrat text-[18px] font-medium leading-[30px] text-[#414141]">
+          <p className="text-[15px] leading-[24px] text-[#414141] sm:text-[16px] sm:leading-[26px]">
             {getCustomizeCopy(language)}
           </p>
           <div className="flex max-w-[763px] flex-col gap-3 sm:flex-row sm:items-start sm:gap-12 sm:pb-4">
