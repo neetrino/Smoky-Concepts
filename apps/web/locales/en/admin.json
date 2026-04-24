@@ -115,6 +115,7 @@
     "filterable": "Filterable",
     "values": "{count} value",
     "valuesPlural": "{count} values",
+    "valuesCount": "values",
     "deleteAttribute": "Delete Attribute",
     "addNewValue": "Add new value (e.g., Red, Blue, Large, Small)",
     "add": "Add",
