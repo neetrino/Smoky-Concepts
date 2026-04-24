@@ -30,6 +30,88 @@ export function getPaymentStatusColor(paymentStatus: string): string {
   }
 }
 
+type AdminOrderSelectTone = {
+  summaryTone: string;
+  rowSelect: string;
+};
+
+const ORDER_STATUS_SELECT_UI: Record<string, AdminOrderSelectTone> = {
+  pending: {
+    summaryTone: 'bg-[#fff4cc] text-[#7a5a00] ring-[#f0d98a] focus:ring-[#e1c259]',
+    rowSelect:
+      'border-[#e1c259]/80 bg-[#fff4cc] text-[#7a5a00] hover:border-[#e1c259] hover:bg-[#ffecb3] focus:ring-[#e1c259]',
+  },
+  processing: {
+    summaryTone: 'bg-[#dbeafe] text-[#1e40af] ring-[#93c5fd] focus:ring-[#60a5fa]',
+    rowSelect:
+      'border-[#93c5fd] bg-[#dbeafe] text-[#1e40af] hover:border-[#60a5fa] hover:bg-[#bfdbfe] focus:ring-[#60a5fa]',
+  },
+  completed: {
+    summaryTone: 'bg-[#dcfce7] text-[#166534] ring-[#9ee4b6] focus:ring-[#64cb8e]',
+    rowSelect:
+      'border-[#86efac] bg-[#dcfce7] text-[#166534] hover:border-[#4ade80] hover:bg-[#bbf7d0] focus:ring-[#64cb8e]',
+  },
+  cancelled: {
+    summaryTone: 'bg-[#fee2e2] text-[#991b1b] ring-[#fca5a5] focus:ring-[#f87171]',
+    rowSelect:
+      'border-[#fca5a5] bg-[#fee2e2] text-[#991b1b] hover:border-[#f87171] hover:bg-[#fecaca] focus:ring-[#f87171]',
+  },
+};
+
+const PAYMENT_STATUS_SELECT_UI: Record<string, AdminOrderSelectTone> = {
+  pending: {
+    summaryTone: 'bg-[#fff4cc] text-[#7a5a00] ring-[#f0d98a] focus:ring-[#e1c259]',
+    rowSelect:
+      'border-[#e1c259]/80 bg-[#fff4cc] text-[#7a5a00] hover:border-[#e1c259] hover:bg-[#ffecb3] focus:ring-[#e1c259]',
+  },
+  paid: {
+    summaryTone: 'bg-[#dcfce7] text-[#166534] ring-[#9ee4b6] focus:ring-[#64cb8e]',
+    rowSelect:
+      'border-[#86efac] bg-[#dcfce7] text-[#166534] hover:border-[#4ade80] hover:bg-[#bbf7d0] focus:ring-[#64cb8e]',
+  },
+  failed: {
+    summaryTone: 'bg-[#fee2e2] text-[#991b1b] ring-[#fca5a5] focus:ring-[#f87171]',
+    rowSelect:
+      'border-[#fca5a5] bg-[#fee2e2] text-[#991b1b] hover:border-[#f87171] hover:bg-[#fecaca] focus:ring-[#f87171]',
+  },
+};
+
+function resolveOrderStatusSelectUi(status: string): AdminOrderSelectTone {
+  const key = status.toLowerCase();
+  return ORDER_STATUS_SELECT_UI[key] ?? ORDER_STATUS_SELECT_UI.pending;
+}
+
+function resolvePaymentStatusSelectUi(paymentStatus: string): AdminOrderSelectTone {
+  const key = paymentStatus.toLowerCase();
+  return PAYMENT_STATUS_SELECT_UI[key] ?? PAYMENT_STATUS_SELECT_UI.pending;
+}
+
+const ADMIN_ORDER_ROW_SELECT_BASE =
+  'w-full cursor-pointer rounded-lg border px-2 py-1.5 text-xs font-bold shadow-sm outline-none transition-colors duration-200 focus:ring-2 focus:outline-none';
+
+const ADMIN_ORDER_SUMMARY_SELECT_BASE =
+  'mt-1 w-full rounded-lg px-3 py-2 text-sm font-semibold ring-1 ring-inset focus:outline-none focus:ring-2';
+
+/** Admin orders table: full class names for the order status select. */
+export function getAdminOrderStatusRowSelectClassNames(status: string): string {
+  return `${ADMIN_ORDER_ROW_SELECT_BASE} ${resolveOrderStatusSelectUi(status).rowSelect}`;
+}
+
+/** Admin orders table: full class names for the payment status select. */
+export function getAdminOrderPaymentRowSelectClassNames(paymentStatus: string): string {
+  return `${ADMIN_ORDER_ROW_SELECT_BASE} ${resolvePaymentStatusSelectUi(paymentStatus).rowSelect}`;
+}
+
+/** Order details summary card: full class names for the order status select. */
+export function getAdminOrderStatusSummarySelectClassNames(status: string): string {
+  return `${ADMIN_ORDER_SUMMARY_SELECT_BASE} ${resolveOrderStatusSelectUi(status).summaryTone}`;
+}
+
+/** Order details summary card: full class names for the payment status select. */
+export function getAdminOrderPaymentSummarySelectClassNames(paymentStatus: string): string {
+  return `${ADMIN_ORDER_SUMMARY_SELECT_BASE} ${resolvePaymentStatusSelectUi(paymentStatus).summaryTone}`;
+}
+
 /**
  * Helper function to get color hex/rgb from color name
  */

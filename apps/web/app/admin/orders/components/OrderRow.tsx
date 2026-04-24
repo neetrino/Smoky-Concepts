@@ -2,7 +2,11 @@
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { ADMIN_PRICE_CURRENCY, amountToUsd, formatStoredMoney } from '../../../../lib/currency';
-import { getColorValue } from '../utils/orderUtils';
+import {
+  getAdminOrderPaymentRowSelectClassNames,
+  getAdminOrderStatusRowSelectClassNames,
+  getColorValue,
+} from '../utils/orderUtils';
 import type { Order } from '../useOrders';
 
 interface OrderRowProps {
@@ -145,7 +149,7 @@ export function OrderRow({
             <select
               value={order.status}
               onChange={(e) => onStatusChange(e.target.value)}
-              className="w-full cursor-pointer rounded-lg border border-[#dcc090]/40 bg-[#dcc090]/28 px-2 py-1.5 text-xs font-bold text-[#122a26] shadow-sm outline-none transition-all hover:border-[#dcc090] hover:bg-[#dcc090]/40 focus:ring-2 focus:ring-[#dcc090]"
+              className={getAdminOrderStatusRowSelectClassNames(order.status)}
             >
               <option value="pending">{t('admin.orders.pending')}</option>
               <option value="processing">{t('admin.orders.processing')}</option>
@@ -166,7 +170,7 @@ export function OrderRow({
             <select
               value={order.paymentStatus}
               onChange={(e) => onPaymentStatusChange(e.target.value)}
-              className="w-full cursor-pointer rounded-lg border border-[#dcc090]/40 bg-[#dcc090]/28 px-2 py-1.5 text-xs font-bold text-[#122a26] shadow-sm outline-none transition-all hover:border-[#dcc090] hover:bg-[#dcc090]/40 focus:ring-2 focus:ring-[#dcc090]"
+              className={getAdminOrderPaymentRowSelectClassNames(order.paymentStatus)}
             >
               <option value="paid">{t('admin.orders.paid')}</option>
               <option value="pending">{t('admin.orders.pendingPayment')}</option>

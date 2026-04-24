@@ -4,6 +4,10 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
 import { ADMIN_PRICE_CURRENCY, amountToUsd, formatStoredMoney } from '../../../../lib/currency';
 import type { OrderDetails } from '../useOrders';
+import {
+  getAdminOrderPaymentSummarySelectClassNames,
+  getAdminOrderStatusSummarySelectClassNames,
+} from '../utils/orderUtils';
 
 interface OrderDetailsSummaryProps {
   orderDetails: OrderDetails;
@@ -45,22 +49,6 @@ export function OrderDetailsSummary({
       : rawPaymentMethod === 'idram'
         ? '/assets/payments/idram.svg'
         : null;
-
-  const statusSelectClassName =
-    orderDetails.status === 'completed'
-      ? 'bg-[#dcfce7] text-[#166534] ring-[#9ee4b6] focus:ring-[#64cb8e]'
-      : orderDetails.status === 'processing'
-        ? 'bg-[#dbeafe] text-[#1e40af] ring-[#93c5fd] focus:ring-[#60a5fa]'
-        : orderDetails.status === 'cancelled'
-          ? 'bg-[#fee2e2] text-[#991b1b] ring-[#fca5a5] focus:ring-[#f87171]'
-          : 'bg-[#fff4cc] text-[#7a5a00] ring-[#f0d98a] focus:ring-[#e1c259]';
-
-  const paymentSelectClassName =
-    orderDetails.paymentStatus === 'paid'
-      ? 'bg-[#dcfce7] text-[#166534] ring-[#9ee4b6] focus:ring-[#64cb8e]'
-      : orderDetails.paymentStatus === 'failed'
-        ? 'bg-[#fee2e2] text-[#991b1b] ring-[#fca5a5] focus:ring-[#f87171]'
-        : 'bg-[#fff4cc] text-[#7a5a00] ring-[#f0d98a] focus:ring-[#e1c259]';
 
   /** Keeps summary column label rows the same height so values line up across the row. */
   const summaryControlHeaderClass =
@@ -116,7 +104,7 @@ export function OrderDetailsSummary({
             <select
               value={orderDetails.status}
               onChange={(e) => onStatusChange(e.target.value)}
-              className={`mt-1 w-full rounded-lg px-3 py-2 text-sm font-semibold ring-1 ring-inset focus:outline-none focus:ring-2 ${statusSelectClassName}`}
+              className={getAdminOrderStatusSummarySelectClassNames(orderDetails.status)}
             >
               <option value="pending">{t('admin.orders.pending')}</option>
               <option value="processing">{t('admin.orders.processing')}</option>
@@ -147,7 +135,7 @@ export function OrderDetailsSummary({
             <select
               value={orderDetails.paymentStatus}
               onChange={(e) => onPaymentStatusChange(e.target.value)}
-              className={`mt-1 w-full rounded-lg px-3 py-2 text-sm font-semibold ring-1 ring-inset focus:outline-none focus:ring-2 ${paymentSelectClassName}`}
+              className={getAdminOrderPaymentSummarySelectClassNames(orderDetails.paymentStatus)}
             >
               <option value="paid">{t('admin.orders.paid')}</option>
               <option value="pending">{t('admin.orders.pendingPayment')}</option>
