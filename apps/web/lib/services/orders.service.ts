@@ -51,7 +51,6 @@ function normalizeSizeCatalogTitleLookup(value: string | null | undefined): stri
   if (typeof value !== 'string') return '';
   return value
     .trim()
-    .replace(/\s*\(v\d+\)\s*$/i, '')
     .replace(/\s+/g, ' ')
     .toLocaleLowerCase();
 }
@@ -63,6 +62,7 @@ function getVariantOptions(attributes: unknown): VariantOptionFromAttributes[] {
 function resolveCollectionSurchargeUsd(
   item: {
     quantity: number | null;
+    price?: number | null;
     total?: number | null;
     sizeCatalogTitle?: string | null;
     variant?: { price?: number | null } | null;
@@ -72,6 +72,15 @@ function resolveCollectionSurchargeUsd(
   const quantity = Math.max(0, Number(item.quantity ?? 0));
   if (quantity === 0) return 0;
 
+  const itemUnitPrice = Number(item.price ?? Number.NaN);
+  const variantBasePrice = Number(item.variant?.price ?? Number.NaN);
+  if (Number.isFinite(itemUnitPrice) && Number.isFinite(variantBasePrice)) {
+    const perUnitSurcharge = Math.max(0, itemUnitPrice - variantBasePrice);
+    if (perUnitSurcharge > 0) {
+      return perUnitSurcharge * quantity;
+    }
+  }
+
   const normalizedTitle = normalizeSizeCatalogTitleLookup(item.sizeCatalogTitle);
   const mappedSurchargeAmd = normalizedTitle !== '' ? (sizeCatalogPriceByTitle.get(normalizedTitle) ?? 0) : 0;
   if (mappedSurchargeAmd > 0) {
@@ -79,7 +88,6 @@ function resolveCollectionSurchargeUsd(
   }
 
   const itemTotal = Number(item.total ?? Number.NaN);
-  const variantBasePrice = Number(item.variant?.price ?? Number.NaN);
   if (!Number.isFinite(itemTotal) || !Number.isFinite(variantBasePrice)) {
     return 0;
   }
