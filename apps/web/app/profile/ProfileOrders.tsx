@@ -5,6 +5,8 @@ import { amountToUsd, convertPrice, formatPriceInCurrency } from '../../lib/curr
 import { getStatusColor, getPaymentStatusColor } from './utils';
 import type { OrderListItem } from './types';
 
+const LEGACY_COLLECTION_AMD_PER_USD = 400;
+
 interface ProfileOrdersProps {
   orders: OrderListItem[];
   ordersLoading: boolean;
@@ -30,8 +32,6 @@ export function ProfileOrders({
   t,
 }: ProfileOrdersProps) {
   const displayCurrency = useCurrency();
-  const formatOrderMoneyUsd = (amountUsd: number) =>
-    formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
 
   if (ordersLoading) {
     return (
@@ -98,6 +98,11 @@ export function ProfileOrders({
                 <p className="text-lg font-bold text-gray-900">
                   {(() => {
                     const collectionUsd = amountToUsd(order.collectionPriceAmount || 0, 'USD');
+                    const collectionDisplay =
+                      displayCurrency === 'AMD'
+                        ? collectionUsd * LEGACY_COLLECTION_AMD_PER_USD
+                        : convertPrice(collectionUsd, 'USD', displayCurrency);
+
                     if (
                       order.subtotal !== undefined &&
                       order.discountAmount !== undefined &&
@@ -108,10 +113,19 @@ export function ProfileOrders({
                       const discountUsd = amountToUsd(order.discountAmount, order.currency);
                       const shippingUsd = amountToUsd(order.shippingAmount, order.currency);
                       const taxUsd = amountToUsd(order.taxAmount, order.currency);
-                      return formatOrderMoneyUsd(subtotalUsd - discountUsd + shippingUsd + taxUsd + collectionUsd);
+                      const totalWithoutCollectionUsd =
+                        subtotalUsd - discountUsd + shippingUsd + taxUsd - collectionUsd;
+                      const totalDisplay =
+                        convertPrice(totalWithoutCollectionUsd, 'USD', displayCurrency) +
+                        collectionDisplay;
+                      return formatPriceInCurrency(totalDisplay, displayCurrency);
                     }
-                    const totalUsd = amountToUsd(order.total, order.currency);
-                    return formatOrderMoneyUsd(totalUsd + collectionUsd);
+                    const totalWithoutCollectionUsd =
+                      amountToUsd(order.total, order.currency) - collectionUsd;
+                    const totalDisplay =
+                      convertPrice(totalWithoutCollectionUsd, 'USD', displayCurrency) +
+                      collectionDisplay;
+                    return formatPriceInCurrency(totalDisplay, displayCurrency);
                   })()}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">{t('profile.dashboard.viewDetails')}</p>

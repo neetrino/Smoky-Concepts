@@ -1,13 +1,21 @@
 'use client';
 
 import { useTranslation } from '../../../../lib/i18n-client';
-import { ADMIN_PRICE_CURRENCY, amountToUsd, formatStoredMoney } from '../../../../lib/currency';
+import {
+  ADMIN_PRICE_CURRENCY,
+  amountToUsd,
+  convertPrice,
+  formatPriceInCurrency,
+  formatStoredMoney,
+} from '../../../../lib/currency';
 import {
   getAdminOrderPaymentRowSelectClassNames,
   getAdminOrderStatusRowSelectClassNames,
   getColorValue,
 } from '../utils/orderUtils';
 import type { Order } from '../useOrders';
+
+const LEGACY_COLLECTION_AMD_PER_USD = 400;
 
 interface OrderRowProps {
   order: Order;
@@ -37,6 +45,8 @@ export function OrderRow({
 
   const calculateOrderTotal = () => {
     const collectionUsd = amountToUsd(order.collectionPriceAmount || 0, 'USD');
+    const collectionDisplay = collectionUsd * LEGACY_COLLECTION_AMD_PER_USD;
+
     if (
       order.subtotal !== undefined &&
       order.discountAmount !== undefined &&
@@ -47,11 +57,20 @@ export function OrderRow({
       const discountUsd = amountToUsd(order.discountAmount, order.currency);
       const shippingUsd = amountToUsd(order.shippingAmount, order.currency);
       const taxUsd = amountToUsd(order.taxAmount, order.currency);
-      const totalUsd = subtotalUsd - discountUsd + shippingUsd + taxUsd + collectionUsd;
-      return formatStoredMoney(totalUsd, 'USD', ADMIN_PRICE_CURRENCY);
+      const totalWithoutCollectionUsd =
+        subtotalUsd - discountUsd + shippingUsd + taxUsd - collectionUsd;
+      const totalDisplay =
+        convertPrice(totalWithoutCollectionUsd, 'USD', ADMIN_PRICE_CURRENCY) +
+        collectionDisplay;
+      return formatPriceInCurrency(totalDisplay, ADMIN_PRICE_CURRENCY);
     }
 
-    return formatStoredMoney(amountToUsd(order.total, order.currency) + collectionUsd, 'USD', ADMIN_PRICE_CURRENCY);
+    const totalWithoutCollectionUsd =
+      amountToUsd(order.total, order.currency) - collectionUsd;
+    const totalDisplay =
+      convertPrice(totalWithoutCollectionUsd, 'USD', ADMIN_PRICE_CURRENCY) +
+      collectionDisplay;
+    return formatPriceInCurrency(totalDisplay, ADMIN_PRICE_CURRENCY);
   };
 
   const previews = order.colorSizePreviews || [];
