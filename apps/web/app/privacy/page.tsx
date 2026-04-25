@@ -19,7 +19,7 @@ export default function PrivacyPage() {
           <h1 className="text-4xl font-bold text-gray-900">{t('privacy.title')}</h1>
 
           <div className="mt-8">
-            <Card variant="glass" className="p-6">
+            <Card variant="default" className="p-6">
               <div className="space-y-8">
                 {Array.isArray(intro) &&
                   intro.map((paragraph) => (
@@ -170,7 +170,7 @@ export default function PrivacyPage() {
       <div className="policy-page-inner">
         <h1 className="text-4xl font-bold text-gray-900">{t('privacy.title')}</h1>
         <div className="mt-8">
-          <Card variant="glass" className="p-6">
+          <Card variant="default" className="p-6">
             <div className="space-y-8">
               <section className="space-y-3">
                 <p className="text-gray-600">{t('privacy.intro.p1')}</p>

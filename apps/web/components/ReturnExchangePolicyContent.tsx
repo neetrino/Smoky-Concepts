@@ -25,7 +25,7 @@ export function ReturnExchangePolicyContent({ namespace }: ReturnExchangePolicyC
         <h1 className="text-4xl font-bold text-gray-900">{tp('title')}</h1>
 
         <div className="mt-8 space-y-6">
-          <Card variant="glass" className="p-6 space-y-6">
+          <Card variant="default" className="p-6 space-y-6">
             {Array.isArray(structuredIntro) &&
               structuredIntro.map((paragraph) => (
                 <p key={paragraph} className="text-gray-600">
@@ -89,7 +89,7 @@ export function ReturnExchangePolicyContent({ namespace }: ReturnExchangePolicyC
       <h1 className="text-4xl font-bold text-gray-900">{tp('title')}</h1>
 
       <div className="mt-8 space-y-6">
-        <Card variant="glass" className="p-6 space-y-6">
+        <Card variant="default" className="p-6 space-y-6">
           <p className="text-gray-600">{tp('intro')}</p>
 
           <section>
