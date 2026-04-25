@@ -37,7 +37,7 @@ export function OrdersFilters({
   const { t } = useTranslation();
 
   const pushFilters = (params: URLSearchParams) => {
-    const newUrl = params.toString() ? `/admin/orders?${params.toString()}` : '/admin/orders';
+    const newUrl = params.toString() ? `/supersudo/orders?${params.toString()}` : '/supersudo/orders';
     router.push(newUrl, { scroll: false });
   };
 

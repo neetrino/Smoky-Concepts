@@ -17,7 +17,7 @@ export function AdminShell({ children }: AdminShellProps) {
 
   return (
     <div className="flex flex-col gap-8 lg:flex-row">
-      <AdminSidebar currentPath={pathname || '/admin'} router={router} t={t} />
+      <AdminSidebar currentPath={pathname || '/supersudo'} router={router} t={t} />
       <div className="min-w-0 flex-1">{children}</div>
     </div>
   );

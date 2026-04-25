@@ -43,7 +43,7 @@ export function QuickInfoCard() {
       <div className="mt-4 pt-4 border-t border-[#dcc090]/25">
         <button
           type="button"
-          onClick={() => router.push('/admin/settings')}
+          onClick={() => router.push('/supersudo/settings')}
           className="w-full rounded-lg border border-[#dcc090]/30 py-2 text-sm font-bold text-[#414141]/70 transition-all hover:border-[#dcc090]/50 hover:bg-[#dcc090]/10"
         >
           {t('admin.quickSettings.moreSettings')}

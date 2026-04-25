@@ -38,7 +38,7 @@ export default function DeliveryPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }
@@ -124,15 +124,15 @@ export default function DeliveryPage() {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:hidden mb-6">
-            <AdminMenuDrawer tabs={adminTabs} currentPath="/admin/delivery" />
+            <AdminMenuDrawer tabs={adminTabs} currentPath="/supersudo/delivery" />
           </div>
           {/* Sidebar Navigation */}
           <aside className={ADMIN_FIXED_SIDEBAR_CLASS}>
             <nav className="h-full space-y-1 overflow-y-auto border-r border-[#dcc090]/25 bg-[#122a26] p-3">
               {adminTabs.map((tab) => {
                 const isActive = pathname === tab.path || 
-                  (tab.path === '/admin' && pathname === '/admin') ||
-                  (tab.path !== '/admin' && pathname?.startsWith(tab.path));
+                  (tab.path === '/supersudo' && pathname === '/supersudo') ||
+                  (tab.path !== '/supersudo' && pathname?.startsWith(tab.path));
                 return (
                   <button
                     key={tab.id}
@@ -249,7 +249,7 @@ export default function DeliveryPage() {
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => router.push('/admin')}
+                onClick={() => router.push('/supersudo')}
                 disabled={saving}
               >
                 {t('admin.delivery.cancel')}

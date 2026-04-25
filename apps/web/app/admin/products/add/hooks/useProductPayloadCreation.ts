@@ -95,7 +95,7 @@ export async function createAndSubmitPayload({
         alert(`${baseMessage}${extra}`);
       }
       
-      router.push('/admin/products');
+      router.push('/supersudo/products');
     } catch (err: unknown) {
       console.error('❌ [ADMIN] Error saving product:', err);
       

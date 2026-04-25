@@ -48,7 +48,7 @@ export default function AdminPanel() {
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  const [currentPath, setCurrentPath] = useState(pathname || '/admin');
+  const [currentPath, setCurrentPath] = useState(pathname || '/supersudo');
 
   useEffect(() => {
     if (pathname) {

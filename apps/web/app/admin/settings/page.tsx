@@ -45,7 +45,7 @@ export default function SettingsPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }
@@ -228,7 +228,7 @@ export default function SettingsPage() {
             </Button>
             <Button
               variant="ghost"
-              onClick={() => router.push('/admin')}
+              onClick={() => router.push('/supersudo')}
               disabled={saving}
             >
               {t('admin.settings.cancel')}

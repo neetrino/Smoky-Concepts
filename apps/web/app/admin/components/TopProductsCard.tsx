@@ -33,7 +33,7 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
           variant="ghost"
           size="sm"
           className="text-[#122a26] hover:bg-[#dcc090]/15 hover:text-[#122a26]"
-          onClick={() => router.push('/admin/products')}
+          onClick={() => router.push('/supersudo/products')}
         >
           {t('admin.dashboard.viewAll')}
         </Button>
@@ -56,7 +56,7 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
             <div
               key={product.variantId}
               className="flex cursor-pointer items-center gap-4 rounded-lg border border-[#dcc090]/25 bg-white/70 p-3 transition-colors hover:border-[#dcc090] hover:bg-[#dcc090]/10"
-              onClick={() => router.push(`/admin/products/${product.productId}`)}
+              onClick={() => router.push(`/supersudo/products/${product.productId}`)}
             >
               <div className="flex-shrink-0">
                 <div className="flex h-10 w-10 items-center justify-center rounded bg-[#122a26] text-xs font-black text-[#dcc090]">

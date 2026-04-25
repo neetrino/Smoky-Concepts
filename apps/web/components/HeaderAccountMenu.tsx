@@ -104,7 +104,7 @@ export function HeaderDesktopAccount() {
             Profile
           </Link>
           {isAdmin ? (
-            <Link href="/admin" role="menuitem" className={menuClass} onClick={() => setOpen(false)}>
+            <Link href="/supersudo" role="menuitem" className={menuClass} onClick={() => setOpen(false)}>
               Admin
             </Link>
           ) : null}
@@ -158,7 +158,7 @@ export function HeaderMobileAccountLinks({ onNavigate }: MobileProps) {
       </Link>
       {isAdmin ? (
         <Link
-          href="/admin"
+          href="/supersudo"
           onClick={close}
           className="border-b border-white/10 py-3.5 text-xs font-extrabold uppercase tracking-[0.16em] text-[#dcc090]/80 transition-opacity hover:text-[#dcc090]"
         >

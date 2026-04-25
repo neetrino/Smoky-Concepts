@@ -31,15 +31,15 @@ export function AdminSidebar({ t }: AdminSidebarProps) {
   return (
     <>
       <div className="lg:hidden mb-6">
-        <AdminMenuDrawer tabs={adminTabs} currentPath={pathname || '/admin/analytics'} />
+        <AdminMenuDrawer tabs={adminTabs} currentPath={pathname || '/supersudo/analytics'} />
       </div>
       <aside className={ADMIN_FIXED_SIDEBAR_CLASS}>
         <nav className={adminNavContainerClass(theme)}>
           {adminTabs.map((tab) => {
             const isActive =
               pathname === tab.path ||
-              (tab.path === '/admin' && pathname === '/admin') ||
-              (tab.path !== '/admin' && pathname?.startsWith(tab.path));
+              (tab.path === '/supersudo' && pathname === '/supersudo') ||
+              (tab.path !== '/supersudo' && pathname?.startsWith(tab.path));
             return (
               <button
                 key={tab.id}

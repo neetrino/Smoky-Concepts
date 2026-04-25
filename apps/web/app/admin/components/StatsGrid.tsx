@@ -31,7 +31,7 @@ export function StatsGrid({ stats, statsLoading }: StatsGridProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <Card
         className={cardClassName}
-        onClick={() => router.push('/admin/users')}
+        onClick={() => router.push('/supersudo/users')}
       >
         <div className="flex items-center justify-between">
           <div>
@@ -54,7 +54,7 @@ export function StatsGrid({ stats, statsLoading }: StatsGridProps) {
 
       <Card
         className={cardClassName}
-        onClick={() => router.push('/admin/products')}
+        onClick={() => router.push('/supersudo/products')}
       >
         <div className="flex items-center justify-between">
           <div>
@@ -77,7 +77,7 @@ export function StatsGrid({ stats, statsLoading }: StatsGridProps) {
 
       <Card
         className={cardClassName}
-        onClick={() => router.push('/admin/orders')}
+        onClick={() => router.push('/supersudo/orders')}
       >
         <div className="flex items-center justify-between">
           <div>
@@ -100,7 +100,7 @@ export function StatsGrid({ stats, statsLoading }: StatsGridProps) {
 
       <Card
         className={cardClassName}
-        onClick={() => router.push('/admin/orders?filter=paid')}
+        onClick={() => router.push('/supersudo/orders?filter=paid')}
       >
         <div className="flex items-center justify-between">
           <div>

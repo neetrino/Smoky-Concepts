@@ -25,6 +25,18 @@ loadRootEnv();
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@shop/ui', '@shop/design-tokens'],
+  async rewrites() {
+    return [
+      {
+        source: '/supersudo',
+        destination: '/admin',
+      },
+      {
+        source: '/supersudo/:path*',
+        destination: '/admin/:path*',
+      },
+    ];
+  },
   // Standalone output - prevents prerendering of 404 page
   output: 'standalone',
   // typescript.ignoreBuildErrors removed - build will fail on TypeScript errors

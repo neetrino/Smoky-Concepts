@@ -365,7 +365,7 @@ export function ProductsTable({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => router.push(`/admin/products/add?id=${product.id}`)}
+                          onClick={() => router.push(`/supersudo/products/add?id=${product.id}`)}
                           className="text-[#122a26] hover:text-[#122a26] hover:bg-[#dcc090]/15 px-2"
                           title={t('admin.products.edit')}
                           aria-label={t('admin.products.edit')}
