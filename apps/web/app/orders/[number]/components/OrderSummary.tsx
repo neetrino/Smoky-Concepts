@@ -8,6 +8,8 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { adminInputAmdToUsd, amountToUsd, convertPrice, formatPriceInCurrency } from '../../../../lib/currency';
 import type { Order } from '../types';
 
+const LEGACY_COLLECTION_AMD_PER_USD = 400;
+
 interface OrderSummaryProps {
   order: Order;
   calculatedShipping: number | null;
@@ -21,8 +23,8 @@ export function OrderSummary({
 }: OrderSummaryProps) {
   const { t } = useTranslation();
   const displayCurrency = useCurrency();
-  const formatOrderMoneyUsd = (amountUsd: number) =>
-    formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
+  const formatOrderMoneyDisplay = (amount: number) =>
+    formatPriceInCurrency(amount, displayCurrency);
 
   const storedCurrency = order.totals.currency;
 
@@ -45,15 +47,28 @@ export function OrderSummary({
 
   const taxUsd = amountToUsd(order.totals.tax, storedCurrency);
 
-  const totalUsd =
-    subtotalWithoutCollectionUsd - discountUsd + shippingUsd + taxUsd + collectionPriceUsd;
+  const subtotalDisplayAmount = convertPrice(subtotalWithoutCollectionUsd, 'USD', displayCurrency);
+  const discountDisplayAmount = convertPrice(discountUsd, 'USD', displayCurrency);
+  const shippingDisplayAmount = convertPrice(shippingUsd, 'USD', displayCurrency);
+  const taxDisplayAmount = convertPrice(taxUsd, 'USD', displayCurrency);
+  const collectionPriceDisplayAmount =
+    displayCurrency === 'AMD'
+      ? collectionPriceUsd * LEGACY_COLLECTION_AMD_PER_USD
+      : convertPrice(collectionPriceUsd, 'USD', displayCurrency);
+
+  const totalDisplayAmount =
+    subtotalDisplayAmount -
+    discountDisplayAmount +
+    shippingDisplayAmount +
+    taxDisplayAmount +
+    collectionPriceDisplayAmount;
 
   const shippingDisplay =
     order.shippingMethod === 'pickup'
       ? t('checkout.shipping.freePickup')
       : loadingShipping
         ? t('checkout.shipping.loading')
-        : formatOrderMoneyUsd(shippingUsd) +
+        : formatOrderMoneyDisplay(shippingDisplayAmount) +
           (order.shippingAddress?.city || order.shippingAddress?.state
             ? ` (${order.shippingAddress.city || order.shippingAddress.state})`
             : '');
@@ -66,12 +81,12 @@ export function OrderSummary({
           <>
             <div className="flex justify-between text-gray-600">
               <span>{t('orders.orderSummary.subtotal')}</span>
-              <span>{formatOrderMoneyUsd(subtotalWithoutCollectionUsd)}</span>
+              <span>{formatOrderMoneyDisplay(subtotalDisplayAmount)}</span>
             </div>
             {order.totals.discount > 0 && (
               <div className="flex justify-between text-gray-600">
                 <span>{t('orders.orderSummary.discount')}</span>
-                <span>-{formatOrderMoneyUsd(discountUsd)}</span>
+                <span>-{formatOrderMoneyDisplay(discountDisplayAmount)}</span>
               </div>
             )}
             <div className="flex justify-between text-gray-600">
@@ -81,13 +96,13 @@ export function OrderSummary({
             {collectionPriceUsd > 0 && (
               <div className="flex justify-between text-gray-600">
                 <span>{t('orders.orderSummary.collectionPrice')}</span>
-                <span>{formatOrderMoneyUsd(collectionPriceUsd)}</span>
+                <span>{formatOrderMoneyDisplay(collectionPriceDisplayAmount)}</span>
               </div>
             )}
             <div className="border-t border-gray-200 pt-4">
               <div className="flex justify-between text-lg font-bold text-gray-900">
                 <span>{t('orders.orderSummary.total')}</span>
-                <span>{formatOrderMoneyUsd(totalUsd)}</span>
+                <span>{formatOrderMoneyDisplay(totalDisplayAmount)}</span>
               </div>
             </div>
           </>

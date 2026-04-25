@@ -19,7 +19,7 @@ export function StatsCards({ analytics, totalUsers }: StatsCardsProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
       <Card
         className="group relative cursor-pointer border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)] transition-all duration-200 hover:scale-105 hover:border-[#dcc090] hover:shadow-[0_14px_34px_rgba(18,42,38,0.12)]"
-        onClick={() => router.push('/admin/orders')}
+        onClick={() => router.push('/supersudo/orders')}
         title={t('admin.analytics.clickToViewAllOrders')}
       >
         <div className="flex items-center justify-between mb-3">
@@ -40,7 +40,7 @@ export function StatsCards({ analytics, totalUsers }: StatsCardsProps) {
 
       <Card
         className="group relative cursor-pointer border-[#dcc090]/30 bg-white/90 p-6 shadow-[0_8px_30px_rgba(18,42,38,0.06)] transition-all duration-200 hover:scale-105 hover:border-[#dcc090] hover:shadow-[0_14px_34px_rgba(18,42,38,0.12)]"
-        onClick={() => router.push('/admin/orders?paymentStatus=paid')}
+        onClick={() => router.push('/supersudo/orders?paymentStatus=paid')}
         title={t('admin.analytics.clickToViewPaidOrders')}
       >
         <div className="flex items-center justify-between mb-3">

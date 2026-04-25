@@ -26,6 +26,8 @@
   "customize_variant_double_fusion": "Double Fusion",
   "color": "Գույն",
   "size": "Չափ",
+  "collection_label": "Կոլեկցիա",
+  "collection_fee_label": "Կոլեկցիայի գումար",
   "quantity": "Քանակ",
   "addToCart": "Ավելացնել զամբյուղ",
   "buy_now": "Գնել",

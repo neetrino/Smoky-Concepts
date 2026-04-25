@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { formatCatalogPrice } from '../../../lib/currency';
+import { formatCatalogPrice, formatPriceInCurrency } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { useCurrency } from '../../../components/hooks/useCurrency';
@@ -266,6 +266,8 @@ export function ProductInfoAndActions({
     selectedCatalogSize?.title ||
     activeSizeOption?.label ||
     t(language, 'product.choose_size');
+  const selectedCollectionTitle = selectedCatalogSize?.categoryTitle?.trim() ?? '';
+  const selectedCollectionPriceAmd = selectedCatalogSize?.categoryPriceAmd ?? 0;
 
   const handleSelectCatalogSizeItem = (item: SizeCatalogItemDto) => {
     setSelectedCatalogSize(item);
@@ -538,6 +540,14 @@ export function ProductInfoAndActions({
           >
             <span className="truncate">{sizeButtonLabel}</span>
           </button>
+          {selectedCollectionTitle ? (
+            <div className="mt-2.5">
+              <p className="font-montserrat text-[13px] font-medium leading-tight text-[#414141]">
+                {t(language, 'product.collection_label')}: {selectedCollectionTitle} {' '}
+                {formatPriceInCurrency(Math.max(0, selectedCollectionPriceAmd), 'AMD')}
+              </p>
+            </div>
+          ) : null}
         </div>
       )}
 

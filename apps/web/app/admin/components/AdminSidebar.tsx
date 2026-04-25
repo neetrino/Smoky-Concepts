@@ -89,8 +89,8 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
             const isActive =
               currentPath === tab.path ||
               (tab.path === '/' && currentPath === '/') ||
-              (tab.path === '/admin' && currentPath === '/admin') ||
-              (tab.path !== '/' && tab.path !== '/admin' && currentPath.startsWith(tab.path));
+              (tab.path === '/supersudo' && currentPath === '/supersudo') ||
+              (tab.path !== '/' && tab.path !== '/supersudo' && currentPath.startsWith(tab.path));
 
             const isParent = parentIds.has(tab.id);
             const isExpanded = expandedGroups.has(tab.id);

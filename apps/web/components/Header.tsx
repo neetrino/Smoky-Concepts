@@ -75,7 +75,7 @@ function MobileMenuButton({
  */
 export function Header() {
   const pathname = usePathname();
-  const isAdminPath = pathname?.startsWith('/admin') ?? false;
+  const isAdminPath = pathname?.startsWith('/supersudo') ?? false;
 
   const [cartCount, setCartCount] = useState(0);
   const [cartReady, setCartReady] = useState(false);

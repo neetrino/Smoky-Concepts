@@ -192,7 +192,7 @@ export function useOrders() {
 
 
   const handleViewOrderDetails = (orderId: string) => {
-    router.push(`/admin/orders/${orderId}`);
+    router.push(`/supersudo/orders/${orderId}`);
   };
 
 

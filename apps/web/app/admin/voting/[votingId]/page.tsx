@@ -21,7 +21,7 @@ export default function VotingDetailPage() {
 
   useEffect(() => {
     if (!isLoading && (!isLoggedIn || !isAdmin)) {
-      router.push('/admin');
+      router.push('/supersudo');
     }
   }, [isAdmin, isLoading, isLoggedIn, router]);
 
@@ -55,7 +55,7 @@ export default function VotingDetailPage() {
       <div className="min-h-screen bg-[#efefef] pt-[3.75rem] pb-8">
         <div className="mx-auto max-w-lg px-4 text-center">
           <p className="text-gray-700">{t('admin.voting.votingNotFound')}</p>
-          <Button variant="primary" className="mt-4" onClick={() => router.push('/admin/voting')}>
+          <Button variant="primary" className="mt-4" onClick={() => router.push('/supersudo/voting')}>
             {t('admin.voting.backToVotingList')}
           </Button>
         </div>
@@ -69,7 +69,7 @@ export default function VotingDetailPage() {
         <div className="hidden">
           <button
             type="button"
-            onClick={() => router.push('/admin/voting')}
+            onClick={() => router.push('/supersudo/voting')}
             className="mb-4 flex items-center text-gray-600 transition-colors duration-200 hover:text-gray-900"
           >
             <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +85,7 @@ export default function VotingDetailPage() {
         </div>
 
         <div className="flex flex-col gap-8 lg:flex-row">
-          <AdminSidebar currentPath={pathname || '/admin/voting'} router={router} t={t} />
+          <AdminSidebar currentPath={pathname || '/supersudo/voting'} router={router} t={t} />
 
           <div className="min-w-0 flex-1" />
         </div>

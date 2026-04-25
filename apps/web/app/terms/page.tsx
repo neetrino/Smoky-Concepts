@@ -26,7 +26,7 @@ export default function TermsPage() {
           <h1 className="text-4xl font-bold text-gray-900">{t('terms.title')}</h1>
 
           <div className="mt-8 space-y-6">
-            <Card variant="glass" className="p-6 space-y-8">
+            <Card variant="default" className="p-6 space-y-8">
               {Array.isArray(intro) &&
                 intro.map((paragraph) => (
                   <p key={paragraph} className="text-gray-600">
@@ -93,7 +93,7 @@ export default function TermsPage() {
         <h1 className="text-4xl font-bold text-gray-900">{t('terms.title')}</h1>
 
         <div className="mt-8 space-y-6">
-          <Card variant="glass" className="p-6">
+          <Card variant="default" className="p-6">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('terms.agreementToTerms.title')}</h2>
             <p className="text-gray-600 mb-4">{t('terms.agreementToTerms.description1')}</p>
             <p className="text-gray-600">{t('terms.agreementToTerms.description2')}</p>

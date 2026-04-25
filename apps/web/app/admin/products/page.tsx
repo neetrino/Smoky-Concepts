@@ -38,7 +38,7 @@ export default function ProductsPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }
@@ -320,7 +320,7 @@ export default function ProductsPage() {
             {/* Add New Product Button */}
             <div className="mb-6">
               <button
-                onClick={() => router.push('/admin/products/add')}
+                onClick={() => router.push('/supersudo/products/add')}
                 className="w-full px-4 py-3 bg-[#122a26] text-[#dcc090] rounded-lg hover:bg-[#18352f] transition-colors flex items-center justify-center gap-2 font-medium text-sm"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -8,7 +8,7 @@ export const ADMIN_MENU_SHOW_FILTER_BY_PRICE = false;
  *
  * ԿԱՐԵՎՈՐ.
  * - Մենյուի բոլոր կետերը centrally պահում ենք այստեղ, որ բոլոր admin էջերում նույնը լինի։
- * - "Discounts" label-ը նույնն է ամեն տեղ, ուղիղ տանում է `/admin/quick-settings` էջ։
+ * - "Discounts" label-ը նույնն է ամեն տեղ, ուղիղ տանում է `/supersudo/quick-settings` էջ։
  * - "Delivery" կետը միշտ առկա է sidebar-ում (Analytics-ի հետ միասին)։
  * 
  * Note: This function returns menu items with translated labels.
@@ -37,7 +37,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'dashboard',
     label: t('admin.menu.dashboard'),
-    path: '/admin',
+    path: '/supersudo',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -52,7 +52,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'home-hero',
     label: t('admin.menu.homeHero'),
-    path: '/admin/home-hero',
+    path: '/supersudo/home-hero',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -67,7 +67,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'orders',
     label: t('admin.menu.orders'),
-    path: '/admin/orders',
+    path: '/supersudo/orders',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -82,7 +82,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'products',
     label: t('admin.menu.products'),
-    path: '/admin/products',
+    path: '/supersudo/products',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -97,7 +97,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'categories',
     label: t('admin.menu.categories'),
-    path: '/admin/categories',
+    path: '/supersudo/categories',
     isSubCategory: true,
     parentId: 'products',
     icon: (
@@ -114,7 +114,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'attributes',
     label: t('admin.menu.attributes'),
-    path: '/admin/attributes',
+    path: '/supersudo/attributes',
     isSubCategory: true,
     parentId: 'products',
     icon: (
@@ -131,7 +131,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'sizes',
     label: t('admin.menu.sizes'),
-    path: '/admin/sizes',
+    path: '/supersudo/sizes',
     isSubCategory: true,
     parentId: 'products',
     icon: (
@@ -148,7 +148,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'quick-settings',
     label: t('admin.menu.discounts'),
-    path: '/admin/quick-settings',
+    path: '/supersudo/quick-settings',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -163,7 +163,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'users',
     label: t('admin.menu.users'),
-    path: '/admin/users',
+    path: '/supersudo/users',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -178,7 +178,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'analytics',
     label: t('admin.menu.analytics'),
-    path: '/admin/analytics',
+    path: '/supersudo/analytics',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -193,7 +193,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'voting',
     label: t('admin.menu.voting'),
-    path: '/admin/voting',
+    path: '/supersudo/voting',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -208,7 +208,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'price-filter-settings',
     label: t('admin.menu.filterByPrice'),
-    path: '/admin/orders/price-filter-settings',
+    path: '/supersudo/orders/price-filter-settings',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -223,7 +223,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'delivery',
     label: t('admin.menu.delivery'),
-    path: '/admin/delivery',
+    path: '/supersudo/delivery',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -238,7 +238,7 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
   {
     id: 'settings',
     label: t('admin.menu.settings'),
-    path: '/admin/settings',
+    path: '/supersudo/settings',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path

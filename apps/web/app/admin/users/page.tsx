@@ -47,7 +47,7 @@ export default function UsersPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
-        router.push('/admin');
+        router.push('/supersudo');
         return;
       }
     }

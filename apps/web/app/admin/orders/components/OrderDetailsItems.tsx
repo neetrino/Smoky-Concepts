@@ -2,7 +2,12 @@
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
-import { ADMIN_PRICE_CURRENCY } from '../../../../lib/currency';
+import {
+  ADMIN_PRICE_CURRENCY,
+  amountToUsd,
+  convertPrice,
+  formatPriceInCurrency,
+} from '../../../../lib/currency';
 import { getColorValue } from '../utils/orderUtils';
 import type { OrderDetails } from '../useOrders';
 
@@ -16,6 +21,31 @@ export function OrderDetailsItems({
   formatCurrency,
 }: OrderDetailsItemsProps) {
   const { t } = useTranslation();
+  const itemMoneyCurrency = orderDetails.currency || 'USD';
+
+  const formatItemAmountWithFixedCollection = (
+    amount: number,
+    quantity: number,
+    collectionPriceAmd?: number | null,
+  ): string => {
+    if (
+      ADMIN_PRICE_CURRENCY !== 'AMD' ||
+      !Number.isFinite(collectionPriceAmd) ||
+      Number(collectionPriceAmd) <= 0
+    ) {
+      return formatCurrency(amount, ADMIN_PRICE_CURRENCY, itemMoneyCurrency);
+    }
+
+    const safeAmountUsd = amountToUsd(amount, itemMoneyCurrency);
+    const safeQuantity = Math.max(0, Number.isFinite(quantity) ? quantity : 0);
+    const collectionPerUnitAmd = Number(collectionPriceAmd);
+    const collectionPerUnitUsd = amountToUsd(collectionPerUnitAmd, 'AMD');
+    const collectionPartUsd = collectionPerUnitUsd * safeQuantity;
+    const baseAmountUsd = Math.max(0, safeAmountUsd - collectionPartUsd);
+    const baseAmountDisplay = convertPrice(baseAmountUsd, 'USD', ADMIN_PRICE_CURRENCY);
+    const collectionPartDisplay = collectionPerUnitAmd * safeQuantity;
+    return formatPriceInCurrency(baseAmountDisplay + collectionPartDisplay, ADMIN_PRICE_CURRENCY);
+  };
 
   const getColorsArray = (colors: unknown): string[] => {
     if (!colors) return [];
@@ -61,6 +91,10 @@ export function OrderDetailsItems({
               const quantity = Number(item.quantity ?? 0);
               const unitPrice = Number(item.unitPrice ?? 0);
               const lineTotal = Number(item.total ?? 0);
+              const collectionPriceAmd =
+                typeof item.sizeCatalogCategoryPriceAmd === 'number'
+                  ? item.sizeCatalogCategoryPriceAmd
+                  : null;
               return (
                 <tr key={item.id}>
                   <td className="px-3 py-2">{item.productTitle}</td>
@@ -107,17 +141,17 @@ export function OrderDetailsItems({
                     {Number.isFinite(quantity) ? quantity : '—'}
                   </td>
                   <td className="px-3 py-2 text-right">
-                    {formatCurrency(
+                    {formatItemAmountWithFixedCollection(
                       Number.isFinite(unitPrice) ? unitPrice : 0,
-                      ADMIN_PRICE_CURRENCY,
-                      orderDetails.currency
+                      1,
+                      collectionPriceAmd,
                     )}
                   </td>
                   <td className="px-3 py-2 text-right">
-                    {formatCurrency(
+                    {formatItemAmountWithFixedCollection(
                       Number.isFinite(lineTotal) ? lineTotal : 0,
-                      ADMIN_PRICE_CURRENCY,
-                      orderDetails.currency
+                      Number.isFinite(quantity) ? quantity : 0,
+                      collectionPriceAmd,
                     )}
                   </td>
                 </tr>

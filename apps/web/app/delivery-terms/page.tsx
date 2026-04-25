@@ -18,7 +18,7 @@ export default function DeliveryTermsPage() {
         </p>
 
         <div className="mt-8 space-y-6">
-          <Card variant="glass" className="p-6 space-y-6">
+          <Card variant="default" className="p-6 space-y-6">
             <p className="text-gray-600">{t('delivery-terms.intro')}</p>
 
             <section>

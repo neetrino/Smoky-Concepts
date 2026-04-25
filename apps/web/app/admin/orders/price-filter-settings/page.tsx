@@ -217,7 +217,7 @@ export default function PriceFilterSettingsPage() {
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
   // Get current path to highlight active tab
-  const [currentPath, setCurrentPath] = useState(pathname || '/admin');
+  const [currentPath, setCurrentPath] = useState(pathname || '/supersudo');
   
   useEffect(() => {
     if (pathname) {
@@ -254,8 +254,8 @@ export default function PriceFilterSettingsPage() {
             <nav className="h-full space-y-1 overflow-y-auto border-r border-[#dcc090]/25 bg-[#122a26] p-3">
               {adminTabs.map((tab: AdminMenuItem) => {
                 const isActive = currentPath === tab.path || 
-                  (tab.path === '/admin' && currentPath === '/admin') ||
-                  (tab.path !== '/admin' && currentPath.startsWith(tab.path));
+                  (tab.path === '/supersudo' && currentPath === '/supersudo') ||
+                  (tab.path !== '/supersudo' && currentPath.startsWith(tab.path));
                 return (
                   <button
                     key={tab.id}

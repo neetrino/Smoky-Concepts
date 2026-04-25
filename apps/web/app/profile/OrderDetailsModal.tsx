@@ -5,6 +5,8 @@ import { amountToUsd, convertPrice, formatPriceInCurrency, formatStoredMoney } f
 import { getStatusColor, getPaymentStatusColor, getColorValue } from './utils';
 import type { OrderDetails } from './types';
 
+const LEGACY_COLLECTION_AMD_PER_USD = 400;
+
 interface OrderDetailsModalProps {
   selectedOrder: OrderDetails;
   orderDetailsLoading: boolean;
@@ -27,12 +29,22 @@ export function OrderDetailsModal({
   const displayCurrency = useCurrency();
   const formatOrderMoneyUsd = (amountUsd: number) =>
     formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
+  const formatOrderMoneyDisplay = (amount: number) =>
+    formatPriceInCurrency(amount, displayCurrency);
 
   const orderMoneyCurrency = selectedOrder.totals?.currency ?? 'USD';
   const collectionPriceUsd = amountToUsd(
     selectedOrder.totals?.collectionPriceAmount ?? selectedOrder.collectionPriceAmount ?? 0,
     'USD',
   );
+  const subtotalWithoutCollectionUsd = Math.max(
+    0,
+    amountToUsd(selectedOrder.totals?.subtotal ?? 0, orderMoneyCurrency) - collectionPriceUsd,
+  );
+  const collectionPriceDisplayAmount =
+    displayCurrency === 'AMD'
+      ? collectionPriceUsd * LEGACY_COLLECTION_AMD_PER_USD
+      : convertPrice(collectionPriceUsd, 'USD', displayCurrency);
 
   const getAttributeLabel = (key: string): string => {
     const attributeType = getAttributeType(key);
@@ -246,9 +258,7 @@ export function OrderDetailsModal({
                           <div className="flex justify-between text-gray-600">
                             <span>{t('profile.orderDetails.subtotal')}</span>
                             <span>
-                              {formatOrderMoneyUsd(
-                                amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency),
-                              )}
+                              {formatOrderMoneyUsd(subtotalWithoutCollectionUsd)}
                             </span>
                           </div>
                           {selectedOrder.totals.discount > 0 && (
@@ -284,20 +294,28 @@ export function OrderDetailsModal({
                           {collectionPriceUsd > 0 && (
                             <div className="flex justify-between text-gray-600">
                               <span>{t('orders.itemDetails.collection_price')}</span>
-                              <span>{formatOrderMoneyUsd(collectionPriceUsd)}</span>
+                              <span>{formatOrderMoneyDisplay(collectionPriceDisplayAmount)}</span>
                             </div>
                           )}
                           <div className="border-t border-gray-200 pt-4">
                             <div className="flex justify-between text-lg font-bold text-gray-900">
                               <span>{t('profile.orderDetails.total')}</span>
                               <span>
-                                {formatOrderMoneyUsd(
-                                  amountToUsd(selectedOrder.totals.subtotal, orderMoneyCurrency) -
+                                {(() => {
+                                  const baseTotalUsd =
+                                    subtotalWithoutCollectionUsd -
                                     amountToUsd(selectedOrder.totals.discount, orderMoneyCurrency) +
                                     amountToUsd(selectedOrder.totals.shipping, orderMoneyCurrency) +
-                                    amountToUsd(selectedOrder.totals.tax, orderMoneyCurrency) +
-                                    collectionPriceUsd,
-                                )}
+                                    amountToUsd(selectedOrder.totals.tax, orderMoneyCurrency);
+                                  const baseTotalDisplay = convertPrice(
+                                    baseTotalUsd,
+                                    'USD',
+                                    displayCurrency,
+                                  );
+                                  return formatOrderMoneyDisplay(
+                                    baseTotalDisplay + collectionPriceDisplayAmount,
+                                  );
+                                })()}
                               </span>
                             </div>
                           </div>

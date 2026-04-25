@@ -64,7 +64,7 @@ export default function AdminHomeHeroPage() {
 
   useEffect(() => {
     if (!isLoading && (!isLoggedIn || !isAdmin)) {
-      router.push('/admin');
+      router.push('/supersudo');
     }
   }, [isAdmin, isLoading, isLoggedIn, router]);
 
