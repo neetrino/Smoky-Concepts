@@ -26,6 +26,8 @@
   "customize_variant_double_fusion": "Double Fusion",
   "color": "Цвет",
   "size": "Размер",
+  "collection_label": "Коллекция",
+  "collection_fee_label": "Стоимость коллекции",
   "quantity": "Количество",
   "addToCart": "Добавить в корзину",
   "buy_now": "Купить",

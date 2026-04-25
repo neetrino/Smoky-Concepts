@@ -42,15 +42,16 @@ export function useOrderSummary({
       }
       return sum + adminInputAmdToUsd(priceAmd) * item.quantity;
     }, 0);
-    const totalUsd = subtotalUsd - discountUsd + taxUsd + shippingUsd + collectionPriceUsd;
+    const baseSubtotalUsd = Math.max(0, subtotalUsd - collectionPriceUsd);
+    const totalUsd = baseSubtotalUsd - discountUsd + taxUsd + shippingUsd + collectionPriceUsd;
 
     return {
-      subtotalUsd,
+      subtotalUsd: baseSubtotalUsd,
       taxUsd,
       shippingUsd,
       collectionPriceUsd,
       totalUsd,
-      subtotalDisplay: subtotalUsd,
+      subtotalDisplay: baseSubtotalUsd,
       taxDisplay: taxUsd,
       shippingDisplay: shippingUsd,
       collectionPriceDisplay: collectionPriceUsd,

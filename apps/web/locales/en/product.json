@@ -26,6 +26,8 @@
   "customize_variant_double_fusion": "Double Fusion",
   "color": "Color",
   "size": "Size",
+  "collection_label": "Collection",
+  "collection_fee_label": "Collection fee",
   "quantity": "Quantity",
   "addToCart": "Add to Cart",
   "buy_now": "Buy",
