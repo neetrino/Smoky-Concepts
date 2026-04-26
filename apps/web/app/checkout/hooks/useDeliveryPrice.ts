@@ -8,6 +8,8 @@ export function useDeliveryPrice(
   shippingMethod: 'pickup' | 'delivery',
   city: string | undefined,
   country: string | undefined,
+  /** Cart merchandise subtotal in USD (for free-delivery threshold); omit when unknown. */
+  merchandiseSubtotalUsd: number | null,
 ) {
   const [deliveryPrice, setDeliveryPrice] = useState<number | null>(null);
   const [loadingDeliveryPrice, setLoadingDeliveryPrice] = useState(false);
@@ -18,11 +20,15 @@ export function useDeliveryPrice(
       if (shippingMethod === 'delivery' && city && city.trim().length > 0) {
         setLoadingDeliveryPrice(true);
         try {
+          const params: Record<string, string> = {
+            city: city.trim(),
+            country: countryNorm,
+          };
+          if (merchandiseSubtotalUsd !== null && Number.isFinite(merchandiseSubtotalUsd) && merchandiseSubtotalUsd >= 0) {
+            params.subtotalUsd = String(merchandiseSubtotalUsd);
+          }
           const response = await apiClient.get<{ price: number }>('/api/v1/delivery/price', {
-            params: {
-              city: city.trim(),
-              country: countryNorm,
-            },
+            params,
           });
           setDeliveryPrice(response.price);
         } catch {
@@ -40,7 +46,7 @@ export function useDeliveryPrice(
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [city, country, shippingMethod]);
+  }, [city, country, shippingMethod, merchandiseSubtotalUsd]);
 
   return { deliveryPrice, loadingDeliveryPrice };
 }

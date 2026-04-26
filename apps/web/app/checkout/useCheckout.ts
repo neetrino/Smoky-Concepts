@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { getCartMerchandiseSubtotalUsd } from './utils/getCartBaseSubtotalUsd';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStoredLanguage } from '../../lib/language';
@@ -63,12 +64,16 @@ export function useCheckout() {
 
   const shippingRegionSummary = activeDeliveryLocation?.city ?? shippingRegion ?? '';
 
+  const { cart, loading, fetchCart } = useCart();
+
+  const merchandiseSubtotalUsd = useMemo(() => getCartMerchandiseSubtotalUsd(cart), [cart]);
+
   const { deliveryPrice, loadingDeliveryPrice } = useDeliveryPrice(
     shippingMethod,
     activeDeliveryLocation?.city,
     activeDeliveryLocation?.country,
+    merchandiseSubtotalUsd,
   );
-  const { cart, loading, fetchCart } = useCart();
   useUserProfile(isLoggedIn, isLoading, setValue, deliveryLocations);
 
   const { submitOrder } = useOrderSubmission({
