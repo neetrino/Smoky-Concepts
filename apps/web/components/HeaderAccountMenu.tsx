@@ -39,8 +39,8 @@ const menuClass =
   'block w-full px-3 py-2.5 text-left text-xs font-extrabold uppercase tracking-[0.12em] text-[#dcc090] transition-opacity hover:bg-white/5 hover:opacity-100';
 
 /**
- * Desktop: account icon opens a small menu (profile, admin if applicable, logout).
- * Guest: icon links to login.
+ * Header bar account: icon opens menu when logged in; guest links to login.
+ * Used on desktop (with cart/currency) and on mobile next to the cart icon.
  */
 export function HeaderDesktopAccount() {
   const pathname = usePathname();
@@ -125,56 +125,3 @@ export function HeaderDesktopAccount() {
   );
 }
 
-type MobileProps = {
-  onNavigate?: () => void;
-};
-
-/** Mobile drawer: same links as the desktop menu */
-export function HeaderMobileAccountLinks({ onNavigate }: MobileProps) {
-  const { isLoggedIn, isAdmin, logout } = useAuth();
-
-  const close = () => onNavigate?.();
-
-  if (!isLoggedIn) {
-    return (
-      <Link
-        href="/login"
-        onClick={close}
-        className="border-b border-white/10 py-3.5 text-xs font-extrabold uppercase tracking-[0.16em] text-[#dcc090]/80 transition-opacity hover:text-[#dcc090]"
-      >
-        Sign in
-      </Link>
-    );
-  }
-
-  return (
-    <>
-      <Link
-        href="/profile"
-        onClick={close}
-        className="border-b border-white/10 py-3.5 text-xs font-extrabold uppercase tracking-[0.16em] text-[#dcc090]/80 transition-opacity hover:text-[#dcc090]"
-      >
-        Profile
-      </Link>
-      {isAdmin ? (
-        <Link
-          href="/supersudo"
-          onClick={close}
-          className="border-b border-white/10 py-3.5 text-xs font-extrabold uppercase tracking-[0.16em] text-[#dcc090]/80 transition-opacity hover:text-[#dcc090]"
-        >
-          Admin
-        </Link>
-      ) : null}
-      <button
-        type="button"
-        onClick={() => {
-          close();
-          logout();
-        }}
-        className="w-full border-b border-white/10 py-3.5 text-left text-xs font-extrabold uppercase tracking-[0.16em] text-[#dcc090]/80 transition-opacity hover:text-[#dcc090]"
-      >
-        Log out
-      </button>
-    </>
-  );
-}
