@@ -16,6 +16,7 @@ import {
   validateCustomizePlainLength,
 } from "../orders/sanitize-customize-html-server";
 import { logger } from "./utils/logger";
+import { adminDeliveryService } from "./admin/admin-delivery.service";
 
 type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
   include: {
@@ -103,6 +104,36 @@ const ORDER_NUMBER_RETRY_LIMIT = 5;
 /** Prisma default interactive tx timeout is 5s; checkout can exceed that on slow DB or many line items. */
 const CHECKOUT_TRANSACTION_TIMEOUT_MS = 30_000;
 
+function checkoutShippingCity(
+  shippingAddress: CheckoutData["shippingAddress"] | Record<string, unknown> | undefined,
+): string {
+  if (!shippingAddress || typeof shippingAddress !== "object") {
+    return "";
+  }
+  const o = shippingAddress as Record<string, unknown>;
+  if (typeof o.state === "string" && o.state.trim()) {
+    return o.state.trim();
+  }
+  if (typeof o.city === "string" && o.city.trim()) {
+    return o.city.trim();
+  }
+  return "";
+}
+
+function checkoutShippingCountry(
+  shippingAddress: CheckoutData["shippingAddress"] | Record<string, unknown> | undefined,
+): string {
+  if (!shippingAddress || typeof shippingAddress !== "object") {
+    return "Armenia";
+  }
+  const o = shippingAddress as Record<string, unknown>;
+  const country = typeof o.country === "string" ? o.country.trim() : "";
+  if (country) {
+    return country;
+  }
+  return "Armenia";
+}
+
 function isP2002Error(error: unknown): error is { code: string; meta?: { target?: string[] } } {
   if (!error || typeof error !== "object" || !("code" in error)) {
     return false;
@@ -155,7 +186,6 @@ class OrdersService {
         phone,
         shippingMethod = 'pickup',
         shippingAddress,
-        shippingAmount: providedShippingAmount,
         paymentMethod = 'idram',
       } = data;
 
@@ -458,8 +488,15 @@ class OrdersService {
         return sum + (item.price + addonUsd) * item.quantity;
       }, 0);
       const discountAmount = 0; // TODO: Implement discount/coupon logic
-      // Use provided shipping amount from frontend (calculated from delivery API), or 0 if not provided
-      const shippingAmount = providedShippingAmount !== undefined ? Number(providedShippingAmount) : 0;
+      let shippingAmount = 0;
+      if (shippingMethod === "delivery" && shippingAddress) {
+        const shipCity = checkoutShippingCity(shippingAddress);
+        const shipCountry = checkoutShippingCountry(shippingAddress);
+        if (shipCity) {
+          const priceAmd = await adminDeliveryService.getDeliveryPrice(shipCity, shipCountry, subtotal);
+          shippingAmount = adminInputAmdToUsd(priceAmd);
+        }
+      }
       const taxAmount = 0; // TODO: Calculate tax if needed
       const total = subtotal - discountAmount + shippingAmount + taxAmount;
       const normalizedShippingAddress =

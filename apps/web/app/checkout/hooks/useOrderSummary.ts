@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { adminInputAmdToUsd, amountToUsd } from '../../../lib/currency';
 import type { Cart } from '../types';
+import { getCartBaseSubtotalUsd } from '../utils/getCartBaseSubtotalUsd';
 
 interface UseOrderSummaryProps {
   cart: Cart | null;
@@ -30,7 +31,6 @@ export function useOrderSummary({
     }
 
     const cartMoneyCurrency = cart.totals.currency?.trim() || 'USD';
-    const subtotalUsd = amountToUsd(cart.totals.subtotal, cartMoneyCurrency);
     const discountUsd = amountToUsd(cart.totals.discount, cartMoneyCurrency);
     const taxUsd = amountToUsd(cart.totals.tax, cartMoneyCurrency);
     const shippingUsd =
@@ -42,7 +42,7 @@ export function useOrderSummary({
       }
       return sum + adminInputAmdToUsd(priceAmd) * item.quantity;
     }, 0);
-    const baseSubtotalUsd = Math.max(0, subtotalUsd - collectionPriceUsd);
+    const baseSubtotalUsd = getCartBaseSubtotalUsd(cart) ?? 0;
     const totalUsd = baseSubtotalUsd - discountUsd + taxUsd + shippingUsd + collectionPriceUsd;
 
     return {

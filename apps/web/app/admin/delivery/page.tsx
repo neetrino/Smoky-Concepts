@@ -19,6 +19,8 @@ interface DeliveryLocation {
   country: string;
   city: string;
   price: number;
+  /** Minimum cart merchandise subtotal in AMD for free delivery; 0 = disabled. */
+  freeDeliveryFromAmd?: number;
 }
 
 interface DeliverySettings {
@@ -55,7 +57,16 @@ export default function DeliveryPage() {
       setLoading(true);
       console.log('🚚 [ADMIN] Fetching delivery settings...');
       const data = await apiClient.get<DeliverySettings>('/api/v1/admin/delivery');
-      setLocations(data.locations || []);
+      const raw = data.locations || [];
+      setLocations(
+        raw.map((loc) => ({
+          ...loc,
+          freeDeliveryFromAmd:
+            typeof loc.freeDeliveryFromAmd === 'number' && Number.isFinite(loc.freeDeliveryFromAmd)
+              ? loc.freeDeliveryFromAmd
+              : 0,
+        })),
+      );
       console.log('✅ [ADMIN] Delivery settings loaded:', data);
     } catch (err: any) {
       console.error('❌ [ADMIN] Error fetching delivery settings:', err);
@@ -85,7 +96,7 @@ export default function DeliveryPage() {
   };
 
   const handleAddLocation = () => {
-    setLocations([...locations, { country: '', city: '', price: 1000 }]);
+    setLocations([...locations, { country: '', city: '', price: 1000, freeDeliveryFromAmd: 0 }]);
     setEditingId(`new-${Date.now()}`);
   };
 
@@ -181,7 +192,7 @@ export default function DeliveryPage() {
                 <div className="space-y-4">
                   {locations.map((location, index) => (
                     <div key={index} className="border border-[#dcc090]/30 bg-white/70 rounded-lg p-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-[#414141]/75 mb-1">
                             {t('admin.delivery.country')}
@@ -210,27 +221,50 @@ export default function DeliveryPage() {
                           <label className="block text-sm font-medium text-[#414141]/75 mb-1">
                             {t('admin.delivery.price')}
                           </label>
-                          <div className="flex gap-2">
-                            <input
-                              type="number"
-                              value={location.price}
-                              onChange={(e) => handleUpdateLocation(index, 'price', parseFloat(e.target.value) || 0)}
-                            className="flex-1 px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
+                          <input
+                            type="number"
+                            value={location.price}
+                            onChange={(e) => handleUpdateLocation(index, 'price', parseFloat(e.target.value) || 0)}
+                            className="w-full px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
                             placeholder={t('admin.delivery.pricePlaceholder')}
                             min="0"
                             step="100"
                           />
-                            <button
-                              onClick={() => handleDeleteLocation(index)}
-                              className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-md"
-                              disabled={saving}
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
                         </div>
+                        <div>
+                          <label className="block text-sm font-medium text-[#414141]/75 mb-1">
+                            {t('admin.delivery.freeDeliveryFromAmd')}
+                          </label>
+                          <input
+                            type="number"
+                            value={location.freeDeliveryFromAmd ?? 0}
+                            onChange={(e) =>
+                              handleUpdateLocation(
+                                index,
+                                'freeDeliveryFromAmd',
+                                Math.max(0, parseFloat(e.target.value) || 0),
+                              )
+                            }
+                            className="w-full px-3 py-2 border border-[#dcc090]/35 rounded-md focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:border-[#dcc090]"
+                            placeholder={t('admin.delivery.freeDeliveryFromAmdPlaceholder')}
+                            min="0"
+                            step="1000"
+                          />
+                          <p className="mt-1 text-xs text-[#414141]/60">{t('admin.delivery.freeDeliveryFromAmdHint')}</p>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteLocation(index)}
+                          className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-md"
+                          disabled={saving}
+                          aria-label={t('admin.delivery.deleteLocation')}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
                   ))}

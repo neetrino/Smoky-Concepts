@@ -1,83 +1,111 @@
 import { db } from "@white-shop/db";
+import { convertPrice } from "@/lib/currency";
+
+/** Persisted shape for `delivery-locations` settings value. */
+export type StoredDeliveryLocation = {
+  id?: string;
+  country: string;
+  city: string;
+  price: number;
+  /** Minimum merchandise subtotal in AMD for free delivery; omit or 0 = disabled. */
+  freeDeliveryFromAmd?: number;
+};
+
+function parseLocations(value: unknown): StoredDeliveryLocation[] {
+  if (!value || typeof value !== "object") {
+    return [];
+  }
+  const raw = (value as { locations?: unknown }).locations;
+  return Array.isArray(raw) ? (raw as StoredDeliveryLocation[]) : [];
+}
+
+function findLocation(
+  locations: StoredDeliveryLocation[],
+  city: string,
+  country: string,
+): StoredDeliveryLocation | undefined {
+  const cityNorm = city.toLowerCase().trim();
+  const countryNorm = country.toLowerCase().trim();
+  const exact = locations.find(
+    (loc) =>
+      loc.city.toLowerCase().trim() === cityNorm && loc.country.toLowerCase().trim() === countryNorm,
+  );
+  if (exact) {
+    return exact;
+  }
+  return locations.find((loc) => loc.city.toLowerCase().trim() === cityNorm);
+}
+
+function applyFreeDeliveryThreshold(
+  basePriceAmd: number,
+  location: StoredDeliveryLocation,
+  orderSubtotalUsd: number | undefined,
+): number {
+  const threshold = location.freeDeliveryFromAmd;
+  if (
+    orderSubtotalUsd === undefined ||
+    !Number.isFinite(orderSubtotalUsd) ||
+    orderSubtotalUsd < 0 ||
+    typeof threshold !== "number" ||
+    !Number.isFinite(threshold) ||
+    threshold <= 0
+  ) {
+    return basePriceAmd;
+  }
+  const subtotalAmd = convertPrice(orderSubtotalUsd, "USD", "AMD");
+  if (subtotalAmd >= threshold) {
+    return 0;
+  }
+  return basePriceAmd;
+}
 
 class AdminDeliveryService {
   /**
    * Get delivery settings
    */
   async getDeliverySettings() {
-    console.log('🚚 [ADMIN SERVICE] getDeliverySettings called');
-    
     const setting = await db.settings.findUnique({
-      where: { key: 'delivery-locations' },
+      where: { key: "delivery-locations" },
     });
 
     if (!setting) {
-      console.log('✅ [ADMIN SERVICE] Delivery settings not found, returning defaults');
       return {
-        locations: [],
+        locations: [] as StoredDeliveryLocation[],
       };
     }
 
-    const value = setting.value as { locations?: Array<{ id?: string; country: string; city: string; price: number }> };
-    console.log('✅ [ADMIN SERVICE] Delivery settings loaded:', value);
+    const value = setting.value as { locations?: StoredDeliveryLocation[] };
     return {
       locations: value.locations || [],
     };
   }
 
   /**
-   * Get delivery price for a specific city
-   * Returns the configured price if city has shipping, otherwise returns 0
+   * Get delivery price for a specific city (AMD). When `orderSubtotalUsd` is set, free delivery may apply.
    */
-  async getDeliveryPrice(city: string, country: string = 'Armenia') {
-    console.log('🚚 [ADMIN SERVICE] getDeliveryPrice called:', { city, country });
-    
+  async getDeliveryPrice(city: string, country: string = "Armenia", orderSubtotalUsd?: number): Promise<number> {
     const setting = await db.settings.findUnique({
-      where: { key: 'delivery-locations' },
+      where: { key: "delivery-locations" },
     });
 
     if (!setting) {
-      console.log('✅ [ADMIN SERVICE] Delivery settings not found, returning 0 (no shipping for this city)');
-      return 0; // No shipping configured for this city
+      return 0;
     }
 
-    const value = setting.value as { locations?: Array<{ country: string; city: string; price: number }> };
-    const locations = value.locations || [];
+    const locations = parseLocations(setting.value);
+    const location = findLocation(locations, city, country);
 
-    // Find matching location (case-insensitive)
-    const location = locations.find(
-      (loc) => 
-        loc.city.toLowerCase().trim() === city.toLowerCase().trim() &&
-        loc.country.toLowerCase().trim() === country.toLowerCase().trim()
-    );
-
-    if (location) {
-      console.log('✅ [ADMIN SERVICE] Delivery price found:', location.price);
-      return location.price;
+    if (!location) {
+      return 0;
     }
 
-    // If no exact match, try to find by city only (case-insensitive)
-    const cityMatch = locations.find(
-      (loc) => loc.city.toLowerCase().trim() === city.toLowerCase().trim()
-    );
-
-    if (cityMatch) {
-      console.log('✅ [ADMIN SERVICE] Delivery price found by city:', cityMatch.price);
-      return cityMatch.price;
-    }
-
-    // Return 0 if no match found (city doesn't have shipping configured)
-    console.log('✅ [ADMIN SERVICE] No delivery price found for city, returning 0');
-    return 0; // No shipping for this city
+    return applyFreeDeliveryThreshold(location.price, location, orderSubtotalUsd);
   }
 
   /**
    * Update delivery settings
    */
-  async updateDeliverySettings(data: { locations: Array<{ id?: string; country: string; city: string; price: number }> }) {
-    console.log('🚚 [ADMIN SERVICE] updateDeliverySettings called:', data);
-    
-    // Validate locations
+  async updateDeliverySettings(data: { locations: StoredDeliveryLocation[] }) {
     if (!Array.isArray(data.locations)) {
       throw {
         status: 400,
@@ -87,7 +115,6 @@ class AdminDeliveryService {
       };
     }
 
-    // Validate each location
     for (const location of data.locations) {
       if (!location.country || !location.city) {
         throw {
@@ -97,7 +124,7 @@ class AdminDeliveryService {
           detail: "Each location must have country and city",
         };
       }
-      if (typeof location.price !== 'number' || location.price < 0) {
+      if (typeof location.price !== "number" || location.price < 0 || !Number.isFinite(location.price)) {
         throw {
           status: 400,
           type: "https://api.shop.am/problems/validation-error",
@@ -105,35 +132,43 @@ class AdminDeliveryService {
           detail: "Price must be a non-negative number",
         };
       }
+      const free = location.freeDeliveryFromAmd;
+      if (
+        free !== undefined &&
+        free !== null &&
+        (typeof free !== "number" || !Number.isFinite(free) || free < 0)
+      ) {
+        throw {
+          status: 400,
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Validation Error",
+          detail: "freeDeliveryFromAmd must be a non-negative number when provided",
+        };
+      }
     }
 
-    // Generate IDs for new locations
     const locationsWithIds = data.locations.map((location, index) => ({
       ...location,
       id: location.id || `location-${Date.now()}-${index}`,
     }));
 
     const setting = await db.settings.upsert({
-      where: { key: 'delivery-locations' },
+      where: { key: "delivery-locations" },
       update: {
         value: { locations: locationsWithIds },
         updatedAt: new Date(),
       },
       create: {
-        key: 'delivery-locations',
+        key: "delivery-locations",
         value: { locations: locationsWithIds },
-        description: 'Delivery prices by country and city',
+        description: "Delivery prices by country and city",
       },
     });
 
-    console.log('✅ [ADMIN SERVICE] Delivery settings updated:', setting);
     return {
-      locations: locationsWithIds,
+      locations: (setting.value as { locations: StoredDeliveryLocation[] }).locations,
     };
   }
 }
 
 export const adminDeliveryService = new AdminDeliveryService();
-
-
-

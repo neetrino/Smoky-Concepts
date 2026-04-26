@@ -10,6 +10,14 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const city = searchParams.get('city');
     const country = searchParams.get('country') || 'Armenia';
+    const subtotalUsdRaw = searchParams.get('subtotalUsd');
+    let orderSubtotalUsd: number | undefined;
+    if (subtotalUsdRaw !== null && subtotalUsdRaw !== '') {
+      const parsed = Number(subtotalUsdRaw);
+      if (Number.isFinite(parsed) && parsed >= 0) {
+        orderSubtotalUsd = parsed;
+      }
+    }
 
     if (!city) {
       return NextResponse.json(
@@ -24,9 +32,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log("🚚 [DELIVERY PRICE] GET request:", { city, country });
-    const price = await adminService.getDeliveryPrice(city, country);
-    console.log("✅ [DELIVERY PRICE] Delivery price fetched:", price);
+    const price = await adminService.getDeliveryPrice(city, country, orderSubtotalUsd);
 
     return NextResponse.json({ price });
   } catch (error: any) {
