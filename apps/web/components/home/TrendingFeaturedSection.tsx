@@ -496,17 +496,17 @@ export function TrendingFeaturedSection() {
         </div>
       </div>
 
-      <div className="relative z-20 flex items-center justify-center gap-8 sm:gap-16 lg:gap-32">
+      <div className="relative z-20 mx-auto grid w-full max-w-[28rem] grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] items-center gap-3 sm:max-w-[34rem] sm:gap-5">
         <button
           type="button"
           onClick={goPrev}
           disabled={!hasMultiplePages}
-          className="flex h-10 w-10 items-center justify-center text-[#122a26] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+          className="col-start-1 row-start-1 flex h-10 w-10 items-center justify-center justify-self-start text-[#122a26] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label={t('home.homepage.trending.previousAria')}
         >
           <ChevronLeft className="h-8 w-8" strokeWidth={2.5} />
         </button>
-        <p className="text-center text-xl font-black leading-tight text-[#122a26] sm:text-[1.5rem] sm:font-extrabold">
+        <p className="col-start-2 row-start-1 w-full truncate px-2 text-center text-xl font-black leading-tight text-[#122a26] sm:text-[1.5rem] sm:font-extrabold">
           {footerCategoryLabel && footerCategoryLabel !== 'Featured'
             ? footerCategoryLabel
             : '—'}
@@ -515,7 +515,7 @@ export function TrendingFeaturedSection() {
           type="button"
           onClick={goNext}
           disabled={!hasMultiplePages}
-          className="flex h-10 w-10 items-center justify-center text-[#122a26] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+          className="col-start-3 row-start-1 flex h-10 w-10 items-center justify-center justify-self-end text-[#122a26] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label={t('home.homepage.trending.nextAria')}
         >
           <ChevronRight className="h-8 w-8" strokeWidth={2.5} />
