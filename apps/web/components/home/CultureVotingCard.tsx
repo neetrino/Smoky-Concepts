@@ -107,9 +107,9 @@ export function CultureVotingCard({
             type="button"
             onClick={() => onToggleLike(id, likedByCurrentUser)}
             disabled={pending}
-            className={`inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 transition-colors ${
-              likedByCurrentUser ? 'text-red-500' : 'text-[#dcc090] hover:bg-[#dcc090]/10'
-            } ${pending ? 'cursor-not-allowed opacity-60' : ''}`}
+            className={`inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 text-[#731818] transition-colors hover:bg-[#731818]/10 ${
+              pending ? 'cursor-not-allowed opacity-60' : ''
+            }`}
             aria-pressed={likedByCurrentUser}
             aria-label={likedByCurrentUser ? `Remove like from ${title}` : `Like ${title}`}
           >
