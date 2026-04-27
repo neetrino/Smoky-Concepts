@@ -69,26 +69,64 @@ interface UpcomingLineCardProps {
   title: string;
   imageSrc: string;
   emphasizeImage?: boolean;
+  /** Pushes the product image lower inside/over the card (e.g. Notebooks in Figma). */
+  imageNudgeDown?: boolean;
+  /** Slightly larger Keys artwork, nudged right and down (Figma alignment). */
+  imageKeysLayout?: boolean;
+  /** Larger Phones artwork, nudged up (less top offset via translate). */
+  imagePhonesLayout?: boolean;
+  /** Smaller Knifes artwork vs default emphasized cards. */
+  imageKnifesLayout?: boolean;
+  /** Documents: more `top` + gentler float so the image clears the title. */
+  imageDocumentsLayout?: boolean;
 }
 
-function UpcomingLineCard({ title, imageSrc, emphasizeImage = false }: UpcomingLineCardProps) {
-  const imageFrameClassName = emphasizeImage
-    ? 'pointer-events-none absolute left-1/2 top-0 h-24 w-24 -translate-x-1/2 -translate-y-[38%] sm:h-32 sm:w-32 sm:-translate-y-[36%]'
-    : 'pointer-events-none absolute left-1/2 top-0 h-20 w-20 -translate-x-1/2 -translate-y-[33%] sm:h-28 sm:w-28 sm:-translate-y-[34%]';
+function UpcomingLineCard({
+  title,
+  imageSrc,
+  emphasizeImage = false,
+  imageNudgeDown = false,
+  imageKeysLayout = false,
+  imagePhonesLayout = false,
+  imageKnifesLayout = false,
+  imageDocumentsLayout = false,
+}: UpcomingLineCardProps) {
+  const imageFrameClassName = !emphasizeImage
+    ? imageDocumentsLayout
+      ? 'pointer-events-none absolute left-1/2 top-3 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[26%] sm:top-4 sm:h-36 sm:w-36 sm:-translate-y-[24%] xl:top-5 xl:h-44 xl:w-44 xl:-translate-y-[28%]'
+      : 'pointer-events-none absolute left-1/2 top-0 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[36%] sm:h-36 sm:w-36 sm:-translate-y-[36%] xl:h-44 xl:w-44 xl:-translate-y-[40%]'
+    : imageNudgeDown
+      ? 'pointer-events-none absolute left-1/2 top-2 h-28 w-28 origin-bottom -translate-x-1/2 -translate-y-[28%] sm:top-4 sm:h-40 sm:w-40 sm:-translate-y-[24%] xl:top-5 xl:h-48 xl:w-48 xl:-translate-y-[28%]'
+      : imageKeysLayout
+        ? 'pointer-events-none absolute left-[57%] top-0 h-32 w-32 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:left-[56%] sm:top-0 sm:h-44 sm:w-44 sm:-translate-y-[30%] xl:left-[56%] xl:top-0 xl:h-[13.25rem] xl:w-[13.25rem] xl:-translate-y-[34%]'
+        : imagePhonesLayout
+          ? 'pointer-events-none absolute left-1/2 top-4 h-44 w-44 origin-bottom -translate-x-1/2 -translate-y-[30%] sm:top-5 sm:h-56 sm:w-56 sm:-translate-y-[26%] xl:top-6 xl:h-[18rem] xl:w-[18rem] xl:-translate-y-[30%]'
+          : imageKnifesLayout
+            ? 'pointer-events-none absolute left-[68%] top-1.5 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[24%] sm:left-[68%] sm:top-2 sm:h-32 sm:w-32 sm:-translate-y-[22%] xl:left-[68%] xl:top-2.5 xl:h-40 xl:w-40 xl:-translate-y-[26%]'
+            : 'pointer-events-none absolute left-1/2 top-0 h-28 w-28 origin-bottom -translate-x-1/2 -translate-y-[40%] sm:h-40 sm:w-40 sm:-translate-y-[38%] xl:h-48 xl:w-48 xl:-translate-y-[42%]';
+  const imageSizes = imagePhonesLayout
+    ? '(max-width: 640px) 160px, (max-width: 1280px) 224px, 288px'
+    : imageKeysLayout
+      ? '(max-width: 640px) 112px, (max-width: 1280px) 176px, 212px'
+      : imageKnifesLayout
+        ? '(max-width: 640px) 88px, (max-width: 1280px) 128px, 160px'
+        : '(max-width: 640px) 96px, (max-width: 1280px) 160px, 192px';
   const imageClassName = emphasizeImage
-    ? 'object-contain scale-[1.32] sm:scale-[1.24] [filter:blur(1.3px)_brightness(1.02)_drop-shadow(0_10px_16px_rgba(18,42,38,0.16))] sm:[filter:blur(3px)_brightness(0.9)_drop-shadow(0_12px_22px_rgba(18,42,38,0.18))]'
-    : 'object-contain [filter:blur(2px)_brightness(1.03)_drop-shadow(0_8px_14px_rgba(18,42,38,0.12))] sm:[filter:blur(5px)_brightness(0.9)_drop-shadow(0_10px_20px_rgba(18,42,38,0.16))]';
+    ? 'object-contain object-center [filter:blur(1px)_brightness(1.02)_drop-shadow(0_10px_16px_rgba(18,42,38,0.16))] sm:[filter:blur(2px)_brightness(0.95)_drop-shadow(0_12px_22px_rgba(18,42,38,0.18))]'
+    : imageDocumentsLayout
+      ? 'object-contain object-center origin-center rotate-[19deg] [filter:blur(1.5px)_brightness(1.03)_drop-shadow(0_8px_14px_rgba(18,42,38,0.12))] sm:[filter:blur(3px)_brightness(0.95)_drop-shadow(0_10px_20px_rgba(18,42,38,0.16))]'
+      : 'object-contain object-center [filter:blur(1.5px)_brightness(1.03)_drop-shadow(0_8px_14px_rgba(18,42,38,0.12))] sm:[filter:blur(3px)_brightness(0.95)_drop-shadow(0_10px_20px_rgba(18,42,38,0.16))]';
 
   return (
-    <div className="relative overflow-visible pt-6 sm:pt-8">
-      <div className="relative flex min-h-[7.6rem] flex-col justify-end rounded-[1.2rem] bg-[#f3f3f3] px-3 pb-2.5 pt-10 sm:min-h-[11.5rem] sm:rounded-[2rem] sm:bg-white sm:px-6 sm:pb-6 sm:pt-14">
+    <div className="relative flex h-full flex-col overflow-visible pt-6 sm:pt-8">
+      <div className="relative flex min-h-[7.6rem] flex-1 flex-col justify-end rounded-[1.2rem] bg-[#f3f3f3] px-3 pb-2.5 pt-10 sm:min-h-[11.5rem] sm:rounded-[2rem] sm:bg-white sm:px-6 sm:pb-6 sm:pt-14 xl:min-h-0">
         <div className={imageFrameClassName}>
           <Image
             src={imageSrc}
             alt={title}
             fill
             className={imageClassName}
-            sizes="(max-width: 640px) 84px, 112px"
+            sizes={imageSizes}
           />
         </div>
         <h3 className="text-[1.25rem] font-extrabold leading-none text-[#36373a] sm:text-3xl">{title}</h3>
@@ -127,8 +165,33 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
     Knifes: 'knifes',
     Phones: 'phones',
     Wallets: 'wallets',
-    Documents: 'keys',
-    Keys: 'documents',
+    Documents: 'documents',
+    Keys: 'keys',
+  };
+  const upcomingLineByTitle: Record<string, (typeof UPCOMING_LINES)[number]> = Object.fromEntries(
+    UPCOMING_LINES.map((it) => [it.title, it]),
+  );
+  const renderUpcomingLineCard = (lineTitle: string) => {
+    const item = upcomingLineByTitle[lineTitle];
+    if (!item) return null;
+    return (
+      <UpcomingLineCard
+        {...item}
+        emphasizeImage={
+          item.title === 'Notebooks' ||
+          item.title === 'Knifes' ||
+          item.title === 'Phones' ||
+          item.title === 'Keys' ||
+          item.title === 'Wallets'
+        }
+        imageNudgeDown={item.title === 'Notebooks'}
+        imageKeysLayout={item.title === 'Keys'}
+        imagePhonesLayout={item.title === 'Phones'}
+        imageKnifesLayout={item.title === 'Knifes'}
+        imageDocumentsLayout={item.title === 'Documents'}
+        title={t(`home.homepage.upcomingLines.cards.${upcomingLineKeyByTitle[item.title] ?? 'documents'}`)}
+      />
+    );
   };
 
   return (
@@ -373,15 +436,45 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               className="mx-auto hidden w-fit !rounded-xl sm:inline-flex sm:mx-0"
             />
           </div>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-3 overflow-visible pt-3 sm:gap-x-4 sm:gap-y-10 sm:pt-10 xl:grid-cols-3 xl:gap-y-14">
-            {orderedUpcomingLines.map((item) => (
-              <UpcomingLineCard
-                key={item.title}
-                {...item}
-                emphasizeImage={item.title === 'Notebooks' || item.title === 'Knifes' || item.title === 'Keys' || item.title === 'Wallets'}
-                title={t(`home.homepage.upcomingLines.cards.${upcomingLineKeyByTitle[item.title] ?? 'documents'}`)}
-              />
-            ))}
+          <div className="overflow-visible pt-3 sm:pt-10">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-3 sm:gap-x-4 sm:gap-y-10 xl:hidden">
+              {orderedUpcomingLines.map((item) => (
+                <UpcomingLineCard
+                  key={item.title}
+                  {...item}
+                  emphasizeImage={
+                    item.title === 'Notebooks' ||
+                    item.title === 'Knifes' ||
+                    item.title === 'Phones' ||
+                    item.title === 'Keys' ||
+                    item.title === 'Wallets'
+                  }
+                  imageNudgeDown={item.title === 'Notebooks'}
+                  imageKeysLayout={item.title === 'Keys'}
+                  imagePhonesLayout={item.title === 'Phones'}
+                  imageKnifesLayout={item.title === 'Knifes'}
+                  imageDocumentsLayout={item.title === 'Documents'}
+                  title={t(`home.homepage.upcomingLines.cards.${upcomingLineKeyByTitle[item.title] ?? 'documents'}`)}
+                />
+              ))}
+            </div>
+            <div className="hidden xl:grid xl:h-[26rem] xl:w-full xl:grid-cols-3 xl:gap-x-4 2xl:h-[30rem]">
+              <div className="grid h-full xl:[grid-template-rows:350fr_32fr_186fr]">
+                {renderUpcomingLineCard('Notebooks')}
+                <div aria-hidden="true" />
+                {renderUpcomingLineCard('Wallets')}
+              </div>
+              <div className="grid h-full xl:[grid-template-rows:234fr_32fr_302fr]">
+                {renderUpcomingLineCard('Knifes')}
+                <div aria-hidden="true" />
+                {renderUpcomingLineCard('Documents')}
+              </div>
+              <div className="grid h-full xl:[grid-template-rows:350fr_32fr_186fr]">
+                {renderUpcomingLineCard('Phones')}
+                <div aria-hidden="true" />
+                {renderUpcomingLineCard('Keys')}
+              </div>
+            </div>
           </div>
         </section>
 
