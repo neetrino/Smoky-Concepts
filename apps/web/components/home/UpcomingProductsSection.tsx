@@ -182,14 +182,14 @@ export function UpcomingProductsSection() {
   };
 
   return (
-    <section className="relative isolate flex flex-col gap-4 overflow-hidden sm:gap-5 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2 xl:overflow-x-clip xl:pl-[7.5rem]">
+    <section className="relative isolate flex flex-col gap-4 sm:gap-5 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2 xl:overflow-x-clip xl:pl-[7.5rem]">
       <UpcomingSectionHeader />
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="scrollbar-hide mt-3 overflow-x-auto pt-[6rem] pb-4 sm:mt-6 sm:pt-[6.25rem]"
+        className="scrollbar-hide mt-3 overflow-x-auto pt-[7.25rem] pb-4 sm:mt-6 sm:pt-[7.5rem]"
       >
-        <div className="flex min-w-max items-start gap-6">
+        <div className="flex min-w-max items-stretch gap-6">
           {items.map((item, index) => {
             const catalogProduct = toCatalogProduct({
               id: item.id,
@@ -209,23 +209,34 @@ export function UpcomingProductsSection() {
             const section = getSectionLabel(catalogProduct);
             const isDarkCollection = section === 'Premium' || section === 'Atelier';
             return (
-              <ProductsCatalogCard
+              <div
                 key={`upcoming-${index}-${item.id}`}
-                product={catalogProduct}
-                sectionLabel={section}
-                sizeLabel={getSizeLabel(catalogProduct)}
-                categoryLabel={getCategoryLabel(catalogProduct, section)}
-                buyButtonLabel={t('home.homepage.upcoming.orderCta')}
-                imageNudgeDown={shouldNudgeCatalogProductImage(index)}
-                imageScaleBoost={isDarkCollection ? 0.2 : 0.04}
-                className="group lg:w-[12.75rem] xl:w-[13rem]"
-                compactLayout
-              />
+                className="flex min-h-0 shrink-0 flex-col self-stretch"
+              >
+                <ProductsCatalogCard
+                  product={catalogProduct}
+                  sectionLabel={section}
+                  sizeLabel={getSizeLabel(catalogProduct)}
+                  categoryLabel={getCategoryLabel(catalogProduct, section)}
+                  buyButtonLabel={t('home.homepage.upcoming.orderCta')}
+                  imageNudgeDown={shouldNudgeCatalogProductImage(index)}
+                  imageScaleBoost={isDarkCollection ? 0.2 : 0.04}
+                  className="group h-full min-h-0 w-full lg:w-[12.75rem] xl:w-[13rem]"
+                  compactLayout
+                />
+              </div>
             );
           })}
       </div>
       </div>
-      {totalPages > 1 && (
+      {totalPages === 1 ? (
+        <div
+          className="mt-1 flex items-center justify-center sm:mt-2"
+          aria-hidden="true"
+        >
+          <span className="h-1.5 w-[100px] shrink-0 rounded-[12px] bg-[#122a26] sm:h-2" />
+        </div>
+      ) : (
         <div
           className="mt-1 flex items-center justify-center gap-4 sm:mt-2"
           role="tablist"

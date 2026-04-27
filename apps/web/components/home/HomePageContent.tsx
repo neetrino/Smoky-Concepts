@@ -138,12 +138,18 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <HomeSectionTitle
             title={t('home.homepage.hero.title')}
             titleMobile={t('home.homepage.hero.titleMobile')}
-            description={t('home.homepage.hero.description')}
+            descriptionEmphasis={{
+              lead: t('home.homepage.hero.tagline.lead'),
+              bold1: t('home.homepage.hero.tagline.bold1'),
+              mid: t('home.homepage.hero.tagline.mid'),
+              bold2: t('home.homepage.hero.tagline.bold2'),
+              tail: t('home.homepage.hero.tagline.tail'),
+            }}
           />
           <HomeHeroSection slides={heroSlides} />
         </section>
 
-        <section className="flex flex-col gap-8 pb-8 sm:gap-10 sm:pb-10">
+        <section className="-mt-10 flex flex-col gap-8 pb-8 sm:-mt-12 sm:gap-10 sm:pb-10">
           <HomeSectionTitle
             title={t('home.homepage.packFit.title')}
             description={t('home.homepage.packFit.description')}
@@ -202,14 +208,14 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                 <Link
                   key={item.slug}
                   href={`/products?category=${item.slug}`}
-                  className="group relative z-0 mt-5 -translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1.1rem] bg-transparent px-2.5 pb-2 pt-0 shadow-[0_6px_24px_rgba(18,42,38,0.05)] transition-shadow duration-200 hover:z-10 hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)] focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2.5rem] sm:bg-white sm:px-6 sm:pb-4"
+                  className="group relative z-0 mt-5 -translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1rem] bg-transparent px-2.5 pb-1 pt-0 shadow-[0_6px_24px_rgba(18,42,38,0.05)] transition-shadow duration-200 hover:z-10 hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)] focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2rem] sm:bg-white sm:px-6 sm:pb-8"
                 >
-                  <div className="relative -mt-16 translate-y-2 h-44 w-[94%] self-center shrink-0 overflow-visible sm:-mt-24 sm:translate-y-0 sm:h-[22rem] sm:w-full">
+                  <div className="relative -mt-16 translate-y-2 h-44 w-[94%] self-center shrink-0 overflow-visible sm:-mt-28 sm:translate-y-0 sm:h-[22rem] sm:w-full">
                     {item.imageSrc ? (
                       <img
                         src={item.imageSrc}
                         alt={item.title}
-                        className="h-full w-full origin-bottom object-contain object-top transition-transform duration-300 ease-out translate-y-10 scale-x-[1.92] scale-y-[1.72] sm:translate-y-[6rem] sm:scale-x-[1.45] sm:scale-y-[1.42] sm:group-hover:translate-y-[5.5rem] sm:group-hover:scale-x-[1.55] sm:group-hover:scale-y-[1.52]"
+                        className="h-full w-full origin-bottom object-contain object-top transition-transform duration-300 ease-out translate-y-10 scale-x-[1.92] scale-y-[1.72] sm:translate-y-[8.25rem] sm:scale-x-[1.45] sm:scale-y-[1.42] sm:group-hover:translate-y-[7.75rem] sm:group-hover:scale-x-[1.55] sm:group-hover:scale-y-[1.52]"
                         loading="lazy"
                         decoding="async"
                       />
@@ -225,7 +231,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     )}
                   </div>
                   <h3
-                    className={`text-base font-black leading-tight text-[#414141] sm:text-xl lg:text-2xl ${
+                    className={`mt-6 text-lg font-black leading-tight text-[#414141] sm:mt-12 sm:text-2xl lg:text-3xl ${
                       item.slug === 'special-edition' ? 'line-clamp-1 whitespace-nowrap' : 'line-clamp-2'
                     }`}
                   >
@@ -285,7 +291,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <div className="relative min-h-[20.5rem] overflow-hidden rounded-t-[2rem] rounded-b-[1rem] sm:min-h-[32rem] sm:rounded-[2rem] lg:rounded-r-[0.625rem]">
             <Image src={HOME_ASSET_PATHS.craftTools} alt={t('home.homepage.bringing.imageAltLeft')} fill className="object-cover object-left" sizes="472px" />
           </div>
-          <div className="flex h-full min-h-[23rem] flex-col rounded-[1.5rem] bg-[#f2f2f2] px-5 py-7 sm:min-h-[32rem] sm:rounded-[2rem] sm:px-8 sm:py-9 lg:px-9">
+          <div className="flex h-full min-h-[23rem] flex-col bg-[#f2f2f2] px-5 py-7 shadow-[0_8px_30px_rgba(18,42,38,0.08)] sm:min-h-[32rem] sm:px-8 sm:py-9 lg:px-9 rounded-[1.5rem] sm:rounded-[1rem]">
             <h2 className="max-w-[20rem] whitespace-pre-line text-[1.82rem] font-black leading-[1.04] tracking-[-0.01em] text-[#434347] sm:text-[2.4rem]">
               {t('home.homepage.bringing.title')}
             </h2>
@@ -295,7 +301,12 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               <p>{t('home.homepage.bringing.paragraphs.third')}</p>
               <p>
                 {t('home.homepage.bringing.paragraphs.fourthPrefix')}{' '}
-                <span className="text-[#dcc090]">{t('home.homepage.bringing.moreLabel')}</span>
+                <Link
+                  href="/about"
+                  className="text-[#dcc090] underline-offset-2 transition-opacity hover:opacity-90 hover:underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090]"
+                >
+                  {t('home.homepage.bringing.moreLabel')}
+                </Link>
               </p>
               <p>{t('home.homepage.bringing.paragraphs.fifth')}</p>
             </div>

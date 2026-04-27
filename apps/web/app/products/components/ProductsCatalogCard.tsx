@@ -130,9 +130,10 @@ export function ProductsCatalogCard({
   const cardShadowClass = suppressShadow
     ? 'shadow-none'
     : 'shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]';
+  const articleStackClassName = 'z-0 hover:z-[8] focus-within:z-[8]';
   const articleClassName = compactLayout
-    ? `relative ${compactArticleWidth} shrink-0 overflow-visible rounded-[1.125rem] bg-white px-3 pb-3 pt-2.5 ${cardShadowClass}`.trim()
-    : `relative w-[14.25rem] shrink-0 overflow-visible rounded-[1.375rem] bg-white px-3.5 pb-3.5 pt-3 ${cardShadowClass}`.trim();
+    ? `relative ${compactArticleWidth} ${articleStackClassName} flex h-full min-h-0 shrink-0 flex-col overflow-visible rounded-[1.125rem] bg-white px-3 pb-3 pt-2.5 ${cardShadowClass}`.trim()
+    : `relative w-[14.25rem] ${articleStackClassName} shrink-0 overflow-visible rounded-[1.375rem] bg-white px-3.5 pb-3.5 pt-3 ${cardShadowClass}`.trim();
   const imageWrapperClassName = compactLayout
     ? widerCompactCard
       ? 'h-[18.5rem]'
@@ -173,6 +174,8 @@ export function ProductsCatalogCard({
     : '-mt-4';
   const dotsGapClassName = compactLayout ? 'gap-1' : 'gap-[0.3125rem]';
   const dotsMarginClassName = compactLayout ? 'mb-1' : 'mb-3';
+  /** Keeps strip / multi-dot rows same block height so flex row stretch aligns all catalog cards. */
+  const dotsRowLayoutClassName = `flex min-h-3 items-center ${dotsGapClassName} ${dotsMarginClassName}`;
   const sizeBadgeClassName = compactLayout
     ? 'inline-flex items-center px-0 py-0 text-[0.625rem] font-semibold leading-tight text-[#122a26]'
     : 'inline-flex items-center px-0 py-0 text-[0.75rem] font-semibold leading-tight text-[#122a26]';
@@ -202,7 +205,7 @@ export function ProductsCatalogCard({
   return (
     <article className={`${articleClassName} ${className ?? ''}`.trim()}>
       <div
-        className={`relative z-10 mb-2 flex items-end justify-center ${imagePullUpClassName} ${imageWrapperClassName} overflow-visible`.trim()}
+        className={`relative z-10 mb-2 flex shrink-0 items-end justify-center ${imagePullUpClassName} ${imageWrapperClassName} overflow-visible`.trim()}
       >
         <div
           className={`relative ${imageInnerClassName} transition-transform duration-300 ease-out md:group-hover:-translate-y-1.5 md:group-hover:scale-[1.045]`}
@@ -233,58 +236,68 @@ export function ProductsCatalogCard({
         </div>
       </div>
 
-      <div className={`relative z-20 ${detailsOffsetClassName}`}>
-        {productImages.length > 1 ? (
+      <div
+        className={`relative z-20 min-h-0 ${compactLayout ? 'flex flex-1 flex-col justify-between' : ''} ${detailsOffsetClassName}`.trim()}
+      >
+        <div className="min-w-0">
+          {visibleDotCount > 0 ? (
+            visibleDotCount === 1 ? (
+              <div className={dotsRowLayoutClassName} aria-hidden="true">
+                <span className="block h-[0.25rem] w-[1.625rem] shrink-0 rounded-[0.15625rem] bg-[#122a26]" />
+              </div>
+            ) : (
+              <div
+                className={dotsRowLayoutClassName}
+                role="tablist"
+                aria-label="Product images"
+              >
+                {Array.from({ length: visibleDotCount }).map((_, index) => {
+                  const isActive = index === activeImageIndex;
+
+                  return (
+                    <button
+                      key={`${product.id}-dot-${index}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setActiveImageIndex(index);
+                      }}
+                      className="relative flex h-3 w-[1.625rem] cursor-pointer items-center"
+                      aria-label={`Select product image ${index + 1}`}
+                    >
+                      <span
+                        className={`block h-[0.25rem] w-full rounded-[0.15625rem] transition-colors ${
+                          isActive ? 'bg-[#122a26]' : 'bg-[#d9d9d9]'
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            )
+          ) : (
+            <div className={`min-h-3 ${dotsMarginClassName}`} aria-hidden />
+          )}
+
+          <Link href={`/products/${product.slug}`} className="block" onClick={handleProductLinkClick}>
+            <h3 className={`line-clamp-1 font-extrabold leading-tight text-[#414141] ${titleClassName}`}>
+              {product.title}
+            </h3>
+          </Link>
+
           <div
-            className={`flex ${dotsGapClassName} ${dotsMarginClassName}`}
-            role="tablist"
-            aria-label="Product images"
+            className={
+              compactLayout
+                ? 'mt-0.5 flex items-center gap-1'
+                : 'mt-2 flex items-center gap-1.5'
+            }
           >
-            {Array.from({ length: visibleDotCount }).map((_, index) => {
-              const isActive = index === activeImageIndex;
-
-              return (
-                <button
-                  key={`${product.id}-dot-${index}`}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setActiveImageIndex(index);
-                  }}
-                  className="relative flex h-3 w-[1.625rem] cursor-pointer items-center"
-                  aria-label={`Select product image ${index + 1}`}
-                >
-                  <span
-                    className={`block h-[0.25rem] w-full rounded-[0.15625rem] transition-colors ${
-                      isActive ? 'bg-[#122a26]' : 'bg-[#d9d9d9]'
-                    }`}
-                  />
-                </button>
-              );
-            })}
+            <span className={sizeBadgeClassName}>{sizeLabel}</span>
+            <span className={badgeClassNames}>{categoryLabel}</span>
           </div>
-        ) : (
-          <div className={dotsMarginClassName} aria-hidden />
-        )}
-
-        <Link href={`/products/${product.slug}`} className="block" onClick={handleProductLinkClick}>
-          <h3 className={`line-clamp-1 font-extrabold leading-tight text-[#414141] ${titleClassName}`}>
-            {product.title}
-          </h3>
-        </Link>
-
-        <div
-          className={
-            compactLayout
-              ? 'mt-0.5 flex items-center gap-1'
-              : 'mt-2 flex items-center gap-1.5'
-          }
-        >
-          <span className={sizeBadgeClassName}>{sizeLabel}</span>
-          <span className={badgeClassNames}>{categoryLabel}</span>
         </div>
 
         <div className={compactLayout ? 'mt-2 flex items-center justify-between gap-2' : 'mt-5 flex items-center justify-between gap-3'}>

@@ -6,13 +6,19 @@
     "hero": {
       "title": "We Make Concepts Real",
       "titleMobile": "We Make\nConcepts Real",
-      "description": "Premium accessories that redefine your rituals.",
+      "tagline": {
+        "lead": "Premium ",
+        "bold1": "accessories",
+        "mid": " that redefine your ",
+        "bold2": "rituals",
+        "tail": "."
+      },
       "imageAlt": "Hero",
       "slideAriaPrefix": "Slide"
     },
     "packFit": {
       "title": "Will it fit mine?",
-      "description": "Pack names are standard. Dimensions aren’t. We make precise versions that match yours",
+      "description": "Pack names are standard. Dimensions aren’t.\nWe make precise versions that match yours",
       "cta": "Check Availability",
       "items": {
         "ultraSlims": { "title": "Ultra Slims", "subtitle": "3 versions" },
