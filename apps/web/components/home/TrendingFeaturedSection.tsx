@@ -350,7 +350,7 @@ export function TrendingFeaturedSection() {
           href="/products"
           label={t('home.homepage.trending.shopCta')}
           variant="outline"
-          className="!w-fit !min-h-8 !-translate-y-1 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-tight !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!-translate-y-2 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-tight sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:z-30 xl:!translate-y-0"
+          className="!w-fit !min-h-8 !-translate-y-3 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-tight !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!-translate-y-4 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-tight sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:z-30 xl:!-translate-y-2"
         />
       </div>
 
