@@ -1,10 +1,13 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
+
+import { MAX_VOTING_GALLERY_IMAGES } from '@/lib/voting/voting-gallery';
+
 interface CultureVotingCardProps {
   id: string;
   title: string;
-  imageUrl: string;
-  likeCount: number;
+  images: string[];
   likedByCurrentUser: boolean;
   pending: boolean;
   onToggleLike: (itemId: string, likedByCurrentUser: boolean) => Promise<void>;
@@ -16,6 +19,60 @@ interface CultureVotingCardProps {
   variantLabel?: string;
   showEarlyAccess?: boolean;
   earlyAccessLabel?: string;
+}
+
+const DOTS_ROW_CLASS =
+  'flex min-h-3 items-center gap-[0.3125rem] mb-1 sm:mb-2';
+
+interface CultureVotingImageDotsProps {
+  itemId: string;
+  visibleDotCount: number;
+  activeImageIndex: number;
+  onSelect: (index: number) => void;
+}
+
+function CultureVotingImageDots({
+  itemId,
+  visibleDotCount,
+  activeImageIndex,
+  onSelect,
+}: CultureVotingImageDotsProps) {
+  if (visibleDotCount <= 0) {
+    return <div className="min-h-3 sm:mb-2" aria-hidden />;
+  }
+
+  if (visibleDotCount === 1) {
+    return (
+      <div className={DOTS_ROW_CLASS} aria-hidden="true">
+        <span className="block h-[0.25rem] w-[1.625rem] shrink-0 rounded-[0.15625rem] bg-[#122a26]" />
+      </div>
+    );
+  }
+
+  return (
+    <div className={DOTS_ROW_CLASS} role="tablist" aria-label="Images">
+      {Array.from({ length: visibleDotCount }).map((_, index) => {
+        const isActive = index === activeImageIndex;
+        return (
+          <button
+            key={`${itemId}-dot-${index}`}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onSelect(index)}
+            className="relative flex h-3 w-[1.625rem] cursor-pointer items-center"
+            aria-label={`Select image ${index + 1} of ${visibleDotCount}`}
+          >
+            <span
+              className={`block h-[0.25rem] w-full rounded-[0.15625rem] transition-colors ${
+                isActive ? 'bg-[#122a26]' : 'bg-[#d9d9d9]'
+              }`}
+            />
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 function HeartIcon({ filled }: { filled: boolean }) {
@@ -37,11 +94,49 @@ function HeartIcon({ filled }: { filled: boolean }) {
   );
 }
 
+function useCultureVotingCardGallery(images: string[], id: string) {
+  const displayImages = useMemo(() => {
+    const trimmed = images.map((u) => u.trim()).filter(Boolean);
+    const unique = trimmed.filter((url, index, arr) => arr.indexOf(url) === index);
+    return unique.slice(0, MAX_VOTING_GALLERY_IMAGES);
+  }, [images]);
+
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
+  const visibleDotCount = Math.min(displayImages.length, MAX_VOTING_GALLERY_IMAGES);
+  const activeSrc = displayImages[activeImageIndex] ?? '';
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [id]);
+
+  useEffect(() => {
+    setActiveImageIndex((previous) => {
+      if (displayImages.length === 0) {
+        return 0;
+      }
+      return previous >= displayImages.length ? 0 : previous;
+    });
+  }, [id, displayImages.length]);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [activeImageIndex, id]);
+
+  return {
+    activeImageIndex,
+    setActiveImageIndex,
+    visibleDotCount,
+    activeSrc,
+    imageError,
+    onHeroImageError: () => setImageError(true),
+  };
+}
+
 export function CultureVotingCard({
   id,
   title,
-  imageUrl,
-  likeCount,
+  images,
   likedByCurrentUser,
   pending,
   onToggleLike,
@@ -52,10 +147,20 @@ export function CultureVotingCard({
   showEarlyAccess = false,
   earlyAccessLabel = 'Early Access',
 }: CultureVotingCardProps) {
+  const {
+    activeImageIndex,
+    setActiveImageIndex,
+    visibleDotCount,
+    activeSrc,
+    imageError,
+    onHeroImageError,
+  } = useCultureVotingCardGallery(images, id);
+
   const imageNudgeClassName = imageNudgeDown ? 'sm:translate-y-3' : '';
   const mobileTopPaddingClassName = mobileCompactBack ? 'pt-[8.25rem]' : 'pt-[9.25rem]';
   const mobileContentOffsetClassName = mobileCompactBack ? 'translate-y-1' : 'translate-y-0';
   const mobileTitleOffsetClassName = mobileCompactBack ? 'translate-y-1' : '';
+
   return (
     <article
       className={`relative z-10 mx-auto flex h-full min-h-0 w-full max-w-[10rem] flex-col overflow-visible rounded-3xl bg-white p-2 ${mobileTopPaddingClassName} sm:max-w-[15rem] sm:p-4 sm:pt-4 lg:max-w-none`}
@@ -63,20 +168,40 @@ export function CultureVotingCard({
       <div
         className={`absolute left-3 right-3 top-[-3.5rem] z-10 h-[15rem] shrink-0 overflow-visible rounded-2xl sm:relative sm:left-auto sm:right-auto sm:top-auto sm:-mt-[5.5rem] sm:mb-2 sm:h-64 ${imageNudgeClassName}`.trim()}
       >
-        <img src={imageUrl} alt={title} className="h-full w-full object-cover" loading="lazy" />
+        {activeSrc && !imageError ? (
+          <img
+            key={`${id}-${activeImageIndex}-${activeSrc}`}
+            src={activeSrc}
+            alt={title}
+            className="h-full w-full object-cover"
+            loading="lazy"
+            onError={onHeroImageError}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center rounded-2xl bg-[#f1f1ef] text-xs font-medium text-[#9d9d9d]">
+            No image
+          </div>
+        )}
       </div>
 
       <div
-        className={`mt-0 flex min-h-0 flex-1 flex-col ${mobileContentOffsetClassName} sm:mt-3 sm:translate-y-0`}
+        className={`mt-0 flex min-h-0 flex-1 flex-col gap-2 sm:gap-3 ${mobileContentOffsetClassName} sm:mt-3 sm:translate-y-0`}
       >
-        <div className="min-w-0 flex-1">
+        <CultureVotingImageDots
+          itemId={id}
+          visibleDotCount={visibleDotCount}
+          activeImageIndex={activeImageIndex}
+          onSelect={setActiveImageIndex}
+        />
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1 sm:gap-2">
           <h3
             className={`min-h-[1.85rem] text-[16px] font-extrabold leading-[1.15] text-[#414141] line-clamp-2 sm:min-h-0 sm:text-xl sm:leading-none ${mobileTitleOffsetClassName}`}
           >
             {title}
           </h3>
           {sizeLabel || variantLabel ? (
-            <div className="mt-0 flex flex-wrap items-center gap-1.5 sm:mt-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               {sizeLabel ? <span className="whitespace-nowrap text-xs font-medium text-[#9d9d9d]">{sizeLabel}</span> : null}
               {variantLabel ? (
                 <span className="rounded-md bg-[#122a26] px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
@@ -88,7 +213,7 @@ export function CultureVotingCard({
         </div>
 
         <div
-          className={`mt-1.5 flex min-h-[1.75rem] shrink-0 items-center gap-2 sm:mt-2.5 ${showEarlyAccess ? 'justify-between' : 'justify-end'}`}
+          className={`flex min-h-[1.75rem] shrink-0 items-center gap-2 ${showEarlyAccess ? 'justify-between' : 'justify-end'}`}
         >
           {showEarlyAccess ? (
             <button

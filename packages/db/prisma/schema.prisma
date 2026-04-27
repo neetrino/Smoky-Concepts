@@ -362,11 +362,13 @@ model Voting {
 }
 
 model VotingItem {
-  id        String       @id @default(cuid())
-  votingId  String
-  title     String
-  imageUrl  String
-  deletedAt DateTime?
+  id          String   @id @default(cuid())
+  votingId    String
+  title       String
+  imageUrl    String
+  /// Extra angles for the home Culture card carousel; empty => use imageUrl only.
+  galleryUrls String[] @default([])
+  deletedAt   DateTime?
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 

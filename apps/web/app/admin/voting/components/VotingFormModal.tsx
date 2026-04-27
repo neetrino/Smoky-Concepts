@@ -5,8 +5,10 @@ import { useRef, useState } from 'react';
 
 import { Button, Input } from '@shop/ui';
 
+import { showToast } from '@/components/Toast';
 import { apiClient } from '@/lib/api-client';
 import { useTranslation } from '@/lib/i18n-client';
+import { MAX_VOTING_GALLERY_IMAGES } from '@/lib/voting/voting-gallery';
 
 import type { VotingFormData } from '../types';
 
@@ -69,6 +71,12 @@ export function VotingFormModal({
       return;
     }
 
+    if (formData.imageUrls.length >= MAX_VOTING_GALLERY_IMAGES) {
+      showToast(t('admin.voting.maxGalleryImagesToast'), 'warning');
+      event.target.value = '';
+      return;
+    }
+
     if (!file.type.startsWith('image/')) {
       setUploadError(t('admin.voting.imageInvalidType'));
       event.target.value = '';
@@ -95,7 +103,7 @@ export function VotingFormModal({
 
       onFormDataChange({
         ...formData,
-        imageUrl,
+        imageUrls: [...formData.imageUrls, imageUrl],
       });
     } catch {
       setUploadError(t('admin.voting.imageUploadFailed'));
@@ -103,6 +111,13 @@ export function VotingFormModal({
       setUploading(false);
       event.target.value = '';
     }
+  };
+
+  const removeImageAt = (index: number) => {
+    onFormDataChange({
+      ...formData,
+      imageUrls: formData.imageUrls.filter((_, i) => i !== index),
+    });
   };
 
   if (!isOpen) {
@@ -113,7 +128,7 @@ export function VotingFormModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6">
+      <div className="mx-4 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white p-6">
         <h3 className="mb-4 text-lg font-semibold text-gray-900">
           {isCreateMode ? t('admin.voting.addChoice') : t('admin.voting.editChoice')}
         </h3>
@@ -140,9 +155,10 @@ export function VotingFormModal({
 
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              {t('admin.voting.imageField')} *
+              {t('admin.voting.imagesField')} *
             </label>
-            <div className="flex items-center gap-3">
+            <p className="mb-2 text-xs text-gray-500">{t('admin.voting.galleryImagesHint')}</p>
+            <div className="flex flex-wrap items-center gap-3">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -150,52 +166,60 @@ export function VotingFormModal({
                 className="sr-only"
                 aria-hidden
                 onChange={handleFileUpload}
-                disabled={saving || uploading}
+                disabled={saving || uploading || formData.imageUrls.length >= MAX_VOTING_GALLERY_IMAGES}
               />
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={saving || uploading}
+                disabled={
+                  saving || uploading || formData.imageUrls.length >= MAX_VOTING_GALLERY_IMAGES
+                }
               >
-                {uploading ? t('admin.voting.uploadingImage') : t('admin.voting.uploadImage')}
+                {formData.imageUrls.length === 0
+                  ? uploading
+                    ? t('admin.voting.uploadingImage')
+                    : t('admin.voting.uploadImage')
+                  : uploading
+                    ? t('admin.voting.uploadingImage')
+                    : t('admin.voting.addAnotherImage')}
               </Button>
-              {formData.imageUrl ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() =>
-                    onFormDataChange({
-                      ...formData,
-                      imageUrl: '',
-                    })
-                  }
-                  disabled={saving || uploading}
-                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                >
-                  {t('admin.voting.removeImage')}
-                </Button>
-              ) : null}
             </div>
           </div>
 
           {uploadError ? <p className="text-sm text-red-600">{uploadError}</p> : null}
 
-          {formData.imageUrl ? (
-            <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-3">
-              <img
-                src={formData.imageUrl}
-                alt={t('admin.voting.imagePreviewAlt')}
-                className="h-40 w-full object-cover"
-              />
-            </div>
+          {formData.imageUrls.length > 0 ? (
+            <ul className="grid grid-cols-2 gap-3">
+              {formData.imageUrls.map((url, index) => (
+                <li
+                  key={`${url}-${index}`}
+                  className="relative overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
+                >
+                  <img
+                    src={url}
+                    alt={t('admin.voting.imagePreviewAlt')}
+                    className="h-36 w-full object-cover"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => removeImageAt(index)}
+                    disabled={saving || uploading}
+                    className="absolute right-1 top-1 rounded-md bg-white/90 px-2 py-1 text-xs text-red-600 shadow-sm hover:bg-red-50"
+                  >
+                    {t('admin.voting.removeImage')}
+                  </Button>
+                </li>
+              ))}
+            </ul>
           ) : null}
         </div>
 
         <div className="mt-6 flex gap-3">
           <Button
             variant="primary"
-            onClick={onSubmit}
+            onClick={() => onSubmit()}
             disabled={saving || uploading}
             className="flex-1"
           >
@@ -207,7 +231,7 @@ export function VotingFormModal({
                 ? t('admin.voting.createChoice')
                 : t('admin.voting.updateChoice')}
           </Button>
-          <Button variant="ghost" onClick={onClose} disabled={saving || uploading}>
+          <Button type="button" variant="ghost" onClick={onClose} disabled={saving || uploading}>
             {t('admin.common.cancel')}
           </Button>
         </div>

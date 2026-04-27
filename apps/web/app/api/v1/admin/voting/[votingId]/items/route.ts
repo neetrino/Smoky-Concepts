@@ -48,6 +48,7 @@ export async function POST(
     const body = (await req.json()) as {
       title?: string;
       imageUrl?: string;
+      imageUrls?: string[];
     };
 
     const result = await adminService.createVotingItem(votingId, body);

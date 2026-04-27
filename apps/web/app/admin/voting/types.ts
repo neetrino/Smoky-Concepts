@@ -17,6 +17,7 @@ export interface VotingSummaryItem {
   id: string;
   title: string;
   imageUrl: string;
+  galleryUrls: string[];
   likeCount: number;
 }
 
@@ -33,6 +34,7 @@ export interface VotingItem {
   votingId: string;
   title: string;
   imageUrl: string;
+  galleryUrls: string[];
   likeCount: number;
   topLiked: boolean;
   createdAt: string;
@@ -53,7 +55,7 @@ export interface VotingWithItemsResponse {
 
 export interface VotingFormData {
   title: string;
-  imageUrl: string;
+  imageUrls: string[];
 }
 
 export interface VotingCampaignFormData {

@@ -91,6 +91,7 @@ export async function PUT(
     const body = (await req.json()) as {
       title?: string;
       imageUrl?: string;
+      imageUrls?: string[];
     };
 
     const result = await adminService.updateVotingItem(itemId, body);
