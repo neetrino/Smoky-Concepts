@@ -93,24 +93,24 @@ function UpcomingLineCard({
 }: UpcomingLineCardProps) {
   const imageFrameClassName = !emphasizeImage
     ? imageDocumentsLayout
-      ? 'pointer-events-none absolute left-1/2 top-3 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[26%] sm:top-4 sm:h-36 sm:w-36 sm:-translate-y-[24%] xl:top-5 xl:h-44 xl:w-44 xl:-translate-y-[28%]'
-      : 'pointer-events-none absolute left-1/2 top-0 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[36%] sm:h-36 sm:w-36 sm:-translate-y-[36%] xl:h-44 xl:w-44 xl:-translate-y-[40%]'
+      ? 'pointer-events-none absolute left-1/2 top-3 h-22 w-22 origin-bottom -translate-x-1/2 -translate-y-[26%] sm:top-4 sm:h-32 sm:w-32 sm:-translate-y-[24%] xl:top-5 xl:h-40 xl:w-40 xl:-translate-y-[28%]'
+      : 'pointer-events-none absolute left-1/2 top-0 h-22 w-22 origin-bottom -translate-x-1/2 -translate-y-[36%] sm:h-32 sm:w-32 sm:-translate-y-[36%] xl:h-40 xl:w-40 xl:-translate-y-[40%]'
     : imageNudgeDown
-      ? 'pointer-events-none absolute left-1/2 top-2 h-28 w-28 origin-bottom -translate-x-1/2 -translate-y-[28%] sm:top-4 sm:h-40 sm:w-40 sm:-translate-y-[24%] xl:top-5 xl:h-48 xl:w-48 xl:-translate-y-[28%]'
+      ? 'pointer-events-none absolute left-1/2 top-2 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[28%] sm:top-4 sm:h-36 sm:w-36 sm:-translate-y-[24%] xl:top-5 xl:h-44 xl:w-44 xl:-translate-y-[28%]'
       : imageKeysLayout
-        ? 'pointer-events-none absolute left-[57%] top-0 h-32 w-32 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:left-[56%] sm:top-0 sm:h-44 sm:w-44 sm:-translate-y-[30%] xl:left-[56%] xl:top-0 xl:h-[13.25rem] xl:w-[13.25rem] xl:-translate-y-[34%]'
+        ? 'pointer-events-none absolute left-[57%] top-0 h-28 w-28 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:left-[56%] sm:top-0 sm:h-40 sm:w-40 sm:-translate-y-[30%] xl:left-[56%] xl:top-0 xl:h-[11.25rem] xl:w-[11.25rem] xl:-translate-y-[34%]'
         : imagePhonesLayout
-          ? 'pointer-events-none absolute left-1/2 top-4 h-44 w-44 origin-bottom -translate-x-1/2 -translate-y-[30%] sm:top-5 sm:h-56 sm:w-56 sm:-translate-y-[26%] xl:top-6 xl:h-[18rem] xl:w-[18rem] xl:-translate-y-[30%]'
+          ? 'pointer-events-none absolute left-1/2 top-2 h-40 w-40 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:top-3 sm:h-52 sm:w-52 sm:-translate-y-[28%] xl:top-4 xl:h-[15.5rem] xl:w-[15.5rem] xl:-translate-y-[32%]'
           : imageKnifesLayout
-            ? 'pointer-events-none absolute left-[68%] top-1.5 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[24%] sm:left-[68%] sm:top-2 sm:h-32 sm:w-32 sm:-translate-y-[22%] xl:left-[68%] xl:top-2.5 xl:h-40 xl:w-40 xl:-translate-y-[26%]'
-            : 'pointer-events-none absolute left-1/2 top-0 h-28 w-28 origin-bottom -translate-x-1/2 -translate-y-[40%] sm:h-40 sm:w-40 sm:-translate-y-[38%] xl:h-48 xl:w-48 xl:-translate-y-[42%]';
+            ? 'pointer-events-none absolute left-[68%] top-1.5 h-22 w-22 origin-bottom -translate-x-1/2 -translate-y-[24%] sm:left-[68%] sm:top-2 sm:h-28 sm:w-28 sm:-translate-y-[22%] xl:left-[68%] xl:top-2.5 xl:h-36 xl:w-36 xl:-translate-y-[26%]'
+            : 'pointer-events-none absolute left-1/2 top-0 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[40%] sm:h-36 sm:w-36 sm:-translate-y-[38%] xl:h-44 xl:w-44 xl:-translate-y-[42%]';
   const imageSizes = imagePhonesLayout
-    ? '(max-width: 640px) 160px, (max-width: 1280px) 224px, 288px'
+    ? '(max-width: 640px) 144px, (max-width: 1280px) 200px, 256px'
     : imageKeysLayout
-      ? '(max-width: 640px) 112px, (max-width: 1280px) 176px, 212px'
+      ? '(max-width: 640px) 100px, (max-width: 1280px) 156px, 192px'
       : imageKnifesLayout
-        ? '(max-width: 640px) 88px, (max-width: 1280px) 128px, 160px'
-        : '(max-width: 640px) 96px, (max-width: 1280px) 160px, 192px';
+        ? '(max-width: 640px) 80px, (max-width: 1280px) 112px, 144px'
+        : '(max-width: 640px) 88px, (max-width: 1280px) 144px, 176px';
   const imageClassName = emphasizeImage
     ? 'object-contain object-center [filter:blur(1px)_brightness(1.02)_drop-shadow(0_10px_16px_rgba(18,42,38,0.16))] sm:[filter:blur(2px)_brightness(0.95)_drop-shadow(0_12px_22px_rgba(18,42,38,0.18))]'
     : imageDocumentsLayout
@@ -118,8 +118,8 @@ function UpcomingLineCard({
       : 'object-contain object-center [filter:blur(1.5px)_brightness(1.03)_drop-shadow(0_8px_14px_rgba(18,42,38,0.12))] sm:[filter:blur(3px)_brightness(0.95)_drop-shadow(0_10px_20px_rgba(18,42,38,0.16))]';
 
   return (
-    <div className="relative flex h-full flex-col overflow-visible pt-6 sm:pt-8">
-      <div className="relative flex min-h-[7.6rem] flex-1 flex-col justify-end rounded-[1.2rem] bg-[#f3f3f3] px-3 pb-2.5 pt-10 sm:min-h-[11.5rem] sm:rounded-[2rem] sm:bg-white sm:px-6 sm:pb-6 sm:pt-14 xl:min-h-0">
+    <div className="relative flex h-full flex-col overflow-visible pt-5 sm:pt-7">
+      <div className="relative flex min-h-[7rem] flex-1 flex-col justify-end rounded-[1.1rem] bg-[#f3f3f3] px-2.5 pb-2 pt-9 sm:min-h-[10.5rem] sm:rounded-[1.75rem] sm:bg-white sm:px-5 sm:pb-5 sm:pt-12 xl:min-h-0">
         <div className={imageFrameClassName}>
           <Image
             src={imageSrc}
@@ -129,7 +129,7 @@ function UpcomingLineCard({
             sizes={imageSizes}
           />
         </div>
-        <h3 className="text-[1.25rem] font-extrabold leading-none text-[#36373a] sm:text-3xl">{title}</h3>
+        <h3 className="text-[1.125rem] font-extrabold leading-none text-[#36373a] sm:text-[1.65rem]">{title}</h3>
       </div>
     </div>
   );
@@ -458,7 +458,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                 />
               ))}
             </div>
-            <div className="hidden xl:grid xl:h-[26rem] xl:w-full xl:grid-cols-3 xl:gap-x-4 2xl:h-[30rem]">
+            <div className="hidden xl:grid xl:h-[23.5rem] xl:w-full xl:grid-cols-3 xl:gap-x-3 2xl:h-[27.5rem] 2xl:gap-x-4">
               <div className="grid h-full xl:[grid-template-rows:350fr_32fr_186fr]">
                 {renderUpcomingLineCard('Notebooks')}
                 <div aria-hidden="true" />
