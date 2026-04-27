@@ -4,6 +4,15 @@ interface HomeSectionTitleDescriptionTwoLine {
   line2: string;
 }
 
+/** Inline emphasis (e.g. hero tagline): two bold spans, rest regular. Takes precedence over `description` when set. */
+interface HomeSectionTitleDescriptionEmphasis {
+  lead: string;
+  bold1: string;
+  mid: string;
+  bold2: string;
+  tail: string;
+}
+
 interface HomeSectionTitleProps {
   title: string;
   /** When set, shown below `sm` with `whitespace-pre-line`; `title` is used from `sm` up (natural wrap). */
@@ -11,6 +20,10 @@ interface HomeSectionTitleProps {
   description?: string;
   /** Two-line description: first word bold, rest of line 1 + line 2 regular. Takes precedence over `description`. */
   descriptionTwoLine?: HomeSectionTitleDescriptionTwoLine;
+  /** Extra Tailwind classes for the bold segment (`line1Bold`) only. */
+  descriptionTwoLineBoldClassName?: string;
+  /** Single-line (or pre-line) copy with two emphasized words — same weight as `descriptionTwoLine` bold span. */
+  descriptionEmphasis?: HomeSectionTitleDescriptionEmphasis;
   centered?: boolean;
   className?: string;
   titleClassName?: string;
@@ -24,6 +37,8 @@ export function HomeSectionTitle({
   titleMobile,
   description,
   descriptionTwoLine,
+  descriptionTwoLineBoldClassName = '',
+  descriptionEmphasis,
   centered = true,
   className = '',
   titleClassName = '',
@@ -45,7 +60,7 @@ export function HomeSectionTitle({
       </h2>
       {descriptionTwoLine ? (
         <p className="max-w-[52rem] text-base font-normal leading-[1.375] text-[#414141] sm:leading-relaxed">
-          <span className="font-bold">{descriptionTwoLine.line1Bold}</span>
+          <span className={`font-bold ${descriptionTwoLineBoldClassName}`.trim()}>{descriptionTwoLine.line1Bold}</span>
           {descriptionTwoLine.line1Rest ? (
             <>
               {' '}
@@ -54,6 +69,14 @@ export function HomeSectionTitle({
           ) : null}
           <br />
           {descriptionTwoLine.line2}
+        </p>
+      ) : descriptionEmphasis ? (
+        <p className="max-w-[52rem] whitespace-pre-line text-base font-normal leading-[1.375] text-[#414141] sm:leading-relaxed">
+          {descriptionEmphasis.lead}
+          <span className="font-black">{descriptionEmphasis.bold1}</span>
+          {descriptionEmphasis.mid}
+          <span className="font-black">{descriptionEmphasis.bold2}</span>
+          {descriptionEmphasis.tail}
         </p>
       ) : description ? (
         <p className="max-w-[52rem] whitespace-pre-line text-base font-medium leading-[1.375] text-[#414141] sm:leading-relaxed">

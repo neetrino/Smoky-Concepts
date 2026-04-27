@@ -13,6 +13,7 @@ interface HomeHeroSectionProps {
 
 /**
  * Homepage hero: same layout/size as static Figma block; supports multiple slides and dot navigation.
+ * Image area: 28rem / 32rem (was 36.125rem / 42.5rem) for a shorter above-the-fold block.
  */
 export function HomeHeroSection({ slides }: HomeHeroSectionProps) {
   const { t } = useTranslation();
@@ -31,7 +32,7 @@ export function HomeHeroSection({ slides }: HomeHeroSectionProps) {
 
   return (
     <div className="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2.25rem]">
-      <div className="relative h-[36.125rem] sm:h-[42.5rem]">
+      <div className="relative h-[28rem] sm:h-[32rem]">
         {safeSlides.map((slide, index) => (
           <div
             key={`${slide.imageUrl}-${index}`}
