@@ -400,11 +400,15 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             </div>
           </div>
           <div className="-mt-5 rounded-[1.5rem] rounded-t-xl bg-white px-5 pb-6 pt-5 font-montserrat shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:-mt-7 sm:rounded-[2.25rem] sm:px-8 sm:pb-7 sm:pt-6">
-            <div className="grid gap-6 xl:grid-cols-4">
+            <div className="grid max-xl:gap-0 gap-6 xl:grid-cols-4">
               {RITUAL_STEPS.map((step, index) => (
                 <div
                   key={step.step}
-                  className={`flex gap-3 ${index < RITUAL_STEPS.length - 1 ? 'xl:border-r xl:border-[#eeeeee] xl:pr-6' : ''}`}
+                  className={`flex gap-3 ${
+                    index < RITUAL_STEPS.length - 1
+                      ? 'border-b border-[#eeeeee] pb-6 xl:border-b-0 xl:border-r xl:border-[#eeeeee] xl:pb-0 xl:pr-6'
+                      : ''
+                  }`}
                 >
                   <span className="shrink-0 text-5xl font-bold leading-none tracking-tight text-[#dcc49a] sm:text-6xl">
                     {step.step}
