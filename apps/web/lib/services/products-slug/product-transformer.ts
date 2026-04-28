@@ -327,6 +327,67 @@ function transformProductAttributes(
   return [];
 }
 
+type CategoryTranslationRow = { locale: string; slug: string; title: string };
+type CategoryWithTranslations = {
+  id: string;
+  translations?: CategoryTranslationRow[];
+};
+
+function mapCategoryToOutput(cat: CategoryWithTranslations, lang: string): {
+  id: string;
+  slug: string;
+  title: string;
+} {
+  const catTranslations = Array.isArray(cat.translations) ? cat.translations : [];
+  const catTranslation =
+    catTranslations.find((t) => t.locale === lang) || catTranslations[0] || null;
+  return {
+    id: cat.id,
+    slug: catTranslation?.slug || "",
+    title: catTranslation?.title || "",
+  };
+}
+
+/**
+ * Same merge as catalog list (`products-find-transform`): scalar `categoryIds` / `primaryCategoryId`
+ * when the many-to-many `categories` relation is empty or partial.
+ */
+async function buildMergedCategoriesForResponse(
+  product: ProductWithFullRelations,
+  lang: string
+): Promise<Array<{ id: string; slug: string; title: string }>> {
+  const relationCategories = Array.isArray(product.categories)
+    ? product.categories.map((cat) => mapCategoryToOutput(cat, lang))
+    : [];
+
+  const relationCategoryIdSet = new Set(relationCategories.map((c) => c.id));
+  const scalarCategoryIds = Array.isArray(product.categoryIds) ? product.categoryIds : [];
+  const primaryCategoryIds = product.primaryCategoryId ? [product.primaryCategoryId] : [];
+  const missingIds = [...new Set([...scalarCategoryIds, ...primaryCategoryIds])].filter(
+    (categoryId) => !relationCategoryIdSet.has(categoryId)
+  );
+
+  if (missingIds.length === 0) {
+    return relationCategories;
+  }
+
+  const fallbackRows = await db.category.findMany({
+    where: { id: { in: missingIds } },
+    include: { translations: true },
+  });
+
+  const missingCategories = fallbackRows.map((cat) => mapCategoryToOutput(cat, lang));
+  const merged = [...relationCategories, ...missingCategories];
+  const seen = new Set<string>();
+  return merged.filter((c) => {
+    if (seen.has(c.id)) {
+      return false;
+    }
+    seen.add(c.id);
+    return true;
+  });
+}
+
 /**
  * Transform product data to response format
  */
@@ -368,16 +429,7 @@ export async function transformProduct(
       ? defaultVariantOriginalPrice
       : defaultVariant?.compareAtPrice || null;
 
-  // Transform categories
-  const categories = Array.isArray(product.categories) ? product.categories.map((cat: { id: string; translations?: Array<{ locale: string; slug: string; title: string }> }) => {
-    const catTranslations = Array.isArray(cat.translations) ? cat.translations : [];
-    const catTranslation = catTranslations.find((t: { locale: string }) => t.locale === lang) || catTranslations[0] || null;
-    return {
-      id: cat.id,
-      slug: catTranslation?.slug || "",
-      title: catTranslation?.title || "",
-    };
-  }) : [];
+  const categories = await buildMergedCategoriesForResponse(product, lang);
 
   return {
     id: product.id,

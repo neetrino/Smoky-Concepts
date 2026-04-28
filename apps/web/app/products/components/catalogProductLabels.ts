@@ -1,5 +1,13 @@
 import type { CatalogProductCardItem } from './ProductsCatalogCard';
 
+/** Section pill colors — same tokens as {@link ProductsCatalogCard} PDP/catalog. */
+export const PRODUCT_SECTION_BADGE_CLASS_NAMES: Record<string, string> = {
+  Classic: 'bg-[#122a26] text-white',
+  Special: 'bg-[#dcc090] text-white',
+  Atelier: 'bg-[#731818] text-white',
+  Premium: 'bg-[#414141] text-white',
+};
+
 const SECTION_NAME_BY_CATEGORY_SLUG: Record<string, string> = {
   classic: 'Classic',
   'special-edition': 'Special',
@@ -70,16 +78,47 @@ export function toCatalogProduct(input: {
   };
 }
 
-export function getProductSectionLabels(product: CatalogProduct): string[] {
-  const labels = product.categories
+export function getProductSectionLabelsForCategories(
+  categories: CatalogProduct['categories']
+): string[] {
+  const labels = categories
     .map((category) => SECTION_NAME_BY_CATEGORY_SLUG[category.slug] ?? category.title)
     .filter((label): label is string => Boolean(label?.trim()));
 
+  return Array.from(new Set(labels));
+}
+
+export function getProductSectionLabels(product: CatalogProduct): string[] {
+  const labels = getProductSectionLabelsForCategories(product.categories);
   if (labels.length === 0) {
     return ['Classic'];
   }
+  return labels;
+}
 
-  return Array.from(new Set(labels));
+/**
+ * Collection pills for PDP — matches catalog card section colors and labels (no fake Classic when there are no categories).
+ */
+export function getProductCollectionBadgeItems(product: {
+  categories?: CatalogProduct['categories'];
+}): Array<{ sectionLabel: string; text: string }> {
+  const categories = product.categories ?? [];
+  if (categories.length === 0) {
+    return [];
+  }
+  const catalogProduct = toCatalogProduct({
+    id: '_pdp',
+    slug: '_pdp',
+    title: '_',
+    price: 0,
+    image: null,
+    categories,
+  });
+  const sections = getProductSectionLabelsForCategories(catalogProduct.categories);
+  return sections.map((sectionTitle) => ({
+    sectionLabel: sectionTitle,
+    text: getCategoryLabel(catalogProduct, sectionTitle),
+  }));
 }
 
 /**

@@ -9,6 +9,8 @@ import { useAddToCart } from '../../../components/hooks/useAddToCart';
 import { useCurrency } from '../../../components/hooks/useCurrency';
 import { formatCatalogPrice } from '../../../lib/currency';
 
+import { PRODUCT_SECTION_BADGE_CLASS_NAMES } from './catalogProductLabels';
+
 const BAG_ICON_PATH = '/assets/home/icons/bag.svg';
 const CATALOG_BAG_ICON_PATH = '/assets/home/icons/bag-catalog.svg';
 const IMAGE_SIZES = '(max-width: 640px) 160px, (max-width: 768px) 200px, 240px';
@@ -16,13 +18,6 @@ const MAX_IMAGE_DOT_COUNT = 8;
 
 /** Default card elevation (catalog, home, upcoming — same token for consistent look). */
 const CARD_SHADOW_TAILWIND = 'shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]';
-
-const SECTION_BADGE_CLASS_NAMES: Record<string, string> = {
-  Classic: 'bg-[#122a26] text-white',
-  Special: 'bg-[#dcc090] text-white',
-  Atelier: 'bg-[#731818] text-white',
-  Premium: 'bg-[#414141] text-white',
-};
 
 export interface CatalogProductCardItem {
   id: string;
@@ -138,7 +133,7 @@ export function ProductsCatalogCard({
 
   const activeImage = productImages[activeImageIndex] ?? product.image;
   const badgeClassName =
-    SECTION_BADGE_CLASS_NAMES[sectionLabel] ?? SECTION_BADGE_CLASS_NAMES.Classic;
+    PRODUCT_SECTION_BADGE_CLASS_NAMES[sectionLabel] ?? PRODUCT_SECTION_BADGE_CLASS_NAMES.Classic;
   const isCompactSize = sizeLabel === 'Compact';
   const isUpcomingLarge = upcomingMobileSize === 'large';
   const isUpcomingSmall = upcomingMobileSize === 'small';

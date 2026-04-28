@@ -10,6 +10,10 @@ import { apiClient } from '../../../lib/api-client';
 import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { Button } from '../../../components/ui/buttons';
 import type { AttributeGroupValue, Product, ProductVariant } from './types';
+import {
+  getProductCollectionBadgeItems,
+  PRODUCT_SECTION_BADGE_CLASS_NAMES,
+} from '../components/catalogProductLabels';
 import { normalizeHexPalette, parseHexFromText } from './utils/swatch-color-utils';
 import { CustomizeFormatToolbar } from './CustomizeFormatToolbar';
 import { CustomizeSizeModal } from './CustomizeSizeModal';
@@ -325,13 +329,23 @@ export function ProductInfoAndActions({
       ? 'pb-2.5 font-montserrat text-[15px] font-extrabold leading-none sm:text-[16px] md:text-[17px]'
       : 'pb-2.5 font-montserrat text-[14px] font-extrabold leading-none sm:text-[15px] md:text-[16px]';
 
-  const productBadges = product.labels?.length
-    ? product.labels
-        .map((label) => label.value?.trim())
-        .filter((value): value is string => Boolean(value))
-    : product.categories
-        ?.map((category) => category.title?.trim())
-        .filter((value): value is string => Boolean(value)) ?? [];
+  const collectionBadgeItems = useMemo(() => getProductCollectionBadgeItems(product), [product]);
+
+  const labelBadgeItems = useMemo(
+    () =>
+      product.labels?.length
+        ? product.labels
+            .map((label) => ({
+              id: label.id,
+              text: label.value?.trim() ?? '',
+              color: label.color?.trim() ?? null,
+            }))
+            .filter((item) => item.text.length > 0)
+        : [],
+    [product.labels, product.id]
+  );
+
+  const hasTitleRowBadges = collectionBadgeItems.length > 0 || labelBadgeItems.length > 0;
   const productDetails = [
     product.brand?.name ?? null,
     activeColorOption ? `${t(language, 'product.color')}: ${activeColorOption.label}` : null,
@@ -471,26 +485,38 @@ export function ProductInfoAndActions({
   return (
     <>
     <div className="max-w-[763px] min-w-0 w-full pt-[clamp(3rem,7.8vw,11.25rem)]">
-      <div className="flex min-w-0 items-start justify-between gap-3">
-        <h1 className="min-w-0 flex-1 truncate whitespace-nowrap font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
-          {productTitle}
-        </h1>
-        {productBadges.length > 0 && (
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
-            {productBadges.map((badge, index) => (
-              <div
-                key={`${badge}-${index}`}
-                className="inline-flex h-[18px] items-center rounded-[6px] bg-[#122a26] px-[7px] text-[12px] font-medium leading-none text-white"
-              >
-                {badge}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <h1 className="min-w-0 font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
+        {productTitle}
+      </h1>
+      {hasTitleRowBadges ? (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          {collectionBadgeItems.map((item, index) => (
+            <span
+              key={`${item.sectionLabel}-${item.text}-${index}`}
+              className={`inline-flex items-center rounded-full px-2.5 py-1 font-montserrat text-xs font-medium leading-none sm:text-[13px] ${
+                PRODUCT_SECTION_BADGE_CLASS_NAMES[item.sectionLabel] ??
+                PRODUCT_SECTION_BADGE_CLASS_NAMES.Classic
+              }`}
+            >
+              {item.text}
+            </span>
+          ))}
+          {labelBadgeItems.map((item) => (
+            <span
+              key={item.id}
+              className={`inline-flex items-center rounded-full px-2.5 py-1 font-montserrat text-xs font-medium leading-none text-white sm:text-[13px] ${
+                item.color ? '' : 'bg-[#122a26]'
+              }`}
+              style={item.color ? { backgroundColor: item.color } : undefined}
+            >
+              {item.text}
+            </span>
+          ))}
+        </div>
+      ) : null}
 
       {colorOptions.length > 0 && (
-        <div className="mt-8">
+        <div className={hasTitleRowBadges ? 'mt-6' : 'mt-8'}>
           <p className="font-montserrat text-[18px] font-extrabold leading-none text-[#414141]">
             {t(language, 'product.color')}
           </p>
