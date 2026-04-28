@@ -6,6 +6,7 @@ import { useTranslation } from '../../../../../lib/i18n-client';
 import { ADMIN_PRODUCT_INPUT_CURRENCY, CURRENCIES } from '../../../../../lib/currency';
 import type { GeneratedVariant } from '../types';
 import type { CategoryAttribute } from '@/lib/category-attributes';
+import { ADMIN_RASTER_IMAGE_FILE_ACCEPT } from '@/lib/services/utils/heic-browser-convert';
 import { VariantRowAttributeSelectors } from './VariantRowAttributeSelectors';
 import {
   isDuplicateVariantCombination,
@@ -411,7 +412,7 @@ export function VariantBuilder({
                               }
                             }}
                             type="file"
-                            accept="image/*"
+                            accept={ADMIN_RASTER_IMAGE_FILE_ACCEPT}
                             onChange={(e) => onVariantImageUpload(variant.id, e)}
                             className="hidden"
                           />
