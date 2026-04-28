@@ -8,6 +8,7 @@ import {
 } from '@/lib/default-pricing-variant';
 import { convertPrice, initializeCurrencyRates } from '@/lib/currency';
 import { DEFAULT_SIMPLE_PRODUCT_DATA } from '../constants/defaultSimpleProductData.constants';
+import { buildAutoSkuBaseFromSlug, buildAutoSkuForVariantIndex } from '../utils/autoSku';
 import type { ProductData } from '../types';
 import type { GeneratedVariant } from '../types';
 
@@ -104,7 +105,7 @@ export function useProductEditMode({
           setSimpleProductData({
             price: DEFAULT_SIMPLE_PRODUCT_DATA.price,
             compareAtPrice: DEFAULT_SIMPLE_PRODUCT_DATA.compareAtPrice,
-            sku: DEFAULT_SIMPLE_PRODUCT_DATA.sku,
+            sku: buildAutoSkuBaseFromSlug(product.slug || ''),
             quantity: DEFAULT_SIMPLE_PRODUCT_DATA.quantity,
           });
           setVariableProductTypeAllowed(false);
@@ -133,7 +134,7 @@ export function useProductEditMode({
             const skuFromApi =
               typeof source.sku === 'string' && source.sku.trim() !== ''
                 ? source.sku.trim()
-                : DEFAULT_SIMPLE_PRODUCT_DATA.sku;
+                : buildAutoSkuBaseFromSlug(product.slug || '');
             setGeneratedVariants([]);
             setProductType('simple');
             setSimpleProductData({
@@ -144,20 +145,22 @@ export function useProductEditMode({
             });
             setVariableProductTypeAllowed(false);
           } else {
-            const generated: GeneratedVariant[] = selectableVariants.map((v: VariantItem) => {
+            const slugForSku = product.slug || '';
+            const generated: GeneratedVariant[] = selectableVariants.map((v: VariantItem, idx: number) => {
               const priceNumUsd = typeof v.price === 'number' ? v.price : parseFloat(String(v.price)) || 0;
               const compareNum =
                 typeof v.compareAtPrice === 'number' ? v.compareAtPrice : parseFloat(String(v.compareAtPrice)) || 0;
               const priceNum = convertPrice(priceNumUsd, 'USD', 'AMD');
               const compareAmd = compareNum ? convertPrice(compareNum, 'USD', 'AMD') : 0;
               const stockNum = typeof v.stock === 'number' ? v.stock : parseInt(String(v.stock), 10) || 0;
+              const apiSku = typeof v.sku === 'string' ? v.sku.trim() : '';
               return {
                 id: v.id || `variant-${Date.now()}-${Math.random().toString(36).slice(2)}`,
                 selectedValueIds: Array.isArray(v.selectedValueIds) ? v.selectedValueIds : [],
                 price: String(priceNum),
                 compareAtPrice: compareAmd ? String(compareAmd) : '',
                 stock: String(stockNum),
-                sku: v.sku || '',
+                sku: apiSku !== '' ? apiSku : buildAutoSkuForVariantIndex(slugForSku, idx),
                 image: v.imageUrl ?? null,
               };
             });
@@ -191,7 +194,7 @@ export function useProductEditMode({
               typeof defaultPricingVariant.sku === 'string' &&
               defaultPricingVariant.sku.trim() !== ''
                 ? defaultPricingVariant.sku.trim()
-                : DEFAULT_SIMPLE_PRODUCT_DATA.sku;
+                : buildAutoSkuBaseFromSlug(product.slug || '');
             setSimpleProductData({
               price: resolvedPrice,
               compareAtPrice:

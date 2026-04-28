@@ -113,8 +113,11 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   const isColorFilterActive = selectedColor !== 'all';
   const isSizeFilterActive = selectedSize !== 'all';
   const isSortFilterActive = selectedSort !== 'default';
-  const hasActiveProductFilters =
-    isCollectionFilterActive || isColorFilterActive || isSizeFilterActive || isSortFilterActive;
+  const activeProductFiltersCount =
+    (isCollectionFilterActive ? 1 : 0) +
+    (isColorFilterActive ? 1 : 0) +
+    (isSizeFilterActive ? 1 : 0) +
+    (isSortFilterActive ? 1 : 0);
 
   useEffect(() => {
     setSelectedSize(searchParams.get('size') ?? 'all');
@@ -445,17 +448,21 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
               <button
                 type="button"
                 onClick={() => setMobileFilterOpen(true)}
-                aria-label={hasActiveProductFilters ? 'Filter, some filters are applied' : 'Open filters'}
-                className={`relative mt-0.5 min-h-[2.5rem] shrink-0 rounded-md bg-[#DBC097] px-7 py-2 text-sm font-black uppercase leading-none tracking-[0.14em] text-[#1A1D1C] transition-[colors,box-shadow] hover:bg-[#d2b68c] active:bg-[#c9ac82] lg:hidden ${
-                  hasActiveProductFilters ? FILTER_CONTROL_ACTIVE : ''
-                }`}
+                aria-label={
+                  activeProductFiltersCount > 0
+                    ? `Filter, ${activeProductFiltersCount} filter${activeProductFiltersCount === 1 ? '' : 's'} applied`
+                    : 'Open filters'
+                }
+                className="relative mt-0.5 min-h-[2.5rem] shrink-0 overflow-visible rounded-md bg-[#DBC097] px-7 py-2 text-sm font-black uppercase leading-none tracking-[0.14em] text-[#1A1D1C] transition-[colors,box-shadow] hover:bg-[#d2b68c] active:bg-[#c9ac82] lg:hidden"
               >
                 Filter
-                {hasActiveProductFilters ? (
+                {activeProductFiltersCount > 0 ? (
                   <span
-                    className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#122a26]"
+                    className="absolute -right-1.5 -top-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[0.6875rem] font-bold leading-none text-white tabular-nums"
                     aria-hidden
-                  />
+                  >
+                    {activeProductFiltersCount}
+                  </span>
                 ) : null}
               </button>
             </div>

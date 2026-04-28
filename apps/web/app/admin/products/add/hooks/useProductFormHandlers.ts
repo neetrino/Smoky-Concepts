@@ -9,6 +9,7 @@ import { buildVariantAttributePayload } from '@/lib/category-attributes';
 import type { CategoryAttribute } from '@/lib/category-attributes';
 import { buildDefaultPricingAttributes } from '@/lib/default-pricing-variant';
 import { convertPrice, initializeCurrencyRates } from '@/lib/currency';
+import { buildAutoSkuBaseFromSlug } from '../utils/autoSku';
 
 interface UseProductFormHandlersProps {
   formData: {
@@ -77,6 +78,7 @@ export function useProductFormHandlers({
     variants: formData.variants,
     generatedVariants,
     simpleProductData,
+    productSlug: formData.slug,
     isClothingCategory,
     setLoading,
   });
@@ -119,10 +121,12 @@ export function useProductFormHandlers({
         const compareAtPriceUsd = compareAtPriceAmd !== undefined && Number.isFinite(compareAtPriceAmd)
           ? convertPrice(compareAtPriceAmd, 'AMD', 'USD')
           : undefined;
+        const resolvedSimpleSku =
+          simpleProductData.sku.trim() || buildAutoSkuBaseFromSlug(currentFormData.slug);
         const simpleVariant: any = {
           price: priceUsd,
           stock: parseInt(simpleProductData.quantity) || 0,
-          sku: simpleProductData.sku.trim(),
+          sku: resolvedSimpleSku,
           attributes: buildDefaultPricingAttributes({
             categoryId: currentFormData.sizeCatalogCategoryId,
             categoryTitle: currentFormData.sizeCatalogCategoryTitle,
@@ -133,7 +137,7 @@ export function useProductFormHandlers({
           simpleVariant.compareAtPrice = compareAtPriceUsd;
         }
         variants.push(simpleVariant);
-        variantSkuSet.add(simpleProductData.sku.trim());
+        variantSkuSet.add(resolvedSimpleSku);
       } else {
         // Variable: one API variant per generatedVariant (no attributes/options)
         const defaultVariantPriceText = String(simpleProductData.price || '').trim();

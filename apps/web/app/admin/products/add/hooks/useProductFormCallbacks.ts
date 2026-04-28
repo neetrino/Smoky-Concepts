@@ -2,11 +2,13 @@
  * Hook for product form callbacks and event handlers
  */
 
-import { useRef, type ChangeEvent } from 'react';
+import { useEffect, useRef, type ChangeEvent } from 'react';
 import type { Category, GeneratedVariant } from '../types';
 import { generateSlug, ensureUniqueSlug } from '../utils/productUtils';
+import { buildAutoSkuForVariantIndex } from '../utils/autoSku';
 
 interface UseProductFormCallbacksProps {
+  slug: string;
   formData: {
     title: string;
     slug: string;
@@ -20,9 +22,12 @@ interface UseProductFormCallbacksProps {
   checkIsClothingCategory: (categoryId: string, categories: Category[]) => boolean;
   /** Product id when in edit mode — used to exclude the current product from duplicate check. */
   productId?: string | null;
+  /** When true, title edits do not overwrite slug (edit mode or user customized slug). */
+  isEditMode: boolean;
 }
 
 export function useProductFormCallbacks({
+  slug,
   formData,
   categories,
   setFormData,
@@ -30,19 +35,24 @@ export function useProductFormCallbacks({
   setSimpleProductData,
   checkIsClothingCategory,
   productId,
+  isEditMode,
 }: UseProductFormCallbacksProps) {
   /** Debounce timer for the async slug uniqueness check. */
   const slugCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Add product: slug follows title until the user edits slug (non-empty) or edit mode loads. */
+  const slugDecoupledFromTitleRef = useRef(isEditMode);
+
+  useEffect(() => {
+    slugDecoupledFromTitleRef.current = isEditMode;
+  }, [isEditMode]);
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const title = e.target.value;
 
     setFormData((prev: unknown) => {
       const prevObj = typeof prev === 'object' && prev !== null ? (prev as Record<string, unknown>) : {};
-      const currentSlug = prevObj.slug as string | undefined;
 
-      // Only auto-generate while the slug field is still empty (untouched by the user).
-      if (currentSlug) {
+      if (isEditMode || slugDecoupledFromTitleRef.current) {
         return { ...prevObj, title };
       }
 
@@ -86,6 +96,19 @@ export function useProductFormCallbacks({
   /**
    * Called on slug input blur — ensures the manually typed slug is also unique.
    */
+  const handleSlugChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const next = e.target.value;
+    if (next.trim() === '') {
+      slugDecoupledFromTitleRef.current = false;
+    } else {
+      slugDecoupledFromTitleRef.current = true;
+    }
+    setFormData((prev: unknown) => {
+      const prevObj = typeof prev === 'object' && prev !== null ? (prev as Record<string, unknown>) : {};
+      return { ...prevObj, slug: next };
+    });
+  };
+
   const handleSlugBlur = () => {
     const currentSlug = formData.slug;
     if (!currentSlug) return;
@@ -107,20 +130,24 @@ export function useProductFormCallbacks({
   const isClothingCategory = () => checkIsClothingCategory(formData.primaryCategoryId, categories);
 
   const handleVariantAdd = () => {
-    const newVariant: GeneratedVariant = {
-      id: `variant-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      selectedValueIds: [],
-      price: '',
-      compareAtPrice: '',
-      stock: '0',
-      sku: '',
-      image: null,
-    };
-    setGeneratedVariants((prev) => [...prev, newVariant]);
+    setGeneratedVariants((prev) => {
+      const nextIndex = prev.length;
+      const newVariant: GeneratedVariant = {
+        id: `variant-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        selectedValueIds: [],
+        price: '',
+        compareAtPrice: '',
+        stock: '0',
+        sku: buildAutoSkuForVariantIndex(slug, nextIndex),
+        image: null,
+      };
+      return [...prev, newVariant];
+    });
   };
 
   return {
     handleTitleChange,
+    handleSlugChange,
     handleSlugBlur,
     isClothingCategory,
     handleVariantAdd,

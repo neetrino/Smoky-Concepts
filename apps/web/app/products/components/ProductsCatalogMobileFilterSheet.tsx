@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 
 import { CatalogForProductLineRow } from './CatalogForProductLineRow';
-
-type MobileFilterSection = 'collections' | 'color' | 'sort';
 
 function ChevronIcon({ className }: { className?: string }) {
   return (
@@ -40,6 +38,7 @@ function CloseIcon() {
   );
 }
 
+/** Header row — matches pre-accordion mobile filter visuals (non-interactive). */
 const ACCORDION_BAR =
   'flex w-full items-center justify-between rounded-xl bg-white px-4 py-3.5 text-left shadow-[0_4px_6px_rgba(0,0,0,0.05)]';
 const FILTER_SECTION_ACTIVE =
@@ -93,8 +92,6 @@ export function ProductsCatalogMobileFilterSheet({
   onOpenSizeCatalog,
   onClearAll,
 }: ProductsCatalogMobileFilterSheetProps) {
-  const [expanded, setExpanded] = useState<MobileFilterSection | null>('collections');
-
   useEffect(() => {
     if (!open) {
       return;
@@ -114,10 +111,6 @@ export function ProductsCatalogMobileFilterSheet({
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [open, onClose]);
-
-  const toggleSection = (id: MobileFilterSection) => {
-    setExpanded((current) => (current === id ? null : id));
-  };
 
   if (!open) {
     return null;
@@ -165,82 +158,70 @@ export function ProductsCatalogMobileFilterSheet({
 
         <div className="flex flex-col gap-3">
           <div>
-            <button
-              type="button"
-              onClick={() => toggleSection('collections')}
-              className={`${ACCORDION_BAR} ${isCollectionActive ? FILTER_SECTION_ACTIVE : ''}`}
-            >
+            <div className={`${ACCORDION_BAR} ${isCollectionActive ? FILTER_SECTION_ACTIVE : ''}`}>
               <span className="text-[0.9375rem] font-semibold text-[#333333]">Collections</span>
-            </button>
-            {expanded === 'collections' && (
-              <FilterSelectWrapper>
-                <select
-                  value={selectedCollection}
-                  onChange={(event) => onCollectionChange(event.target.value)}
-                  className={`${SELECT_CLASS} ${isCollectionActive ? SELECT_CLASS_ACTIVE : ''}`}
-                >
-                  <option value="all">All collections</option>
-                  {collectionOptions
-                    .filter((option) => option !== 'all')
-                    .map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                </select>
-              </FilterSelectWrapper>
-            )}
-          </div>
-
-          <div>
-            <button
-              type="button"
-              onClick={() => toggleSection('color')}
-              className={`${ACCORDION_BAR} ${isColorActive ? FILTER_SECTION_ACTIVE : ''}`}
-            >
-              <span className="text-[0.9375rem] font-semibold text-[#333333]">Color</span>
-            </button>
-            {expanded === 'color' && (
-              <FilterSelectWrapper>
-                <select
-                  value={selectedColor}
-                  onChange={(event) => onColorChange(event.target.value)}
-                  className={`${SELECT_CLASS} ${isColorActive ? SELECT_CLASS_ACTIVE : ''}`}
-                >
-                  <option value="all">All colors</option>
-                  {colorOptions.map((option) => (
+              <ChevronIcon className="shrink-0 text-[#414141]" />
+            </div>
+            <FilterSelectWrapper>
+              <select
+                aria-label="Collections"
+                value={selectedCollection}
+                onChange={(event) => onCollectionChange(event.target.value)}
+                className={`${SELECT_CLASS} ${isCollectionActive ? SELECT_CLASS_ACTIVE : ''}`}
+              >
+                <option value="all">All collections</option>
+                {collectionOptions
+                  .filter((option) => option !== 'all')
+                  .map((option) => (
                     <option key={option} value={option}>
                       {option}
                     </option>
                   ))}
-                </select>
-              </FilterSelectWrapper>
-            )}
+              </select>
+            </FilterSelectWrapper>
           </div>
 
           <div>
-            <button
-              type="button"
-              onClick={() => toggleSection('sort')}
-              className={`${ACCORDION_BAR} ${isSortActive ? FILTER_SECTION_ACTIVE : ''}`}
-            >
+            <div className={`${ACCORDION_BAR} ${isColorActive ? FILTER_SECTION_ACTIVE : ''}`}>
+              <span className="text-[0.9375rem] font-semibold text-[#333333]">Color</span>
+              <ChevronIcon className="shrink-0 text-[#414141]" />
+            </div>
+            <FilterSelectWrapper>
+              <select
+                aria-label="Color"
+                value={selectedColor}
+                onChange={(event) => onColorChange(event.target.value)}
+                className={`${SELECT_CLASS} ${isColorActive ? SELECT_CLASS_ACTIVE : ''}`}
+              >
+                <option value="all">All</option>
+                {colorOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </FilterSelectWrapper>
+          </div>
+
+          <div>
+            <div className={`${ACCORDION_BAR} ${isSortActive ? FILTER_SECTION_ACTIVE : ''}`}>
               <span className="text-[0.9375rem] font-semibold text-[#333333]">Sort By</span>
-            </button>
-            {expanded === 'sort' && (
-              <FilterSelectWrapper>
-                <select
-                  value={selectedSort}
-                  onChange={(event) => onSortChange(event.target.value)}
-                  className={`${SELECT_CLASS} ${isSortActive ? SELECT_CLASS_ACTIVE : ''}`}
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </FilterSelectWrapper>
-            )}
+              <ChevronIcon className="shrink-0 text-[#414141]" />
+            </div>
+            <FilterSelectWrapper>
+              <select
+                aria-label="Sort By"
+                value={selectedSort}
+                onChange={(event) => onSortChange(event.target.value)}
+                className={`${SELECT_CLASS} ${isSortActive ? SELECT_CLASS_ACTIVE : ''}`}
+              >
+                {sortOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </FilterSelectWrapper>
           </div>
         </div>
 
