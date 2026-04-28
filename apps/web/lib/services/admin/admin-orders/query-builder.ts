@@ -113,6 +113,16 @@ export function buildOrderWhereClause(filters: OrderFilters): Prisma.OrderWhereI
     });
   }
 
+  if (filters.orderType === 'early') {
+    andConditions.push({
+      items: {
+        some: {
+          earlyAccess: true,
+        },
+      },
+    });
+  }
+
   // Return where clause
   if (andConditions.length > 0) {
     return { AND: andConditions };

@@ -92,6 +92,9 @@
       "loadError": "Не удалось загрузить варианты голосования.",
       "updateError": "Не удалось обновить голос.",
       "loginPrompt": "Войдите, чтобы проголосовать.",
+      "earlyAccessNoProduct": "Этот вариант ещё не привязан к товару. Админ должен указать slug товара в разделе Voting.",
+      "earlyAccessProductLoadError": "Не удалось загрузить товар. Проверьте slug или попробуйте снова.",
+      "earlyAccessOutOfStock": "Этот товар сейчас нет в наличии.",
       "labels": {
         "kingSize": "King Size",
         "compact": "Compact",

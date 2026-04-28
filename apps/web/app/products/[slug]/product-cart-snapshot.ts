@@ -14,7 +14,8 @@ function guestLineKey(line: GuestCartItem): string {
   const s = line.sizeCatalogTitle?.trim() ?? '';
   const sv = line.sizeCatalogVersion?.trim() ?? '';
   const cp = String(line.sizeCatalogCategoryPriceAmd ?? 0);
-  return `${v}::${s}::${sv}::${cp}::${p}::${h}::${c}`;
+  const ea = line.earlyAccess === true ? '1' : '0';
+  return `${v}::${s}::${sv}::${cp}::${p}::${h}::${c}::${ea}`;
 }
 
 function readGuestCart(): GuestCartItem[] {
@@ -88,6 +89,7 @@ export function buildCatalogGuestCartSnapshot(params: {
   sizeLabel: string | null;
   categoryLabel: string | null;
   quantity: number;
+  earlyAccess?: boolean;
 }): GuestCartItem {
   return {
     productId: params.productId,
@@ -102,6 +104,7 @@ export function buildCatalogGuestCartSnapshot(params: {
     sku: params.sku,
     sizeLabel: params.sizeLabel,
     categoryLabel: params.categoryLabel,
+    ...(params.earlyAccess === true ? { earlyAccess: true } : {}),
   };
 }
 

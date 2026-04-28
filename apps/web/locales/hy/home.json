@@ -92,6 +92,9 @@
       "loadError": "Չհաջողվեց բեռնել քվեարկության տարբերակները։",
       "updateError": "Չհաջողվեց թարմացնել քվեն։",
       "loginPrompt": "Քվեարկելու համար մուտք գործիր։",
+      "earlyAccessNoProduct": "Այս ընտրությունը դեռ չի կապված ապրանքի հետ։ Ադմինը պետք է Voting-ում լրացնի product slug-ը։",
+      "earlyAccessProductLoadError": "Կապված ապրանքը չբեռնվեց։ Ստուգիր slug-ը կամ կրկին փորձիր։",
+      "earlyAccessOutOfStock": "Այդ ապրանքը այս պահին չկա պահեստում։",
       "labels": {
         "kingSize": "King Size",
         "compact": "Compact",

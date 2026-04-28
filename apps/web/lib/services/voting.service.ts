@@ -23,6 +23,7 @@ interface VotingItemRow {
   title: string;
   imageUrl: string;
   galleryUrls: string[];
+  productSlug: string | null;
   _count: { likes: number };
 }
 
@@ -50,6 +51,7 @@ class VotingService {
         title: true,
         imageUrl: true,
         galleryUrls: true,
+        productSlug: true,
         _count: {
           select: {
             likes: true,
@@ -88,6 +90,7 @@ class VotingService {
         title: item.title,
         imageUrl: item.imageUrl,
         images: buildVotingItemImagesForDisplay(item.imageUrl, item.galleryUrls),
+        productSlug: item.productSlug?.trim() ? item.productSlug.trim() : null,
         likeCount: item._count.likes,
         likedByCurrentUser: likedItemIds.has(item.id),
       })),

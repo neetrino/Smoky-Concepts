@@ -7,6 +7,8 @@ export interface CartItem {
     id: string;
     sku: string;
     sizeLabel?: string | null;
+    /** Home Culture early-access path */
+    earlyAccess?: boolean;
     /** Size catalog (PDP modal) — passed to checkout for order display */
     sizeCatalogTitle?: string | null;
     sizeCatalogVersion?: string | null;
@@ -88,6 +90,8 @@ export interface GuestCartItem {
     imageDataUrl: string;
     imageFileName: string;
   } | null;
+  /** Set when adding from home Culture early-access checkout */
+  earlyAccess?: boolean;
 }
 
 

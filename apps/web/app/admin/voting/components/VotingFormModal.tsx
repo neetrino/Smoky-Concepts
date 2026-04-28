@@ -155,6 +155,26 @@ export function VotingFormModal({
 
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
+              {t('admin.voting.productSlugField')}
+            </label>
+            <p className="mb-2 text-xs text-gray-500">{t('admin.voting.productSlugHint')}</p>
+            <Input
+              type="text"
+              value={formData.productSlug}
+              onChange={(event) =>
+                onFormDataChange({
+                  ...formData,
+                  productSlug: event.target.value,
+                })
+              }
+              placeholder={t('admin.voting.productSlugPlaceholder')}
+              className="w-full"
+              disabled={saving || uploading}
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
               {t('admin.voting.imagesField')} *
             </label>
             <p className="mb-2 text-xs text-gray-500">{t('admin.voting.galleryImagesHint')}</p>

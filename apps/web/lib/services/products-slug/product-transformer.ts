@@ -447,6 +447,9 @@ export async function transformProduct(
       productDiscount,
       lang
     ),
+    defaultVariantId: defaultVariant?.id ?? null,
+    defaultVariantStock: defaultVariant?.stock ?? 0,
+    defaultVariantSku: defaultVariant?.sku?.trim() ? defaultVariant.sku : "",
     defaultPrice: defaultVariantFinalPrice,
     defaultOriginalPrice: defaultVariantOriginalOrCompare,
     defaultCompareAtPrice: defaultVariant?.compareAtPrice || null,

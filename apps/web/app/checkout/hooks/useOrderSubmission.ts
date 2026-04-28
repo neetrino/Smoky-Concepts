@@ -51,6 +51,7 @@ export function useOrderSubmission({
           productId: item.variant.product.id,
           variantId: item.variant.id,
           quantity: item.quantity,
+          ...(item.variant.earlyAccess === true ? { earlyAccess: true } : {}),
           ...(title
             ? {
                 sizeCatalogTitle: title,

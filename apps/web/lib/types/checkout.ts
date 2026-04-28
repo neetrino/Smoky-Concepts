@@ -24,6 +24,8 @@ export interface CheckoutData {
       imageDataUrl: string;
       imageFileName?: string;
     };
+    /** Home Culture early-access line (validated server-side against voting productSlug) */
+    earlyAccess?: boolean;
   }>;
   email: string;
   phone: string;

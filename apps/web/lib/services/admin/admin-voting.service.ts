@@ -17,6 +17,7 @@ interface VotingItemRecord {
   title: string;
   imageUrl: string;
   galleryUrls: string[];
+  productSlug: string | null;
   createdAt: Date;
   updatedAt: Date;
   _count: {
@@ -28,6 +29,8 @@ interface VotingItemInput {
   title?: string;
   imageUrl?: string;
   imageUrls?: string[];
+  /** Storefront product slug for early-access checkout from home Culture */
+  productSlug?: string | null;
 }
 
 interface VotingCampaignInput {
@@ -52,6 +55,14 @@ function requireTrimmedValue(value: string | undefined, fieldName: string): stri
   }
 
   return trimmedValue;
+}
+
+function normalizeOptionalProductSlug(value: string | null | undefined): string | null {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  const trimmed = String(value).trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
 
 /**
@@ -123,6 +134,7 @@ function mapVotingItem(item: VotingItemRecord, topLikedId: string | null) {
     title: item.title,
     imageUrl: item.imageUrl,
     galleryUrls: item.galleryUrls ?? [],
+    productSlug: item.productSlug?.trim() ? item.productSlug.trim() : null,
     likeCount: item._count.likes,
     topLiked: item.id === topLikedId,
     createdAt: item.createdAt.toISOString(),
@@ -158,6 +170,7 @@ class AdminVotingService {
               title: true,
               imageUrl: true,
               galleryUrls: true,
+              productSlug: true,
               _count: {
                 select: { likes: true },
               },
@@ -195,12 +208,14 @@ class AdminVotingService {
             title: string;
             imageUrl: string;
             galleryUrls: string[];
+            productSlug: string | null;
             _count: { likes: number };
           }) => ({
             id: item.id,
             title: item.title,
             imageUrl: item.imageUrl,
             galleryUrls: item.galleryUrls ?? [],
+            productSlug: item.productSlug?.trim() ? item.productSlug.trim() : null,
             likeCount: item._count.likes,
           }),
         ),
@@ -239,6 +254,7 @@ class AdminVotingService {
         title: true,
         imageUrl: true,
         galleryUrls: true,
+        productSlug: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -421,6 +437,7 @@ class AdminVotingService {
     const resolvedUrls = await resolveVotingImageUrlList(data);
     const imageUrl = resolvedUrls[0];
     const galleryUrls = resolvedUrls;
+    const productSlug = normalizeOptionalProductSlug(data.productSlug ?? null);
 
     const item = await db.votingItem.create({
       data: {
@@ -428,6 +445,7 @@ class AdminVotingService {
         title,
         imageUrl,
         galleryUrls,
+        productSlug,
       },
       select: {
         id: true,
@@ -435,6 +453,7 @@ class AdminVotingService {
         title: true,
         imageUrl: true,
         galleryUrls: true,
+        productSlug: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -462,6 +481,7 @@ class AdminVotingService {
         title: true,
         imageUrl: true,
         galleryUrls: true,
+        productSlug: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -498,6 +518,7 @@ class AdminVotingService {
     const resolvedUrls = await resolveVotingImageUrlList(data);
     const imageUrl = resolvedUrls[0];
     const galleryUrls = resolvedUrls;
+    const productSlug = normalizeOptionalProductSlug(data.productSlug ?? null);
 
     const item = await db.votingItem.update({
       where: {
@@ -507,6 +528,7 @@ class AdminVotingService {
         title,
         imageUrl,
         galleryUrls,
+        productSlug,
       },
       select: {
         id: true,
@@ -514,6 +536,7 @@ class AdminVotingService {
         title: true,
         imageUrl: true,
         galleryUrls: true,
+        productSlug: true,
         createdAt: true,
         updatedAt: true,
         _count: {

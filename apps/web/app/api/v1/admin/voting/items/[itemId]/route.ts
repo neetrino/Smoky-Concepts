@@ -92,6 +92,7 @@ export async function PUT(
       title?: string;
       imageUrl?: string;
       imageUrls?: string[];
+      productSlug?: string | null;
     };
 
     const result = await adminService.updateVotingItem(itemId, body);

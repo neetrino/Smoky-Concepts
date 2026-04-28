@@ -114,7 +114,7 @@ export interface OrderDetails {
   updatedAt?: string;
 }
 
-export type OrderTypeFilter = 'all' | 'orders' | 'custom' | 'new';
+export type OrderTypeFilter = 'all' | 'orders' | 'custom' | 'new' | 'early';
 
 export function useOrders() {
   const { t } = useTranslation();
@@ -144,7 +144,10 @@ export function useOrders() {
       const search = searchParams.get('search') || '';
       const orderTypeParam = searchParams.get('orderType');
       const orderType: OrderTypeFilter =
-        orderTypeParam === 'custom' || orderTypeParam === 'new' || orderTypeParam === 'orders'
+        orderTypeParam === 'custom' ||
+        orderTypeParam === 'new' ||
+        orderTypeParam === 'orders' ||
+        orderTypeParam === 'early'
           ? orderTypeParam
           : 'all';
       setStatusFilter(status);
@@ -173,8 +176,6 @@ export function useOrders() {
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('📦 [ADMIN] Fetching orders...', { page, statusFilter, paymentStatusFilter, orderTypeFilter, searchQuery, sortBy, sortOrder });
-      
       const response = await apiClient.get<OrdersResponse>('/api/v1/admin/orders', {
         params: {
           page: page.toString(),
@@ -188,7 +189,6 @@ export function useOrders() {
         },
       });
 
-      console.log('✅ [ADMIN] Orders fetched:', response);
       setOrders(response.data || []);
       setMeta(response.meta || null);
       setSelectedIds(new Set());

@@ -56,6 +56,49 @@ function normalizeSizeCatalogTitleLookup(value: string | null | undefined): stri
     .toLocaleLowerCase();
 }
 
+/**
+ * Honors client `earlyAccess` only when this product slug is linked on a published voting item.
+ */
+async function resolveEarlyAccessForCheckoutLine(productId: string, requested: boolean): Promise<boolean> {
+  if (!requested) {
+    return false;
+  }
+
+  const translations = await db.productTranslation.findMany({
+    where: { productId },
+    select: { slug: true },
+  });
+  const slugSet = new Set(
+    translations
+      .map((row) => row.slug.trim().toLowerCase())
+      .filter((s) => s.length > 0),
+  );
+  if (slugSet.size === 0) {
+    return false;
+  }
+
+  const votingItems = await db.votingItem.findMany({
+    where: {
+      deletedAt: null,
+      productSlug: { not: null },
+      voting: { published: true, deletedAt: null },
+    },
+    select: { productSlug: true },
+  });
+
+  for (const row of votingItems) {
+    const slug = row.productSlug?.trim().toLowerCase() ?? '';
+    if (slug.length > 0 && slugSet.has(slug)) {
+      return true;
+    }
+  }
+
+  logger.warn("Checkout earlyAccess ignored: product slug not linked to published culture voting item", {
+    productId,
+  });
+  return false;
+}
+
 function getVariantOptions(attributes: unknown): VariantOptionFromAttributes[] {
   return Array.isArray(attributes) ? (attributes as VariantOptionFromAttributes[]) : [];
 }
@@ -222,6 +265,7 @@ class OrdersService {
           description: string;
           imageUrl: string;
         } | null;
+        earlyAccess: boolean;
       }> = [];
 
       if (guestItems && Array.isArray(guestItems) && guestItems.length > 0) {
@@ -232,6 +276,7 @@ class OrdersService {
               productId: string;
               variantId: string;
               quantity: number;
+              earlyAccess?: boolean;
               sizeCatalogTitle?: string;
               sizeCatalogVersion?: string;
               sizeCatalogImageUrl?: string;
@@ -445,6 +490,11 @@ class OrdersService {
               }
             }
 
+            const earlyAccess = await resolveEarlyAccessForCheckoutLine(
+              variant.product.id,
+              item.earlyAccess === true,
+            );
+
             return {
               variantId: variant.id,
               productId: variant.product.id,
@@ -461,6 +511,7 @@ class OrdersService {
               customizePlain,
               customizeHtml,
               customSizeRequest: customSizeRequest ?? null,
+              earlyAccess,
             };
           })
         );
@@ -567,6 +618,7 @@ class OrdersService {
                 sizeCatalogImageUrl: item.sizeCatalogImageUrl ?? null,
                 customizePlain: item.customizePlain ?? null,
                 customizeHtml: item.customizeHtml ?? null,
+                earlyAccess: item.earlyAccess,
               })),
             },
             events: {

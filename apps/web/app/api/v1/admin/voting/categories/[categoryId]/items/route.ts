@@ -49,6 +49,7 @@ export async function POST(
       title?: string;
       imageUrl?: string;
       imageUrls?: string[];
+      productSlug?: string | null;
     };
 
     const result = await adminService.createVotingItem(categoryId, body);

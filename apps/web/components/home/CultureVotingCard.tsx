@@ -10,7 +10,9 @@ interface CultureVotingCardProps {
   images: string[];
   likedByCurrentUser: boolean;
   pending: boolean;
+  earlyAccessPending?: boolean;
   onToggleLike: (itemId: string, likedByCurrentUser: boolean) => Promise<void>;
+  onEarlyAccess?: (itemId: string) => void;
   /** Nudge image down on desktop only (e.g. middle card alignment). */
   imageNudgeDown?: boolean;
   /** Make mobile card back area slightly smaller. */
@@ -139,7 +141,9 @@ export function CultureVotingCard({
   images,
   likedByCurrentUser,
   pending,
+  earlyAccessPending = false,
   onToggleLike,
+  onEarlyAccess,
   imageNudgeDown = false,
   mobileCompactBack = false,
   sizeLabel,
@@ -218,12 +222,12 @@ export function CultureVotingCard({
           {showEarlyAccess ? (
             <button
               type="button"
-              onClick={() => onToggleLike(id, likedByCurrentUser)}
-              disabled={pending}
+              onClick={() => onEarlyAccess?.(id)}
+              disabled={pending || earlyAccessPending}
               className={`whitespace-nowrap rounded-md border border-[#dcc090] px-2 py-1 text-xs font-extrabold leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10 ${
-                pending ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+                pending || earlyAccessPending ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
               }`}
-              aria-label={`Toggle like for ${title}`}
+              aria-label={earlyAccessLabel}
             >
               {earlyAccessLabel}
             </button>

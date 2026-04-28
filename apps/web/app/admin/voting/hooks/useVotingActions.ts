@@ -12,6 +12,7 @@ import type { VotingFormData, VotingItem } from '../types';
 const INITIAL_FORM_DATA: VotingFormData = {
   title: '',
   imageUrls: [],
+  productSlug: '',
 };
 
 export function useVotingActions() {
@@ -52,6 +53,7 @@ export function useVotingActions() {
       await apiClient.post(`/api/v1/admin/voting/${votingId}/items`, {
         title: formData.title.trim(),
         imageUrls: formData.imageUrls.map((url) => url.trim()).filter(Boolean),
+        productSlug: formData.productSlug.trim() ? formData.productSlug.trim() : null,
       });
       setShowAddModal(false);
       resetForm();
@@ -75,6 +77,7 @@ export function useVotingActions() {
       title: item.title,
       imageUrls:
         item.galleryUrls.length > 0 ? [...item.galleryUrls] : item.imageUrl ? [item.imageUrl] : [],
+      productSlug: item.productSlug?.trim() ?? '',
     });
     setShowEditModal(true);
   };
@@ -90,6 +93,7 @@ export function useVotingActions() {
       await apiClient.put(`/api/v1/admin/voting/items/${editingItem.id}`, {
         title: formData.title.trim(),
         imageUrls: formData.imageUrls.map((url) => url.trim()).filter(Boolean),
+        productSlug: formData.productSlug.trim() ? formData.productSlug.trim() : null,
       });
       setShowEditModal(false);
       setEditingItem(null);

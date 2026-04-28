@@ -27,12 +27,15 @@ async function uploadImagesToR2(images: string[]): Promise<string[]> {
 
 function createEmptySlide(): HomeHeroSlide {
   const base = HOME_HERO_DEFAULT_SLIDES[0];
+  const empty = { title: '', description: '', ctaLabel: '' };
   return {
     imageUrl: base?.imageUrl ?? '/assets/home/concepts/hero-banner.png',
-    title: '',
-    description: '',
-    ctaLabel: base?.ctaLabel ?? 'Deep Dive',
     ctaHref: base?.ctaHref ?? '/about',
+    copy: {
+      hy: { ...empty },
+      en: { ...empty },
+      ru: { ...empty },
+    },
   };
 }
 

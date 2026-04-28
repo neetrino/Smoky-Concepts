@@ -3,8 +3,33 @@
 import type { ChangeEvent } from 'react';
 import { ChevronRight } from 'lucide-react';
 
+import { getHomeHeroSlidePreviewTitle } from '@/lib/home-hero-display';
 import { useTranslation } from '@/lib/i18n-client';
-import type { HomeHeroSlide } from '@/lib/types/home-hero.types';
+import {
+  HOME_HERO_UI_LOCALES,
+  type HomeHeroSlide,
+  type HomeHeroSlideLocaleCopy,
+  type HomeHeroUiLocale,
+} from '@/lib/types/home-hero.types';
+
+const LOCALE_I18N_KEY: Record<HomeHeroUiLocale, string> = {
+  hy: 'admin.homeHero.localeHy',
+  en: 'admin.homeHero.localeEn',
+  ru: 'admin.homeHero.localeRu',
+};
+
+function patchLocaleCopy(
+  slide: HomeHeroSlide,
+  locale: HomeHeroUiLocale,
+  patch: Partial<HomeHeroSlideLocaleCopy>,
+): Partial<HomeHeroSlide> {
+  return {
+    copy: {
+      ...slide.copy,
+      [locale]: { ...slide.copy[locale], ...patch },
+    },
+  };
+}
 
 export interface HomeHeroSlideEditorProps {
   slide: HomeHeroSlide;
@@ -31,6 +56,7 @@ export function HomeHeroSlideEditor({
 }: HomeHeroSlideEditorProps) {
   const { t } = useTranslation();
   const panelId = `home-hero-slide-${index}`;
+  const previewTitle = getHomeHeroSlidePreviewTitle(slide);
 
   return (
     <div className="rounded-xl border border-[#dcc090]/25 bg-white/95 transition-all duration-200 hover:border-[#dcc090]/50 hover:shadow-[0_4px_16px_rgba(18,42,38,0.06)]">
@@ -55,8 +81,8 @@ export function HomeHeroSlideEditor({
               <h2 className="text-sm font-black uppercase tracking-[0.08em] text-[#122a26]">
                 {t('admin.homeHero.slideLabel').replace('{n}', String(index + 1))}
               </h2>
-              {!isExpanded && slide.title.trim() ? (
-                <p className="truncate text-xs text-[#414141]/55">{slide.title}</p>
+              {!isExpanded && previewTitle ? (
+                <p className="truncate text-xs text-[#414141]/55">{previewTitle}</p>
               ) : null}
             </div>
             <button
@@ -74,7 +100,7 @@ export function HomeHeroSlideEditor({
       {isExpanded ? (
         <div
           id={panelId}
-          className="border-t border-[#dcc090]/20 px-4 pb-5 pt-4 grid gap-4 sm:grid-cols-2"
+          className="grid gap-4 border-t border-[#dcc090]/20 px-4 pb-5 pt-4 sm:grid-cols-2"
         >
           <div className="sm:col-span-2">
             <span className="mb-2 block text-xs font-bold uppercase tracking-[0.08em] text-[#414141]/70">
@@ -94,7 +120,7 @@ export function HomeHeroSlideEditor({
                   </div>
                 )}
               </div>
-              <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 self-start rounded-lg border border-[#dcc090]/35 bg-[#dcc090]/10 px-4 py-2 text-xs font-bold text-[#122a26] transition-all hover:bg-[#dcc090]/25 hover:border-[#dcc090]">
+              <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 self-start rounded-lg border border-[#dcc090]/35 bg-[#dcc090]/10 px-4 py-2 text-xs font-bold text-[#122a26] transition-all hover:border-[#dcc090] hover:bg-[#dcc090]/25">
                 <input
                   type="file"
                   accept="image/*"
@@ -116,26 +142,68 @@ export function HomeHeroSlideEditor({
 
           <div className="sm:col-span-2">
             <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.08em] text-[#414141]/70">
-              {t('admin.homeHero.titleField')}
+              {t('admin.homeHero.ctaHref')}
             </label>
             <input
               type="text"
-              value={slide.title}
-              onChange={(e) => onUpdate({ title: e.target.value })}
+              value={slide.ctaHref}
+              onChange={(e) => onUpdate({ ctaHref: e.target.value })}
               className="w-full rounded-lg border border-[#dcc090]/35 bg-white px-3 py-2 text-sm text-[#122a26] placeholder-[#414141]/30 outline-none transition-all focus:border-[#dcc090] focus:ring-2 focus:ring-[#dcc090]/30"
             />
           </div>
 
-          <div className="sm:col-span-2">
-            <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.08em] text-[#414141]/70">
-              {t('admin.homeHero.description')}
-            </label>
-            <textarea
-              value={slide.description}
-              onChange={(e) => onUpdate({ description: e.target.value })}
-              rows={3}
-              className="w-full rounded-lg border border-[#dcc090]/35 bg-white px-3 py-2 text-sm text-[#122a26] placeholder-[#414141]/30 outline-none transition-all focus:border-[#dcc090] focus:ring-2 focus:ring-[#dcc090]/30"
-            />
+          <div className="sm:col-span-2 grid grid-cols-1 gap-4 lg:grid-cols-3">
+            {HOME_HERO_UI_LOCALES.map((locale) => (
+              <div
+                key={locale}
+                className="min-w-0 rounded-xl border border-[#dcc090]/20 bg-[#faf9f6]/80 p-4"
+              >
+                <p className="mb-3 text-xs font-black uppercase tracking-[0.1em] text-[#122a26]/80">
+                  {t(LOCALE_I18N_KEY[locale])}
+                </p>
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.08em] text-[#414141]/70">
+                      {t('admin.homeHero.titleField')}
+                    </label>
+                    <input
+                      type="text"
+                      value={slide.copy[locale].title}
+                      onChange={(e) =>
+                        onUpdate(patchLocaleCopy(slide, locale, { title: e.target.value }))
+                      }
+                      className="w-full rounded-lg border border-[#dcc090]/35 bg-white px-3 py-2 text-sm text-[#122a26] placeholder-[#414141]/30 outline-none transition-all focus:border-[#dcc090] focus:ring-2 focus:ring-[#dcc090]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.08em] text-[#414141]/70">
+                      {t('admin.homeHero.description')}
+                    </label>
+                    <textarea
+                      value={slide.copy[locale].description}
+                      onChange={(e) =>
+                        onUpdate(patchLocaleCopy(slide, locale, { description: e.target.value }))
+                      }
+                      rows={3}
+                      className="w-full rounded-lg border border-[#dcc090]/35 bg-white px-3 py-2 text-sm text-[#122a26] placeholder-[#414141]/30 outline-none transition-all focus:border-[#dcc090] focus:ring-2 focus:ring-[#dcc090]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold uppercase tracking-[0.08em] text-[#414141]/70">
+                      {t('admin.homeHero.ctaLabel')}
+                    </label>
+                    <input
+                      type="text"
+                      value={slide.copy[locale].ctaLabel}
+                      onChange={(e) =>
+                        onUpdate(patchLocaleCopy(slide, locale, { ctaLabel: e.target.value }))
+                      }
+                      className="w-full rounded-lg border border-[#dcc090]/35 bg-white px-3 py-2 text-sm text-[#122a26] placeholder-[#414141]/30 outline-none transition-all focus:border-[#dcc090] focus:ring-2 focus:ring-[#dcc090]/30"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       ) : null}

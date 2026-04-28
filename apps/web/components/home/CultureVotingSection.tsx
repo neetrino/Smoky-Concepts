@@ -1,12 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { useAuth } from '../../lib/auth/AuthContext';
 import { apiClient } from '../../lib/api-client';
 import { showToast } from '../Toast';
 import { useTranslation } from '@/lib/i18n-client';
 
+import { addCultureEarlyAccessLine } from './cultureEarlyAccessToCheckout';
 import { CultureVotingCard } from './CultureVotingCard';
 import { HomeSectionTitle } from './HomeSectionTitle';
 
@@ -15,6 +17,7 @@ interface VotingItem {
   title: string;
   imageUrl: string;
   images?: string[];
+  productSlug?: string | null;
   likeCount: number;
   likedByCurrentUser: boolean;
 }
@@ -33,12 +36,14 @@ interface VotingLikeResponse {
 
 export function CultureVotingSection() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { isLoggedIn } = useAuth();
   const [items, setItems] = useState<VotingItem[]>([]);
   const [earlyAccessItemId, setEarlyAccessItemId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pendingItemId, setPendingItemId] = useState<string | null>(null);
+  const [earlyAccessPendingId, setEarlyAccessPendingId] = useState<string | null>(null);
 
   const fetchVotingItems = useCallback(async () => {
     try {
@@ -171,6 +176,29 @@ export function CultureVotingSection() {
     [pendingItemId, isLoggedIn, t, items, earlyAccessItemId],
   );
 
+  const handleEarlyAccessCheckout = useCallback(
+    async (itemId: string) => {
+      const item = items.find((row) => row.id === itemId);
+      const slug = item?.productSlug?.trim();
+      if (!slug) {
+        showToast(t('home.homepage.culture.earlyAccessNoProduct'), 'warning');
+        return;
+      }
+      setEarlyAccessPendingId(itemId);
+      try {
+        const result = await addCultureEarlyAccessLine(slug);
+        if (!result.ok) {
+          showToast(t(result.messageKey), 'error');
+          return;
+        }
+        router.push('/checkout');
+      } finally {
+        setEarlyAccessPendingId(null);
+      }
+    },
+    [items, router, t],
+  );
+
   if (error) {
     return (
       <section className="flex flex-col gap-10">
@@ -272,7 +300,9 @@ export function CultureVotingSection() {
                   }
                   likedByCurrentUser={item.likedByCurrentUser}
                   pending={pendingItemId === item.id}
+                  earlyAccessPending={earlyAccessPendingId === item.id}
                   onToggleLike={handleToggleLike}
+                  onEarlyAccess={handleEarlyAccessCheckout}
                   imageNudgeDown={index === 1}
                   mobileCompactBack={index === 1}
                   sizeLabel={sizeLabel}
