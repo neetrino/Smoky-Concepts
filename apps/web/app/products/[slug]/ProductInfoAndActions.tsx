@@ -359,6 +359,23 @@ export function ProductInfoAndActions({
     currentVariant?.sku ? `SKU: ${currentVariant.sku}` : null,
   ].filter(Boolean) as string[];
 
+  /** Hide Apply until plain/HTML differs from last saved (new text, edit, or format change). */
+  const showCustomizeApplyButton = useMemo(() => {
+    const rawHtml = getCustomizeSanitizedHtml();
+    const sanitized = sanitizeCustomizeHtml(rawHtml);
+    const plain = getPlainTextFromHtml(sanitized).trim();
+    if (!plain) {
+      return false;
+    }
+    if (!appliedCustomize) {
+      return true;
+    }
+    const appliedPlain = appliedCustomize.plain.trim();
+    const appliedHtml = (appliedCustomize.html ?? '').trim();
+    const currentHtml = sanitized.trim();
+    return plain !== appliedPlain || currentHtml !== appliedHtml;
+  }, [appliedCustomize, customizeDraftText, customizeFormat, getCustomizeSanitizedHtml]);
+
   const renderedTabContent = useMemo(() => {
     if (activeTab === 'description') {
       if (!productDescription) {
@@ -411,13 +428,15 @@ export function ProductInfoAndActions({
                 {customizeDraftText.length}/{customizeTextMaxLength}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleCustomizeApplyClick}
-              className="h-10 w-full shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:mt-1 sm:w-[168px]"
-            >
-              {t(language, 'product.customize_apply')}
-            </button>
+            {showCustomizeApplyButton ? (
+              <button
+                type="button"
+                onClick={handleCustomizeApplyClick}
+                className="h-10 w-full shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:mt-1 sm:w-[168px]"
+              >
+                {t(language, 'product.customize_apply')}
+              </button>
+            ) : null}
           </div>
           {appliedCustomize?.plain ? (
             <button
@@ -480,6 +499,7 @@ export function ProductInfoAndActions({
     product.id,
     customizeFormat,
     onCustomizeFormatChange,
+    showCustomizeApplyButton,
   ]);
 
   return (
