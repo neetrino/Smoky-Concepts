@@ -28,7 +28,7 @@ import {
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
 const ITEMS_PER_SECTION_PAGE = CATALOG_SECTION_PAGE_SIZE;
 
-const SECTION_ORDER = ['Classic', 'Special', 'Atelier', 'Premium'] as const;
+const SECTION_ORDER = ['Classic', 'Premium', 'Atelier', 'Special'] as const;
 
 const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
   { value: 'default', label: 'Sort By' },
@@ -37,6 +37,14 @@ const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
   { value: 'name-asc', label: 'Name: A to Z' },
   { value: 'name-desc', label: 'Name: Z to A' },
 ];
+
+/** Applied when a filter control has a non-default selection (desktop selects + sort). */
+const FILTER_CONTROL_ACTIVE =
+  'border-[#122a26] bg-[#eef3f2] text-[#122a26] ring-2 ring-[#122a26]/40 ring-offset-2 ring-offset-[#f5f4f1]';
+const FILTER_CONTROL_INACTIVE_BORDER = 'border-transparent bg-white text-[#414141]';
+/** Size opener stays on gold; only border/ring indicate active. */
+const SIZE_FILTER_BUTTON_ACTIVE =
+  'border-[#122a26] bg-[#c9b07a] text-[#122a26] ring-2 ring-[#122a26]/40 ring-offset-2 ring-offset-[#f5f4f1]';
 
 interface ProductsCatalogViewProps {
   products: CatalogProduct[];
@@ -101,6 +109,12 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   }, [sizeCatalogCategories, selectedSizeCatalogCategoryId]);
   const isCategoryFilteredView = selectedCollection !== 'all';
   const selectedSectionTitle = resolveSectionLabelFromCollectionValue(selectedCollection);
+  const isCollectionFilterActive = selectedCollection !== 'all';
+  const isColorFilterActive = selectedColor !== 'all';
+  const isSizeFilterActive = selectedSize !== 'all';
+  const isSortFilterActive = selectedSort !== 'default';
+  const hasActiveProductFilters =
+    isCollectionFilterActive || isColorFilterActive || isSizeFilterActive || isSortFilterActive;
 
   useEffect(() => {
     setSelectedSize(searchParams.get('size') ?? 'all');
@@ -431,9 +445,18 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
               <button
                 type="button"
                 onClick={() => setMobileFilterOpen(true)}
-                className="mt-0.5 min-h-[2.5rem] shrink-0 rounded-md bg-[#DBC097] px-7 py-2 text-sm font-black uppercase leading-none tracking-[0.14em] text-[#1A1D1C] transition-colors hover:bg-[#d2b68c] active:bg-[#c9ac82] lg:hidden"
+                aria-label={hasActiveProductFilters ? 'Filter, some filters are applied' : 'Open filters'}
+                className={`relative mt-0.5 min-h-[2.5rem] shrink-0 rounded-md bg-[#DBC097] px-7 py-2 text-sm font-black uppercase leading-none tracking-[0.14em] text-[#1A1D1C] transition-[colors,box-shadow] hover:bg-[#d2b68c] active:bg-[#c9ac82] lg:hidden ${
+                  hasActiveProductFilters ? FILTER_CONTROL_ACTIVE : ''
+                }`}
               >
                 Filter
+                {hasActiveProductFilters ? (
+                  <span
+                    className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#122a26]"
+                    aria-hidden
+                  />
+                ) : null}
               </button>
             </div>
 
@@ -446,7 +469,9 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <select
                   value={selectedCollection}
                   onChange={(event) => updateQuery({ category: event.target.value })}
-                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-semibold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
+                  className={`h-10 w-full appearance-none rounded-[0.375rem] border-2 px-4 pr-10 text-[0.9375rem] font-semibold leading-none shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-[box-shadow,ring,border-color,background-color,color] focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)] ${
+                    isCollectionFilterActive ? FILTER_CONTROL_ACTIVE : FILTER_CONTROL_INACTIVE_BORDER
+                  }`}
                 >
                   <option value="all">Collections</option>
                   {collectionOptions.filter((option) => option !== 'all').map((option) => (
@@ -464,7 +489,9 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <select
                   value={selectedColor}
                   onChange={(event) => updateQuery({ color: event.target.value })}
-                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-semibold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
+                  className={`h-10 w-full appearance-none rounded-[0.375rem] border-2 px-4 pr-10 text-[0.9375rem] font-semibold leading-none shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-[box-shadow,ring,border-color,background-color,color] focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)] ${
+                    isColorFilterActive ? FILTER_CONTROL_ACTIVE : FILTER_CONTROL_INACTIVE_BORDER
+                  }`}
                 >
                   <option value="all">Color</option>
                   {colorOptions.map((option) => (
@@ -481,7 +508,9 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
               <button
                 type="button"
                 onClick={() => setCatalogSizeModalOpen(true)}
-                className="h-10 w-full whitespace-nowrap rounded-[0.5rem] bg-[#dcc090] px-4 text-left text-[0.9375rem] font-semibold leading-none text-[#122a26]"
+                className={`h-10 w-full whitespace-nowrap rounded-[0.5rem] border-2 px-4 text-left text-[0.9375rem] font-semibold leading-none transition-[box-shadow,ring,border-color,background-color,color] ${
+                  isSizeFilterActive ? SIZE_FILTER_BUTTON_ACTIVE : 'border-transparent bg-[#dcc090] text-[#122a26]'
+                }`}
               >
                 {selectedSize === 'all' ? 'Select size' : selectedSize}
               </button>
@@ -500,7 +529,9 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <select
                   value={selectedSort}
                   onChange={(event) => updateQuery({ sort: event.target.value })}
-                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-extrabold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
+                  className={`h-10 w-full appearance-none rounded-[0.375rem] border-2 px-4 pr-10 text-[0.9375rem] font-extrabold leading-none shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-[box-shadow,ring,border-color,background-color,color] focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)] ${
+                    isSortFilterActive ? FILTER_CONTROL_ACTIVE : FILTER_CONTROL_INACTIVE_BORDER
+                  }`}
                 >
                   {SORT_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>

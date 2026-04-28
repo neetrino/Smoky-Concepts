@@ -42,8 +42,12 @@ function CloseIcon() {
 
 const ACCORDION_BAR =
   'flex w-full items-center justify-between rounded-xl bg-white px-4 py-3.5 text-left shadow-[0_4px_6px_rgba(0,0,0,0.05)]';
+const FILTER_SECTION_ACTIVE =
+  'ring-2 ring-[#122a26] ring-offset-2 ring-offset-[#F2F2F2]';
 const SELECT_CLASS =
-  'h-11 w-full appearance-none rounded-xl border border-[#e8e8e8] bg-white px-4 pr-10 text-[0.9375rem] font-semibold text-[#414141] outline-none';
+  'h-11 w-full appearance-none rounded-xl border-2 border-[#e8e8e8] bg-white px-4 pr-10 text-[0.9375rem] font-semibold text-[#414141] outline-none transition-[border-color,background-color,color]';
+const SELECT_CLASS_ACTIVE =
+  'border-[#122a26] bg-[#eef3f2] text-[#122a26] ring-2 ring-[#122a26]/30 ring-offset-2 ring-offset-white';
 
 function FilterSelectWrapper({ children }: { children: ReactNode }) {
   return (
@@ -119,6 +123,11 @@ export function ProductsCatalogMobileFilterSheet({
     return null;
   }
 
+  const isCollectionActive = selectedCollection !== 'all';
+  const isColorActive = selectedColor !== 'all';
+  const isSortActive = selectedSort !== 'default';
+  const isSizeActive = selectedSize !== 'all';
+
   return (
     <div
       className="fixed inset-0 z-[100] flex flex-col bg-[#F2F2F2] font-montserrat lg:hidden"
@@ -159,19 +168,16 @@ export function ProductsCatalogMobileFilterSheet({
             <button
               type="button"
               onClick={() => toggleSection('collections')}
-              className={ACCORDION_BAR}
+              className={`${ACCORDION_BAR} ${isCollectionActive ? FILTER_SECTION_ACTIVE : ''}`}
             >
               <span className="text-[0.9375rem] font-semibold text-[#333333]">Collections</span>
-              <ChevronIcon
-                className={`text-[#414141] transition-transform ${expanded === 'collections' ? 'rotate-180' : ''}`}
-              />
             </button>
             {expanded === 'collections' && (
               <FilterSelectWrapper>
                 <select
                   value={selectedCollection}
                   onChange={(event) => onCollectionChange(event.target.value)}
-                  className={SELECT_CLASS}
+                  className={`${SELECT_CLASS} ${isCollectionActive ? SELECT_CLASS_ACTIVE : ''}`}
                 >
                   <option value="all">All collections</option>
                   {collectionOptions
@@ -187,18 +193,19 @@ export function ProductsCatalogMobileFilterSheet({
           </div>
 
           <div>
-            <button type="button" onClick={() => toggleSection('color')} className={ACCORDION_BAR}>
+            <button
+              type="button"
+              onClick={() => toggleSection('color')}
+              className={`${ACCORDION_BAR} ${isColorActive ? FILTER_SECTION_ACTIVE : ''}`}
+            >
               <span className="text-[0.9375rem] font-semibold text-[#333333]">Color</span>
-              <ChevronIcon
-                className={`text-[#414141] transition-transform ${expanded === 'color' ? 'rotate-180' : ''}`}
-              />
             </button>
             {expanded === 'color' && (
               <FilterSelectWrapper>
                 <select
                   value={selectedColor}
                   onChange={(event) => onColorChange(event.target.value)}
-                  className={SELECT_CLASS}
+                  className={`${SELECT_CLASS} ${isColorActive ? SELECT_CLASS_ACTIVE : ''}`}
                 >
                   <option value="all">All colors</option>
                   {colorOptions.map((option) => (
@@ -212,18 +219,19 @@ export function ProductsCatalogMobileFilterSheet({
           </div>
 
           <div>
-            <button type="button" onClick={() => toggleSection('sort')} className={ACCORDION_BAR}>
+            <button
+              type="button"
+              onClick={() => toggleSection('sort')}
+              className={`${ACCORDION_BAR} ${isSortActive ? FILTER_SECTION_ACTIVE : ''}`}
+            >
               <span className="text-[0.9375rem] font-semibold text-[#333333]">Sort By</span>
-              <ChevronIcon
-                className={`text-[#414141] transition-transform ${expanded === 'sort' ? 'rotate-180' : ''}`}
-              />
             </button>
             {expanded === 'sort' && (
               <FilterSelectWrapper>
                 <select
                   value={selectedSort}
                   onChange={(event) => onSortChange(event.target.value)}
-                  className={SELECT_CLASS}
+                  className={`${SELECT_CLASS} ${isSortActive ? SELECT_CLASS_ACTIVE : ''}`}
                 >
                   {sortOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -240,7 +248,11 @@ export function ProductsCatalogMobileFilterSheet({
           <button
             type="button"
             onClick={onOpenSizeCatalog}
-            className="flex h-12 w-full items-center rounded-xl bg-[#dcc090] px-4 text-left text-[0.9375rem] font-semibold text-[#122a26]"
+            className={`flex h-12 w-full items-center rounded-xl border-2 px-4 text-left text-[0.9375rem] font-semibold transition-[box-shadow,ring,border-color] ${
+              isSizeActive
+                ? `${FILTER_SECTION_ACTIVE} border-[#122a26] bg-[#c9b07a] text-[#122a26]`
+                : 'border-transparent bg-[#dcc090] text-[#122a26]'
+            }`}
           >
             {selectedSize === 'all' ? 'Select size' : selectedSize}
           </button>
