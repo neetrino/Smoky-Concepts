@@ -4,6 +4,11 @@ import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
 
+/** Delay between consecutive size cards in the open animation (ms). */
+const SIZE_CARD_STAGGER_MS = 52;
+/** Extra delay before the first size card animates (after panel motion). */
+const SIZE_CARD_STAGGER_BASE_MS = 220;
+
 interface SizeCatalogPickerContentProps {
   categories: SizeCatalogCategoryDto[];
   selectedItemId: string | null;
@@ -15,16 +20,19 @@ function CatalogSizeCard({
   item,
   selected,
   onSelect,
+  enterDelayMs,
 }: {
   item: SizeCatalogItemDto;
   selected: boolean;
   onSelect: () => void;
+  enterDelayMs: number;
 }) {
   return (
     <button
       type="button"
       onClick={onSelect}
-      className={`flex h-[129px] w-full max-w-[126px] shrink-0 flex-col items-center justify-self-center rounded-[14px] bg-white pt-2 transition-shadow ${
+      style={{ animationDelay: `${enterDelayMs}ms` }}
+      className={`flex h-[129px] w-full max-w-[126px] shrink-0 animate-size-catalog-card-in flex-col items-center justify-self-center rounded-[14px] bg-white pt-2 transition-shadow ${
         selected
           ? 'border-[3px] border-solid border-[#dcc090] shadow-none'
           : 'border border-transparent shadow-[0px_2px_8px_rgba(0,0,0,0.06)]'
@@ -50,11 +58,16 @@ export function SizeCatalogPickerContent({
 
   if (!hasAny) {
     return (
-      <p className="font-montserrat text-[16px] font-medium text-[#414141]">
+      <p
+        className="animate-size-modal-block-in font-montserrat text-[16px] font-medium text-[#414141]"
+        style={{ animationDelay: '200ms' }}
+      >
         {t(language, 'product.size_catalog_empty')}
       </p>
     );
   }
+
+  let cardStaggerIndex = 0;
 
   return (
     <div className="space-y-[50px] pb-8">
@@ -62,20 +75,31 @@ export function SizeCatalogPickerContent({
         if (category.items.length === 0) {
           return null;
         }
+        const sectionHeadingDelayMs =
+          SIZE_CARD_STAGGER_BASE_MS + cardStaggerIndex * SIZE_CARD_STAGGER_MS - 40;
         return (
           <section key={category.id}>
-            <h3 className="font-montserrat text-[22px] font-extrabold leading-none text-[#414141] sm:text-[24px]">
+            <h3
+              className="animate-size-modal-block-in font-montserrat text-[22px] font-extrabold leading-none text-[#414141] sm:text-[24px]"
+              style={{ animationDelay: `${Math.max(0, sectionHeadingDelayMs)}ms` }}
+            >
               {category.title}
             </h3>
             <div className="mt-[36px] grid grid-cols-3 gap-x-2 gap-y-5 sm:gap-x-4 sm:gap-y-6 md:grid-cols-4 lg:grid-cols-7">
-              {category.items.map((item) => (
-                <CatalogSizeCard
-                  key={item.id}
-                  item={item}
-                  selected={selectedItemId === item.id}
-                  onSelect={() => onSelectItem(item)}
-                />
-              ))}
+              {category.items.map((item) => {
+                const enterDelayMs =
+                  SIZE_CARD_STAGGER_BASE_MS + cardStaggerIndex * SIZE_CARD_STAGGER_MS;
+                cardStaggerIndex += 1;
+                return (
+                  <CatalogSizeCard
+                    key={item.id}
+                    item={item}
+                    selected={selectedItemId === item.id}
+                    enterDelayMs={enterDelayMs}
+                    onSelect={() => onSelectItem(item)}
+                  />
+                );
+              })}
             </div>
           </section>
         );

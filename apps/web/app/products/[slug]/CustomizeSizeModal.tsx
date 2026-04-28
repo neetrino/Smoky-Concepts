@@ -215,18 +215,21 @@ export function CustomizeSizeModal({
     <div className="fixed inset-0 z-[100]" role="presentation">
       <button
         type="button"
-        className="absolute inset-0 z-0 bg-[rgba(0,0,0,0.6)]"
+        className="absolute inset-0 z-0 animate-size-modal-backdrop-in bg-[rgba(0,0,0,0.6)]"
         aria-label={t(language, 'product.customize_modal_close_aria')}
         onClick={onClose}
       />
       <div
-        className="absolute inset-y-0 right-0 z-10 flex h-full max-h-dvh w-full flex-col overflow-hidden bg-[#efefef] shadow-[-8px_0_32px_rgba(0,0,0,0.12)] md:w-[min(1078px,56.15vw)]"
+        className="absolute inset-y-0 right-0 z-10 flex h-full max-h-dvh w-full animate-size-modal-panel-in flex-col overflow-hidden bg-[#efefef] shadow-[-8px_0_32px_rgba(0,0,0,0.12)] md:w-[min(1078px,56.15vw)]"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
       >
         <div className="relative min-h-0 flex-1 overflow-y-auto px-[24px] pb-16 pt-[50px] sm:px-[50px]">
-          <div className="flex items-start justify-between gap-4">
+          <div
+            className="flex items-start justify-between gap-4 animate-size-modal-block-in"
+            style={{ animationDelay: '90ms' }}
+          >
             <h2 id={titleId} className="font-montserrat text-[28px] font-extrabold leading-none text-[#414141] sm:text-[36px]">
               {t(language, 'product.choose_size')}
             </h2>
@@ -247,7 +250,10 @@ export function CustomizeSizeModal({
           </div>
 
           {hasAnyCatalogItems ? (
-            <div className="mt-6 w-full max-w-[978px]">
+            <div
+              className="mt-6 w-full max-w-[978px] animate-size-modal-block-in"
+              style={{ animationDelay: '160ms' }}
+            >
               <label htmlFor={searchInputId} className="sr-only">
                 {t(language, 'product.size_catalog_search_placeholder')}
               </label>
@@ -265,17 +271,19 @@ export function CustomizeSizeModal({
 
           <div className="mt-10">
             {hasAnyCatalogItems && !hasFilteredItems && sizeSearchQuery.trim().length > 0 ? (
-              <CustomizeSizeOrderFallback
-                language={language}
-                draft={customOrderDraft}
-                onDraftChange={handleCustomOrderDraftChange}
-                onUploadImage={handleCustomOrderImageUpload}
-                onSubmit={handleCustomOrderSubmit}
-                isUploadingImage={isUploadingImage}
-                isSubmitting={false}
-                submitError={customOrderSubmitError}
-                canSubmit={canSubmitCustomOrder}
-              />
+              <div className="animate-size-modal-block-in" style={{ animationDelay: '220ms' }}>
+                <CustomizeSizeOrderFallback
+                  language={language}
+                  draft={customOrderDraft}
+                  onDraftChange={handleCustomOrderDraftChange}
+                  onUploadImage={handleCustomOrderImageUpload}
+                  onSubmit={handleCustomOrderSubmit}
+                  isUploadingImage={isUploadingImage}
+                  isSubmitting={false}
+                  submitError={customOrderSubmitError}
+                  canSubmit={canSubmitCustomOrder}
+                />
+              </div>
             ) : (
               <SizeCatalogPickerContent
                 categories={filteredSizeCategories}
