@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from 'react';
 import { apiClient } from '../../lib/api-client';
 import { HomeSectionTitle } from './HomeSectionTitle';
 import { HomeActionButton } from './HomeActionButton';
@@ -37,7 +37,28 @@ interface ProductsResponse {
 }
 
 const UPCOMING_LIMIT = 12;
-const CARDS_PER_PAGE = 6;
+/** Matches Tailwind `sm` (640px): below = mobile strip, at/above = wider row. */
+const UPCOMING_VIEWPORT_SM_QUERY = '(min-width: 640px)';
+const UPCOMING_CARDS_PER_PAGE_MOBILE = 2;
+const UPCOMING_CARDS_PER_PAGE_SM_UP = 6;
+
+function subscribeUpcomingSmViewport(onStoreChange: () => void): () => void {
+  if (typeof window === 'undefined') {
+    return () => {};
+  }
+  const mq = window.matchMedia(UPCOMING_VIEWPORT_SM_QUERY);
+  mq.addEventListener('change', onStoreChange);
+  return () => mq.removeEventListener('change', onStoreChange);
+}
+
+function getUpcomingSmViewportSnapshot(): boolean {
+  return typeof window !== 'undefined' && window.matchMedia(UPCOMING_VIEWPORT_SM_QUERY).matches;
+}
+
+/** SSR: assume mobile pagination (2 per step) to avoid layout jump on narrow clients. */
+function getServerUpcomingSmViewportSnapshot(): boolean {
+  return false;
+}
 
 /** Matches `TrendingFeaturedSection` shop CTA sizing and xl placement. */
 const UPCOMING_SHOP_BUTTON_CLASS_NAME =
@@ -70,10 +91,17 @@ function UpcomingSectionHeader() {
 export function UpcomingProductsSection() {
   const { t } = useTranslation();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const pageStartRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [items, setItems] = useState<ApiProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const isSmUp = useSyncExternalStore(
+    subscribeUpcomingSmViewport,
+    getUpcomingSmViewportSnapshot,
+    getServerUpcomingSmViewportSnapshot
+  );
+  const cardsPerPage = isSmUp ? UPCOMING_CARDS_PER_PAGE_SM_UP : UPCOMING_CARDS_PER_PAGE_MOBILE;
 
   const fetchUpcoming = useCallback(async () => {
     try {
@@ -101,6 +129,11 @@ export function UpcomingProductsSection() {
   useEffect(() => {
     fetchUpcoming();
   }, [fetchUpcoming]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    scrollContainerRef.current?.scrollTo({ left: 0 });
+  }, [isSmUp]);
 
   if (error) {
     return (
@@ -142,9 +175,39 @@ export function UpcomingProductsSection() {
     );
   }
 
-  const totalPages = Math.max(1, Math.ceil(items.length / CARDS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(items.length / cardsPerPage));
   const safePage = Math.min(currentPage, totalPages);
-  const start = (safePage - 1) * CARDS_PER_PAGE;
+
+  const getScrollLeftForPage = (page: number, container: HTMLDivElement): number => {
+    const pageIndex = Math.max(0, Math.min(totalPages - 1, page - 1));
+    const anchor = pageStartRefs.current[pageIndex];
+    if (!anchor) {
+      return 0;
+    }
+    const maxScrollLeft = Math.max(0, container.scrollWidth - container.clientWidth);
+    return Math.min(anchor.offsetLeft, maxScrollLeft);
+  };
+
+  const resolvePageFromScrollLeft = (container: HTMLDivElement): number => {
+    if (totalPages <= 1) {
+      return 1;
+    }
+    const scrollLeft = container.scrollLeft;
+    let bestPage = 1;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (let p = 0; p < totalPages; p += 1) {
+      const anchor = pageStartRefs.current[p];
+      if (!anchor) {
+        continue;
+      }
+      const distance = Math.abs(scrollLeft - anchor.offsetLeft);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestPage = p + 1;
+      }
+    }
+    return bestPage;
+  };
 
   const handlePageChange = (page: number) => {
     const container = scrollContainerRef.current;
@@ -153,17 +216,12 @@ export function UpcomingProductsSection() {
       return;
     }
 
-    const maxScrollLeft = container.scrollWidth - container.clientWidth;
-    const targetScrollLeft =
-      page <= 1 || maxScrollLeft <= 0
-        ? 0
-        : (maxScrollLeft * (page - 1)) / Math.max(1, totalPages - 1);
-
+    const clampedPage = Math.max(1, Math.min(totalPages, page));
     container.scrollTo({
-      left: targetScrollLeft,
+      left: getScrollLeftForPage(clampedPage, container),
       behavior: 'smooth',
     });
-    setCurrentPage(page);
+    setCurrentPage(clampedPage);
   };
 
   const handleScroll = () => {
@@ -172,12 +230,7 @@ export function UpcomingProductsSection() {
       return;
     }
 
-    const maxScrollLeft = container.scrollWidth - container.clientWidth;
-    const nextPage =
-      maxScrollLeft <= 0
-        ? 1
-        : Math.round((container.scrollLeft / maxScrollLeft) * (totalPages - 1)) + 1;
-
+    const nextPage = resolvePageFromScrollLeft(container);
     setCurrentPage((current) => (current === nextPage ? current : nextPage));
   };
 
@@ -187,10 +240,12 @@ export function UpcomingProductsSection() {
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="scrollbar-hide mt-3 overflow-x-auto pt-[7.25rem] pb-4 sm:mt-6 sm:pt-[7.5rem]"
+        className="scrollbar-hide mt-3 snap-x snap-mandatory overflow-x-auto pt-[7.25rem] pb-4 sm:mt-6 sm:pt-[7.5rem]"
       >
         <div className="flex min-w-max items-stretch gap-6">
           {items.map((item, index) => {
+            const pageIndex = Math.floor(index / cardsPerPage);
+            const isPageStart = index % cardsPerPage === 0;
             const catalogProduct = toCatalogProduct({
               id: item.id,
               slug: item.slug,
@@ -211,7 +266,12 @@ export function UpcomingProductsSection() {
             return (
               <div
                 key={`upcoming-${index}-${item.id}`}
-                className="flex min-h-0 shrink-0 flex-col self-stretch"
+                ref={(el) => {
+                  if (isPageStart) {
+                    pageStartRefs.current[pageIndex] = el;
+                  }
+                }}
+                className={`flex min-h-0 shrink-0 flex-col self-stretch ${isPageStart ? 'snap-start snap-always' : ''}`}
               >
                 <ProductsCatalogCard
                   product={catalogProduct}
@@ -238,7 +298,7 @@ export function UpcomingProductsSection() {
         </div>
       ) : (
         <div
-          className="mt-1 flex items-center justify-center gap-4 sm:mt-2"
+          className="mt-1 flex flex-wrap items-center justify-center gap-2 sm:mt-2 sm:gap-4"
           role="tablist"
           aria-label={t('home.homepage.upcoming.paginationAria')}
         >
@@ -253,7 +313,7 @@ export function UpcomingProductsSection() {
                 aria-selected={isActive}
                 aria-label={`${t('home.homepage.upcoming.pageAriaPrefix')} ${page}`}
                 onClick={() => handlePageChange(page)}
-                className={`h-1.5 w-[100px] rounded-[12px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#122a26] focus-visible:ring-offset-2 sm:h-2 ${
+                className={`h-1.5 w-14 shrink-0 rounded-[12px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#122a26] focus-visible:ring-offset-2 sm:h-2 sm:w-[100px] ${
                   isActive ? 'bg-[#122a26]' : 'bg-[#d9d9d9] hover:bg-[#c9c9c9]'
                 }`}
               />
