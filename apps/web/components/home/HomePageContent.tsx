@@ -196,7 +196,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
 
   return (
     <div className="overflow-x-hidden overflow-y-hidden bg-[#efefef] text-[#414141]">
-      <div className="mx-auto flex max-w-[120rem] flex-col gap-16 overflow-x-hidden overflow-y-hidden px-6 pb-20 pt-8 sm:gap-24 sm:px-8 sm:pb-24 sm:pt-10 lg:px-[7.5rem]">
+      <div className="mx-auto flex max-w-[120rem] flex-col gap-16 overflow-x-hidden overflow-y-hidden px-5 pb-20 pt-8 sm:gap-24 sm:px-8 sm:pb-24 sm:pt-10 lg:px-[7.5rem]">
         <section className="flex flex-col gap-8 sm:gap-10">
           <HomeSectionTitle
             title={t('home.homepage.hero.title')}
@@ -218,7 +218,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             description={t('home.homepage.packFit.description')}
           />
           <div className="sm:hidden">
-            <div className="-mx-6 overflow-x-auto px-6 pb-2 scrollbar-hide">
+            <div className="-mx-5 overflow-x-auto px-5 pb-2 scrollbar-hide">
               <div className="flex min-w-max snap-x snap-mandatory items-end gap-x-6">
                 {PACK_FIT_ITEMS.map((item, index) => (
                   <PackFitCard
