@@ -271,8 +271,12 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                 <Link
                   key={item.slug}
                   href={`/products?category=${item.slug}`}
-                  className="group relative z-0 mt-5 -translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1rem] bg-transparent px-2.5 pb-1 pt-0 shadow-[0_6px_24px_rgba(18,42,38,0.05)] transition-shadow duration-200 hover:z-10 hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)] focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2rem] sm:bg-white sm:px-6 sm:pb-8"
+                  className="group relative z-0 mt-5 -translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1rem] max-sm:bg-transparent bg-white px-2.5 pb-1 pt-0 shadow-none transition-shadow duration-200 hover:z-10 hover:shadow-none focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2rem] sm:px-6 sm:pb-8 sm:shadow-[0_6px_24px_rgba(18,42,38,0.05)] sm:hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)]"
                 >
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 -z-10 hidden max-sm:block rounded-[1rem] bg-white shadow-[0_8px_28px_rgba(18,42,38,0.12)] transition-shadow duration-200 max-sm:-translate-y-6 group-hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)]"
+                  />
                   <div className="relative -mt-16 translate-y-2 h-44 w-[94%] self-center shrink-0 overflow-visible sm:-mt-28 sm:translate-y-0 sm:h-[22rem] sm:w-full">
                     {item.imageSrc ? (
                       <img
@@ -294,7 +298,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     )}
                   </div>
                   <h3
-                    className={`mt-6 text-lg font-black leading-tight text-[#414141] sm:mt-12 sm:text-2xl lg:text-3xl ${
+                    className={`relative z-[1] mt-6 text-lg font-black leading-tight text-[#414141] max-sm:-translate-y-6 sm:mt-12 sm:translate-y-0 sm:text-2xl lg:text-3xl ${
                       item.slug === 'special-edition' ? 'line-clamp-1 whitespace-nowrap' : 'line-clamp-2'
                     }`}
                   >
