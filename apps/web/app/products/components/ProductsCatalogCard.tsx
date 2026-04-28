@@ -14,6 +14,9 @@ const CATALOG_BAG_ICON_PATH = '/assets/home/icons/bag-catalog.svg';
 const IMAGE_SIZES = '(max-width: 640px) 160px, (max-width: 768px) 200px, 240px';
 const MAX_IMAGE_DOT_COUNT = 8;
 
+/** Default card elevation (catalog, home, upcoming — same token for consistent look). */
+const CARD_SHADOW_TAILWIND = 'shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]';
+
 const SECTION_BADGE_CLASS_NAMES: Record<string, string> = {
   Classic: 'bg-[#122a26] text-white',
   Special: 'bg-[#dcc090] text-white',
@@ -61,6 +64,13 @@ interface ProductsCatalogCardProps {
   buyButtonLabel?: string;
   /** Merged onto the compact/non-compact product image frame (below pull-up); use for section-specific tweaks. */
   imageFrameClassName?: string;
+  /**
+   * Upcoming section (mobile only): alternating big/small card per Figma spec.
+   * 'large' — bigger image pop-up (52 px above card body).
+   * 'small' — smaller image pop-up (24 px above card body).
+   * Only affects styles below the sm breakpoint; sm+ keeps standard compact sizing.
+   */
+  upcomingMobileSize?: 'large' | 'small';
 }
 
 /**
@@ -82,6 +92,7 @@ export function ProductsCatalogCard({
   suppressShadow = false,
   buyButtonLabel = 'Buy',
   imageFrameClassName,
+  upcomingMobileSize,
 }: ProductsCatalogCardProps) {
   const displayCurrency = useCurrency();
   const isAmdCurrency = displayCurrency === 'AMD';
@@ -129,50 +140,93 @@ export function ProductsCatalogCard({
   const badgeClassName =
     SECTION_BADGE_CLASS_NAMES[sectionLabel] ?? SECTION_BADGE_CLASS_NAMES.Classic;
   const isCompactSize = sizeLabel === 'Compact';
-  const compactArticleWidth = widerCompactCard
-    ? 'w-[12rem] max-sm:w-[10.75rem]'
-    : 'w-[11rem] max-sm:w-[10.25rem]';
-  const cardShadowClass = suppressShadow
-    ? 'shadow-none'
-    : 'shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]';
+  const isUpcomingLarge = upcomingMobileSize === 'large';
+  const isUpcomingSmall = upcomingMobileSize === 'small';
+  const isUpcomingMobile = Boolean(upcomingMobileSize);
+
+  // Card width: upcoming mobile slightly under prior 15rem strip; sm+ keeps default compact width.
+  const compactArticleWidth = isUpcomingMobile
+    ? 'w-[11rem] max-sm:w-[14.25rem]'
+    : widerCompactCard
+      ? 'w-[12rem] max-sm:w-[10.75rem]'
+      : 'w-[11rem] max-sm:w-[10.25rem]';
+  const cardShadowClass = suppressShadow ? 'shadow-none' : CARD_SHADOW_TAILWIND;
   const articleStackClassName = 'z-0 hover:z-[8] focus-within:z-[8]';
+  // Upcoming mobile: 24 px radius + 14 px horizontal padding (Figma spec).
+  const upcomingMobileArticleExtra = isUpcomingMobile
+    ? 'max-sm:rounded-[1.5rem] max-sm:px-3.5'
+    : '';
   const articleClassName = compactLayout
-    ? `relative ${compactArticleWidth} ${articleStackClassName} flex h-full min-h-0 shrink-0 flex-col overflow-visible rounded-[1.125rem] bg-white px-2.5 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5 ${cardShadowClass}`.trim()
+    ? `relative ${compactArticleWidth} ${articleStackClassName} flex h-full min-h-0 shrink-0 flex-col overflow-visible rounded-[1.125rem] bg-white px-2.5 pb-2.5 pt-2 sm:px-3 sm:pb-3 sm:pt-2.5 ${cardShadowClass} ${upcomingMobileArticleExtra}`.trim()
     : `relative w-[14.25rem] max-sm:w-[12.5rem] ${articleStackClassName} shrink-0 overflow-visible rounded-[1.375rem] bg-white px-3 pb-3 pt-2.5 sm:px-3.5 sm:pb-3.5 sm:pt-3 ${cardShadowClass}`.trim();
+
+  // Image wrapper height — upcoming mobile overrides per big/small Figma spec.
   const imageWrapperClassName = compactLayout
-    ? widerCompactCard
-      ? 'h-[15.25rem] sm:h-[18.5rem]'
-      : 'h-[14.75rem] sm:h-[17.75rem]'
+    ? isUpcomingLarge
+      ? 'h-[14.75rem] max-sm:h-[14.5rem] sm:h-[17.75rem]'
+      : isUpcomingSmall
+        ? 'h-[14.75rem] max-sm:h-[12.75rem] sm:h-[17.75rem]'
+        : widerCompactCard
+          ? 'h-[15.25rem] sm:h-[18.5rem]'
+          : 'h-[14.75rem] sm:h-[17.75rem]'
     : isCompactSize
       ? 'h-[12.5rem] sm:h-60'
       : 'h-[15rem] sm:h-72';
+
+  // Image pull-up — big card: 52 px above card; small card: 24 px above card (Figma).
   const baseImagePullUpClassName = compactLayout
-    ? '-mt-[5.125rem] sm:-mt-[6.25rem]'
+    ? isUpcomingLarge
+      ? '-mt-[5.125rem] max-sm:-mt-[3.75rem] sm:-mt-[6.25rem]'
+      : isUpcomingSmall
+        ? '-mt-[5.125rem] max-sm:-mt-[2rem] sm:-mt-[6.25rem]'
+        : '-mt-[5.125rem] sm:-mt-[6.25rem]'
     : isCompactSize
       ? '-mt-12 sm:-mt-16'
       : '-mt-[4.5rem] sm:-mt-24';
   const imagePullUpClassName = baseImagePullUpClassName;
-  const compactInnerImageHeight = widerCompactCard
-    ? 'h-[14.25rem] sm:h-[17.25rem]'
-    : 'h-[13.75rem] sm:h-[16.5rem]';
+
+  // Inner image container height tracks wrapper minus ~1 rem for visual alignment.
+  const compactInnerImageHeight = isUpcomingLarge
+    ? 'h-[13.75rem] max-sm:h-[13.5rem] sm:h-[16.5rem]'
+    : isUpcomingSmall
+      ? 'h-[13.75rem] max-sm:h-[11.75rem] sm:h-[16.5rem]'
+      : widerCompactCard
+        ? 'h-[14.25rem] sm:h-[17.25rem]'
+        : 'h-[13.75rem] sm:h-[16.5rem]';
   const imageInnerClassName = compactLayout
     ? `${compactInnerImageHeight} w-full`
     : 'h-full w-full';
   const compactBaseScale = imageNudgeDown ? 1.05 : 1.12;
   const compactImageScale = compactBaseScale + imageScaleBoost;
   const imageClassName = compactLayout ? 'object-contain origin-bottom' : 'object-contain';
+
+  // Text sizes — upcoming mobile bumped to match Figma (18 px title, 12 px meta, 20 px price).
   const titleClassName = compactLayout
-    ? 'text-[0.9375rem] sm:text-[1.0625rem]'
+    ? isUpcomingMobile
+      ? 'text-[0.9375rem] max-sm:text-[1.125rem] sm:text-[1.0625rem]'
+      : 'text-[0.9375rem] sm:text-[1.0625rem]'
     : 'text-[1.0625rem] sm:text-[1.25rem]';
-  const metaTextClassName = compactLayout ? 'text-[0.625rem]' : 'text-[0.75rem]';
+  const metaTextClassName = compactLayout
+    ? isUpcomingMobile
+      ? 'text-[0.625rem] max-sm:text-[0.75rem]'
+      : 'text-[0.625rem]'
+    : 'text-[0.75rem]';
   const badgeClassNames = compactLayout
-    ? `rounded-[0.3125rem] px-[0.3125rem] py-px text-[0.5625rem] font-medium leading-tight sm:rounded-[0.375rem] sm:px-[0.375rem] sm:py-[0.125rem] sm:text-[0.625rem] ${badgeClassName}`
+    ? isUpcomingMobile
+      ? `rounded-[0.3125rem] max-sm:rounded-[0.375rem] px-[0.3125rem] max-sm:px-[0.375rem] py-px max-sm:py-[0.125rem] text-[0.5625rem] max-sm:text-[0.625rem] font-medium leading-tight sm:rounded-[0.375rem] sm:px-[0.375rem] sm:py-[0.125rem] sm:text-[0.625rem] ${badgeClassName}`
+      : `rounded-[0.3125rem] px-[0.3125rem] py-px text-[0.5625rem] font-medium leading-tight sm:rounded-[0.375rem] sm:px-[0.375rem] sm:py-[0.125rem] sm:text-[0.625rem] ${badgeClassName}`
     : `rounded-[0.375rem] px-[0.375rem] py-[0.125rem] text-[0.6875rem] font-medium leading-tight sm:px-[0.4375rem] sm:py-[0.1875rem] sm:text-[0.75rem] ${badgeClassName}`;
   const priceClassName = compactLayout
-    ? 'text-[0.75rem] sm:text-[0.98rem]'
+    ? isUpcomingMobile
+      ? 'text-[0.75rem] max-sm:text-[1.25rem] sm:text-[0.98rem]'
+      : 'text-[0.75rem] sm:text-[0.98rem]'
     : 'text-[0.875rem] sm:text-[1.05rem]';
+
+  // Buy button — upcoming mobile uses Figma-spec height/min-width (26 px × 60 px).
   const buyButtonClassName = compactLayout
-    ? 'inline-flex h-[1.375rem] min-w-[2.75rem] items-center justify-center rounded-[0.4375rem] border-2 border-[#dcc090] px-1.5 text-[0.6875rem] font-extrabold leading-tight text-[#dcc090] transition-colors hover:bg-[#dcc090]/10 sm:h-6 sm:min-w-[3.25rem] sm:rounded-[0.5rem] sm:px-2 sm:text-[0.75rem]'
+    ? isUpcomingMobile
+      ? 'inline-flex h-[1.375rem] max-sm:h-[1.625rem] min-w-[2.75rem] max-sm:min-w-[3.75rem] items-center justify-center rounded-[0.4375rem] max-sm:rounded-[0.5rem] border-2 border-[#dcc090] px-1.5 max-sm:px-2 text-[0.6875rem] max-sm:text-[0.875rem] font-extrabold leading-tight text-[#dcc090] transition-colors hover:bg-[#dcc090]/10 sm:h-6 sm:min-w-[3.25rem] sm:rounded-[0.5rem] sm:px-2 sm:text-[0.75rem]'
+      : 'inline-flex h-[1.375rem] min-w-[2.75rem] items-center justify-center rounded-[0.4375rem] border-2 border-[#dcc090] px-1.5 text-[0.6875rem] font-extrabold leading-tight text-[#dcc090] transition-colors hover:bg-[#dcc090]/10 sm:h-6 sm:min-w-[3.25rem] sm:rounded-[0.5rem] sm:px-2 sm:text-[0.75rem]'
     : 'inline-flex h-[1.375rem] min-w-[3.25rem] items-center justify-center rounded-[0.5rem] border-2 border-[#dcc090] px-2 text-[0.8125rem] font-extrabold leading-tight text-[#dcc090] transition-colors hover:bg-[#dcc090]/10 sm:h-[1.625rem] sm:min-w-[3.75rem] sm:px-3 sm:text-[0.875rem]';
   const iconClassName = compactLayout
     ? 'h-3.5 w-3.5 object-contain sm:h-4 sm:w-4'
@@ -180,17 +234,23 @@ export function ProductsCatalogCard({
   const catalogBagIconClassName = compactLayout
     ? 'h-5 w-6 object-contain sm:h-6 sm:w-[28px]'
     : 'h-6 w-8 object-contain sm:h-7 sm:w-9';
+
+  // Details section offset — upcoming mobile needs tighter pull-up since image-inside-card depth matches.
   const detailsOffsetClassName = compactLayout
-    ? tightenDetailsUnderImage
-      ? '-mt-[4.125rem] sm:-mt-[5rem]'
-      : '-mt-[2.75rem] sm:-mt-[3.25rem]'
+    ? isUpcomingMobile
+      ? '-mt-[2.75rem] max-sm:-mt-1 sm:-mt-[3.25rem]'
+      : tightenDetailsUnderImage
+        ? '-mt-[4.125rem] sm:-mt-[5rem]'
+        : '-mt-[2.75rem] sm:-mt-[3.25rem]'
     : '-mt-4';
   const dotsGapClassName = compactLayout ? 'gap-1' : 'gap-[0.3125rem]';
   const dotsMarginClassName = compactLayout ? 'mb-1' : 'mb-3';
   /** Keeps strip / multi-dot rows same block height so flex row stretch aligns all catalog cards. */
   const dotsRowLayoutClassName = `flex min-h-3 items-center ${dotsGapClassName} ${dotsMarginClassName}`;
   const sizeBadgeClassName = compactLayout
-    ? 'inline-flex items-center px-0 py-0 text-[0.5625rem] font-semibold leading-tight text-[#122a26] sm:text-[0.625rem]'
+    ? isUpcomingMobile
+      ? 'inline-flex items-center px-0 py-0 text-[0.5625rem] max-sm:text-[0.75rem] font-semibold leading-tight text-[#122a26] sm:text-[0.625rem]'
+      : 'inline-flex items-center px-0 py-0 text-[0.5625rem] font-semibold leading-tight text-[#122a26] sm:text-[0.625rem]'
     : 'inline-flex items-center px-0 py-0 text-[0.6875rem] font-semibold leading-tight text-[#122a26] sm:text-[0.75rem]';
 
   const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {
