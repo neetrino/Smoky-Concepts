@@ -54,6 +54,8 @@
   "size_catalog_custom_order_cta": "Заказать",
   "size_catalog_custom_order_cta_aria": "Отправить заказ на индивидуальный размер",
   "size_catalog_empty": "Размеры ещё не настроены в админке.",
+  "size_catalog_scroll_previous_aria": "Прокрутить размеры влево",
+  "size_catalog_scroll_next_aria": "Прокрутить размеры вправо",
   "outOfStock": "Нет в наличии",
   "selectColor": "Пожалуйста, выберите цвет",
   "selectSize": "Пожалуйста, выберите размер",
