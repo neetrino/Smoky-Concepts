@@ -56,55 +56,6 @@ function FilterSelectWrapper({ children }: { children: ReactNode }) {
   );
 }
 
-function MobileSizePickerBlock({
-  selectedSize,
-  sizeOptions,
-  sizeMenuOpen,
-  onToggleMenu,
-  onSizeChange,
-}: {
-  selectedSize: string;
-  sizeOptions: string[];
-  sizeMenuOpen: boolean;
-  onToggleMenu: () => void;
-  onSizeChange: (value: string) => void;
-}) {
-  return (
-    <div className="relative mt-6">
-      <button
-        type="button"
-        onClick={onToggleMenu}
-        className="flex h-12 w-full items-center rounded-xl bg-[#dcc090] px-4 text-left text-[0.9375rem] font-semibold text-[#122a26]"
-      >
-        {selectedSize === 'all' ? 'Select size' : selectedSize}
-      </button>
-      {sizeMenuOpen && (
-        <div className="absolute bottom-full left-0 right-0 z-10 mb-2 max-h-56 overflow-y-auto rounded-xl border border-[#e8e8e8] bg-white p-2 shadow-[0_10px_32px_rgba(18,42,38,0.14)]">
-          <button
-            type="button"
-            onClick={() => {
-              onSizeChange('all');
-            }}
-            className="block w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-[#414141] hover:bg-[#f5f4f1]"
-          >
-            All Sizes
-          </button>
-          {sizeOptions.map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => onSizeChange(option)}
-              className="block w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-[#414141] hover:bg-[#f5f4f1]"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export interface ProductsCatalogMobileFilterSheetProps {
   open: boolean;
   onClose: () => void;
@@ -114,12 +65,11 @@ export interface ProductsCatalogMobileFilterSheetProps {
   selectedSize: string;
   collectionOptions: string[];
   colorOptions: string[];
-  sizeOptions: string[];
   sortOptions: Array<{ value: string; label: string }>;
   onCollectionChange: (value: string) => void;
   onColorChange: (value: string) => void;
   onSortChange: (value: string) => void;
-  onSizeChange: (value: string) => void;
+  onOpenSizeCatalog: () => void;
   onClearAll: () => void;
 }
 
@@ -132,20 +82,17 @@ export function ProductsCatalogMobileFilterSheet({
   selectedSize,
   collectionOptions,
   colorOptions,
-  sizeOptions,
   sortOptions,
   onCollectionChange,
   onColorChange,
   onSortChange,
-  onSizeChange,
+  onOpenSizeCatalog,
   onClearAll,
 }: ProductsCatalogMobileFilterSheetProps) {
   const [expanded, setExpanded] = useState<MobileFilterSection | null>('collections');
-  const [sizeMenuOpen, setSizeMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!open) {
-      setSizeMenuOpen(false);
       return;
     }
     const previousOverflow = document.body.style.overflow;
@@ -166,11 +113,6 @@ export function ProductsCatalogMobileFilterSheet({
 
   const toggleSection = (id: MobileFilterSection) => {
     setExpanded((current) => (current === id ? null : id));
-  };
-
-  const handleSizePick = (value: string) => {
-    onSizeChange(value);
-    setSizeMenuOpen(false);
   };
 
   if (!open) {
@@ -294,13 +236,15 @@ export function ProductsCatalogMobileFilterSheet({
           </div>
         </div>
 
-        <MobileSizePickerBlock
-          selectedSize={selectedSize}
-          sizeOptions={sizeOptions}
-          sizeMenuOpen={sizeMenuOpen}
-          onToggleMenu={() => setSizeMenuOpen((value) => !value)}
-          onSizeChange={handleSizePick}
-        />
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={onOpenSizeCatalog}
+            className="flex h-12 w-full items-center rounded-xl bg-[#dcc090] px-4 text-left text-[0.9375rem] font-semibold text-[#122a26]"
+          >
+            {selectedSize === 'all' ? 'Select size' : selectedSize}
+          </button>
+        </div>
       </div>
     </div>
   );

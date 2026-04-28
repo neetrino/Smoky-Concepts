@@ -212,7 +212,7 @@ export function CustomizeSizeModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100]" role="presentation">
+    <div className="fixed inset-0 z-[110]" role="presentation">
       <button
         type="button"
         className="absolute inset-0 z-0 animate-size-modal-backdrop-in bg-[rgba(0,0,0,0.6)]"

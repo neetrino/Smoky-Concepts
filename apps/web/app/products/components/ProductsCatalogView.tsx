@@ -3,19 +3,25 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { CustomizeSizeModal } from '../[slug]/CustomizeSizeModal';
+import type { CustomOrderDraft } from '../[slug]/CustomizeSizeOrderFallback';
+import { apiClient } from '../../../lib/api-client';
+import { getStoredLanguage, type LanguageCode } from '../../../lib/language';
+import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { CatalogForProductLineRow } from './CatalogForProductLineRow';
 import { ProductsCatalogMobileFilterSheet } from './ProductsCatalogMobileFilterSheet';
 import { ProductsCatalogCard } from './ProductsCatalogCard';
 import {
   type CatalogProduct,
   CATALOG_SECTION_PAGE_SIZE,
+  filterSizeCatalogByProducts,
   getProductSectionLabels,
   getCategoryLabel,
   getColorLabel,
   getSizeLabel,
   productMatchesCategoryFilter,
+  productMatchesSizeFilter,
   shouldNudgeCatalogProductImage,
-  isClientSideCollectionFilterValue,
   resolveSectionLabelFromCollectionValue,
 } from './catalogProductLabels';
 
@@ -67,16 +73,32 @@ function ChevronIcon() {
 export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const sizeMenuRef = useRef<HTMLDivElement>(null);
   const sectionScrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const [showSizeMenu, setShowSizeMenu] = useState(false);
+  const [catalogSizeModalOpen, setCatalogSizeModalOpen] = useState(false);
+  const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
+  const [language, setLanguage] = useState<LanguageCode>('en');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState(searchParams.get('size') ?? 'all');
   const [sectionPages, setSectionPages] = useState<Record<string, number>>({});
 
   const selectedCollection = searchParams.get('category') ?? 'all';
   const selectedColor = searchParams.get('color') ?? 'all';
+  const selectedSizeCatalogCategoryId = searchParams.get('sizeCat')?.trim() ?? '';
   const selectedSort = (searchParams.get('sort') as SortOption | null) ?? 'default';
+
+  const selectedSizeCatalogCategoryTitle = useMemo(() => {
+    const id = selectedSizeCatalogCategoryId.trim();
+    if (!id) {
+      return null;
+    }
+    for (const category of sizeCatalogCategories) {
+      const hit = category.items.find((item) => item.categoryId === id);
+      if (hit?.categoryTitle?.trim()) {
+        return hit.categoryTitle.trim();
+      }
+    }
+    return null;
+  }, [sizeCatalogCategories, selectedSizeCatalogCategoryId]);
   const isCategoryFilteredView = selectedCollection !== 'all';
   const selectedSectionTitle = resolveSectionLabelFromCollectionValue(selectedCollection);
 
@@ -85,14 +107,31 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   }, [searchParams]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!sizeMenuRef.current?.contains(event.target as Node)) {
-        setShowSizeMenu(false);
-      }
+    setLanguage(getStoredLanguage());
+    const handleLanguageUpdate = () => {
+      setLanguage(getStoredLanguage());
     };
+    window.addEventListener('language-updated', handleLanguageUpdate);
+    return () => window.removeEventListener('language-updated', handleLanguageUpdate);
+  }, []);
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await apiClient.get<{ data: SizeCatalogCategoryDto[] }>('/api/v1/size-catalog');
+        if (!cancelled) {
+          setSizeCatalogCategories(Array.isArray(res.data) ? res.data : []);
+        }
+      } catch {
+        if (!cancelled) {
+          setSizeCatalogCategories([]);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const collectionOptions = useMemo(() => {
@@ -109,27 +148,95 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
     );
   }, [products]);
 
-  const sizeOptions = useMemo(() => {
-    return Array.from(new Set(products.map((product) => getSizeLabel(product))));
-  }, [products]);
+  const productsForSizeRelevance = useMemo(() => {
+    const gateByCollection = selectedCollection !== 'all';
+    return products.filter((product) => {
+      const colorLabel = getColorLabel(product);
+      if (gateByCollection && !productMatchesCategoryFilter(product, selectedCollection)) {
+        return false;
+      }
+      if (selectedColor !== 'all' && colorLabel !== selectedColor) {
+        return false;
+      }
+      return true;
+    });
+  }, [products, selectedCollection, selectedColor]);
+
+  const sizeCatalogForModal = useMemo(
+    () => filterSizeCatalogByProducts(sizeCatalogCategories, productsForSizeRelevance),
+    [sizeCatalogCategories, productsForSizeRelevance]
+  );
+
+  const selectedCatalogItemId = useMemo(() => {
+    if (selectedSize === 'all') {
+      return null;
+    }
+    const sizeNeedle = selectedSize.trim().toLowerCase();
+    const categoryNeedle = selectedSizeCatalogCategoryId.trim();
+    for (const category of sizeCatalogCategories) {
+      const exactTitleHit = category.items.find((item) => {
+        const titleMatch = item.title.trim().toLowerCase() === sizeNeedle;
+        if (!titleMatch) {
+          return false;
+        }
+        if (!categoryNeedle) {
+          return true;
+        }
+        return item.categoryId === categoryNeedle;
+      });
+      if (exactTitleHit) {
+        return exactTitleHit.id;
+      }
+      const bandTitleHit = category.items.find((item) => {
+        const bandMatch = item.categoryTitle.trim().toLowerCase() === sizeNeedle;
+        if (!bandMatch) {
+          return false;
+        }
+        if (!categoryNeedle) {
+          return true;
+        }
+        return item.categoryId === categoryNeedle;
+      });
+      if (bandTitleHit) {
+        return bandTitleHit.id;
+      }
+    }
+    return null;
+  }, [sizeCatalogCategories, selectedSize, selectedSizeCatalogCategoryId]);
 
   const visibleProducts = useMemo(() => {
-    const shouldApplyClientCategoryFilter = isClientSideCollectionFilterValue(selectedCollection);
+    const gateByCollection = selectedCollection !== 'all';
     const filtered = products.filter((product) => {
       const colorLabel = getColorLabel(product);
-      const sizeLabel = getSizeLabel(product);
 
-      if (shouldApplyClientCategoryFilter && !productMatchesCategoryFilter(product, selectedCollection)) {
+      if (gateByCollection && !productMatchesCategoryFilter(product, selectedCollection)) {
         return false;
       }
       if (selectedColor !== 'all' && colorLabel !== selectedColor) return false;
-      if (selectedSize !== 'all' && sizeLabel !== selectedSize) return false;
+      if (
+        !productMatchesSizeFilter(
+          product,
+          selectedSize,
+          selectedSizeCatalogCategoryId || null,
+          selectedSizeCatalogCategoryTitle
+        )
+      ) {
+        return false;
+      }
 
       return true;
     });
 
     return sortProducts(filtered, selectedSort);
-  }, [products, selectedCollection, selectedColor, selectedSize, selectedSort]);
+  }, [
+    products,
+    selectedCollection,
+    selectedColor,
+    selectedSize,
+    selectedSizeCatalogCategoryId,
+    selectedSizeCatalogCategoryTitle,
+    selectedSort,
+  ]);
 
   const sectionItemsByTitle = useMemo(() => {
     return visibleProducts.reduce<Record<string, CatalogProduct[]>>((accumulator, product) => {
@@ -214,9 +321,24 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
     router.replace(params.toString() ? `/products?${params.toString()}` : '/products', { scroll: false });
   };
 
+  const applyCatalogSizeFilter = (item: SizeCatalogItemDto) => {
+    const packTitle = item.title.trim();
+    const bandTitle = item.categoryTitle.trim();
+    const sizeQueryValue = bandTitle || packTitle;
+    const categoryId = item.categoryId.trim();
+    setSelectedSize(sizeQueryValue ? sizeQueryValue : 'all');
+    setCatalogSizeModalOpen(false);
+    setMobileFilterOpen(false);
+    if (!sizeQueryValue) {
+      updateQuery({ size: 'all', sizeCat: 'all' });
+      return;
+    }
+    updateQuery({ size: sizeQueryValue, sizeCat: categoryId || 'all' });
+  };
+
   const clearFilters = () => {
     setSelectedSize('all');
-    setShowSizeMenu(false);
+    setCatalogSizeModalOpen(false);
     setMobileFilterOpen(false);
     router.replace('/products', { scroll: false });
   };
@@ -287,14 +409,13 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
         selectedSize={selectedSize}
         collectionOptions={collectionOptions}
         colorOptions={colorOptions}
-        sizeOptions={sizeOptions}
         sortOptions={SORT_OPTIONS}
         onCollectionChange={(value) => updateQuery({ category: value })}
         onColorChange={(value) => updateQuery({ color: value })}
         onSortChange={(value) => updateQuery({ sort: value })}
-        onSizeChange={(value) => {
-          setSelectedSize(value === 'all' ? 'all' : value);
-          updateQuery({ size: value });
+        onOpenSizeCatalog={() => {
+          setMobileFilterOpen(false);
+          setCatalogSizeModalOpen(true);
         }}
         onClearAll={clearFilters}
       />
@@ -357,45 +478,13 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 </span>
               </label>
 
-              <div className="relative" ref={sizeMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setShowSizeMenu((value) => !value)}
-                  className="h-10 w-full whitespace-nowrap rounded-[0.5rem] bg-[#dcc090] px-4 text-left text-[0.9375rem] font-semibold leading-none text-[#122a26]"
-                >
-                  {selectedSize === 'all' ? 'Select size' : selectedSize}
-                </button>
-
-                {showSizeMenu && (
-                  <div className="absolute left-0 top-[calc(100%+0.75rem)] z-20 min-w-full rounded-[1rem] bg-white p-3 shadow-[0_10px_32px_rgba(18,42,38,0.14)]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedSize('all');
-                        setShowSizeMenu(false);
-                        updateQuery({ size: 'all' });
-                      }}
-                      className="mb-2 block w-full rounded-[0.75rem] px-3 py-2 text-left text-sm font-extrabold text-[#414141] transition-colors hover:bg-[#f5f4f1]"
-                    >
-                      All Sizes
-                    </button>
-                    {sizeOptions.map((option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => {
-                          setSelectedSize(option);
-                          setShowSizeMenu(false);
-                          updateQuery({ size: option });
-                        }}
-                        className="block w-full rounded-[0.75rem] px-3 py-2 text-left text-sm font-extrabold text-[#414141] transition-colors hover:bg-[#f5f4f1]"
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <button
+                type="button"
+                onClick={() => setCatalogSizeModalOpen(true)}
+                className="h-10 w-full whitespace-nowrap rounded-[0.5rem] bg-[#dcc090] px-4 text-left text-[0.9375rem] font-semibold leading-none text-[#122a26]"
+              >
+                {selectedSize === 'all' ? 'Select size' : selectedSize}
+              </button>
 
               <button
                 type="button"
@@ -497,6 +586,18 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
           </div>
         </div>
       </div>
+
+      <CustomizeSizeModal
+        isOpen={catalogSizeModalOpen}
+        onClose={() => setCatalogSizeModalOpen(false)}
+        language={language}
+        sizeCategories={sizeCatalogForModal}
+        selectedSizeItemId={selectedCatalogItemId}
+        onSelectSizeCatalogItem={applyCatalogSizeFilter}
+        onSelectCustomSizeRequest={(_draft: CustomOrderDraft) => {
+          setCatalogSizeModalOpen(false);
+        }}
+      />
     </div>
   );
 }
