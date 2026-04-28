@@ -505,15 +505,15 @@ export function ProductInfoAndActions({
                   key={option.valueId || option.value}
                   type="button"
                   onClick={() => onColorSelect(option.value)}
-                  className={`relative rounded-[6px] transition-transform hover:scale-[1.02] ${
+                  className={`relative transition-transform hover:scale-[1.02] ${
                     isActive
-                      ? 'flex h-[34px] w-[34px] items-center justify-center bg-white shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
-                      : 'h-[22px] w-[22px]'
+                      ? 'flex h-10 w-10 items-center justify-center rounded-[10px] bg-white shadow-[0_2px_10px_rgba(0,0,0,0.1)]'
+                      : 'h-[22px] w-[22px] rounded-[6px]'
                   }`}
                   aria-label={option.label}
                 >
                   <span
-                    className={`block rounded-[5px] ${isActive ? 'h-[28px] w-[28px]' : 'h-[22px] w-[22px]'}`}
+                    className={`block ${isActive ? 'h-7 w-7 rounded-lg' : 'h-[22px] w-[22px] rounded-[5px]'}`}
                     style={{
                       background:
                         swatches.length > 1
