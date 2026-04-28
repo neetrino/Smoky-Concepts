@@ -146,7 +146,7 @@ function UpcomingLineCard({
     ? imageDocumentsLayout
       ? masonryTile === 'documents'
         ? 'pointer-events-none absolute left-[76%] top-2.5 h-[7rem] w-[7rem] origin-bottom -translate-x-1/2 -translate-y-[28%] sm:top-3 sm:h-40 sm:w-40 sm:-translate-y-[24%]'
-        : 'pointer-events-none absolute left-[76%] top-4 h-[7rem] w-[7rem] origin-bottom -translate-x-1/2 -translate-y-[20%] sm:top-5 sm:h-40 sm:w-40 sm:-translate-y-[18%] xl:top-6 xl:h-48 xl:w-48 xl:-translate-y-[22%]'
+        : 'pointer-events-none absolute left-[76%] top-4 h-[7rem] w-[7rem] origin-bottom -translate-x-1/2 -translate-y-[20%] sm:top-5 sm:h-40 sm:w-40 sm:-translate-y-[18%] xl:left-1/2 xl:top-4 xl:h-48 xl:w-48 xl:-translate-y-[30%]'
       : 'pointer-events-none absolute left-1/2 top-0 h-[5.5rem] w-[5.5rem] origin-bottom -translate-x-1/2 -translate-y-[36%] sm:h-32 sm:w-32 sm:-translate-y-[36%] xl:h-40 xl:w-40 xl:-translate-y-[40%]'
     : imageNudgeDown
       ? masonryTile === 'notebooks'
@@ -163,9 +163,9 @@ function UpcomingLineCard({
           : imageKnifesLayout
             ? masonryTile === 'knifes'
               ? 'pointer-events-none absolute left-[68%] top-3 h-36 w-36 origin-bottom -translate-x-1/2 -translate-y-[19%] sm:left-[68%] sm:top-2 sm:h-40 sm:w-40 sm:-translate-y-[17%]'
-              : 'pointer-events-none absolute left-[68%] top-4 h-36 w-36 origin-bottom -translate-x-1/2 -translate-y-[12%] sm:left-[68%] sm:top-4 sm:h-40 sm:w-40 sm:-translate-y-[12%] xl:left-[68%] xl:top-5 xl:h-52 xl:w-52 xl:-translate-y-[14%]'
+              : 'pointer-events-none absolute left-[68%] top-4 h-36 w-36 origin-bottom -translate-x-1/2 -translate-y-[12%] sm:left-[68%] sm:top-4 sm:h-40 sm:w-40 sm:-translate-y-[12%] xl:left-[68%] xl:top-1 xl:h-40 xl:w-40 xl:-translate-y-[30%]'
             : masonryTile === 'wallets' || imageWalletsLayout
-              ? 'pointer-events-none absolute left-1/2 top-2 h-[11.25rem] w-[11.25rem] origin-bottom -translate-x-1/2 -translate-y-[40%] sm:top-2 sm:h-[14rem] sm:w-[14rem] sm:-translate-y-[36%] xl:top-3 xl:h-[15rem] xl:w-[15rem] xl:-translate-y-[38%]'
+              ? 'pointer-events-none absolute left-1/2 top-2 h-[11.25rem] w-[11.25rem] origin-bottom -translate-x-1/2 -translate-y-[40%] sm:top-2 sm:h-[14rem] sm:w-[14rem] sm:-translate-y-[36%] xl:top-1 xl:h-[15rem] xl:w-[15rem] xl:-translate-y-[42%]'
               : 'pointer-events-none absolute left-1/2 top-0 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[40%] sm:h-36 sm:w-36 sm:-translate-y-[38%] xl:h-44 xl:w-44 xl:-translate-y-[42%]';
   const imageSizes = imagePhonesLayout
     ? masonryTile === 'phones'
@@ -176,7 +176,7 @@ function UpcomingLineCard({
         ? '(max-width: 640px) 304px, (max-width: 1280px) 352px, 480px'
         : '(max-width: 640px) 152px, (max-width: 1280px) 232px, 288px'
       : imageKnifesLayout
-        ? '(max-width: 640px) 132px, (max-width: 1280px) 176px, 232px'
+        ? '(max-width: 640px) 132px, (max-width: 1280px) 176px, 176px'
         : masonryTile === 'documents'
           ? '(max-width: 640px) 136px, (max-width: 1280px) 176px, 208px'
           : imageNudgeDown && masonryTile === 'notebooks'
