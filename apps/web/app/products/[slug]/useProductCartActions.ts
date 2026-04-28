@@ -7,6 +7,7 @@ import type { LanguageCode } from '@/lib/language';
 import type { SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import type { Product, ProductVariant } from './types';
 import type { CustomOrderDraft } from './CustomizeSizeOrderFallback';
+import { dispatchCartDrawerOpen } from '@/app/cart/constants';
 import {
   buildGuestCartLineSnapshot,
   canAddVariantToGuestCart,
@@ -132,10 +133,11 @@ export function useProductCartActions({
 
   const handleAddToCart = useCallback(async () => {
     runAddFlow(() => {
-      setShowMessage(`${t(language, 'product.addedToCart')} ${quantity} ${t(language, 'product.pcs')}`);
-      setTimeout(() => setShowMessage(null), 2000);
+      if (product) {
+        dispatchCartDrawerOpen(product.id);
+      }
     });
-  }, [runAddFlow, language, quantity, setShowMessage]);
+  }, [runAddFlow, product]);
 
   const handleBuyNow = useCallback(async () => {
     runAddFlow(() => {

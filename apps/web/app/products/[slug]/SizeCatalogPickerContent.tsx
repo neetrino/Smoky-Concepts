@@ -4,7 +4,10 @@ import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { CatalogCategorySizeBand } from './SizeCatalogCategoryBand';
-import { SIZE_CARD_STAGGER_BASE_MS, SIZE_CARD_STAGGER_MS } from './sizeCatalogPicker.constants';
+import {
+  SIZE_CARD_STAGGER_BASE_MS,
+  SIZE_CATALOG_CATEGORY_SECTION_STEP_MS,
+} from './sizeCatalogPicker.constants';
 
 interface SizeCatalogPickerContentProps {
   categories: SizeCatalogCategoryDto[];
@@ -32,7 +35,7 @@ export function SizeCatalogPickerContent({
     );
   }
 
-  let cardStaggerIndex = 0;
+  let nonEmptyCategoryIndex = 0;
 
   return (
     <div className="space-y-[50px] pb-8">
@@ -41,9 +44,10 @@ export function SizeCatalogPickerContent({
           return null;
         }
         const sectionHeadingDelayMs =
-          SIZE_CARD_STAGGER_BASE_MS + cardStaggerIndex * SIZE_CARD_STAGGER_MS - 40;
-        const staggerStart = cardStaggerIndex;
-        cardStaggerIndex += category.items.length;
+          SIZE_CARD_STAGGER_BASE_MS +
+          nonEmptyCategoryIndex * SIZE_CATALOG_CATEGORY_SECTION_STEP_MS -
+          40;
+        nonEmptyCategoryIndex += 1;
         return (
           <CatalogCategorySizeBand
             key={category.id}
@@ -52,7 +56,7 @@ export function SizeCatalogPickerContent({
             language={language}
             onSelectItem={onSelectItem}
             sectionHeadingDelayMs={sectionHeadingDelayMs}
-            staggerStartIndex={staggerStart}
+            staggerStartIndex={0}
           />
         );
       })}

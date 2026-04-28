@@ -1,3 +1,9 @@
+/**
+ * Offset between category *sections* (heading + first cards) on modal open.
+ * Must stay small: heading uses `animate-size-modal-block-in` with fill-both, so a large delay
+ * keeps later collection titles and grids invisible until the delay elapses.
+ */
+export const SIZE_CATALOG_CATEGORY_SECTION_STEP_MS = 72;
 /** Delay between consecutive size cards in the open animation (ms). */
 export const SIZE_CARD_STAGGER_MS = 52;
 /** Extra delay before the first size card animates (after panel motion). */
