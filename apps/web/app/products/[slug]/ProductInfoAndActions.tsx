@@ -562,7 +562,7 @@ export function ProductInfoAndActions({
           <button
             type="button"
             onClick={openSizeCatalogModal}
-            className="mt-3 flex w-full min-h-9 items-center justify-center gap-2 rounded-[6px] bg-[#dcc090] px-3 py-2 text-center text-[16px] font-medium uppercase tracking-[0.08em] text-[#122a26] sm:inline-flex sm:w-auto sm:min-w-[160px]"
+            className="mt-3 flex w-full min-h-9 items-center justify-center gap-2 rounded-[6px] bg-[#dcc090] px-3 py-2 text-center font-montserrat text-[16px] font-bold leading-normal tracking-normal text-neutral-700 sm:inline-flex sm:w-auto sm:min-w-[160px]"
           >
             <span className="truncate">{sizeButtonLabel}</span>
           </button>
