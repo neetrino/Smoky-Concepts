@@ -1,7 +1,9 @@
 'use client';
 
-import { useTranslation } from '../../../lib/i18n-client';
+import { ADMIN_PRICE_CURRENCY } from '../../../lib/currency';
+import { useOrderDetailsDialog } from './hooks/useOrderDetailsDialog';
 import { useOrders } from './useOrders';
+import { OrderDetailsModal } from './components/OrderDetailsModal';
 import { OrdersFilters } from './components/OrdersFilters';
 import { BulkSelectionControls } from './components/BulkSelectionControls';
 import { OrdersTable } from './components/OrdersTable';
@@ -9,7 +11,6 @@ import { AdminShell } from '../components/AdminShell';
 import { ADMIN_PAGE_SHELL_CLASS } from '../constants/adminShell.constants';
 
 export function OrdersPageContent() {
-  const { t } = useTranslation();
   const {
     orders,
     loading,
@@ -26,12 +27,12 @@ export function OrdersPageContent() {
     updateMessage,
     selectedIds,
     bulkDeleting,
+    applyOrderListPatch,
     setStatusFilter,
     setPaymentStatusFilter,
     setOrderTypeFilter,
     setSearchQuery,
     setPage,
-    handleViewOrderDetails,
     toggleSelect,
     toggleSelectAll,
     handleSort,
@@ -41,6 +42,8 @@ export function OrdersPageContent() {
     router,
     searchParams,
   } = useOrders();
+
+  const detailsDialog = useOrderDetailsDialog({ applyOrderListPatch });
 
   return (
     <div className={ADMIN_PAGE_SHELL_CLASS}>
@@ -80,13 +83,29 @@ export function OrdersPageContent() {
             onToggleSelect={toggleSelect}
             onToggleSelectAll={toggleSelectAll}
             onSort={handleSort}
-            onViewDetails={handleViewOrderDetails}
+            onViewDetails={detailsDialog.openDetails}
+            onPrefetchOrderDetails={detailsDialog.prefetchOrderDetails}
             onStatusChange={handleStatusChange}
             onPaymentStatusChange={handlePaymentStatusChange}
             onPageChange={(newPage) => setPage(newPage)}
           />
         </AdminShell>
       </div>
+
+      <OrderDetailsModal
+        open={detailsDialog.detailsOpen}
+        detailHeaderHint={detailsDialog.detailHeaderHint}
+        orderDetails={detailsDialog.orderDetails}
+        loading={detailsDialog.detailsLoading}
+        error={detailsDialog.detailsError}
+        currency={ADMIN_PRICE_CURRENCY}
+        onClose={detailsDialog.closeDetails}
+        formatCurrency={detailsDialog.formatCurrency}
+        updatingStatus={detailsDialog.updatingStatus}
+        updatingPaymentStatus={detailsDialog.updatingPaymentStatus}
+        onStatusChange={detailsDialog.handleDetailsStatusChange}
+        onPaymentStatusChange={detailsDialog.handleDetailsPaymentStatusChange}
+      />
     </div>
   );
 }

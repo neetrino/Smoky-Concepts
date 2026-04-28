@@ -24,6 +24,7 @@ interface OrderRowProps {
   updatingPaymentStatus: boolean;
   onToggleSelect: () => void;
   onViewDetails: () => void;
+  onPrefetchDetails?: () => void;
   onStatusChange: (newStatus: string) => void;
   onPaymentStatusChange: (newPaymentStatus: string) => void;
 }
@@ -35,6 +36,7 @@ export function OrderRow({
   updatingPaymentStatus,
   onToggleSelect,
   onViewDetails,
+  onPrefetchDetails,
   onStatusChange,
   onPaymentStatusChange,
 }: OrderRowProps) {
@@ -89,6 +91,7 @@ export function OrderRow({
       <td
         className="cursor-pointer border-y border-[#dcc090]/25 bg-white/95 px-3 py-3 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0]"
         onClick={onViewDetails}
+        onPointerEnter={onPrefetchDetails}
       >
         <div className="inline-flex items-center rounded-full bg-[#122a26] px-2.5 py-1 text-xs font-bold text-[#dcc090]">
           #{order.number}
@@ -97,6 +100,7 @@ export function OrderRow({
       <td
         className="cursor-pointer border-y border-[#dcc090]/25 bg-white/95 px-3 py-3 transition-all duration-200 group-hover:border-[#dcc090] group-hover:bg-[#fffaf0]"
         onClick={onViewDetails}
+        onPointerEnter={onPrefetchDetails}
       >
         <div className="truncate text-sm font-bold text-[#122a26]">
           {[order.customerFirstName, order.customerLastName].filter(Boolean).join(' ') || t('admin.orders.unknownCustomer')}
