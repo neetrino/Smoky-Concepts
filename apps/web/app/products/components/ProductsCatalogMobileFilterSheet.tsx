@@ -4,6 +4,9 @@ import { useEffect, type ReactNode } from 'react';
 
 import { CatalogForProductLineRow } from './CatalogForProductLineRow';
 
+const MOBILE_FILTER_TOUCH_ROW =
+  'relative w-full overflow-hidden rounded-xl bg-white shadow-[0_4px_6px_rgba(0,0,0,0.05)]';
+
 function ChevronIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -38,24 +41,46 @@ function CloseIcon() {
   );
 }
 
-/** Header row — matches pre-accordion mobile filter visuals (non-interactive). */
-const ACCORDION_BAR =
-  'flex w-full items-center justify-between rounded-xl bg-white px-4 py-3.5 text-left shadow-[0_4px_6px_rgba(0,0,0,0.05)]';
 const FILTER_SECTION_ACTIVE =
   'ring-2 ring-[#122a26] ring-offset-2 ring-offset-[#F2F2F2]';
-const SELECT_CLASS =
-  'h-11 w-full appearance-none rounded-xl border-2 border-[#e8e8e8] bg-white px-4 pr-10 text-[0.9375rem] font-semibold text-[#414141] outline-none transition-[border-color,background-color,color]';
-const SELECT_CLASS_ACTIVE =
-  'border-[#122a26] bg-[#eef3f2] text-[#122a26] ring-2 ring-[#122a26]/30 ring-offset-2 ring-offset-white';
 
-function FilterSelectWrapper({ children }: { children: ReactNode }) {
+const MOBILE_FILTER_ROW_MIN_H = 'min-h-[3.25rem]';
+
+/** Single tap target: invisible native select over the labeled row (no duplicate “All” / default in list). */
+function MobileFilterNativeRow({
+  ariaLabel,
+  value,
+  onChange,
+  isActive,
+  displayText,
+  children,
+}: {
+  ariaLabel: string;
+  value: string;
+  onChange: (value: string) => void;
+  isActive: boolean;
+  displayText: string;
+  children: ReactNode;
+}) {
+  const wrapClass = isActive ? `${MOBILE_FILTER_TOUCH_ROW} ${FILTER_SECTION_ACTIVE}` : MOBILE_FILTER_TOUCH_ROW;
+  const titleClass = isActive ? 'text-[#122a26]' : 'text-[#333333]';
   return (
-    <label className="relative mt-2 block px-1">
-      {children}
-      <span className="pointer-events-none absolute right-6 top-1/2 -translate-y-1/2 text-[#414141]">
-        <ChevronIcon />
-      </span>
-    </label>
+    <div className={wrapClass}>
+      <select
+        aria-label={ariaLabel}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={`absolute inset-0 z-10 w-full ${MOBILE_FILTER_ROW_MIN_H} cursor-pointer opacity-0`}
+      >
+        {children}
+      </select>
+      <div
+        className={`pointer-events-none flex w-full items-center justify-between px-4 py-3.5 text-left ${MOBILE_FILTER_ROW_MIN_H}`}
+      >
+        <span className={`text-[0.9375rem] font-semibold ${titleClass}`}>{displayText}</span>
+        <ChevronIcon className={`shrink-0 ${isActive ? 'text-[#122a26]' : 'text-[#414141]'}`} />
+      </div>
+    </div>
   );
 }
 
@@ -157,72 +182,58 @@ export function ProductsCatalogMobileFilterSheet({
         </div>
 
         <div className="flex flex-col gap-3">
-          <div>
-            <div className={`${ACCORDION_BAR} ${isCollectionActive ? FILTER_SECTION_ACTIVE : ''}`}>
-              <span className="text-[0.9375rem] font-semibold text-[#333333]">Collections</span>
-              <ChevronIcon className="shrink-0 text-[#414141]" />
-            </div>
-            <FilterSelectWrapper>
-              <select
-                aria-label="Collections"
-                value={selectedCollection}
-                onChange={(event) => onCollectionChange(event.target.value)}
-                className={`${SELECT_CLASS} ${isCollectionActive ? SELECT_CLASS_ACTIVE : ''}`}
-              >
-                <option value="all">All collections</option>
-                {collectionOptions
-                  .filter((option) => option !== 'all')
-                  .map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-              </select>
-            </FilterSelectWrapper>
-          </div>
+          <MobileFilterNativeRow
+            ariaLabel="Collections"
+            value={selectedCollection}
+            onChange={onCollectionChange}
+            isActive={isCollectionActive}
+            displayText={selectedCollection === 'all' ? 'Collections' : selectedCollection}
+          >
+            <option value="all" hidden />
+            {collectionOptions
+              .filter((option) => option !== 'all')
+              .map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+          </MobileFilterNativeRow>
 
-          <div>
-            <div className={`${ACCORDION_BAR} ${isColorActive ? FILTER_SECTION_ACTIVE : ''}`}>
-              <span className="text-[0.9375rem] font-semibold text-[#333333]">Color</span>
-              <ChevronIcon className="shrink-0 text-[#414141]" />
-            </div>
-            <FilterSelectWrapper>
-              <select
-                aria-label="Color"
-                value={selectedColor}
-                onChange={(event) => onColorChange(event.target.value)}
-                className={`${SELECT_CLASS} ${isColorActive ? SELECT_CLASS_ACTIVE : ''}`}
-              >
-                <option value="all">All</option>
-                {colorOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </FilterSelectWrapper>
-          </div>
+          <MobileFilterNativeRow
+            ariaLabel="Color"
+            value={selectedColor}
+            onChange={onColorChange}
+            isActive={isColorActive}
+            displayText={selectedColor === 'all' ? 'Color' : selectedColor}
+          >
+            <option value="all" hidden />
+            {colorOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </MobileFilterNativeRow>
 
-          <div>
-            <div className={`${ACCORDION_BAR} ${isSortActive ? FILTER_SECTION_ACTIVE : ''}`}>
-              <span className="text-[0.9375rem] font-semibold text-[#333333]">Sort By</span>
-              <ChevronIcon className="shrink-0 text-[#414141]" />
-            </div>
-            <FilterSelectWrapper>
-              <select
-                aria-label="Sort By"
-                value={selectedSort}
-                onChange={(event) => onSortChange(event.target.value)}
-                className={`${SELECT_CLASS} ${isSortActive ? SELECT_CLASS_ACTIVE : ''}`}
-              >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </FilterSelectWrapper>
-          </div>
+          <MobileFilterNativeRow
+            ariaLabel="Sort By"
+            value={selectedSort}
+            onChange={onSortChange}
+            isActive={isSortActive}
+            displayText={
+              selectedSort === 'default'
+                ? 'Sort By'
+                : (sortOptions.find((o) => o.value === selectedSort)?.label ?? 'Sort By')
+            }
+          >
+            <option value="default" hidden />
+            {sortOptions
+              .filter((option) => option.value !== 'default')
+              .map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+          </MobileFilterNativeRow>
         </div>
 
         <div className="mt-6">
