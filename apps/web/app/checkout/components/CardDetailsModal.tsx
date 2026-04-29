@@ -6,7 +6,7 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { PaymentMethodLogo } from './PaymentMethodLogo';
 import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
-import { CheckoutFormData, Cart } from '../types';
+import type { CheckoutFormData, Cart, CheckoutOrderSummaryTotals } from '../types';
 
 interface CardDetailsModalProps {
   isOpen: boolean;
@@ -20,13 +20,7 @@ interface CardDetailsModalProps {
   shippingMethod: 'pickup' | 'delivery';
   shippingRegion?: string;
   cart: Cart | null;
-  orderSummary: {
-    subtotalDisplay: number;
-    taxDisplay: number;
-    shippingDisplay: number;
-    collectionPriceDisplay: number;
-    totalDisplay: number;
-  };
+  orderSummary: CheckoutOrderSummaryTotals;
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
   logoErrors: Record<string, boolean>;

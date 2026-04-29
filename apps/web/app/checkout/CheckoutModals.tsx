@@ -3,7 +3,7 @@
 import { UseFormRegister, UseFormSetValue, UseFormHandleSubmit, FieldErrors } from 'react-hook-form';
 import { ShippingAddressModal } from './components/ShippingAddressModal';
 import { CardDetailsModal } from './components/CardDetailsModal';
-import { CheckoutFormData, Cart } from './types';
+import type { CheckoutFormData, Cart, CheckoutOrderSummaryTotals } from './types';
 import type { DeliveryLocationOption } from './hooks/useDeliveryLocations';
 
 interface CheckoutModalsProps {
@@ -22,13 +22,7 @@ interface CheckoutModalsProps {
   deliveryLocations: DeliveryLocationOption[];
   loadingDeliveryLocations: boolean;
   cart: Cart | null;
-  orderSummary: {
-    subtotalDisplay: number;
-    taxDisplay: number;
-    shippingDisplay: number;
-    collectionPriceDisplay: number;
-    totalDisplay: number;
-  };
+  orderSummary: CheckoutOrderSummaryTotals;
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
   logoErrors: Record<string, boolean>;

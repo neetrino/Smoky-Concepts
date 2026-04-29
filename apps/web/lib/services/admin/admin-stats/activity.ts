@@ -20,8 +20,16 @@ export async function getActivity(limit: number = 10): Promise<ActivityItem[]> {
   const recentOrders = await db.order.findMany({
     take: limit,
     orderBy: { createdAt: "desc" },
-    include: {
-      items: true,
+    select: {
+      number: true,
+      total: true,
+      currency: true,
+      createdAt: true,
+      items: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 

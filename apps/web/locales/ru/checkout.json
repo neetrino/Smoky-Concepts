@@ -56,8 +56,20 @@
     "subtotal": "Промежуточный итог",
     "shipping": "Доставка",
     "collectionPrice": "Цена коллекции",
+    "couponDiscount": "Скидка по купону",
     "tax": "Налог",
     "total": "Итого"
+  },
+  "coupon": {
+    "sectionTitle": "Купон",
+    "placeholder": "Введите код купона",
+    "apply": "Применить",
+    "applying": "Применение…",
+    "invalid": "Неверный или просроченный купон.",
+    "notEligibleUser": "Этот купон недоступен для вашего аккаунта.",
+    "cartEmpty": "Сначала добавьте товары в корзину.",
+    "applied": "Код {code} применён.",
+    "remove": "Убрать"
   },
   "buttons": {
     "placeOrder": "Оформить заказ",

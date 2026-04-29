@@ -7,8 +7,21 @@ export async function getRecentOrders(limit: number = 5) {
   const orders = await db.order.findMany({
     take: limit,
     orderBy: { createdAt: "desc" },
-    include: {
-      items: true,
+    select: {
+      id: true,
+      number: true,
+      status: true,
+      paymentStatus: true,
+      total: true,
+      currency: true,
+      customerEmail: true,
+      customerPhone: true,
+      createdAt: true,
+      items: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 

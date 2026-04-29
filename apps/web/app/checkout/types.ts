@@ -1,5 +1,15 @@
 export type { Cart, CartItem } from '../cart/types';
 
+/** Totals passed to checkout summary UI (USD display amounts) */
+export type CheckoutOrderSummaryTotals = {
+  subtotalDisplay: number;
+  taxDisplay: number;
+  shippingDisplay: number;
+  collectionPriceDisplay: number;
+  couponDiscountDisplay: number;
+  totalDisplay: number;
+};
+
 export type CheckoutFormData = {
   firstName: string;
   lastName: string;

@@ -42,6 +42,8 @@ export interface CheckoutData {
     phone?: string;
   };
   shippingAmount?: number;
+  /** Optional checkout coupon (re-validated server-side; normalized in DB) */
+  couponCode?: string;
   paymentMethod?: string;
   billingAddress?: {
     firstName?: string;

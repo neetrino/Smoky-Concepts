@@ -18,20 +18,33 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const filters = {};
-    const result = await adminService.getUsers(filters);
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get("search") ?? undefined;
+    const roleRaw = searchParams.get("role");
+    const role =
+      roleRaw === "admin" || roleRaw === "customer" || roleRaw === "all" ? roleRaw : undefined;
+    const takeRaw = searchParams.get("take");
+    const takeParsed = takeRaw != null ? Number.parseInt(takeRaw, 10) : Number.NaN;
+    const take = Number.isFinite(takeParsed) ? takeParsed : undefined;
+
+    const result = await adminService.getUsers({
+      ...(search != null && search !== "" ? { search } : {}),
+      ...(role != null ? { role } : {}),
+      ...(take != null ? { take } : {}),
+    });
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("❌ [ADMIN] Error:", error);
+    const err = error as { status?: number; type?: string; title?: string; detail?: string; message?: string };
     return NextResponse.json(
       {
-        type: error.type || "https://api.shop.am/problems/internal-error",
-        title: error.title || "Internal Server Error",
-        status: error.status || 500,
-        detail: error.detail || error.message || "An error occurred",
+        type: err.type || "https://api.shop.am/problems/internal-error",
+        title: err.title || "Internal Server Error",
+        status: err.status || 500,
+        detail: err.detail || err.message || "An error occurred",
         instance: req.url,
       },
-      { status: error.status || 500 }
+      { status: err.status || 500 }
     );
   }
 }

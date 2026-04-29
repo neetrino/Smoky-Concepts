@@ -17,6 +17,7 @@ import {
 } from "../orders/sanitize-customize-html-server";
 import { logger } from "./utils/logger";
 import { adminDeliveryService } from "./admin/admin-delivery.service";
+import { tryApplyCoupon } from "./coupon.service";
 
 type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
   include: {
@@ -230,6 +231,7 @@ class OrdersService {
         shippingMethod = 'pickup',
         shippingAddress,
         paymentMethod = 'idram',
+        couponCode: rawCouponCode,
       } = data;
 
       // Validate required fields
@@ -538,7 +540,26 @@ class OrdersService {
         const addonUsd = adminInputAmdToUsd(item.sizeCatalogCategoryPriceAmd ?? 0);
         return sum + (item.price + addonUsd) * item.quantity;
       }, 0);
-      const discountAmount = 0; // TODO: Implement discount/coupon logic
+
+      const couponTrimmed =
+        typeof rawCouponCode === 'string' && rawCouponCode.trim().length > 0
+          ? rawCouponCode.trim()
+          : '';
+      let discountAmount = 0;
+      let orderCouponCode: string | null = null;
+      if (couponTrimmed) {
+        const applied = await tryApplyCoupon(couponTrimmed, subtotal, { userId: userId ?? null });
+        if (applied.status !== 'ok') {
+          throw {
+            status: 400,
+            type: 'https://api.shop.am/problems/validation-error',
+            title: 'Validation Error',
+            detail: 'Invalid or expired coupon code',
+          };
+        }
+        discountAmount = applied.discountAmountUsd;
+        orderCouponCode = applied.code;
+      }
       let shippingAmount = 0;
       if (shippingMethod === "delivery" && shippingAddress) {
         const shipCity = checkoutShippingCity(shippingAddress);
@@ -589,6 +610,7 @@ class OrdersService {
             fulfillmentStatus: 'unfulfilled',
             subtotal,
             discountAmount,
+            couponCode: orderCouponCode,
             shippingAmount,
             taxAmount,
             total,
@@ -631,7 +653,7 @@ class OrdersService {
                 },
               },
             },
-          },
+          } as Prisma.OrderUncheckedCreateInput,
           include: {
             items: true,
           },

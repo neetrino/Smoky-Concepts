@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { getCartMerchandiseSubtotalUsd } from './utils/getCartBaseSubtotalUsd';
+import { apiClient } from '../../lib/api-client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStoredLanguage } from '../../lib/language';
@@ -23,6 +24,11 @@ export function useCheckout() {
   const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
+  const [couponDraft, setCouponDraft] = useState('');
+  const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(null);
+  const [couponDiscountUsd, setCouponDiscountUsd] = useState(0);
+  const [couponApplying, setCouponApplying] = useState(false);
+  const [couponFieldError, setCouponFieldError] = useState<string | null>(null);
 
   const paymentMethods = usePaymentMethods();
   const checkoutSchema = useCheckoutSchema();
@@ -68,6 +74,18 @@ export function useCheckout() {
 
   const merchandiseSubtotalUsd = useMemo(() => getCartMerchandiseSubtotalUsd(cart), [cart]);
 
+  const cartFingerprint = useMemo(
+    () => cart?.items.map((i) => `${i.id}:${i.quantity}`).join('|') ?? '',
+    [cart?.items],
+  );
+
+  useEffect(() => {
+    setAppliedCouponCode(null);
+    setCouponDiscountUsd(0);
+    setCouponFieldError(null);
+    setCouponDraft('');
+  }, [cartFingerprint]);
+
   const { deliveryPrice, loadingDeliveryPrice } = useDeliveryPrice(
     shippingMethod,
     activeDeliveryLocation?.city,
@@ -81,13 +99,68 @@ export function useCheckout() {
     deliveryPrice,
     setError,
     deliveryLocations,
+    appliedCouponCode,
   });
 
   const { orderSummary } = useOrderSummary({
     cart,
     shippingMethod,
     deliveryPrice,
+    couponDiscountUsd,
   });
+
+  const applyCoupon = useCallback(async () => {
+    setCouponFieldError(null);
+    if (!cart) {
+      return;
+    }
+    const merch = getCartMerchandiseSubtotalUsd(cart);
+    if (merch == null || merch <= 0) {
+      setCouponFieldError(t('checkout.coupon.cartEmpty'));
+      return;
+    }
+    setCouponApplying(true);
+    try {
+      const res = await apiClient.post<{
+        valid: boolean;
+        discountAmountUsd?: number;
+        code?: string;
+        reason?: 'not_eligible_user';
+      }>('/api/v1/coupons/validate', {
+        code: couponDraft,
+        merchandiseSubtotalUsd: merch,
+      });
+      if (!res.valid) {
+        setAppliedCouponCode(null);
+        setCouponDiscountUsd(0);
+        setCouponFieldError(
+          res.reason === 'not_eligible_user'
+            ? t('checkout.coupon.notEligibleUser')
+            : t('checkout.coupon.invalid'),
+        );
+        return;
+      }
+      setAppliedCouponCode(typeof res.code === 'string' ? res.code : null);
+      setCouponDiscountUsd(
+        typeof res.discountAmountUsd === 'number' && Number.isFinite(res.discountAmountUsd)
+          ? Math.max(0, res.discountAmountUsd)
+          : 0,
+      );
+    } catch {
+      setAppliedCouponCode(null);
+      setCouponDiscountUsd(0);
+      setCouponFieldError(t('checkout.coupon.invalid'));
+    } finally {
+      setCouponApplying(false);
+    }
+  }, [cart, couponDraft, t]);
+
+  const removeCoupon = useCallback(() => {
+    setAppliedCouponCode(null);
+    setCouponDiscountUsd(0);
+    setCouponFieldError(null);
+    setCouponDraft('');
+  }, []);
 
   useEffect(() => {
     if (isLoading) {
@@ -165,6 +238,13 @@ export function useCheckout() {
     shippingRegionSummary,
     paymentMethods,
     orderSummary,
+    couponDraft,
+    setCouponDraft,
+    applyCoupon,
+    removeCoupon,
+    couponApplying,
+    couponFieldError,
+    appliedCouponCode,
     // Actions
     handlePlaceOrder,
     onSubmit,

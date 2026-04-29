@@ -37,6 +37,13 @@ export default function CheckoutPage() {
     loadingDeliveryLocations,
     paymentMethods,
     orderSummary,
+    couponDraft,
+    setCouponDraft,
+    applyCoupon,
+    removeCoupon,
+    couponApplying,
+    couponFieldError,
+    appliedCouponCode,
     handlePlaceOrder,
     onSubmit,
   } = useCheckout();
@@ -95,7 +102,6 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <OrderSummary
-            cart={cart}
             orderSummary={orderSummary}
             shippingMethod={shippingMethod}
             shippingRegion={shippingRegionSummary}
@@ -110,6 +116,13 @@ export default function CheckoutPage() {
                 handlePlaceOrder({ preventDefault: () => {} } as React.FormEvent);
               }
             }}
+            couponDraft={couponDraft}
+            onCouponDraftChange={setCouponDraft}
+            onApplyCoupon={applyCoupon}
+            onRemoveCoupon={removeCoupon}
+            couponApplying={couponApplying}
+            couponFieldError={couponFieldError}
+            appliedCouponCode={appliedCouponCode}
           />
         </div>
       </form>
