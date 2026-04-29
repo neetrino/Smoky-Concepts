@@ -59,6 +59,10 @@ interface ProductsCatalogCardProps {
   buyButtonLabel?: string;
   /** Merged onto the compact/non-compact product image frame (below pull-up); use for section-specific tweaks. */
   imageFrameClassName?: string;
+  /**
+   * When true, the hero product image loads eagerly (avoids lazy decode when the card sits in a clipped carousel track).
+   */
+  eagerProductImage?: boolean;
 }
 
 /**
@@ -80,6 +84,7 @@ export function ProductsCatalogCard({
   suppressShadow = false,
   buyButtonLabel = 'Buy',
   imageFrameClassName,
+  eagerProductImage = false,
 }: ProductsCatalogCardProps) {
   const displayCurrency = useCurrency();
   const isAmdCurrency = displayCurrency === 'AMD';
@@ -241,6 +246,7 @@ export function ProductsCatalogCard({
                 style={compactLayout ? { transform: `scale(${compactImageScale})` } : undefined}
                 sizes={IMAGE_SIZES}
                 unoptimized
+                loading={eagerProductImage ? 'eager' : undefined}
                 onError={() => setImageError(true)}
               />
             </Link>
