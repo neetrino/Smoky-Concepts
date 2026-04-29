@@ -71,8 +71,8 @@ async function resolveEarlyAccessForCheckoutLine(productId: string, requested: b
   });
   const slugSet = new Set(
     translations
-      .map((row) => row.slug.trim().toLowerCase())
-      .filter((s) => s.length > 0),
+      .map((row: { slug: string }) => row.slug.trim().toLowerCase())
+      .filter((s: string) => s.length > 0),
   );
   if (slugSet.size === 0) {
     return false;

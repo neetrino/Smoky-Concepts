@@ -357,7 +357,9 @@ async function buildMergedCategoriesForResponse(
   lang: string
 ): Promise<Array<{ id: string; slug: string; title: string }>> {
   const relationCategories = Array.isArray(product.categories)
-    ? product.categories.map((cat) => mapCategoryToOutput(cat, lang))
+    ? product.categories.map((cat: CategoryWithTranslations) =>
+        mapCategoryToOutput(cat, lang),
+      )
     : [];
 
   const relationCategoryIdSet = new Set(relationCategories.map((c) => c.id));
@@ -376,7 +378,9 @@ async function buildMergedCategoriesForResponse(
     include: { translations: true },
   });
 
-  const missingCategories = fallbackRows.map((cat) => mapCategoryToOutput(cat, lang));
+  const missingCategories = fallbackRows.map((cat: CategoryWithTranslations) =>
+    mapCategoryToOutput(cat, lang),
+  );
   const merged = [...relationCategories, ...missingCategories];
   const seen = new Set<string>();
   return merged.filter((c) => {

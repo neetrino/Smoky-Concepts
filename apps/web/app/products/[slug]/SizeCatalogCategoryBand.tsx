@@ -202,7 +202,7 @@ function CatalogCategorySizeBandView({
   sectionHeadingDelayMs: number;
   staggerStartIndex: number;
   itemsPerRow: number;
-  scrollerRef: RefObject<HTMLDivElement | null>;
+  scrollerRef: RefObject<HTMLDivElement>;
   pageWidthPx: number;
   hasOverflow: boolean;
   canScrollLeft: boolean;

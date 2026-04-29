@@ -6,7 +6,7 @@ import { useLayoutEffect, useState, type RefObject } from 'react';
  * Tracks `clientWidth` of a scroll container (e.g. for full-viewport horizontal “pages”).
  */
 export function useScrollerClientWidth(
-  scrollerRef: RefObject<HTMLDivElement | null>,
+  scrollerRef: RefObject<HTMLDivElement>,
   resyncKey: string
 ): number {
   const [widthPx, setWidthPx] = useState(0);

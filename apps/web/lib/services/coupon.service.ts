@@ -139,7 +139,9 @@ export async function tryApplyCoupon(
     }
   }
 
-  const allowedUserIds = coupon.allowedUsers.map((row) => row.userId);
+  const allowedUserIds = coupon.allowedUsers.map(
+    (row: { userId: string }) => row.userId,
+  );
   if (allowedUserIds.length > 0) {
     const uid = options.userId?.trim();
     if (!uid || !allowedUserIds.includes(uid)) {
