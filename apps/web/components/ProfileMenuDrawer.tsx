@@ -75,7 +75,7 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
                 aria-label="Go to home page"
               >
                 <img
-                  src="/assets/home/Logo%20Full.png"
+                  src="/assets/home/Logo%20Full.webp"
                   alt="Home"
                   className="h-10 w-10 object-contain"
                 />

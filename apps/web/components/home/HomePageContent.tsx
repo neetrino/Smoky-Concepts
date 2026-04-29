@@ -475,7 +475,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               <div className="overflow-hidden rounded-[1.5rem] sm:rounded-[2rem]">
                 <div className="relative h-[170.812px] sm:h-[26rem] lg:h-[28rem]">
                   <Image
-                    src="/assets/home/concepts/behind-creation.png"
+                    src="/assets/home/concepts/behind-creation.webp"
                     alt={t('home.homepage.behindCreation.imageAlt')}
                     fill
                     className="object-cover"

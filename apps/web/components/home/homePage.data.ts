@@ -8,15 +8,15 @@ import type {
 export const HOME_ASSET_PATHS = {
   bagIcon: '/assets/home/icons/bag.svg',
   compactPack: '/assets/home/products/compact-figma.svg',
-  craftTools: '/assets/home/concepts/craft-tools.png',
-  heroBanner: '/assets/home/concepts/hero-banner.png',
+  craftTools: '/assets/home/concepts/craft-tools.webp',
+  heroBanner: '/assets/home/concepts/hero-banner.webp',
   instagramIcon: '/assets/home/icons/instagram.svg',
   logo: '/assets/home/icons/logo.svg',
-  notebook: '/assets/home/products/notebook.png',
-  packMark: '/assets/home/icons/pack-mark-figma.png',
-  phone: '/assets/home/products/phone.png',
+  notebook: '/assets/home/products/notebook.webp',
+  packMark: '/assets/home/icons/pack-mark-figma.webp',
+  phone: '/assets/home/products/phone.webp',
   playIcon: '/assets/home/icons/play.svg',
-  ritualBanner: '/assets/home/concepts/ritual-banner.png',
+  ritualBanner: '/assets/home/concepts/ritual-banner.webp',
   /** Public path; filename contains spaces — keep percent-encoded for reliable loading */
   neetrinoPartnerLogo: '/assets/home/concepts/Asset%201%20(1).svg',
   studioLogo: '/assets/home/icons/gazar-logo.svg',
@@ -216,12 +216,12 @@ export const CULTURE_PRODUCTS: HomeProductItem[] = [
 ];
 
 export const UPCOMING_LINES: HomeSimpleCardItem[] = [
-  { title: 'Notebooks', imageSrc: '/assets/home/products/notebook.png' },
-  { title: 'Knifes', imageSrc: '/assets/home/products/knife.png' },
-  { title: 'Phones', imageSrc: '/assets/home/products/phone.png' },
-  { title: 'Wallets', imageSrc: '/assets/home/products/wallet.png' },
-  { title: 'Documents', imageSrc: '/assets/home/products/keys.png' },
-  { title: 'Keys', imageSrc: '/assets/home/products/documents.png' },
+  { title: 'Notebooks', imageSrc: '/assets/home/products/notebook.webp' },
+  { title: 'Knifes', imageSrc: '/assets/home/products/knife.webp' },
+  { title: 'Phones', imageSrc: '/assets/home/products/phone.webp' },
+  { title: 'Wallets', imageSrc: '/assets/home/products/wallet.webp' },
+  { title: 'Documents', imageSrc: '/assets/home/products/keys.webp' },
+  { title: 'Keys', imageSrc: '/assets/home/products/documents.webp' },
 ];
 
 export const FOOTER_LINKS = [

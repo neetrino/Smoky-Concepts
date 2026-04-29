@@ -29,7 +29,7 @@ function createEmptySlide(): HomeHeroSlide {
   const base = HOME_HERO_DEFAULT_SLIDES[0];
   const empty = { title: '', description: '', ctaLabel: '' };
   return {
-    imageUrl: base?.imageUrl ?? '/assets/home/concepts/hero-banner.png',
+    imageUrl: base?.imageUrl ?? '/assets/home/concepts/hero-banner.webp',
     ctaHref: base?.ctaHref ?? '/about',
     copy: {
       hy: { ...empty },
