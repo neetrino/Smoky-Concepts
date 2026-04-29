@@ -12,7 +12,7 @@ const EMPTY_BLOCK = { title: '', description: '', ctaLabel: '' } as const;
 /** Fallback when DB has no `homeHero` or empty slides — matches previous static homepage. */
 export const HOME_HERO_DEFAULT_SLIDES: readonly HomeHeroSlide[] = [
   {
-    imageUrl: '/assets/home/concepts/hero-banner.png',
+    imageUrl: '/assets/home/concepts/hero-banner.webp',
     ctaHref: '/about',
     copy: {
       hy: { ...EMPTY_BLOCK },

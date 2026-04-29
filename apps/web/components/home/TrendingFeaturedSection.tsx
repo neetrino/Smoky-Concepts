@@ -337,6 +337,19 @@ export function TrendingFeaturedSection() {
     );
   }
 
+  /** Prev + visible + next page along the desktop track — avoids lazy-loading only after translate. */
+  const trendingTrackEagerMin =
+    desktopTrackItems.length === 0
+      ? 0
+      : Math.max(0, startIndex - TRENDING_ITEMS_PER_PAGE);
+  const trendingTrackEagerMax =
+    desktopTrackItems.length === 0
+      ? 0
+      : Math.min(
+          desktopTrackItems.length - 1,
+          startIndex + TRENDING_ITEMS_PER_PAGE * 2 - 1
+        );
+
   return (
     <section className="relative isolate flex min-w-0 flex-col gap-8 overflow-x-clip overflow-y-visible pb-6 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2">
       <div className="flex min-h-[4rem] min-w-0 items-center justify-between gap-3 xl:relative xl:z-20 xl:-translate-y-4 xl:justify-center">
@@ -385,6 +398,7 @@ export function TrendingFeaturedSection() {
                 imageNudgeDown={isMiddleOfThree}
                 compactLayout
                 suppressShadow
+                eagerProductImage
                 imageFrameClassName="max-sm:origin-bottom max-sm:scale-[0.9] max-sm:-translate-y-2"
               />
             </div>
@@ -416,6 +430,7 @@ export function TrendingFeaturedSection() {
                       imageScaleBoost={index === 1 ? -0.07 : 0.02}
                       compactLayout
                       suppressShadow
+                      eagerProductImage
                     />
                   </div>
                 );
@@ -460,6 +475,9 @@ export function TrendingFeaturedSection() {
                       imageNudgeDown={isMiddle}
                       compactLayout
                       suppressShadow
+                      eagerProductImage={
+                        index >= trendingTrackEagerMin && index <= trendingTrackEagerMax
+                      }
                     />
                   </div>
                 );
@@ -487,6 +505,7 @@ export function TrendingFeaturedSection() {
                       imageScaleBoost={index === 1 ? -0.07 : 0.02}
                       compactLayout
                       suppressShadow
+                      eagerProductImage
                     />
                   </div>
                 );

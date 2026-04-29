@@ -212,6 +212,7 @@ function UpcomingLineCard({
             fill
             className={imageClassName}
             sizes={imageSizes}
+            loading="eager"
           />
         </div>
         <h3 className="text-[1.125rem] font-extrabold leading-none text-[#36373a] sm:text-[1.65rem]">{title}</h3>
@@ -357,7 +358,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                         src={item.imageSrc}
                         alt={item.title}
                         className="h-full w-full origin-bottom object-contain object-top transition-transform duration-300 ease-out translate-y-10 scale-x-[1.92] scale-y-[1.72] sm:translate-y-[8.25rem] sm:scale-x-[1.45] sm:scale-y-[1.42] sm:group-hover:translate-y-[7.75rem] sm:group-hover:scale-x-[1.55] sm:group-hover:scale-y-[1.52]"
-                        loading="lazy"
+                        loading="eager"
                         decoding="async"
                       />
                     ) : (
@@ -474,7 +475,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               <div className="overflow-hidden rounded-[1.5rem] sm:rounded-[2rem]">
                 <div className="relative h-[170.812px] sm:h-[26rem] lg:h-[28rem]">
                   <Image
-                    src="/assets/home/concepts/behind-creation.png"
+                    src="/assets/home/concepts/behind-creation.webp"
                     alt={t('home.homepage.behindCreation.imageAlt')}
                     fill
                     className="object-cover"

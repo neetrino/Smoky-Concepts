@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { CustomizeSizeModal } from '../[slug]/CustomizeSizeModal';
@@ -45,6 +45,32 @@ const FILTER_CONTROL_INACTIVE_BORDER = 'border-transparent bg-white text-[#41414
 /** Size opener stays on gold; only border/ring indicate active. */
 const SIZE_FILTER_BUTTON_ACTIVE =
   'border-[#122a26] bg-[#c9b07a] text-[#122a26] ring-2 ring-[#122a26]/40 ring-offset-2 ring-offset-[#f5f4f1]';
+
+/** Matches Tailwind `max-lg` so JS scroll offset stays in sync with strip card breakpoints. */
+const CATALOG_STRIP_PEEK_MEDIA_QUERY = '(max-width: 1023px)';
+
+/**
+ * Horizontal scroll offset so ~half of the first strip card sits left of the viewport (mobile hint).
+ */
+function getCatalogStripPeekStartScroll(container: HTMLElement): number {
+  if (typeof window === 'undefined') {
+    return 0;
+  }
+
+  if (!window.matchMedia(CATALOG_STRIP_PEEK_MEDIA_QUERY).matches) {
+    return 0;
+  }
+
+  const first = container.querySelector<HTMLElement>('[data-catalog-strip-card]');
+  if (!first) {
+    return 0;
+  }
+
+  const halfCard = Math.round(first.offsetWidth / 2);
+  const maxScroll = Math.max(0, container.scrollWidth - container.clientWidth);
+
+  return Math.min(halfCard, maxScroll);
+}
 
 interface ProductsCatalogViewProps {
   products: CatalogProduct[];
@@ -269,6 +295,12 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
     }, {});
   }, [visibleProducts]);
 
+  const catalogStripSectionTitles = useMemo(() => {
+    return selectedCollection !== 'all' && selectedSectionTitle
+      ? [selectedSectionTitle]
+      : [...SECTION_ORDER];
+  }, [selectedCollection, selectedSectionTitle]);
+
   useEffect(() => {
     setSectionPages((currentPages) => {
       let hasChanges = false;
@@ -323,6 +355,52 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
     }).filter((section): section is NonNullable<typeof section> => Boolean(section));
   }, [sectionItemsByTitle, sectionPages, selectedCollection, selectedSectionTitle]);
 
+  const applyStripPeekStartScroll = useCallback(() => {
+    if (isCategoryFilteredView) {
+      return;
+    }
+
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    for (const title of catalogStripSectionTitles) {
+      if ((sectionItemsByTitle[title]?.length ?? 0) === 0) {
+        continue;
+      }
+
+      const element = sectionScrollRefs.current[title];
+      if (!element) {
+        continue;
+      }
+
+      if (!window.matchMedia(CATALOG_STRIP_PEEK_MEDIA_QUERY).matches) {
+        element.scrollLeft = 0;
+        continue;
+      }
+
+      element.scrollLeft = getCatalogStripPeekStartScroll(element);
+    }
+  }, [catalogStripSectionTitles, isCategoryFilteredView, sectionItemsByTitle]);
+
+  useLayoutEffect(() => {
+    applyStripPeekStartScroll();
+    const frame = requestAnimationFrame(() => {
+      applyStripPeekStartScroll();
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [applyStripPeekStartScroll]);
+
+  useEffect(() => {
+    if (isCategoryFilteredView) {
+      return;
+    }
+
+    window.addEventListener('resize', applyStripPeekStartScroll);
+    return () => window.removeEventListener('resize', applyStripPeekStartScroll);
+  }, [applyStripPeekStartScroll, isCategoryFilteredView]);
+
   const updateQuery = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -365,10 +443,15 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
       const container = sectionScrollRefs.current[title];
       if (container) {
         const maxScrollLeft = container.scrollWidth - container.clientWidth;
+        const sectionMeta = sections.find((section) => section.title === title);
+        const totalPages = sectionMeta?.totalPages ?? 1;
+        const startLeft = getCatalogStripPeekStartScroll(container);
+        const span = Math.max(0, maxScrollLeft - startLeft);
+        const denominator = Math.max(1, totalPages - 1);
         const targetScrollLeft =
-          pageIndex <= 0 || maxScrollLeft <= 0 || sectionPages[title] === undefined
+          maxScrollLeft <= 0
             ? 0
-            : (maxScrollLeft * pageIndex) / Math.max(1, (sections.find((section) => section.title === title)?.totalPages ?? 1) - 1);
+            : Math.min(maxScrollLeft, startLeft + (span * pageIndex) / denominator);
 
         container.scrollTo({
           left: targetScrollLeft,
@@ -398,10 +481,13 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
     }
 
     const maxScrollLeft = container.scrollWidth - container.clientWidth;
+    const startLeft = getCatalogStripPeekStartScroll(container);
+    const span = Math.max(0, maxScrollLeft - startLeft);
+    const adjustedLeft = Math.max(0, container.scrollLeft - startLeft);
     const nextPage =
-      maxScrollLeft <= 0
+      span <= 0 || section.totalPages <= 1
         ? 0
-        : Math.round((container.scrollLeft / maxScrollLeft) * (section.totalPages - 1));
+        : Math.round((adjustedLeft / span) * (section.totalPages - 1));
 
     setSectionPages((currentPages) => {
       if (currentPages[title] === nextPage) {
@@ -573,14 +659,14 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                     className={
                       isCategoryFilteredView
                         ? 'mt-4 pt-[7.5rem] pb-4'
-                        : 'scrollbar-hide mt-4 overflow-x-auto pt-[7.5rem] pb-4'
+                        : 'scrollbar-hide mt-4 overflow-x-auto overscroll-x-contain pt-[7.5rem] pb-4'
                     }
                   >
                     <div
                       className={
                         isCategoryFilteredView
                           ? 'grid grid-cols-2 items-start gap-x-3 gap-y-20 md:grid-cols-3 lg:grid-cols-6'
-                          : 'flex min-w-max gap-7'
+                          : 'flex min-w-max gap-7 max-lg:pr-4'
                       }
                     >
                       {(isCategoryFilteredView ? section.items : section.items).map((product, index) => (
@@ -592,7 +678,8 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                           categoryLabel={getCategoryLabel(product, section.title)}
                           imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                           imageScaleBoost={0.04}
-                          className="group lg:w-[12.75rem] xl:w-[13rem]"
+                          className="group"
+                          catalogStripMobilePeek
                           compactLayout
                         />
                       ))}

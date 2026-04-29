@@ -2,8 +2,10 @@ import Image from 'next/image';
 
 /** Figma: Group 1321315375 — “For” row (Smoky Covers product line). */
 const CATALOG_FOR_CIGARETTE_PACK_IMAGE = '/assets/home/products/compact-figma.svg';
-const CATALOG_FOR_CIGARETTE_MARK_IMAGE = '/assets/products/catalog-for/cigarette-pack-mark.png';
-const CATALOG_FOR_MONEY_IMAGE = '/assets/products/catalog-for/money-wallet.png';
+/** Same asset + placement pattern as home “Will it fit mine?” Compact (`PackFitCard`). */
+const CATALOG_FOR_CIGARETTE_MARK_IMAGE = '/assets/home/icons/pack-mark-figma.webp';
+/** `money-wallet.png` is not in repo; home wallet art matches “Money” intent (Figma blur/crop still applies). */
+const CATALOG_FOR_MONEY_IMAGE = '/assets/home/products/wallet.webp';
 const CATALOG_FOR_PHONE_CASE_IMAGE = '/assets/products/catalog-for/phone-case.png';
 
 const CARD_SHELL =
@@ -23,17 +25,13 @@ function CatalogForCigarettePacksCard() {
           className="h-[64px] w-[34px] object-contain lg:h-[74px] lg:w-[39px]"
           unoptimized
         />
-        <div className="pointer-events-none absolute left-3 top-[37px] h-[10px] w-[10px] lg:left-[14px] lg:top-[43px] lg:h-[12px] lg:w-[11px]">
-          <Image
-            src={CATALOG_FOR_CIGARETTE_MARK_IMAGE}
-            alt=""
-            width={11}
-            height={12}
-            className="h-[10px] w-[10px] object-contain lg:h-[12px] lg:w-[11px]"
-            unoptimized
-            aria-hidden
-          />
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element -- match home PackFitCard overlay (plain img) */}
+        <img
+          src={CATALOG_FOR_CIGARETTE_MARK_IMAGE}
+          alt=""
+          className="pointer-events-none absolute left-1/2 top-[62%] h-8 w-7 origin-center object-contain opacity-90 [transform:translate(-50%,-50%)_scale(0.36)] lg:[transform:translate(-50%,-50%)_scale(0.41)]"
+          aria-hidden
+        />
       </div>
       <p className="mt-auto mb-2 w-[76px] text-center text-[11px] font-medium leading-tight text-[#414141] lg:mb-3 lg:w-[86px] lg:text-[12px]">
         For Cigarette

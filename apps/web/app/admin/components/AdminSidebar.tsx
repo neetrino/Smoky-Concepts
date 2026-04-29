@@ -77,7 +77,7 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
             aria-label="Go to home page"
           >
             <img
-              src="/assets/home/Logo%20Full.png"
+              src="/assets/home/Logo%20Full.webp"
               alt="Home"
               className="h-7 w-auto max-w-[120px] object-contain"
             />

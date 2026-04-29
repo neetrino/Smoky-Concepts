@@ -281,9 +281,9 @@ export function UpcomingProductsSection() {
                   buyButtonLabel={t('home.homepage.upcoming.orderCta')}
                   imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                   imageScaleBoost={isDarkCollection ? 0.2 : 0.04}
-                  className="group h-full min-h-0 w-full lg:w-[12.75rem] xl:w-[13rem]"
+                  className="group h-full min-h-0 lg:w-[12.75rem] xl:w-[13rem]"
                   compactLayout
-                  upcomingMobileSize={index % 2 === 0 ? 'large' : 'small'}
+                  eagerProductImage
                 />
               </div>
             );
