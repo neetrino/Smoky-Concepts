@@ -33,6 +33,28 @@ export interface HomeProductItem {
   slug?: string;
 }
 
+/** JSON-safe storefront row for home trending / upcoming sections */
+export interface HomeStorefrontProductListItem {
+  id: string;
+  slug: string;
+  title: string;
+  price: number;
+  image: string | null;
+  images: string[];
+  inStock: boolean;
+  categories: { id: string; slug: string; title: string }[];
+  skus: string[];
+  brand: string | null;
+  originalPrice: number | null;
+  defaultVariantId: string | null;
+  defaultVariantStock: number;
+  defaultSku: string;
+  sizeLabel?: string;
+  sizeLabels?: string[];
+  sizeCatalogCategoryIds?: string[];
+  sizeCatalogCategoryTitles?: string[];
+}
+
 export interface HomeRitualStep {
   step: string;
   title: string;
