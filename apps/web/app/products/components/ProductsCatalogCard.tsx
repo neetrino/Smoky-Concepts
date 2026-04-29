@@ -14,6 +14,7 @@ import { PRODUCT_SECTION_BADGE_CLASS_NAMES } from './catalogProductLabels';
 const BAG_ICON_PATH = '/assets/home/icons/bag.svg';
 const CATALOG_BAG_ICON_PATH = '/assets/home/icons/bag-catalog.svg';
 const IMAGE_SIZES = '(max-width: 640px) 160px, (max-width: 768px) 200px, 240px';
+
 const MAX_IMAGE_DOT_COUNT = 8;
 
 /** Default card elevation (catalog, home, upcoming — same token for consistent look). */
@@ -63,6 +64,11 @@ interface ProductsCatalogCardProps {
    * When true, the hero product image loads eagerly (avoids lazy decode when the card sits in a clipped carousel track).
    */
   eagerProductImage?: boolean;
+  /**
+   * With `compactLayout`, below `lg` the card uses a viewport-based width so ~half of the next
+   * card shows in the horizontal catalog strip (mobile / tablet scroll hint).
+   */
+  catalogStripMobilePeek?: boolean;
 }
 
 /**
@@ -85,6 +91,7 @@ export function ProductsCatalogCard({
   buyButtonLabel = 'Buy',
   imageFrameClassName,
   eagerProductImage = false,
+  catalogStripMobilePeek = false,
 }: ProductsCatalogCardProps) {
   const displayCurrency = useCurrency();
   const isAmdCurrency = displayCurrency === 'AMD';
@@ -133,9 +140,13 @@ export function ProductsCatalogCard({
     PRODUCT_SECTION_BADGE_CLASS_NAMES[sectionLabel] ?? PRODUCT_SECTION_BADGE_CLASS_NAMES.Classic;
   const isCompactSize = sizeLabel === 'Compact';
 
-  const compactArticleWidth = widerCompactCard
-    ? 'w-[12rem] max-sm:w-[10.75rem]'
-    : 'w-[11rem] max-sm:w-[10.25rem]';
+  const compactArticleWidth =
+    catalogStripMobilePeek && compactLayout
+      ? // 3.75rem ≈ page px-4 (2rem) + strip gap-7 (1.75rem); /1.5 ≈ half of next card visible in viewport
+        'max-lg:w-[calc((100vw-3.75rem)/1.5)] max-lg:max-w-[19rem] lg:w-[12.75rem] xl:w-[13rem]'
+      : widerCompactCard
+        ? 'w-[12rem] max-sm:w-[10.75rem]'
+        : 'w-[11rem] max-sm:w-[10.25rem]';
   const cardShadowClass = suppressShadow ? 'shadow-none' : CARD_SHADOW_TAILWIND;
   const articleStackClassName = 'z-0 hover:z-[8] focus-within:z-[8]';
   const articleClassName = compactLayout
@@ -224,7 +235,10 @@ export function ProductsCatalogCard({
   const amountText = isAmdCurrency ? formattedPrice.replace(/\s?֏$/, '') : formattedPrice;
 
   return (
-    <article className={`${articleClassName} ${className ?? ''}`.trim()}>
+    <article
+      className={`${articleClassName} ${className ?? ''}`.trim()}
+      {...(catalogStripMobilePeek ? { 'data-catalog-strip-card': '' } : {})}
+    >
       <div
         className={`relative z-10 mb-2 flex shrink-0 items-end justify-center ${imagePullUpClassName} ${imageWrapperClassName} overflow-visible`.trim()}
       >
