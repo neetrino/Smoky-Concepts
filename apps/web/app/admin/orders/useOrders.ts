@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatAdminOrderAmount } from '../../../lib/currency';
+import { patchAdminOrderDetailsCache } from './hooks/adminOrderDetailsCache';
 
 export interface Order {
   id: string;
@@ -113,7 +114,7 @@ export interface OrderDetails {
   updatedAt?: string;
 }
 
-export type OrderTypeFilter = 'all' | 'orders' | 'custom' | 'new';
+export type OrderTypeFilter = 'all' | 'orders' | 'custom' | 'new' | 'early';
 
 export function useOrders() {
   const { t } = useTranslation();
@@ -143,7 +144,10 @@ export function useOrders() {
       const search = searchParams.get('search') || '';
       const orderTypeParam = searchParams.get('orderType');
       const orderType: OrderTypeFilter =
-        orderTypeParam === 'custom' || orderTypeParam === 'new' || orderTypeParam === 'orders'
+        orderTypeParam === 'custom' ||
+        orderTypeParam === 'new' ||
+        orderTypeParam === 'orders' ||
+        orderTypeParam === 'early'
           ? orderTypeParam
           : 'all';
       setStatusFilter(status);
@@ -153,11 +157,25 @@ export function useOrders() {
     }
   }, [searchParams]);
 
+  const applyOrderListPatch = useCallback((orderId: string, patch: Partial<Order>) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) => (order.id === orderId ? { ...order, ...patch } : order))
+    );
+    const cachePatch: { status?: string; paymentStatus?: string } = {};
+    if (patch.status !== undefined) {
+      cachePatch.status = patch.status;
+    }
+    if (patch.paymentStatus !== undefined) {
+      cachePatch.paymentStatus = patch.paymentStatus;
+    }
+    if (Object.keys(cachePatch).length > 0) {
+      patchAdminOrderDetailsCache(orderId, cachePatch);
+    }
+  }, []);
+
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('📦 [ADMIN] Fetching orders...', { page, statusFilter, paymentStatusFilter, orderTypeFilter, searchQuery, sortBy, sortOrder });
-      
       const response = await apiClient.get<OrdersResponse>('/api/v1/admin/orders', {
         params: {
           page: page.toString(),
@@ -171,7 +189,6 @@ export function useOrders() {
         },
       });
 
-      console.log('✅ [ADMIN] Orders fetched:', response);
       setOrders(response.data || []);
       setMeta(response.meta || null);
       setSelectedIds(new Set());
@@ -189,11 +206,6 @@ export function useOrders() {
 
   const formatCurrency = (amount: number, _orderCurrency?: string, storedAs?: string) =>
     formatAdminOrderAmount(amount, storedAs);
-
-
-  const handleViewOrderDetails = (orderId: string) => {
-    router.push(`/supersudo/orders/${orderId}`);
-  };
 
 
   const toggleSelect = (id: string) => {
@@ -293,12 +305,7 @@ export function useOrders() {
 
       console.log('✅ [ADMIN] Order status updated successfully');
 
-      // Update local state
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order.id === orderId ? { ...order, status: newStatus } : order
-        )
-      );
+      applyOrderListPatch(orderId, { status: newStatus });
 
       // Show success message
       setUpdateMessage({ type: 'success', text: t('admin.orders.statusUpdated') });
@@ -335,12 +342,7 @@ export function useOrders() {
 
       console.log('✅ [ADMIN] Order payment status updated successfully');
 
-      // Update local state
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order.id === orderId ? { ...order, paymentStatus: newPaymentStatus } : order
-        )
-      );
+      applyOrderListPatch(orderId, { paymentStatus: newPaymentStatus });
 
       // Show success message
       setUpdateMessage({ type: 'success', text: t('admin.orders.paymentStatusUpdated') });
@@ -387,7 +389,7 @@ export function useOrders() {
     setPage,
     fetchOrders,
     formatCurrency,
-    handleViewOrderDetails,
+    applyOrderListPatch,
     toggleSelect,
     toggleSelectAll,
     handleSort,

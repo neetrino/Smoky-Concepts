@@ -1,4 +1,5 @@
 import type { Variant, GeneratedVariant } from '../types';
+import { buildAutoSkuBaseFromSlug, buildAutoSkuForVariantIndex } from '../utils/autoSku';
 
 interface UseVariantValidationProps {
   productType: 'simple' | 'variable';
@@ -9,6 +10,8 @@ interface UseVariantValidationProps {
     sku: string;
     quantity: string;
   };
+  /** Used to resolve empty SKUs the same way as submit (slug-based). */
+  productSlug: string;
   isClothingCategory: () => boolean;
   setLoading: (loading: boolean) => void;
 }
@@ -18,6 +21,7 @@ export function useVariantValidation({
   variants,
   generatedVariants = [],
   simpleProductData,
+  productSlug,
   isClothingCategory,
   setLoading,
 }: UseVariantValidationProps) {
@@ -36,8 +40,9 @@ export function useVariantValidation({
         return false;
       }
       const skuSet = new Set<string>();
-      for (const gv of generatedVariants) {
-        const sku = (gv.sku || '').trim();
+      for (let i = 0; i < generatedVariants.length; i++) {
+        const gv = generatedVariants[i];
+        const sku = (gv.sku || '').trim() || buildAutoSkuForVariantIndex(productSlug, i);
         if (!sku) {
           setLoading(false);
           return false;
@@ -125,7 +130,9 @@ export function useVariantValidation({
         setLoading(false);
         return false;
       }
-      if (!simpleProductData.sku || simpleProductData.sku.trim() === '') {
+      const simpleSkuEffective =
+        simpleProductData.sku.trim() || buildAutoSkuBaseFromSlug(productSlug);
+      if (!simpleSkuEffective) {
         setLoading(false);
         return false;
       }

@@ -1,12 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { useAuth } from '../../lib/auth/AuthContext';
 import { apiClient } from '../../lib/api-client';
 import { showToast } from '../Toast';
 import { useTranslation } from '@/lib/i18n-client';
 
+import { addCultureEarlyAccessLine } from './cultureEarlyAccessToCheckout';
 import { CultureVotingCard } from './CultureVotingCard';
 import { HomeSectionTitle } from './HomeSectionTitle';
 
@@ -14,6 +16,8 @@ interface VotingItem {
   id: string;
   title: string;
   imageUrl: string;
+  images?: string[];
+  productSlug?: string | null;
   likeCount: number;
   likedByCurrentUser: boolean;
 }
@@ -32,12 +36,14 @@ interface VotingLikeResponse {
 
 export function CultureVotingSection() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { isLoggedIn } = useAuth();
   const [items, setItems] = useState<VotingItem[]>([]);
   const [earlyAccessItemId, setEarlyAccessItemId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pendingItemId, setPendingItemId] = useState<string | null>(null);
+  const [earlyAccessPendingId, setEarlyAccessPendingId] = useState<string | null>(null);
 
   const fetchVotingItems = useCallback(async () => {
     try {
@@ -170,6 +176,29 @@ export function CultureVotingSection() {
     [pendingItemId, isLoggedIn, t, items, earlyAccessItemId],
   );
 
+  const handleEarlyAccessCheckout = useCallback(
+    async (itemId: string) => {
+      const item = items.find((row) => row.id === itemId);
+      const slug = item?.productSlug?.trim();
+      if (!slug) {
+        showToast(t('home.homepage.culture.earlyAccessNoProduct'), 'warning');
+        return;
+      }
+      setEarlyAccessPendingId(itemId);
+      try {
+        const result = await addCultureEarlyAccessLine(slug);
+        if (!result.ok) {
+          showToast(t(result.messageKey), 'error');
+          return;
+        }
+        router.push('/checkout');
+      } finally {
+        setEarlyAccessPendingId(null);
+      }
+    },
+    [items, router, t],
+  );
+
   if (error) {
     return (
       <section className="flex flex-col gap-10">
@@ -209,7 +238,7 @@ export function CultureVotingSection() {
           </div>
         </div>
         <div className="mx-auto w-full max-w-[80rem] px-4">
-          <div className="grid grid-cols-1 gap-x-4 gap-y-10 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-3 sm:gap-x-10 lg:gap-x-12">
             {Array.from({ length: 3 }).map((_, index) => (
               <div key={index} className="h-80 w-full animate-pulse rounded-3xl bg-white/60" />
             ))}
@@ -235,7 +264,7 @@ export function CultureVotingSection() {
         </div>
       </div>
       <div className="mx-auto w-full max-w-[24rem] px-4 sm:max-w-[80rem]">
-        <div className="mx-auto grid grid-cols-2 items-stretch justify-items-center gap-x-3 gap-y-10 sm:grid-cols-3 sm:gap-x-4 sm:gap-y-10 lg:max-w-[52rem] lg:grid-cols-3 lg:[grid-template-columns:repeat(3,minmax(10rem,1fr))]">
+        <div className="mx-auto grid grid-cols-2 items-stretch justify-items-center gap-x-8 gap-y-10 sm:grid-cols-3 sm:gap-x-10 sm:gap-y-10 lg:max-w-[52rem] lg:grid-cols-3 lg:gap-x-12 lg:[grid-template-columns:repeat(3,minmax(10rem,1fr))]">
           {items.map((item, index) => {
             const sizeLabel =
               index === 0 || index === 2
@@ -262,11 +291,18 @@ export function CultureVotingSection() {
                 <CultureVotingCard
                   id={item.id}
                   title={item.title}
-                  imageUrl={item.imageUrl}
-                  likeCount={item.likeCount}
+                  images={
+                    item.images?.length
+                      ? item.images
+                      : item.imageUrl
+                        ? [item.imageUrl]
+                        : []
+                  }
                   likedByCurrentUser={item.likedByCurrentUser}
                   pending={pendingItemId === item.id}
+                  earlyAccessPending={earlyAccessPendingId === item.id}
                   onToggleLike={handleToggleLike}
+                  onEarlyAccess={handleEarlyAccessCheckout}
                   imageNudgeDown={index === 1}
                   mobileCompactBack={index === 1}
                   sizeLabel={sizeLabel}

@@ -1,5 +1,7 @@
 import { db } from "@white-shop/db";
 
+import { buildVotingItemImagesForDisplay } from "@/lib/voting/voting-gallery";
+
 interface VotingProblem {
   status: number;
   type: string;
@@ -20,6 +22,8 @@ interface VotingItemRow {
   id: string;
   title: string;
   imageUrl: string;
+  galleryUrls: string[];
+  productSlug: string | null;
   _count: { likes: number };
 }
 
@@ -46,6 +50,8 @@ class VotingService {
         id: true,
         title: true,
         imageUrl: true,
+        galleryUrls: true,
+        productSlug: true,
         _count: {
           select: {
             likes: true,
@@ -83,6 +89,8 @@ class VotingService {
         id: item.id,
         title: item.title,
         imageUrl: item.imageUrl,
+        images: buildVotingItemImagesForDisplay(item.imageUrl, item.galleryUrls),
+        productSlug: item.productSlug?.trim() ? item.productSlug.trim() : null,
         likeCount: item._count.likes,
         likedByCurrentUser: likedItemIds.has(item.id),
       })),

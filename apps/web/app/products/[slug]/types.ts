@@ -90,6 +90,10 @@ export interface Product {
   defaultPrice?: number | null;
   defaultOriginalPrice?: number | null;
   defaultCompareAtPrice?: number | null;
+  /** Default pricing variant (excluded from `variants` list) — used for catalog / early access */
+  defaultVariantId?: string | null;
+  defaultVariantStock?: number;
+  defaultVariantSku?: string | null;
 }
 
 // Reserved routes that should not be treated as product slugs

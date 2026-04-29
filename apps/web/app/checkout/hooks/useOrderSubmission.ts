@@ -11,6 +11,8 @@ interface UseOrderSubmissionProps {
   deliveryPrice: number | null;
   setError: (error: string | null) => void;
   deliveryLocations: DeliveryLocationOption[];
+  /** Normalized coupon code when applied (server validates again on checkout) */
+  appliedCouponCode: string | null;
 }
 
 function regionLabelForOrder(value: string, locations: DeliveryLocationOption[]): string {
@@ -27,6 +29,7 @@ export function useOrderSubmission({
   deliveryPrice,
   setError,
   deliveryLocations,
+  appliedCouponCode,
 }: UseOrderSubmissionProps) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -51,6 +54,7 @@ export function useOrderSubmission({
           productId: item.variant.product.id,
           variantId: item.variant.id,
           quantity: item.quantity,
+          ...(item.variant.earlyAccess === true ? { earlyAccess: true } : {}),
           ...(title
             ? {
                 sizeCatalogTitle: title,
@@ -120,6 +124,7 @@ export function useOrderSubmission({
         ...(shippingAddress ? { shippingAddress } : {}),
         shippingAmount: shippingAmount,
         paymentMethod: data.paymentMethod,
+        ...(appliedCouponCode ? { couponCode: appliedCouponCode } : {}),
       });
 
       clearGuestCart();

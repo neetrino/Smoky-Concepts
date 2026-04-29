@@ -20,6 +20,10 @@ dotenv.config({ path: join(root, ".env") });
 
 const NEON_DATABASE_URL = process.env.DATABASE_URL;
 
+if (!process.env.DIRECT_URL && NEON_DATABASE_URL) {
+  process.env.DIRECT_URL = NEON_DATABASE_URL;
+}
+
 if (!NEON_DATABASE_URL) {
   console.error("❌ [MIGRATION] DATABASE_URL environment variable is not set!");
   console.error("   Set DATABASE_URL in project root .env or .env.local, then run from root:");

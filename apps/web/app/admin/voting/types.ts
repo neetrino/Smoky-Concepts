@@ -17,6 +17,8 @@ export interface VotingSummaryItem {
   id: string;
   title: string;
   imageUrl: string;
+  galleryUrls: string[];
+  productSlug?: string | null;
   likeCount: number;
 }
 
@@ -33,6 +35,8 @@ export interface VotingItem {
   votingId: string;
   title: string;
   imageUrl: string;
+  galleryUrls: string[];
+  productSlug?: string | null;
   likeCount: number;
   topLiked: boolean;
   createdAt: string;
@@ -53,7 +57,9 @@ export interface VotingWithItemsResponse {
 
 export interface VotingFormData {
   title: string;
-  imageUrl: string;
+  imageUrls: string[];
+  /** Storefront product slug for home Culture early-access checkout */
+  productSlug: string;
 }
 
 export interface VotingCampaignFormData {

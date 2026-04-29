@@ -14,6 +14,7 @@ import { useImageHandling } from './hooks/useImageHandling';
 import { useLabelManagement } from './hooks/useLabelManagement';
 import { useProductFormHandlers } from './hooks/useProductFormHandlers';
 import { useProductFormCallbacks } from './hooks/useProductFormCallbacks';
+import { useAutoSkuSyncForNewProduct } from './hooks/useAutoSkuSyncForNewProduct';
 import { isClothingCategory as checkIsClothingCategory, generateSlug } from './utils/productUtils';
 import { AdminShell } from '../../components/AdminShell';
 import { buildSelectedAttributeValueIdsMap } from '@/lib/category-attributes';
@@ -40,6 +41,14 @@ function AddProductPageContent() {
     setCategories: formState.setCategories,
     categoriesExpanded: formState.categoriesExpanded,
     setCategoriesExpanded: formState.setCategoriesExpanded,
+  });
+
+  useAutoSkuSyncForNewProduct({
+    isEditMode,
+    loadingProduct: formState.loadingProduct,
+    slug: formState.formData.slug,
+    simpleProductSku: formState.simpleProductData.sku,
+    setSimpleProductData: formState.setSimpleProductData,
   });
 
   useProductEditMode({
@@ -166,10 +175,12 @@ function AddProductPageContent() {
 
   const {
     handleTitleChange,
+    handleSlugChange,
     handleSlugBlur,
     isClothingCategory,
     handleVariantAdd,
   } = useProductFormCallbacks({
+    slug: formState.formData.slug,
     formData: formState.formData,
     categories: formState.categories,
     generatedVariants: formState.generatedVariants,
@@ -178,6 +189,7 @@ function AddProductPageContent() {
     setSimpleProductData: (value) => formState.setSimpleProductData(value as SetStateAction<typeof formState.simpleProductData>),
     checkIsClothingCategory,
     productId,
+    isEditMode,
   });
 
   const {
@@ -311,7 +323,7 @@ function AddProductPageContent() {
             fileInputRef={formState.fileInputRef}
             variantImageInputRefs={formState.variantImageInputRefs}
             onTitleChange={handleTitleChange}
-            onSlugChange={(e) => formState.setFormData((prev) => ({ ...prev, slug: e.target.value }))}
+            onSlugChange={handleSlugChange}
             onSlugBlur={handleSlugBlur}
             onDescriptionChange={(e) => formState.setFormData((prev) => ({ ...prev, descriptionHtml: e.target.value }))}
             variableProductTypeAllowed={formState.variableProductTypeAllowed}

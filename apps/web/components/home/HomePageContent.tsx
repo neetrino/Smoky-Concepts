@@ -19,6 +19,23 @@ import type { HomeCoverCollectionItem } from './homePage.types';
 import type { HomeHeroSlide } from '@/lib/types/home-hero.types';
 import { useTranslation } from '@/lib/i18n-client';
 
+/**
+ * Sub-xl masonry (2×3 cards): vertical `gap-y` between rows; keep tight so tiles read as one strip.
+ */
+const UPCOMING_LINES_MASONRY_STACK_CLASS = 'flex w-full flex-col gap-y-1 sm:gap-y-2 xl:hidden';
+const UPCOMING_LINES_MASONRY_ROW_CLASS = 'flex min-w-0 gap-x-2.5 sm:gap-x-3.5';
+/** Row 3 — `items-end` so Documents + Wallets white tiles share one bottom edge (sub-xl). */
+const UPCOMING_LINES_MASONRY_ROW3_CLASS = `${UPCOMING_LINES_MASONRY_ROW_CLASS} items-end`;
+/** Row 1 — Phones (1) wider/taller; Notebooks nudged up (Figma). */
+const MASONRY_ROW1_LEFT = 'min-w-0 flex-[0.92] sm:flex-[0.93]';
+const MASONRY_ROW1_RIGHT = 'min-w-0 flex-[1.08] sm:flex-[1.07] -translate-y-1 sm:-translate-y-1.5';
+/** Row 2 — card 3 narrow/tall, card 4 wider. */
+const MASONRY_ROW2_LEFT = 'min-w-0 flex-[0.7] sm:flex-[0.74]';
+const MASONRY_ROW2_RIGHT = 'min-w-0 flex-[1.3] sm:flex-[1.26]';
+/** Row 3 — Documents narrower, Wallets wider (sub-xl masonry). */
+const MASONRY_ROW3_LEFT = 'min-w-0 flex-[1.48] sm:flex-[1.44]';
+const MASONRY_ROW3_RIGHT = 'min-w-0 flex-[1.02] sm:flex-[1.06]';
+
 function PackFitCard({
   title,
   subtitle,
@@ -65,6 +82,14 @@ function PackFitCard({
   );
 }
 
+export type UpcomingLineMasonryTile =
+  | 'phones'
+  | 'notebooks'
+  | 'knifes'
+  | 'keys'
+  | 'documents'
+  | 'wallets';
+
 interface UpcomingLineCardProps {
   title: string;
   imageSrc: string;
@@ -79,6 +104,30 @@ interface UpcomingLineCardProps {
   imageKnifesLayout?: boolean;
   /** Documents: more `top` + gentler float so the image clears the title. */
   imageDocumentsLayout?: boolean;
+  /** Wallets (xl row, no masonry tile): match masonry-style hero image framing. */
+  imageWalletsLayout?: boolean;
+  /** Per-slot dimensions in the sub-xl masonry grid (white tile + shadow). */
+  masonryTile?: UpcomingLineMasonryTile;
+}
+
+/** Elevation for masonry tiles; matches catalog card token. */
+const UPCOMING_LINE_MASONRY_SHADOW = 'shadow-[0_4px_22.5px_rgba(0,0,0,0.08)]';
+
+/** No `flex-1` — avoids stretching sibling tiles when one row card has a larger `min-h`. */
+const MASONRY_INNER_BASE =
+  'relative flex flex-col justify-end rounded-[1.1rem] bg-white px-2.5 pb-2 sm:rounded-[1.75rem] sm:px-5 xl:min-h-0';
+
+const MASONRY_INNER_BY_TILE: Record<UpcomingLineMasonryTile, string> = {
+  phones: `${MASONRY_INNER_BASE} min-h-[8.25rem] pt-9 ${UPCOMING_LINE_MASONRY_SHADOW} sm:min-h-[11.25rem] sm:pb-4 sm:pt-12`,
+  notebooks: `${MASONRY_INNER_BASE} min-h-[9.5rem] pt-10 ${UPCOMING_LINE_MASONRY_SHADOW} sm:min-h-[12.25rem] sm:pb-5 sm:pt-[3.35rem]`,
+  knifes: `${MASONRY_INNER_BASE} min-h-[11.25rem] pt-3 ${UPCOMING_LINE_MASONRY_SHADOW} sm:min-h-[14.75rem] sm:pb-5 sm:pt-6`,
+  keys: `${MASONRY_INNER_BASE} min-h-[9.25rem] pt-7 ${UPCOMING_LINE_MASONRY_SHADOW} sm:min-h-[13rem] sm:pb-4 sm:pt-10`,
+  documents: `${MASONRY_INNER_BASE} min-h-[6.25rem] pt-3 ${UPCOMING_LINE_MASONRY_SHADOW} sm:min-h-[9rem] sm:pb-4 sm:pt-6`,
+  wallets: `${MASONRY_INNER_BASE} min-h-[8rem] pt-4 ${UPCOMING_LINE_MASONRY_SHADOW} sm:min-h-[11.25rem] sm:pb-4 sm:pt-6`,
+};
+
+function getMasonryInnerShellClassName(tile: UpcomingLineMasonryTile): string {
+  return MASONRY_INNER_BY_TILE[tile];
 }
 
 function UpcomingLineCard({
@@ -90,36 +139,72 @@ function UpcomingLineCard({
   imagePhonesLayout = false,
   imageKnifesLayout = false,
   imageDocumentsLayout = false,
+  imageWalletsLayout = false,
+  masonryTile,
 }: UpcomingLineCardProps) {
   const imageFrameClassName = !emphasizeImage
     ? imageDocumentsLayout
-      ? 'pointer-events-none absolute left-1/2 top-3 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[26%] sm:top-4 sm:h-36 sm:w-36 sm:-translate-y-[24%] xl:top-5 xl:h-44 xl:w-44 xl:-translate-y-[28%]'
-      : 'pointer-events-none absolute left-1/2 top-0 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[36%] sm:h-36 sm:w-36 sm:-translate-y-[36%] xl:h-44 xl:w-44 xl:-translate-y-[40%]'
+      ? masonryTile === 'documents'
+        ? 'pointer-events-none absolute left-[76%] top-2.5 h-[7rem] w-[7rem] origin-bottom -translate-x-1/2 -translate-y-[28%] sm:top-3 sm:h-40 sm:w-40 sm:-translate-y-[24%]'
+        : 'pointer-events-none absolute left-[76%] top-4 h-[7rem] w-[7rem] origin-bottom -translate-x-1/2 -translate-y-[20%] sm:top-5 sm:h-40 sm:w-40 sm:-translate-y-[18%] xl:left-1/2 xl:top-4 xl:h-48 xl:w-48 xl:-translate-y-[30%]'
+      : 'pointer-events-none absolute left-1/2 top-0 h-[5.5rem] w-[5.5rem] origin-bottom -translate-x-1/2 -translate-y-[36%] sm:h-32 sm:w-32 sm:-translate-y-[36%] xl:h-40 xl:w-40 xl:-translate-y-[40%]'
     : imageNudgeDown
-      ? 'pointer-events-none absolute left-1/2 top-2 h-28 w-28 origin-bottom -translate-x-1/2 -translate-y-[28%] sm:top-4 sm:h-40 sm:w-40 sm:-translate-y-[24%] xl:top-5 xl:h-48 xl:w-48 xl:-translate-y-[28%]'
+      ? masonryTile === 'notebooks'
+        ? 'pointer-events-none absolute left-1/2 top-2 h-[9rem] w-[9rem] origin-bottom -translate-x-1/2 -translate-y-[28%] sm:top-4 sm:h-[12rem] sm:w-[12rem] sm:-translate-y-[25%]'
+        : 'pointer-events-none absolute left-1/2 top-2 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[28%] sm:top-4 sm:h-36 sm:w-36 sm:-translate-y-[24%] xl:top-5 xl:h-44 xl:w-44 xl:-translate-y-[28%]'
       : imageKeysLayout
-        ? 'pointer-events-none absolute left-[57%] top-0 h-32 w-32 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:left-[56%] sm:top-0 sm:h-44 sm:w-44 sm:-translate-y-[30%] xl:left-[56%] xl:top-0 xl:h-[13.25rem] xl:w-[13.25rem] xl:-translate-y-[34%]'
+        ? masonryTile === 'keys'
+          ? 'pointer-events-none absolute left-[57%] top-0 h-64 w-64 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:left-[56%] sm:top-0 sm:h-[20rem] sm:w-[20rem] sm:-translate-y-[30%]'
+          : 'pointer-events-none absolute left-[57%] top-0 h-40 w-40 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:left-[56%] sm:top-0 sm:h-52 sm:w-52 sm:-translate-y-[30%] xl:left-[56%] xl:top-0 xl:h-[16rem] xl:w-[16rem] xl:-translate-y-[34%]'
         : imagePhonesLayout
-          ? 'pointer-events-none absolute left-1/2 top-4 h-44 w-44 origin-bottom -translate-x-1/2 -translate-y-[30%] sm:top-5 sm:h-56 sm:w-56 sm:-translate-y-[26%] xl:top-6 xl:h-[18rem] xl:w-[18rem] xl:-translate-y-[30%]'
+          ? masonryTile === 'phones'
+            ? 'pointer-events-none absolute left-1/2 top-1 h-36 w-36 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:top-2 sm:h-[11.5rem] sm:w-[11.5rem] sm:-translate-y-[28%]'
+            : 'pointer-events-none absolute left-1/2 top-2 h-40 w-40 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:top-3 sm:h-52 sm:w-52 sm:-translate-y-[28%] xl:top-4 xl:h-[15.5rem] xl:w-[15.5rem] xl:-translate-y-[32%]'
           : imageKnifesLayout
-            ? 'pointer-events-none absolute left-[68%] top-1.5 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[24%] sm:left-[68%] sm:top-2 sm:h-32 sm:w-32 sm:-translate-y-[22%] xl:left-[68%] xl:top-2.5 xl:h-40 xl:w-40 xl:-translate-y-[26%]'
-            : 'pointer-events-none absolute left-1/2 top-0 h-28 w-28 origin-bottom -translate-x-1/2 -translate-y-[40%] sm:h-40 sm:w-40 sm:-translate-y-[38%] xl:h-48 xl:w-48 xl:-translate-y-[42%]';
+            ? masonryTile === 'knifes'
+              ? 'pointer-events-none absolute left-[68%] top-3 h-36 w-36 origin-bottom -translate-x-1/2 -translate-y-[19%] sm:left-[68%] sm:top-2 sm:h-40 sm:w-40 sm:-translate-y-[17%]'
+              : 'pointer-events-none absolute left-[68%] top-4 h-36 w-36 origin-bottom -translate-x-1/2 -translate-y-[12%] sm:left-[68%] sm:top-4 sm:h-40 sm:w-40 sm:-translate-y-[12%] xl:left-[68%] xl:top-1 xl:h-40 xl:w-40 xl:-translate-y-[30%]'
+            : masonryTile === 'wallets' || imageWalletsLayout
+              ? 'pointer-events-none absolute left-1/2 top-2 h-[11.25rem] w-[11.25rem] origin-bottom -translate-x-1/2 -translate-y-[40%] sm:top-2 sm:h-[14rem] sm:w-[14rem] sm:-translate-y-[36%] xl:top-1 xl:h-[15rem] xl:w-[15rem] xl:-translate-y-[42%]'
+              : 'pointer-events-none absolute left-1/2 top-0 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[40%] sm:h-36 sm:w-36 sm:-translate-y-[38%] xl:h-44 xl:w-44 xl:-translate-y-[42%]';
   const imageSizes = imagePhonesLayout
-    ? '(max-width: 640px) 160px, (max-width: 1280px) 224px, 288px'
+    ? masonryTile === 'phones'
+      ? '(max-width: 640px) 132px, (max-width: 1280px) 184px, 240px'
+      : '(max-width: 640px) 144px, (max-width: 1280px) 200px, 256px'
     : imageKeysLayout
-      ? '(max-width: 640px) 112px, (max-width: 1280px) 176px, 212px'
+      ? masonryTile === 'keys'
+        ? '(max-width: 640px) 304px, (max-width: 1280px) 352px, 480px'
+        : '(max-width: 640px) 152px, (max-width: 1280px) 232px, 288px'
       : imageKnifesLayout
-        ? '(max-width: 640px) 88px, (max-width: 1280px) 128px, 160px'
-        : '(max-width: 640px) 96px, (max-width: 1280px) 160px, 192px';
+        ? '(max-width: 640px) 132px, (max-width: 1280px) 176px, 176px'
+        : masonryTile === 'documents'
+          ? '(max-width: 640px) 136px, (max-width: 1280px) 176px, 208px'
+          : imageNudgeDown && masonryTile === 'notebooks'
+            ? '(max-width: 640px) 168px, (max-width: 1280px) 208px, 256px'
+            : masonryTile === 'wallets' || imageWalletsLayout
+              ? '(max-width: 640px) 208px, (max-width: 1280px) 256px, 304px'
+              : '(max-width: 640px) 88px, (max-width: 1280px) 144px, 176px';
   const imageClassName = emphasizeImage
     ? 'object-contain object-center [filter:blur(1px)_brightness(1.02)_drop-shadow(0_10px_16px_rgba(18,42,38,0.16))] sm:[filter:blur(2px)_brightness(0.95)_drop-shadow(0_12px_22px_rgba(18,42,38,0.18))]'
     : imageDocumentsLayout
       ? 'object-contain object-center origin-center rotate-[19deg] [filter:blur(1.5px)_brightness(1.03)_drop-shadow(0_8px_14px_rgba(18,42,38,0.12))] sm:[filter:blur(3px)_brightness(0.95)_drop-shadow(0_10px_20px_rgba(18,42,38,0.16))]'
       : 'object-contain object-center [filter:blur(1.5px)_brightness(1.03)_drop-shadow(0_8px_14px_rgba(18,42,38,0.12))] sm:[filter:blur(3px)_brightness(0.95)_drop-shadow(0_10px_20px_rgba(18,42,38,0.16))]';
 
+  const innerShellClassName = masonryTile
+    ? getMasonryInnerShellClassName(masonryTile)
+    : 'relative flex min-h-[7rem] flex-1 flex-col justify-end rounded-[1.1rem] bg-[#f3f3f3] px-2.5 pb-2 pt-9 sm:min-h-[10.5rem] sm:rounded-[1.75rem] sm:bg-white sm:px-5 sm:pb-5 sm:pt-12 xl:min-h-0';
+
+  const rootClassName = masonryTile
+    ? masonryTile === 'knifes'
+      ? 'relative flex h-auto w-full flex-col overflow-visible pt-2 sm:pt-4'
+      : masonryTile === 'wallets' || masonryTile === 'documents'
+        ? 'relative flex h-auto w-full flex-col overflow-visible pt-2 sm:pt-4'
+        : 'relative flex h-auto w-full flex-col overflow-visible pt-5 sm:pt-7'
+    : 'relative flex h-full flex-col overflow-visible pt-5 sm:pt-7';
+
   return (
-    <div className="relative flex h-full flex-col overflow-visible pt-6 sm:pt-8">
-      <div className="relative flex min-h-[7.6rem] flex-1 flex-col justify-end rounded-[1.2rem] bg-[#f3f3f3] px-3 pb-2.5 pt-10 sm:min-h-[11.5rem] sm:rounded-[2rem] sm:bg-white sm:px-6 sm:pb-6 sm:pt-14 xl:min-h-0">
+    <div className={rootClassName}>
+      <div className={innerShellClassName}>
         <div className={imageFrameClassName}>
           <Image
             src={imageSrc}
@@ -129,7 +214,7 @@ function UpcomingLineCard({
             sizes={imageSizes}
           />
         </div>
-        <h3 className="text-[1.25rem] font-extrabold leading-none text-[#36373a] sm:text-3xl">{title}</h3>
+        <h3 className="text-[1.125rem] font-extrabold leading-none text-[#36373a] sm:text-[1.65rem]">{title}</h3>
       </div>
     </div>
   );
@@ -145,19 +230,6 @@ interface HomePageContentProps {
 
 export function HomePageContent({ coverCollections, heroSlides }: HomePageContentProps) {
   const { t } = useTranslation();
-  const upcomingLineOrder: Record<string, number> = {
-    Phones: 0,
-    Notebooks: 1,
-    Knifes: 2,
-    Keys: 3,
-    Documents: 4,
-    Wallets: 5,
-  };
-  const orderedUpcomingLines = [...UPCOMING_LINES].sort((a, b) => {
-    const aOrder = upcomingLineOrder[a.title] ?? Number.MAX_SAFE_INTEGER;
-    const bOrder = upcomingLineOrder[b.title] ?? Number.MAX_SAFE_INTEGER;
-    return aOrder - bOrder;
-  });
   const packFitKeyByIndex = ['ultraSlims', 'compact', 'superSlims', 'slims', 'kingSize', 'sticks'] as const;
   const ritualStepKeys = ['apply', 'consultation', 'designAndMaterials', 'packagingAndDelivery'] as const;
   const upcomingLineKeyByTitle: Record<string, string> = {
@@ -171,7 +243,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
   const upcomingLineByTitle: Record<string, (typeof UPCOMING_LINES)[number]> = Object.fromEntries(
     UPCOMING_LINES.map((it) => [it.title, it]),
   );
-  const renderUpcomingLineCard = (lineTitle: string) => {
+  const renderUpcomingLineCard = (lineTitle: string, options?: { masonryTile?: UpcomingLineMasonryTile }) => {
     const item = upcomingLineByTitle[lineTitle];
     if (!item) return null;
     return (
@@ -189,14 +261,16 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
         imagePhonesLayout={item.title === 'Phones'}
         imageKnifesLayout={item.title === 'Knifes'}
         imageDocumentsLayout={item.title === 'Documents'}
+        imageWalletsLayout={item.title === 'Wallets'}
         title={t(`home.homepage.upcomingLines.cards.${upcomingLineKeyByTitle[item.title] ?? 'documents'}`)}
+        masonryTile={options?.masonryTile}
       />
     );
   };
 
   return (
     <div className="overflow-x-hidden overflow-y-hidden bg-[#efefef] text-[#414141]">
-      <div className="mx-auto flex max-w-[120rem] flex-col gap-16 overflow-x-hidden overflow-y-hidden px-6 pb-20 pt-8 sm:gap-24 sm:px-8 sm:pb-24 sm:pt-10 lg:px-[7.5rem]">
+      <div className="mx-auto flex max-w-[120rem] flex-col gap-16 overflow-x-hidden overflow-y-hidden px-5 pb-20 pt-8 sm:gap-24 sm:px-8 sm:pb-24 sm:pt-10 lg:px-[7.5rem]">
         <section className="flex flex-col gap-8 sm:gap-10">
           <HomeSectionTitle
             title={t('home.homepage.hero.title')}
@@ -218,7 +292,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             description={t('home.homepage.packFit.description')}
           />
           <div className="sm:hidden">
-            <div className="-mx-6 overflow-x-auto px-6 pb-2 scrollbar-hide">
+            <div className="-mx-5 overflow-x-auto px-5 pb-2 scrollbar-hide">
               <div className="flex min-w-max snap-x snap-mandatory items-end gap-x-6">
                 {PACK_FIT_ITEMS.map((item, index) => (
                   <PackFitCard
@@ -271,8 +345,12 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                 <Link
                   key={item.slug}
                   href={`/products?category=${item.slug}`}
-                  className="group relative z-0 mt-5 -translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1rem] bg-transparent px-2.5 pb-1 pt-0 shadow-[0_6px_24px_rgba(18,42,38,0.05)] transition-shadow duration-200 hover:z-10 hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)] focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2rem] sm:bg-white sm:px-6 sm:pb-8"
+                  className="group relative z-0 mt-5 -translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1rem] max-sm:bg-transparent bg-white px-2.5 pb-1 pt-0 shadow-none transition-shadow duration-200 hover:z-10 hover:shadow-none focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2rem] sm:px-6 sm:pb-8 sm:shadow-[0_6px_24px_rgba(18,42,38,0.05)] sm:hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)]"
                 >
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 -z-10 hidden max-sm:block rounded-[1rem] bg-white shadow-[0_8px_28px_rgba(18,42,38,0.12)] transition-shadow duration-200 max-sm:-translate-y-6 group-hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)]"
+                  />
                   <div className="relative -mt-16 translate-y-2 h-44 w-[94%] self-center shrink-0 overflow-visible sm:-mt-28 sm:translate-y-0 sm:h-[22rem] sm:w-full">
                     {item.imageSrc ? (
                       <img
@@ -294,7 +372,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     )}
                   </div>
                   <h3
-                    className={`mt-6 text-lg font-black leading-tight text-[#414141] sm:mt-12 sm:text-2xl lg:text-3xl ${
+                    className={`relative z-[1] mt-6 text-lg font-black leading-tight text-[#414141] max-sm:-translate-y-6 sm:mt-12 sm:translate-y-0 sm:text-2xl lg:text-3xl ${
                       item.slug === 'special-edition' ? 'line-clamp-1 whitespace-nowrap' : 'line-clamp-2'
                     }`}
                   >
@@ -322,11 +400,15 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             </div>
           </div>
           <div className="-mt-5 rounded-[1.5rem] rounded-t-xl bg-white px-5 pb-6 pt-5 font-montserrat shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:-mt-7 sm:rounded-[2.25rem] sm:px-8 sm:pb-7 sm:pt-6">
-            <div className="grid gap-6 xl:grid-cols-4">
+            <div className="grid max-xl:gap-0 gap-6 xl:grid-cols-4">
               {RITUAL_STEPS.map((step, index) => (
                 <div
                   key={step.step}
-                  className={`flex gap-3 ${index < RITUAL_STEPS.length - 1 ? 'xl:border-r xl:border-[#eeeeee] xl:pr-6' : ''}`}
+                  className={`flex gap-3 ${
+                    index < RITUAL_STEPS.length - 1
+                      ? 'border-b border-[#eeeeee] pb-6 xl:border-b-0 xl:border-r xl:border-[#eeeeee] xl:pb-0 xl:pr-6'
+                      : ''
+                  }`}
                 >
                   <span className="shrink-0 text-5xl font-bold leading-none tracking-tight text-[#dcc49a] sm:text-6xl">
                     {step.step}
@@ -437,28 +519,33 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             />
           </div>
           <div className="overflow-visible pt-3 sm:pt-10">
-            <div className="grid grid-cols-2 gap-x-3 gap-y-3 sm:gap-x-4 sm:gap-y-10 xl:hidden">
-              {orderedUpcomingLines.map((item) => (
-                <UpcomingLineCard
-                  key={item.title}
-                  {...item}
-                  emphasizeImage={
-                    item.title === 'Notebooks' ||
-                    item.title === 'Knifes' ||
-                    item.title === 'Phones' ||
-                    item.title === 'Keys' ||
-                    item.title === 'Wallets'
-                  }
-                  imageNudgeDown={item.title === 'Notebooks'}
-                  imageKeysLayout={item.title === 'Keys'}
-                  imagePhonesLayout={item.title === 'Phones'}
-                  imageKnifesLayout={item.title === 'Knifes'}
-                  imageDocumentsLayout={item.title === 'Documents'}
-                  title={t(`home.homepage.upcomingLines.cards.${upcomingLineKeyByTitle[item.title] ?? 'documents'}`)}
-                />
-              ))}
+            <div className={UPCOMING_LINES_MASONRY_STACK_CLASS}>
+              <div className={`${UPCOMING_LINES_MASONRY_ROW_CLASS} items-start`}>
+                <div className={MASONRY_ROW1_LEFT}>
+                  {renderUpcomingLineCard('Phones', { masonryTile: 'phones' })}
+                </div>
+                <div className={MASONRY_ROW1_RIGHT}>
+                  {renderUpcomingLineCard('Notebooks', { masonryTile: 'notebooks' })}
+                </div>
+              </div>
+              <div className={`${UPCOMING_LINES_MASONRY_ROW_CLASS} items-start`}>
+                <div className={MASONRY_ROW2_LEFT}>
+                  {renderUpcomingLineCard('Knifes', { masonryTile: 'knifes' })}
+                </div>
+                <div className={MASONRY_ROW2_RIGHT}>
+                  {renderUpcomingLineCard('Keys', { masonryTile: 'keys' })}
+                </div>
+              </div>
+              <div className={UPCOMING_LINES_MASONRY_ROW3_CLASS}>
+                <div className={MASONRY_ROW3_LEFT}>
+                  {renderUpcomingLineCard('Documents', { masonryTile: 'documents' })}
+                </div>
+                <div className={MASONRY_ROW3_RIGHT}>
+                  {renderUpcomingLineCard('Wallets', { masonryTile: 'wallets' })}
+                </div>
+              </div>
             </div>
-            <div className="hidden xl:grid xl:h-[26rem] xl:w-full xl:grid-cols-3 xl:gap-x-4 2xl:h-[30rem]">
+            <div className="hidden xl:grid xl:h-[23.5rem] xl:w-full xl:grid-cols-3 xl:gap-x-3 2xl:h-[27.5rem] 2xl:gap-x-4">
               <div className="grid h-full xl:[grid-template-rows:350fr_32fr_186fr]">
                 {renderUpcomingLineCard('Notebooks')}
                 <div aria-hidden="true" />

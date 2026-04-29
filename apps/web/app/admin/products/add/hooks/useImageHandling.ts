@@ -2,6 +2,7 @@
 
 import type { ChangeEvent } from 'react';
 import { apiClient } from '@/lib/api-client';
+import { isLikelyRasterImageFileForAdminUpload } from '@/lib/services/utils/heic-browser-convert';
 import { processImageFile } from '@/lib/services/utils/image-utils';
 import type { Variant, ColorData } from '../types';
 import type { GeneratedVariant } from '../types';
@@ -77,7 +78,7 @@ export function useImageHandling({
     setImageUploadError(null);
 
     try {
-      const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+      const imageFiles = files.filter((file) => isLikelyRasterImageFileForAdminUpload(file));
       if (imageFiles.length === 0) {
         setImageUploadError(t('admin.products.add.failedToProcessImages') || 'No valid image files selected');
         return;
@@ -225,7 +226,7 @@ export function useImageHandling({
     }
 
     const file = files[0];
-    if (!file.type.startsWith('image/')) {
+    if (!isLikelyRasterImageFileForAdminUpload(file)) {
       setImageUploadError(`"${file.name}" is not an image file`);
       if (event.target) {
         event.target.value = '';
@@ -275,7 +276,7 @@ export function useImageHandling({
       return;
     }
 
-    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+    const imageFiles = files.filter((file) => isLikelyRasterImageFileForAdminUpload(file));
     if (imageFiles.length === 0) {
       if (event.target) {
         event.target.value = '';

@@ -17,6 +17,7 @@ import {
 } from "../orders/sanitize-customize-html-server";
 import { logger } from "./utils/logger";
 import { adminDeliveryService } from "./admin/admin-delivery.service";
+import { tryApplyCoupon } from "./coupon.service";
 
 type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
   include: {
@@ -54,6 +55,49 @@ function normalizeSizeCatalogTitleLookup(value: string | null | undefined): stri
     .trim()
     .replace(/\s+/g, ' ')
     .toLocaleLowerCase();
+}
+
+/**
+ * Honors client `earlyAccess` only when this product slug is linked on a published voting item.
+ */
+async function resolveEarlyAccessForCheckoutLine(productId: string, requested: boolean): Promise<boolean> {
+  if (!requested) {
+    return false;
+  }
+
+  const translations = await db.productTranslation.findMany({
+    where: { productId },
+    select: { slug: true },
+  });
+  const slugSet = new Set(
+    translations
+      .map((row: { slug: string }) => row.slug.trim().toLowerCase())
+      .filter((s: string) => s.length > 0),
+  );
+  if (slugSet.size === 0) {
+    return false;
+  }
+
+  const votingItems = await db.votingItem.findMany({
+    where: {
+      deletedAt: null,
+      productSlug: { not: null },
+      voting: { published: true, deletedAt: null },
+    },
+    select: { productSlug: true },
+  });
+
+  for (const row of votingItems) {
+    const slug = row.productSlug?.trim().toLowerCase() ?? '';
+    if (slug.length > 0 && slugSet.has(slug)) {
+      return true;
+    }
+  }
+
+  logger.warn("Checkout earlyAccess ignored: product slug not linked to published culture voting item", {
+    productId,
+  });
+  return false;
 }
 
 function getVariantOptions(attributes: unknown): VariantOptionFromAttributes[] {
@@ -187,6 +231,7 @@ class OrdersService {
         shippingMethod = 'pickup',
         shippingAddress,
         paymentMethod = 'idram',
+        couponCode: rawCouponCode,
       } = data;
 
       // Validate required fields
@@ -222,6 +267,7 @@ class OrdersService {
           description: string;
           imageUrl: string;
         } | null;
+        earlyAccess: boolean;
       }> = [];
 
       if (guestItems && Array.isArray(guestItems) && guestItems.length > 0) {
@@ -232,6 +278,7 @@ class OrdersService {
               productId: string;
               variantId: string;
               quantity: number;
+              earlyAccess?: boolean;
               sizeCatalogTitle?: string;
               sizeCatalogVersion?: string;
               sizeCatalogImageUrl?: string;
@@ -445,6 +492,11 @@ class OrdersService {
               }
             }
 
+            const earlyAccess = await resolveEarlyAccessForCheckoutLine(
+              variant.product.id,
+              item.earlyAccess === true,
+            );
+
             return {
               variantId: variant.id,
               productId: variant.product.id,
@@ -461,6 +513,7 @@ class OrdersService {
               customizePlain,
               customizeHtml,
               customSizeRequest: customSizeRequest ?? null,
+              earlyAccess,
             };
           })
         );
@@ -487,7 +540,26 @@ class OrdersService {
         const addonUsd = adminInputAmdToUsd(item.sizeCatalogCategoryPriceAmd ?? 0);
         return sum + (item.price + addonUsd) * item.quantity;
       }, 0);
-      const discountAmount = 0; // TODO: Implement discount/coupon logic
+
+      const couponTrimmed =
+        typeof rawCouponCode === 'string' && rawCouponCode.trim().length > 0
+          ? rawCouponCode.trim()
+          : '';
+      let discountAmount = 0;
+      let orderCouponCode: string | null = null;
+      if (couponTrimmed) {
+        const applied = await tryApplyCoupon(couponTrimmed, subtotal, { userId: userId ?? null });
+        if (applied.status !== 'ok') {
+          throw {
+            status: 400,
+            type: 'https://api.shop.am/problems/validation-error',
+            title: 'Validation Error',
+            detail: 'Invalid or expired coupon code',
+          };
+        }
+        discountAmount = applied.discountAmountUsd;
+        orderCouponCode = applied.code;
+      }
       let shippingAmount = 0;
       if (shippingMethod === "delivery" && shippingAddress) {
         const shipCity = checkoutShippingCity(shippingAddress);
@@ -538,6 +610,7 @@ class OrdersService {
             fulfillmentStatus: 'unfulfilled',
             subtotal,
             discountAmount,
+            couponCode: orderCouponCode,
             shippingAmount,
             taxAmount,
             total,
@@ -567,6 +640,7 @@ class OrdersService {
                 sizeCatalogImageUrl: item.sizeCatalogImageUrl ?? null,
                 customizePlain: item.customizePlain ?? null,
                 customizeHtml: item.customizeHtml ?? null,
+                earlyAccess: item.earlyAccess,
               })),
             },
             events: {
@@ -579,7 +653,7 @@ class OrdersService {
                 },
               },
             },
-          },
+          } as Prisma.OrderUncheckedCreateInput,
           include: {
             items: true,
           },

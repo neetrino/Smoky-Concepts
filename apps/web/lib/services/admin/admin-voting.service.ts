@@ -1,6 +1,7 @@
 import { db } from "@white-shop/db";
 
 import { isR2Configured, uploadVotingImageToR2 } from "@/lib/services/r2.service";
+import { MAX_VOTING_GALLERY_IMAGES } from "@/lib/voting/voting-gallery";
 import { parseDataImageUrl } from "@/lib/services/utils/data-url-image";
 
 interface VotingProblem {
@@ -15,6 +16,8 @@ interface VotingItemRecord {
   votingId: string;
   title: string;
   imageUrl: string;
+  galleryUrls: string[];
+  productSlug: string | null;
   createdAt: Date;
   updatedAt: Date;
   _count: {
@@ -25,6 +28,9 @@ interface VotingItemRecord {
 interface VotingItemInput {
   title?: string;
   imageUrl?: string;
+  imageUrls?: string[];
+  /** Storefront product slug for early-access checkout from home Culture */
+  productSlug?: string | null;
 }
 
 interface VotingCampaignInput {
@@ -49,6 +55,14 @@ function requireTrimmedValue(value: string | undefined, fieldName: string): stri
   }
 
   return trimmedValue;
+}
+
+function normalizeOptionalProductSlug(value: string | null | undefined): string | null {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  const trimmed = String(value).trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
 
 /**
@@ -79,6 +93,26 @@ async function resolveVotingImageUrl(imageUrl: string): Promise<string> {
   return uploadVotingImageToR2(parsed.buffer, parsed.contentType);
 }
 
+async function resolveVotingImageUrlList(data: VotingItemInput): Promise<string[]> {
+  const trimmedList =
+    Array.isArray(data.imageUrls) && data.imageUrls.length > 0
+      ? data.imageUrls.map((url) => String(url).trim()).filter((url) => url.length > 0)
+      : [];
+
+  if (trimmedList.length > 0) {
+    const resolved = await Promise.all(trimmedList.map((raw) => resolveVotingImageUrl(raw)));
+    const unique = [...new Set(resolved)].slice(0, MAX_VOTING_GALLERY_IMAGES);
+    if (unique.length === 0) {
+      throw buildProblem(400, "Image is required", "Please provide at least one valid image.");
+    }
+    return unique;
+  }
+
+  const single = requireTrimmedValue(data.imageUrl, "Image");
+  const resolvedSingle = await resolveVotingImageUrl(single);
+  return [resolvedSingle];
+}
+
 function getTopLikedId(items: VotingItemRecord[]): string | null {
   let topLikedId: string | null = null;
   let maxLikes = 0;
@@ -99,6 +133,8 @@ function mapVotingItem(item: VotingItemRecord, topLikedId: string | null) {
     votingId: item.votingId,
     title: item.title,
     imageUrl: item.imageUrl,
+    galleryUrls: item.galleryUrls ?? [],
+    productSlug: item.productSlug?.trim() ? item.productSlug.trim() : null,
     likeCount: item._count.likes,
     topLiked: item.id === topLikedId,
     createdAt: item.createdAt.toISOString(),
@@ -133,6 +169,8 @@ class AdminVotingService {
               votingId: true,
               title: true,
               imageUrl: true,
+              galleryUrls: true,
+              productSlug: true,
               _count: {
                 select: { likes: true },
               },
@@ -164,12 +202,23 @@ class AdminVotingService {
         published: row.published,
         itemCount,
         totalLikes,
-        items: votingItems.map((item: { id: string; title: string; imageUrl: string; _count: { likes: number } }) => ({
-          id: item.id,
-          title: item.title,
-          imageUrl: item.imageUrl,
-          likeCount: item._count.likes,
-        })),
+        items: votingItems.map(
+          (item: {
+            id: string;
+            title: string;
+            imageUrl: string;
+            galleryUrls: string[];
+            productSlug: string | null;
+            _count: { likes: number };
+          }) => ({
+            id: item.id,
+            title: item.title,
+            imageUrl: item.imageUrl,
+            galleryUrls: item.galleryUrls ?? [],
+            productSlug: item.productSlug?.trim() ? item.productSlug.trim() : null,
+            likeCount: item._count.likes,
+          }),
+        ),
         createdAt: row.createdAt.toISOString(),
         updatedAt: row.updatedAt.toISOString(),
       };
@@ -204,6 +253,8 @@ class AdminVotingService {
         votingId: true,
         title: true,
         imageUrl: true,
+        galleryUrls: true,
+        productSlug: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -383,20 +434,26 @@ class AdminVotingService {
     }
 
     const title = requireTrimmedValue(data.title, "Title");
-    const rawImageUrl = requireTrimmedValue(data.imageUrl, "Image");
-    const imageUrl = await resolveVotingImageUrl(rawImageUrl);
+    const resolvedUrls = await resolveVotingImageUrlList(data);
+    const imageUrl = resolvedUrls[0];
+    const galleryUrls = resolvedUrls;
+    const productSlug = normalizeOptionalProductSlug(data.productSlug ?? null);
 
     const item = await db.votingItem.create({
       data: {
         votingId,
         title,
         imageUrl,
+        galleryUrls,
+        productSlug,
       },
       select: {
         id: true,
         votingId: true,
         title: true,
         imageUrl: true,
+        galleryUrls: true,
+        productSlug: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -423,6 +480,8 @@ class AdminVotingService {
         votingId: true,
         title: true,
         imageUrl: true,
+        galleryUrls: true,
+        productSlug: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -437,7 +496,7 @@ class AdminVotingService {
       return null;
     }
 
-    return mapVotingItem(item, null);
+    return mapVotingItem(item as VotingItemRecord, null);
   }
 
   async updateVotingItem(itemId: string, data: VotingItemInput) {
@@ -456,8 +515,10 @@ class AdminVotingService {
     }
 
     const title = requireTrimmedValue(data.title, "Title");
-    const rawImageUrl = requireTrimmedValue(data.imageUrl, "Image");
-    const imageUrl = await resolveVotingImageUrl(rawImageUrl);
+    const resolvedUrls = await resolveVotingImageUrlList(data);
+    const imageUrl = resolvedUrls[0];
+    const galleryUrls = resolvedUrls;
+    const productSlug = normalizeOptionalProductSlug(data.productSlug ?? null);
 
     const item = await db.votingItem.update({
       where: {
@@ -466,12 +527,16 @@ class AdminVotingService {
       data: {
         title,
         imageUrl,
+        galleryUrls,
+        productSlug,
       },
       select: {
         id: true,
         votingId: true,
         title: true,
         imageUrl: true,
+        galleryUrls: true,
+        productSlug: true,
         createdAt: true,
         updatedAt: true,
         _count: {

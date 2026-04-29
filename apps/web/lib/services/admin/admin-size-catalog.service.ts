@@ -41,6 +41,7 @@ type SizeCategoryRow = {
   position: number;
   items: Array<{
     id: string;
+    categoryId: string;
     title: string;
     imageUrl: string;
     version?: string | null;
@@ -93,7 +94,8 @@ function mapCategory(row: SizeCategoryRow): SizeCatalogCategoryDto {
     items: row.items.map((item) =>
       mapItem({
         ...item,
-        categoryId: row.id,
+        /** Preserve DB FK so storefront filters match `__size_catalog_category_id__` on products after merge-by-title. */
+        categoryId: item.categoryId,
         categoryTitle: row.title,
         categoryPriceAmd: row.priceAmd,
       })

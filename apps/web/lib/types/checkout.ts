@@ -24,6 +24,8 @@ export interface CheckoutData {
       imageDataUrl: string;
       imageFileName?: string;
     };
+    /** Home Culture early-access line (validated server-side against voting productSlug) */
+    earlyAccess?: boolean;
   }>;
   email: string;
   phone: string;
@@ -40,6 +42,8 @@ export interface CheckoutData {
     phone?: string;
   };
   shippingAmount?: number;
+  /** Optional checkout coupon (re-validated server-side; normalized in DB) */
+  couponCode?: string;
   paymentMethod?: string;
   billingAddress?: {
     firstName?: string;

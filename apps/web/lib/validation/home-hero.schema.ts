@@ -1,14 +1,68 @@
 import { z } from 'zod';
 
+import type { HomeHeroSlide } from '@/lib/types/home-hero.types';
+
 const MAX_SLIDES = 12;
 
-export const homeHeroSlideSchema = z.object({
-  imageUrl: z.string().trim().min(1).max(2048),
+const heroLocaleCopySchema = z.object({
   title: z.string().max(400),
   description: z.string().max(4000),
   ctaLabel: z.string().max(120),
-  ctaHref: z.string().max(512),
 });
+
+const heroCopySchema = z.object({
+  hy: heroLocaleCopySchema,
+  en: heroLocaleCopySchema,
+  ru: heroLocaleCopySchema,
+});
+
+/**
+ * Accepts either legacy flat `title` / `description` / `ctaLabel` (same for all locales)
+ * or `copy.hy` / `copy.en` / `copy.ru`.
+ */
+export const homeHeroSlideSchema = z
+  .object({
+    imageUrl: z.string().trim().min(1).max(2048),
+    ctaHref: z.string().max(512).default(''),
+    copy: heroCopySchema.optional(),
+    title: z.string().max(400).optional(),
+    description: z.string().max(4000).optional(),
+    ctaLabel: z.string().max(120).optional(),
+  })
+  .transform((data): HomeHeroSlide => {
+    const imageUrl = data.imageUrl.trim();
+    const ctaHref = data.ctaHref.trim();
+    const trimBlock = (b: { title: string; description: string; ctaLabel: string }) => ({
+      title: b.title.trim(),
+      description: b.description.trim(),
+      ctaLabel: b.ctaLabel.trim(),
+    });
+    if (data.copy) {
+      return {
+        imageUrl,
+        ctaHref,
+        copy: {
+          hy: trimBlock(data.copy.hy),
+          en: trimBlock(data.copy.en),
+          ru: trimBlock(data.copy.ru),
+        },
+      };
+    }
+    const legacy = trimBlock({
+      title: data.title ?? '',
+      description: data.description ?? '',
+      ctaLabel: data.ctaLabel ?? '',
+    });
+    return {
+      imageUrl,
+      ctaHref,
+      copy: {
+        hy: { ...legacy },
+        en: { ...legacy },
+        ru: { ...legacy },
+      },
+    };
+  });
 
 export const homeHeroConfigSchema = z.object({
   slides: z.array(homeHeroSlideSchema).max(MAX_SLIDES),

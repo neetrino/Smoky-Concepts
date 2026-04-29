@@ -3,17 +3,11 @@
 import { useCurrency } from '../../../components/hooks/useCurrency';
 import { useTranslation } from '../../../lib/i18n-client';
 import { convertPrice, formatPriceInCurrency } from '../../../lib/currency';
-import { Cart } from '../types';
+import type { Cart, CheckoutOrderSummaryTotals } from '../types';
 
 interface OrderSummaryModalProps {
   cart: Cart | null;
-  orderSummary: {
-    subtotalDisplay: number;
-    taxDisplay: number;
-    shippingDisplay: number;
-    collectionPriceDisplay: number;
-    totalDisplay: number;
-  };
+  orderSummary: CheckoutOrderSummaryTotals;
   shippingMethod: 'pickup' | 'delivery';
   shippingRegion?: string;
   loadingDeliveryPrice: boolean;
@@ -64,6 +58,14 @@ export function OrderSummaryModal({
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">{t('checkout.summary.collectionPrice')}:</span>
           <span className="font-medium">{formatCheckoutUsd(orderSummary.collectionPriceDisplay)}</span>
+        </div>
+      )}
+      {orderSummary.couponDiscountDisplay > 0 && (
+        <div className="flex justify-between text-sm">
+          <span className="text-emerald-700">{t('checkout.summary.couponDiscount')}:</span>
+          <span className="font-medium text-emerald-700">
+            -{formatCheckoutUsd(orderSummary.couponDiscountDisplay)}
+          </span>
         </div>
       )}
       <div className="flex justify-between text-sm">

@@ -3,6 +3,7 @@
  */
 
 import imageCompression from 'browser-image-compression';
+import { ensureBrowserDecodableImageFile } from './heic-browser-convert';
 import { logger } from './logger';
 
 /**
@@ -346,9 +347,17 @@ export async function processImageFile(
       initialQuality = 0.8
     } = options || {};
 
+    const decodableFile = await ensureBrowserDecodableImageFile(file);
+    if (decodableFile !== file) {
+      logger.info('HEIC/HEIF decoded to JPEG for pipeline', {
+        originalName: file.name,
+        decodedName: decodableFile.name,
+      });
+    }
+
     // Process image with compression and EXIF orientation correction
     // browser-image-compression automatically handles EXIF orientation
-    const compressedFile = await imageCompression(file, {
+    const compressedFile = await imageCompression(decodableFile, {
       maxSizeMB,
       maxWidthOrHeight,
       useWebWorker,
@@ -358,9 +367,9 @@ export async function processImageFile(
     });
 
     logger.info('Image processed successfully', {
-      originalSize: `${Math.round(file.size / 1024)}KB`,
+      originalSize: `${Math.round(decodableFile.size / 1024)}KB`,
       compressedSize: `${Math.round(compressedFile.size / 1024)}KB`,
-      reduction: `${Math.round((1 - compressedFile.size / file.size) * 100)}%`
+      reduction: `${Math.round((1 - compressedFile.size / decodableFile.size) * 100)}%`
     });
 
     // Convert to base64

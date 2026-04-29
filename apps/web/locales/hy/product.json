@@ -54,6 +54,8 @@
   "size_catalog_custom_order_cta": "Պատվիրել",
   "size_catalog_custom_order_cta_aria": "Ուղարկել անհատական չափի պատվեր",
   "size_catalog_empty": "Ադմինում դեռ չափեր չեն կարգավորված։",
+  "size_catalog_scroll_previous_aria": "Չափերը թերթել ձախ",
+  "size_catalog_scroll_next_aria": "Չափերը թերթել աջ",
   "outOfStock": "Արտադրված",
   "selectColor": "Խնդրում ենք ընտրել գույն",
   "selectSize": "Խնդրում ենք ընտրել չափ",

@@ -40,6 +40,15 @@
     -moz-user-select: none !important;
     -ms-user-select: none !important;
   }
+
+  /* No visible focus ring sitewide (Tab / pointer focus) */
+  *:focus,
+  *:focus-visible {
+    outline: none !important;
+    outline-offset: 0 !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+  }
 }
 
 @layer utilities {

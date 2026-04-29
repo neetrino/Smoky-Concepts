@@ -46,6 +46,9 @@ interface Product {
   defaultVariantStock?: number;
   defaultSku?: string;
   sizeLabel?: string | null;
+  sizeLabels?: string[];
+  sizeCatalogCategoryIds?: string[];
+  sizeCatalogCategoryTitles?: string[];
 }
 
 interface ProductsResponse {
@@ -153,6 +156,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     defaultVariantStock: p.defaultVariantStock ?? 0,
     defaultSku: p.defaultSku ?? '',
     sizeLabel: typeof p.sizeLabel === 'string' ? p.sizeLabel : null,
+    sizeLabels: Array.isArray(p.sizeLabels) ? p.sizeLabels.filter((s): s is string => typeof s === 'string') : undefined,
+    sizeCatalogCategoryIds: Array.isArray(p.sizeCatalogCategoryIds)
+      ? p.sizeCatalogCategoryIds.filter((id): id is string => typeof id === 'string' && id.trim().length > 0)
+      : undefined,
+    sizeCatalogCategoryTitles: Array.isArray(p.sizeCatalogCategoryTitles)
+      ? p.sizeCatalogCategoryTitles.filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
+      : undefined,
   }));
 
   return (

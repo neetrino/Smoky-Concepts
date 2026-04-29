@@ -11,7 +11,8 @@ import type { VotingFormData, VotingItem } from '../types';
 
 const INITIAL_FORM_DATA: VotingFormData = {
   title: '',
-  imageUrl: '',
+  imageUrls: [],
+  productSlug: '',
 };
 
 export function useVotingActions() {
@@ -33,7 +34,7 @@ export function useVotingActions() {
       return false;
     }
 
-    if (!formData.imageUrl.trim()) {
+    if (formData.imageUrls.length === 0) {
       showToast(t('admin.voting.imageRequired'), 'warning');
       return false;
     }
@@ -51,7 +52,8 @@ export function useVotingActions() {
     try {
       await apiClient.post(`/api/v1/admin/voting/${votingId}/items`, {
         title: formData.title.trim(),
-        imageUrl: formData.imageUrl.trim(),
+        imageUrls: formData.imageUrls.map((url) => url.trim()).filter(Boolean),
+        productSlug: formData.productSlug.trim() ? formData.productSlug.trim() : null,
       });
       setShowAddModal(false);
       resetForm();
@@ -73,7 +75,9 @@ export function useVotingActions() {
     setEditingItem(item);
     setFormData({
       title: item.title,
-      imageUrl: item.imageUrl,
+      imageUrls:
+        item.galleryUrls.length > 0 ? [...item.galleryUrls] : item.imageUrl ? [item.imageUrl] : [],
+      productSlug: item.productSlug?.trim() ?? '',
     });
     setShowEditModal(true);
   };
@@ -88,7 +92,8 @@ export function useVotingActions() {
     try {
       await apiClient.put(`/api/v1/admin/voting/items/${editingItem.id}`, {
         title: formData.title.trim(),
-        imageUrl: formData.imageUrl.trim(),
+        imageUrls: formData.imageUrls.map((url) => url.trim()).filter(Boolean),
+        productSlug: formData.productSlug.trim() ? formData.productSlug.trim() : null,
       });
       setShowEditModal(false);
       setEditingItem(null);

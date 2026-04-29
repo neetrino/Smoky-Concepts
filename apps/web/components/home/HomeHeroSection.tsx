@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import { HomeActionButton } from './HomeActionButton';
+import { getHomeHeroSlideLines } from '@/lib/home-hero-display';
 import type { HomeHeroSlide } from '@/lib/types/home-hero.types';
 import { useTranslation } from '@/lib/i18n-client';
 
@@ -16,7 +17,7 @@ interface HomeHeroSectionProps {
  * Image area: 28rem / 32rem (was 36.125rem / 42.5rem) for a shorter above-the-fold block.
  */
 export function HomeHeroSection({ slides }: HomeHeroSectionProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
   const safeSlides = slides.length > 0 ? slides : [];
 
@@ -29,6 +30,8 @@ export function HomeHeroSection({ slides }: HomeHeroSectionProps) {
   if (!current) {
     return null;
   }
+
+  const lines = getHomeHeroSlideLines(current, lang);
 
   return (
     <div className="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2.25rem]">
@@ -43,7 +46,7 @@ export function HomeHeroSection({ slides }: HomeHeroSectionProps) {
           >
             <Image
               src={slide.imageUrl}
-              alt={slide.title || t('home.homepage.hero.imageAlt')}
+              alt={getHomeHeroSlideLines(slide, lang).title || t('home.homepage.hero.imageAlt')}
               fill
               className="object-cover"
               priority={index === 0}
@@ -56,9 +59,9 @@ export function HomeHeroSection({ slides }: HomeHeroSectionProps) {
         ))}
         <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
         <div className="absolute bottom-10 left-7 z-[3] max-w-[22.625rem] text-white sm:bottom-12 sm:left-12 sm:max-w-[33rem]">
-          <h1 className="text-4xl font-extrabold leading-none sm:text-5xl">{current.title}</h1>
-          <p className="mt-3 text-sm font-medium leading-[1.57] sm:mt-4 sm:text-lg sm:leading-relaxed">{current.description}</p>
-          <HomeActionButton href={current.ctaHref} label={current.ctaLabel} className="mt-6 sm:mt-7" />
+          <h1 className="text-4xl font-extrabold leading-none sm:text-5xl">{lines.title}</h1>
+          <p className="mt-3 text-sm font-medium leading-[1.57] sm:mt-4 sm:text-lg sm:leading-relaxed">{lines.description}</p>
+          <HomeActionButton href={current.ctaHref} label={lines.ctaLabel} className="mt-6 sm:mt-7" />
         </div>
         {safeSlides.length > 1 ? (
           <div className="absolute bottom-7 left-7 z-[3] flex gap-2 sm:bottom-6 sm:left-1/2 sm:-translate-x-1/2">

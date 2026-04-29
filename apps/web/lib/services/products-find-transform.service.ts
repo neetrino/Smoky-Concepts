@@ -2,7 +2,10 @@ import { db } from "@white-shop/db";
 import { buildCatalogGalleryImages } from "./products-list-gallery-images";
 import { t } from "../i18n";
 import { ProductWithRelations } from "./products-find-query.service";
-import { isDefaultPricingVariant } from "@/lib/default-pricing-variant";
+import {
+  extractSizeCatalogSelectionFromAttributes,
+  isDefaultPricingVariant,
+} from "@/lib/default-pricing-variant";
 
 /** Option-like item from variant.attributes JSON (options relation removed from schema) */
 type VariantOptionFromAttributes = {
@@ -21,14 +24,29 @@ function getVariantOptions(attributes: unknown): VariantOptionFromAttributes[] {
   return Array.isArray(attributes) ? (attributes as VariantOptionFromAttributes[]) : [];
 }
 
-function extractSizeLabelFromProductVariants(params: {
-  defaultPricingVariant: { attributes?: unknown } | null;
-  selectableVariants: Array<{ attributes?: unknown }>;
-}): string | null {
-  const defaultAttributes = Array.isArray(params.defaultPricingVariant?.attributes)
-    ? params.defaultPricingVariant?.attributes
-    : [];
+function extractFirstSizeOptionLabelFromVariant(variant: { attributes?: unknown }): string | null {
+  const options = getVariantOptions(variant.attributes);
+  const sizeOption = options.find((option) => {
+    if (option.attributeValue?.attribute?.key) {
+      return option.attributeValue.attribute.key === "size";
+    }
+    return option.attributeKey === "size";
+  });
+  if (!sizeOption) {
+    return null;
+  }
+  const sizeFromAttributeValue =
+    sizeOption.attributeValue?.translations?.[0]?.label || sizeOption.attributeValue?.value;
+  const normalizedSize = (sizeFromAttributeValue || sizeOption.value || "").trim();
+  return normalizedSize || null;
+}
 
+function extractSizeCatalogCategoryTitleFromDefaultVariant(
+  defaultPricingVariant: { attributes?: unknown } | null
+): string | null {
+  const defaultAttributes = Array.isArray(defaultPricingVariant?.attributes)
+    ? defaultPricingVariant?.attributes
+    : [];
   const sizeCatalogEntry = defaultAttributes.find((item) => {
     if (!item || typeof item !== "object") {
       return false;
@@ -36,33 +54,109 @@ function extractSizeLabelFromProductVariants(params: {
     const entry = item as { attributeKey?: unknown };
     return entry.attributeKey === "__size_catalog_category_title__";
   }) as { value?: unknown } | undefined;
-
   if (typeof sizeCatalogEntry?.value === "string" && sizeCatalogEntry.value.trim()) {
     return sizeCatalogEntry.value.trim();
   }
+  return null;
+}
 
+/**
+ * Display hint: prefer real variant size so catalog cards are not mistaken for "size = collection name".
+ * Falls back to default-pricing size-catalog category title only when no size option exists.
+ */
+function extractSizeLabelFromProductVariants(params: {
+  defaultPricingVariant: { attributes?: unknown } | null;
+  selectableVariants: Array<{ attributes?: unknown }>;
+}): string | null {
   for (const variant of params.selectableVariants) {
-    const options = getVariantOptions(variant.attributes);
-    const sizeOption = options.find((option) => {
-      if (option.attributeValue?.attribute?.key) {
-        return option.attributeValue.attribute.key === "size";
-      }
-      return option.attributeKey === "size";
-    });
-
-    if (!sizeOption) {
-      continue;
+    const label = extractFirstSizeOptionLabelFromVariant(variant);
+    if (label) {
+      return label;
     }
+  }
+  if (params.defaultPricingVariant) {
+    const fromDefault = extractFirstSizeOptionLabelFromVariant(params.defaultPricingVariant);
+    if (fromDefault) {
+      return fromDefault;
+    }
+  }
+  return extractSizeCatalogCategoryTitleFromDefaultVariant(params.defaultPricingVariant);
+}
 
-    const sizeFromAttributeValue =
-      sizeOption.attributeValue?.translations?.[0]?.label || sizeOption.attributeValue?.value;
-    const normalizedSize = (sizeFromAttributeValue || sizeOption.value || "").trim();
-    if (normalizedSize) {
-      return normalizedSize;
+function collectSizeCatalogCategoryIdsFromVariants(
+  variants: Array<{ attributes?: unknown }>
+): string[] {
+  const ids = new Set<string>();
+  for (const variant of variants) {
+    const { categoryId } = extractSizeCatalogSelectionFromAttributes(variant.attributes);
+    const trimmed = categoryId?.trim();
+    if (trimmed) {
+      ids.add(trimmed);
+    }
+  }
+  return Array.from(ids);
+}
+
+function collectSizeCatalogCategoryTitlesFromVariants(
+  variants: Array<{ attributes?: unknown }>
+): string[] {
+  const titles = new Set<string>();
+  for (const variant of variants) {
+    const { categoryTitle } = extractSizeCatalogSelectionFromAttributes(variant.attributes);
+    const trimmed = categoryTitle?.trim();
+    if (trimmed) {
+      titles.add(trimmed);
+    }
+  }
+  return Array.from(titles);
+}
+
+/**
+ * Distinct size attribute labels/values from variants only (never size-catalog category titles),
+ * so catalog "Select size" matches physical sizes / PDP titles, not collection display strings.
+ */
+function collectSizeLabelsForCatalogFilter(params: {
+  defaultPricingVariant: { attributes?: unknown } | null;
+  selectableVariants: Array<{ attributes?: unknown }>;
+  allVariants: Array<{ attributes?: unknown }>;
+  lang: string;
+}): string[] {
+  const labels = new Set<string>();
+
+  const variantsToScan =
+    params.selectableVariants.length > 0 ? params.selectableVariants : params.allVariants;
+
+  for (const variant of variantsToScan) {
+    const options = getVariantOptions(variant.attributes);
+    for (const option of options) {
+      const isSize =
+        option.attributeValue?.attribute?.key === "size" || option.attributeKey === "size";
+      if (!isSize) {
+        continue;
+      }
+      const translations = option.attributeValue?.translations;
+      const tr =
+        Array.isArray(translations) && translations.length > 0
+          ? translations.find((item: { locale: string }) => item.locale === params.lang) ??
+            translations[0]
+          : undefined;
+      const label = (
+        (typeof tr?.label === "string" ? tr.label : "") ||
+        option.attributeValue?.value ||
+        option.value ||
+        ""
+      ).trim();
+      if (label) {
+        labels.add(label);
+      }
+      const valueOnly = (option.attributeValue?.value || "").trim();
+      if (valueOnly && valueOnly !== label) {
+        labels.add(valueOnly);
+      }
     }
   }
 
-  return null;
+  return Array.from(labels);
 }
 
 /**
@@ -150,10 +244,23 @@ class ProductsFindTransformService {
         (item) => !isDefaultPricingVariant(item as { attributes?: unknown })
       );
       const defaultVariant = defaultPricingVariant || variants[0] || null;
+      const selectableForSize = selectableVariants as Array<{ attributes?: unknown }>;
       const sizeLabel = extractSizeLabelFromProductVariants({
         defaultPricingVariant: defaultPricingVariant as { attributes?: unknown } | null,
-        selectableVariants: selectableVariants as Array<{ attributes?: unknown }>,
+        selectableVariants: selectableForSize,
       });
+      const sizeLabels = collectSizeLabelsForCatalogFilter({
+        defaultPricingVariant: defaultPricingVariant as { attributes?: unknown } | null,
+        selectableVariants: selectableForSize,
+        allVariants: variants as Array<{ attributes?: unknown }>,
+        lang,
+      });
+      const sizeCatalogCategoryIds = collectSizeCatalogCategoryIdsFromVariants(
+        variants as Array<{ attributes?: unknown }>
+      );
+      const sizeCatalogCategoryTitles = collectSizeCatalogCategoryTitlesFromVariants(
+        variants as Array<{ attributes?: unknown }>
+      );
       const stockSourceVariants = selectableVariants.length > 0 ? selectableVariants : variants;
 
       // Get all unique colors from ALL variants with imageUrl and colors hex (support both new and old format)
@@ -315,6 +422,9 @@ class ProductsFindTransformService {
         defaultVariantStock: defaultVariant?.stock ?? 0,
         defaultSku: defaultVariant?.sku?.trim() ?? "",
         sizeLabel,
+        sizeLabels,
+        sizeCatalogCategoryIds,
+        sizeCatalogCategoryTitles,
         categories,
         skus: (selectableVariants.length > 0 ? selectableVariants : variants)
           .map((item) => item.sku?.trim() || "")

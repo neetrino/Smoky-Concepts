@@ -338,8 +338,8 @@ export function TrendingFeaturedSection() {
   }
 
   return (
-    <section className="relative isolate flex flex-col gap-8 overflow-x-visible overflow-y-hidden pb-6 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2 xl:overflow-x-clip xl:overflow-y-visible">
-      <div className="flex min-h-[4rem] items-center justify-between gap-3 xl:relative xl:z-20 xl:-translate-y-4 xl:justify-center">
+    <section className="relative isolate flex min-w-0 flex-col gap-8 overflow-x-clip overflow-y-visible pb-6 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2">
+      <div className="flex min-h-[4rem] min-w-0 items-center justify-between gap-3 xl:relative xl:z-20 xl:-translate-y-4 xl:justify-center">
         <HomeSectionTitle
           title={t('home.homepage.trending.title')}
           centered={false}
@@ -350,37 +350,42 @@ export function TrendingFeaturedSection() {
           href="/products"
           label={t('home.homepage.trending.shopCta')}
           variant="outline"
-          className="!w-fit !min-h-8 !-translate-y-1 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-tight !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!-translate-y-2 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-tight sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:z-30 xl:!translate-y-0"
+          className="!w-fit !min-h-8 !-translate-y-3 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-tight !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!-translate-y-4 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-tight sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:z-30 xl:!-translate-y-2"
         />
       </div>
 
-      <div className="grid grid-cols-2 justify-items-center gap-x-3 gap-y-2 xl:hidden">
+      <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-start justify-items-center gap-x-4 gap-y-3 sm:gap-x-5 sm:gap-y-4 xl:hidden">
         {visibleItems.map((product, index) => {
           const isMiddleOfThree = visibleItems.length === 3 && index === 1;
           const isSideCard = index !== 1;
           const section = getSectionLabel(product);
+          // #3 uses -mt and would paint over #1 without explicit order; middle stays on top.
+          const mobileCellZ =
+            index === 1 ? 'relative z-[3]' : index === 0 ? 'relative z-[2]' : 'relative z-[1]';
+
           return (
             <div
               key={`trending-mobile-${product.id}-${index}`}
-              className={
+              className={`${mobileCellZ} ${
                 index === 1
                   ? 'pt-[14rem]'
                   : index === 2
                     ? '-mt-[10rem] pt-2'
-                    : 'pt-4 '
-              }
+                    : 'pt-4'
+              }`}
             >
               <ProductsCatalogCard
                 product={product}
                 sectionLabel={section}
                 sizeLabel={getSizeLabel(product)}
                 categoryLabel={getCategoryLabel(product, section)}
-                className={isSideCard ? 'w-[10.25rem]' : 'w-[11rem]'}
+                className={isSideCard ? '!h-auto w-full max-w-[10.25rem]' : '!h-auto w-full max-w-[11rem]'}
                 tightenDetailsUnderImage
-                imageScaleBoost={0.08}
+                imageScaleBoost={0.15}
                 imageNudgeDown={isMiddleOfThree}
                 compactLayout
                 suppressShadow
+                imageFrameClassName="max-sm:origin-bottom max-sm:scale-[0.9] max-sm:-translate-y-2"
               />
             </div>
           );

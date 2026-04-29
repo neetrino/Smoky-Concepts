@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import * as jwt from "jsonwebtoken";
+import { Prisma } from "@prisma/client";
 import { db } from "@white-shop/db";
 
 export interface AuthUser {
@@ -8,6 +9,19 @@ export interface AuthUser {
   phone: string | null;
   locale: string;
   roles: string[];
+}
+
+function isPrismaInitializationError(error: unknown): boolean {
+  if (error instanceof Prisma.PrismaClientInitializationError) {
+    return true;
+  }
+
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+
+  const maybePrismaError = error as { name?: string };
+  return maybePrismaError.name === "PrismaClientInitializationError";
 }
 
 /**
@@ -64,6 +78,17 @@ export async function authenticateToken(
     ) {
       return null;
     }
+
+    if (isPrismaInitializationError(error)) {
+      throw {
+        type: "https://api.shop.am/problems/service-unavailable",
+        title: "Service Unavailable",
+        status: 503,
+        detail:
+          "Authentication service is temporarily unavailable. Please try again later.",
+      };
+    }
+
     throw error;
   }
 }

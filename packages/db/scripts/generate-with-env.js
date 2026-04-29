@@ -81,9 +81,13 @@ try {
   const hasExistingGeneratedClient = fs.existsSync(path.join(workspaceRoot, 'node_modules', '.prisma', 'client', 'index.js'));
 
   if (lockedWindowsEngine && hasExistingGeneratedClient) {
-    console.warn('[db:generate] Prisma engine file is locked on Windows (EPERM). Using existing generated client.');
+    console.error(
+      '[db:generate] Prisma could not replace query_engine-windows.dll.node (EPERM — file in use).\n' +
+        'Stop the Next.js dev server and any Node process using @prisma/client, then run: npm run db:generate\n' +
+        'Continuing with an old client causes runtime errors after schema changes (e.g. Unknown field `galleryUrls`).',
+    );
     restoreEnv();
-    process.exit(0);
+    process.exit(1);
   }
 
   console.error('[db:generate] exit code:', err.status);

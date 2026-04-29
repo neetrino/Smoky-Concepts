@@ -40,6 +40,7 @@ function cartItemFromGuestSnapshot(item: GuestCartItem, index: number): CartItem
       customizePlain: item.customizePlain ?? null,
       customizeHtml: item.customizeHtml ?? null,
       customSizeRequest: item.customSizeRequest ?? null,
+      earlyAccess: item.earlyAccess === true,
       stock: item.stock !== undefined ? item.stock : undefined,
       product: {
         id: item.productId,

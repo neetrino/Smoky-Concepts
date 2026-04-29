@@ -1,15 +1,43 @@
 import { db } from "@white-shop/db";
+import type { Prisma } from "@prisma/client";
+
+import type { AdminUserListFilters } from "./admin-users.types";
+
+const ADMIN_USER_LIST_MAX_TAKE = 500;
 
 class AdminUsersService {
   /**
    * Get users
    */
-  async getUsers(_filters: any) {
+  async getUsers(filters: AdminUserListFilters = {}) {
+    const take = Math.min(
+      typeof filters.take === "number" && Number.isFinite(filters.take)
+        ? Math.max(1, Math.floor(filters.take))
+        : 200,
+      ADMIN_USER_LIST_MAX_TAKE,
+    );
+    const search = typeof filters.search === "string" ? filters.search.trim() : "";
+    const role = filters.role ?? "all";
+
+    const where: Prisma.UserWhereInput = {
+      deletedAt: null,
+      ...(search !== ""
+        ? {
+            OR: [
+              { email: { contains: search, mode: "insensitive" } },
+              { phone: { contains: search, mode: "insensitive" } },
+              { firstName: { contains: search, mode: "insensitive" } },
+              { lastName: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+      ...(role === "admin" ? { roles: { has: "admin" } } : {}),
+      ...(role === "customer" ? { NOT: { roles: { has: "admin" } } } : {}),
+    };
+
     const users = await db.user.findMany({
-      where: {
-        deletedAt: null,
-      },
-      take: 100,
+      where,
+      take,
       orderBy: { createdAt: "desc" },
       select: {
         id: true,

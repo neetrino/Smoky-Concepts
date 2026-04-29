@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 
 import { CatalogForProductLineRow } from './CatalogForProductLineRow';
 
-type MobileFilterSection = 'collections' | 'color' | 'sort';
+const MOBILE_FILTER_TOUCH_ROW =
+  'relative w-full overflow-hidden rounded-xl bg-white shadow-[0_4px_6px_rgba(0,0,0,0.05)]';
 
 function ChevronIcon({ className }: { className?: string }) {
   return (
@@ -40,67 +41,45 @@ function CloseIcon() {
   );
 }
 
-const ACCORDION_BAR =
-  'flex w-full items-center justify-between rounded-xl bg-white px-4 py-3.5 text-left shadow-[0_4px_6px_rgba(0,0,0,0.05)]';
-const SELECT_CLASS =
-  'h-11 w-full appearance-none rounded-xl border border-[#e8e8e8] bg-white px-4 pr-10 text-[0.9375rem] font-semibold text-[#414141] outline-none';
+const FILTER_SECTION_ACTIVE =
+  'ring-2 ring-[#122a26] ring-offset-2 ring-offset-[#F2F2F2]';
 
-function FilterSelectWrapper({ children }: { children: ReactNode }) {
-  return (
-    <label className="relative mt-2 block px-1">
-      {children}
-      <span className="pointer-events-none absolute right-6 top-1/2 -translate-y-1/2 text-[#414141]">
-        <ChevronIcon />
-      </span>
-    </label>
-  );
-}
+const MOBILE_FILTER_ROW_MIN_H = 'min-h-[3.25rem]';
 
-function MobileSizePickerBlock({
-  selectedSize,
-  sizeOptions,
-  sizeMenuOpen,
-  onToggleMenu,
-  onSizeChange,
+/** Single tap target: invisible native select over the labeled row (no duplicate “All” / default in list). */
+function MobileFilterNativeRow({
+  ariaLabel,
+  value,
+  onChange,
+  isActive,
+  displayText,
+  children,
 }: {
-  selectedSize: string;
-  sizeOptions: string[];
-  sizeMenuOpen: boolean;
-  onToggleMenu: () => void;
-  onSizeChange: (value: string) => void;
+  ariaLabel: string;
+  value: string;
+  onChange: (value: string) => void;
+  isActive: boolean;
+  displayText: string;
+  children: ReactNode;
 }) {
+  const wrapClass = isActive ? `${MOBILE_FILTER_TOUCH_ROW} ${FILTER_SECTION_ACTIVE}` : MOBILE_FILTER_TOUCH_ROW;
+  const titleClass = isActive ? 'text-[#122a26]' : 'text-[#333333]';
   return (
-    <div className="relative mt-6">
-      <button
-        type="button"
-        onClick={onToggleMenu}
-        className="flex h-12 w-full items-center rounded-xl bg-[#dcc090] px-4 text-left text-[0.9375rem] font-semibold text-[#122a26]"
+    <div className={wrapClass}>
+      <select
+        aria-label={ariaLabel}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={`absolute inset-0 z-10 w-full ${MOBILE_FILTER_ROW_MIN_H} cursor-pointer opacity-0`}
       >
-        {selectedSize === 'all' ? 'Select size' : selectedSize}
-      </button>
-      {sizeMenuOpen && (
-        <div className="absolute bottom-full left-0 right-0 z-10 mb-2 max-h-56 overflow-y-auto rounded-xl border border-[#e8e8e8] bg-white p-2 shadow-[0_10px_32px_rgba(18,42,38,0.14)]">
-          <button
-            type="button"
-            onClick={() => {
-              onSizeChange('all');
-            }}
-            className="block w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-[#414141] hover:bg-[#f5f4f1]"
-          >
-            All Sizes
-          </button>
-          {sizeOptions.map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => onSizeChange(option)}
-              className="block w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-[#414141] hover:bg-[#f5f4f1]"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      )}
+        {children}
+      </select>
+      <div
+        className={`pointer-events-none flex w-full items-center justify-between px-4 py-3.5 text-left ${MOBILE_FILTER_ROW_MIN_H}`}
+      >
+        <span className={`text-[0.9375rem] font-semibold ${titleClass}`}>{displayText}</span>
+        <ChevronIcon className={`shrink-0 ${isActive ? 'text-[#122a26]' : 'text-[#414141]'}`} />
+      </div>
     </div>
   );
 }
@@ -114,12 +93,11 @@ export interface ProductsCatalogMobileFilterSheetProps {
   selectedSize: string;
   collectionOptions: string[];
   colorOptions: string[];
-  sizeOptions: string[];
   sortOptions: Array<{ value: string; label: string }>;
   onCollectionChange: (value: string) => void;
   onColorChange: (value: string) => void;
   onSortChange: (value: string) => void;
-  onSizeChange: (value: string) => void;
+  onOpenSizeCatalog: () => void;
   onClearAll: () => void;
 }
 
@@ -132,20 +110,15 @@ export function ProductsCatalogMobileFilterSheet({
   selectedSize,
   collectionOptions,
   colorOptions,
-  sizeOptions,
   sortOptions,
   onCollectionChange,
   onColorChange,
   onSortChange,
-  onSizeChange,
+  onOpenSizeCatalog,
   onClearAll,
 }: ProductsCatalogMobileFilterSheetProps) {
-  const [expanded, setExpanded] = useState<MobileFilterSection | null>('collections');
-  const [sizeMenuOpen, setSizeMenuOpen] = useState(false);
-
   useEffect(() => {
     if (!open) {
-      setSizeMenuOpen(false);
       return;
     }
     const previousOverflow = document.body.style.overflow;
@@ -164,18 +137,14 @@ export function ProductsCatalogMobileFilterSheet({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [open, onClose]);
 
-  const toggleSection = (id: MobileFilterSection) => {
-    setExpanded((current) => (current === id ? null : id));
-  };
-
-  const handleSizePick = (value: string) => {
-    onSizeChange(value);
-    setSizeMenuOpen(false);
-  };
-
   if (!open) {
     return null;
   }
+
+  const isCollectionActive = selectedCollection !== 'all';
+  const isColorActive = selectedColor !== 'all';
+  const isSortActive = selectedSort !== 'default';
+  const isSizeActive = selectedSize !== 'all';
 
   return (
     <div
@@ -213,94 +182,73 @@ export function ProductsCatalogMobileFilterSheet({
         </div>
 
         <div className="flex flex-col gap-3">
-          <div>
-            <button
-              type="button"
-              onClick={() => toggleSection('collections')}
-              className={ACCORDION_BAR}
-            >
-              <span className="text-[0.9375rem] font-semibold text-[#333333]">Collections</span>
-              <ChevronIcon
-                className={`text-[#414141] transition-transform ${expanded === 'collections' ? 'rotate-180' : ''}`}
-              />
-            </button>
-            {expanded === 'collections' && (
-              <FilterSelectWrapper>
-                <select
-                  value={selectedCollection}
-                  onChange={(event) => onCollectionChange(event.target.value)}
-                  className={SELECT_CLASS}
-                >
-                  <option value="all">All collections</option>
-                  {collectionOptions
-                    .filter((option) => option !== 'all')
-                    .map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                </select>
-              </FilterSelectWrapper>
-            )}
-          </div>
+          <MobileFilterNativeRow
+            ariaLabel="Collections"
+            value={selectedCollection}
+            onChange={onCollectionChange}
+            isActive={isCollectionActive}
+            displayText={selectedCollection === 'all' ? 'Collections' : selectedCollection}
+          >
+            <option value="all" hidden />
+            {collectionOptions
+              .filter((option) => option !== 'all')
+              .map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+          </MobileFilterNativeRow>
 
-          <div>
-            <button type="button" onClick={() => toggleSection('color')} className={ACCORDION_BAR}>
-              <span className="text-[0.9375rem] font-semibold text-[#333333]">Color</span>
-              <ChevronIcon
-                className={`text-[#414141] transition-transform ${expanded === 'color' ? 'rotate-180' : ''}`}
-              />
-            </button>
-            {expanded === 'color' && (
-              <FilterSelectWrapper>
-                <select
-                  value={selectedColor}
-                  onChange={(event) => onColorChange(event.target.value)}
-                  className={SELECT_CLASS}
-                >
-                  <option value="all">All colors</option>
-                  {colorOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </FilterSelectWrapper>
-            )}
-          </div>
+          <MobileFilterNativeRow
+            ariaLabel="Color"
+            value={selectedColor}
+            onChange={onColorChange}
+            isActive={isColorActive}
+            displayText={selectedColor === 'all' ? 'Color' : selectedColor}
+          >
+            <option value="all" hidden />
+            {colorOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </MobileFilterNativeRow>
 
-          <div>
-            <button type="button" onClick={() => toggleSection('sort')} className={ACCORDION_BAR}>
-              <span className="text-[0.9375rem] font-semibold text-[#333333]">Sort By</span>
-              <ChevronIcon
-                className={`text-[#414141] transition-transform ${expanded === 'sort' ? 'rotate-180' : ''}`}
-              />
-            </button>
-            {expanded === 'sort' && (
-              <FilterSelectWrapper>
-                <select
-                  value={selectedSort}
-                  onChange={(event) => onSortChange(event.target.value)}
-                  className={SELECT_CLASS}
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </FilterSelectWrapper>
-            )}
-          </div>
+          <MobileFilterNativeRow
+            ariaLabel="Sort By"
+            value={selectedSort}
+            onChange={onSortChange}
+            isActive={isSortActive}
+            displayText={
+              selectedSort === 'default'
+                ? 'Sort By'
+                : (sortOptions.find((o) => o.value === selectedSort)?.label ?? 'Sort By')
+            }
+          >
+            <option value="default" hidden />
+            {sortOptions
+              .filter((option) => option.value !== 'default')
+              .map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+          </MobileFilterNativeRow>
         </div>
 
-        <MobileSizePickerBlock
-          selectedSize={selectedSize}
-          sizeOptions={sizeOptions}
-          sizeMenuOpen={sizeMenuOpen}
-          onToggleMenu={() => setSizeMenuOpen((value) => !value)}
-          onSizeChange={handleSizePick}
-        />
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={onOpenSizeCatalog}
+            className={`flex h-12 w-full items-center rounded-xl border-2 px-4 text-left text-[0.9375rem] font-semibold transition-[box-shadow,ring,border-color] ${
+              isSizeActive
+                ? `${FILTER_SECTION_ACTIVE} border-[#122a26] bg-[#c9b07a] text-[#122a26]`
+                : 'border-transparent bg-[#dcc090] text-[#122a26]'
+            }`}
+          >
+            {selectedSize === 'all' ? 'Select size' : selectedSize}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -56,8 +56,20 @@
     "subtotal": "Ենթագումար",
     "shipping": "Առաքում",
     "collectionPrice": "Collection գին",
+    "couponDiscount": "Քուպոնի զեղչ",
     "tax": "Հարկ",
     "total": "Ընդամենը"
+  },
+  "coupon": {
+    "sectionTitle": "Քուպոն",
+    "placeholder": "Մուտքագրեք քուպոնի կոդը",
+    "apply": "Կիրառել",
+    "applying": "Կիրառում…",
+    "invalid": "Անվավեր կամ ժամկետանց քուպոն։",
+    "notEligibleUser": "Այս քուպոնը հասանելի չէ ձեր հաշվի համար։",
+    "cartEmpty": "Նախ ավելացրեք ապրանքներ զամբյուղում։",
+    "applied": "{code} կոդը կիրառված է։",
+    "remove": "Հանել"
   },
   "buttons": {
     "placeOrder": "Պատվիրել",

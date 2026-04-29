@@ -146,26 +146,29 @@ export function CartDrawer() {
   }
 
   return (
-    <div className="fixed inset-0 z-[70]">
+    <div className="fixed inset-0 z-[100]" role="presentation">
       <button
         type="button"
         aria-label="Close cart drawer"
-        className="absolute inset-0 bg-black/20"
+        className="absolute inset-0 z-0 animate-size-modal-backdrop-in bg-[rgba(0,0,0,0.6)]"
         onClick={() => setIsOpen(false)}
       />
 
-      <aside className="absolute right-0 top-0 flex h-full w-full max-w-[30rem] flex-col overflow-hidden bg-[#efefef] shadow-[-12px_0_32px_rgba(18,42,38,0.16)]">
+      <aside className="absolute inset-y-0 right-0 z-10 flex h-full max-h-dvh w-full max-w-[30rem] animate-size-modal-panel-in flex-col overflow-hidden bg-[#efefef] shadow-[-8px_0_32px_rgba(0,0,0,0.12)]">
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          className="absolute right-5 top-5 text-[#b4b4b4] transition-colors hover:text-[#414141]"
+          className="absolute right-5 top-5 z-20 text-[#b4b4b4] transition-colors hover:text-[#414141]"
           aria-label="Close cart drawer"
         >
           <CloseIcon />
         </button>
 
         <div className="flex h-full flex-col px-8 pb-6 pt-6 font-montserrat">
-          <div className="flex items-center gap-4">
+          <div
+            className="flex items-center gap-4 animate-size-modal-block-in"
+            style={{ animationDelay: '90ms' }}
+          >
             <h2 className="text-[1.625rem] font-extrabold leading-none text-[#414141]">My Cart</h2>
             <span className="pt-1 text-[0.875rem] font-medium leading-none text-[#414141]">
               {itemCountLabel}

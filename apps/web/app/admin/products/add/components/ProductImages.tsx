@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent, type DragEvent, type RefObject } from 'react';
 import { useTranslation } from '../../../../../lib/i18n-client';
+import { ADMIN_RASTER_IMAGE_FILE_ACCEPT } from '@/lib/services/utils/heic-browser-convert';
 
 interface ProductImagesProps {
   imageUrls: string[];
@@ -85,7 +86,7 @@ export function ProductImages({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept={ADMIN_RASTER_IMAGE_FILE_ACCEPT}
               multiple
               onChange={onUploadImages}
               className="hidden"

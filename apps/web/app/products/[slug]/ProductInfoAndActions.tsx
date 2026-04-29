@@ -10,6 +10,10 @@ import { apiClient } from '../../../lib/api-client';
 import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { Button } from '../../../components/ui/buttons';
 import type { AttributeGroupValue, Product, ProductVariant } from './types';
+import {
+  getProductCollectionBadgeItems,
+  PRODUCT_SECTION_BADGE_CLASS_NAMES,
+} from '../components/catalogProductLabels';
 import { normalizeHexPalette, parseHexFromText } from './utils/swatch-color-utils';
 import { CustomizeFormatToolbar } from './CustomizeFormatToolbar';
 import { CustomizeSizeModal } from './CustomizeSizeModal';
@@ -325,13 +329,23 @@ export function ProductInfoAndActions({
       ? 'pb-2.5 font-montserrat text-[15px] font-extrabold leading-none sm:text-[16px] md:text-[17px]'
       : 'pb-2.5 font-montserrat text-[14px] font-extrabold leading-none sm:text-[15px] md:text-[16px]';
 
-  const productBadges = product.labels?.length
-    ? product.labels
-        .map((label) => label.value?.trim())
-        .filter((value): value is string => Boolean(value))
-    : product.categories
-        ?.map((category) => category.title?.trim())
-        .filter((value): value is string => Boolean(value)) ?? [];
+  const collectionBadgeItems = useMemo(() => getProductCollectionBadgeItems(product), [product]);
+
+  const labelBadgeItems = useMemo(
+    () =>
+      product.labels?.length
+        ? product.labels
+            .map((label) => ({
+              id: label.id,
+              text: label.value?.trim() ?? '',
+              color: label.color?.trim() ?? null,
+            }))
+            .filter((item) => item.text.length > 0)
+        : [],
+    [product.labels, product.id]
+  );
+
+  const hasTitleRowBadges = collectionBadgeItems.length > 0 || labelBadgeItems.length > 0;
   const productDetails = [
     product.brand?.name ?? null,
     activeColorOption ? `${t(language, 'product.color')}: ${activeColorOption.label}` : null,
@@ -344,6 +358,23 @@ export function ProductInfoAndActions({
         : null,
     currentVariant?.sku ? `SKU: ${currentVariant.sku}` : null,
   ].filter(Boolean) as string[];
+
+  /** Hide Apply until plain/HTML differs from last saved (new text, edit, or format change). */
+  const showCustomizeApplyButton = useMemo(() => {
+    const rawHtml = getCustomizeSanitizedHtml();
+    const sanitized = sanitizeCustomizeHtml(rawHtml);
+    const plain = getPlainTextFromHtml(sanitized).trim();
+    if (!plain) {
+      return false;
+    }
+    if (!appliedCustomize) {
+      return true;
+    }
+    const appliedPlain = appliedCustomize.plain.trim();
+    const appliedHtml = (appliedCustomize.html ?? '').trim();
+    const currentHtml = sanitized.trim();
+    return plain !== appliedPlain || currentHtml !== appliedHtml;
+  }, [appliedCustomize, customizeDraftText, customizeFormat, getCustomizeSanitizedHtml]);
 
   const renderedTabContent = useMemo(() => {
     if (activeTab === 'description') {
@@ -397,13 +428,15 @@ export function ProductInfoAndActions({
                 {customizeDraftText.length}/{customizeTextMaxLength}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleCustomizeApplyClick}
-              className="h-10 w-full shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:mt-1 sm:w-[168px]"
-            >
-              {t(language, 'product.customize_apply')}
-            </button>
+            {showCustomizeApplyButton ? (
+              <button
+                type="button"
+                onClick={handleCustomizeApplyClick}
+                className="h-10 w-full shrink-0 cursor-pointer rounded-md border-2 border-solid border-[#dcc090] bg-transparent font-montserrat text-[18px] font-extrabold uppercase tracking-[1.5px] text-[#dcc090] transition-colors duration-200 hover:bg-[#dcc090]/12 hover:text-[#3a3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#dcc090] active:bg-[#dcc090]/20 sm:mt-1 sm:w-[168px]"
+              >
+                {t(language, 'product.customize_apply')}
+              </button>
+            ) : null}
           </div>
           {appliedCustomize?.plain ? (
             <button
@@ -466,31 +499,44 @@ export function ProductInfoAndActions({
     product.id,
     customizeFormat,
     onCustomizeFormatChange,
+    showCustomizeApplyButton,
   ]);
 
   return (
     <>
     <div className="max-w-[763px] min-w-0 w-full pt-[clamp(3rem,7.8vw,11.25rem)]">
-      <div className="flex min-w-0 items-start justify-between gap-3">
-        <h1 className="min-w-0 flex-1 truncate whitespace-nowrap font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
-          {productTitle}
-        </h1>
-        {productBadges.length > 0 && (
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
-            {productBadges.map((badge, index) => (
-              <div
-                key={`${badge}-${index}`}
-                className="inline-flex h-[18px] items-center rounded-[6px] bg-[#122a26] px-[7px] text-[12px] font-medium leading-none text-white"
-              >
-                {badge}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <h1 className="min-w-0 font-montserrat text-[26px] font-black leading-tight text-[#414141] sm:text-[30px]">
+        {productTitle}
+      </h1>
+      {hasTitleRowBadges ? (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          {collectionBadgeItems.map((item, index) => (
+            <span
+              key={`${item.sectionLabel}-${item.text}-${index}`}
+              className={`inline-flex items-center rounded-full px-2.5 py-1 font-montserrat text-xs font-medium leading-none sm:text-[13px] ${
+                PRODUCT_SECTION_BADGE_CLASS_NAMES[item.sectionLabel] ??
+                PRODUCT_SECTION_BADGE_CLASS_NAMES.Classic
+              }`}
+            >
+              {item.text}
+            </span>
+          ))}
+          {labelBadgeItems.map((item) => (
+            <span
+              key={item.id}
+              className={`inline-flex items-center rounded-full px-2.5 py-1 font-montserrat text-xs font-medium leading-none text-white sm:text-[13px] ${
+                item.color ? '' : 'bg-[#122a26]'
+              }`}
+              style={item.color ? { backgroundColor: item.color } : undefined}
+            >
+              {item.text}
+            </span>
+          ))}
+        </div>
+      ) : null}
 
       {colorOptions.length > 0 && (
-        <div className="mt-8">
+        <div className={hasTitleRowBadges ? 'mt-6' : 'mt-8'}>
           <p className="font-montserrat text-[18px] font-extrabold leading-none text-[#414141]">
             {t(language, 'product.color')}
           </p>
@@ -505,15 +551,15 @@ export function ProductInfoAndActions({
                   key={option.valueId || option.value}
                   type="button"
                   onClick={() => onColorSelect(option.value)}
-                  className={`relative rounded-[6px] transition-transform hover:scale-[1.02] ${
+                  className={`relative transition-transform hover:scale-[1.02] ${
                     isActive
-                      ? 'flex h-[34px] w-[34px] items-center justify-center bg-white shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
-                      : 'h-[22px] w-[22px]'
+                      ? 'flex h-10 w-10 items-center justify-center rounded-[10px] bg-white shadow-[0_2px_10px_rgba(0,0,0,0.1)]'
+                      : 'h-[22px] w-[22px] rounded-[6px]'
                   }`}
                   aria-label={option.label}
                 >
                   <span
-                    className={`block rounded-[5px] ${isActive ? 'h-[28px] w-[28px]' : 'h-[22px] w-[22px]'}`}
+                    className={`block ${isActive ? 'h-7 w-7 rounded-lg' : 'h-[22px] w-[22px] rounded-[5px]'}`}
                     style={{
                       background:
                         swatches.length > 1
@@ -536,7 +582,7 @@ export function ProductInfoAndActions({
           <button
             type="button"
             onClick={openSizeCatalogModal}
-            className="mt-3 flex w-full min-h-9 items-center justify-center gap-2 rounded-[6px] bg-[#dcc090] px-3 py-2 text-center text-[16px] font-medium uppercase tracking-[0.08em] text-[#122a26] sm:inline-flex sm:w-auto sm:min-w-[160px]"
+            className="mt-3 flex w-full min-h-9 items-center justify-center gap-2 rounded-[6px] bg-[#dcc090] px-3 py-2 text-center font-montserrat text-[16px] font-bold leading-normal tracking-normal text-neutral-700 sm:inline-flex sm:w-auto sm:min-w-[160px]"
           >
             <span className="truncate">{sizeButtonLabel}</span>
           </button>

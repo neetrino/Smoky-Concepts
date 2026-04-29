@@ -3,26 +3,32 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { CustomizeSizeModal } from '../[slug]/CustomizeSizeModal';
+import type { CustomOrderDraft } from '../[slug]/CustomizeSizeOrderFallback';
+import { apiClient } from '../../../lib/api-client';
+import { getStoredLanguage, type LanguageCode } from '../../../lib/language';
+import type { SizeCatalogCategoryDto, SizeCatalogItemDto } from '@/lib/types/size-catalog';
 import { CatalogForProductLineRow } from './CatalogForProductLineRow';
 import { ProductsCatalogMobileFilterSheet } from './ProductsCatalogMobileFilterSheet';
 import { ProductsCatalogCard } from './ProductsCatalogCard';
 import {
   type CatalogProduct,
   CATALOG_SECTION_PAGE_SIZE,
+  filterSizeCatalogByProducts,
   getProductSectionLabels,
   getCategoryLabel,
   getColorLabel,
   getSizeLabel,
   productMatchesCategoryFilter,
+  productMatchesSizeFilter,
   shouldNudgeCatalogProductImage,
-  isClientSideCollectionFilterValue,
   resolveSectionLabelFromCollectionValue,
 } from './catalogProductLabels';
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
 const ITEMS_PER_SECTION_PAGE = CATALOG_SECTION_PAGE_SIZE;
 
-const SECTION_ORDER = ['Classic', 'Special', 'Atelier', 'Premium'] as const;
+const SECTION_ORDER = ['Classic', 'Premium', 'Atelier', 'Special'] as const;
 
 const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
   { value: 'default', label: 'Sort By' },
@@ -31,6 +37,14 @@ const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
   { value: 'name-asc', label: 'Name: A to Z' },
   { value: 'name-desc', label: 'Name: Z to A' },
 ];
+
+/** Applied when a filter control has a non-default selection (desktop selects + sort). */
+const FILTER_CONTROL_ACTIVE =
+  'border-[#122a26] bg-[#eef3f2] text-[#122a26] ring-2 ring-[#122a26]/40 ring-offset-2 ring-offset-[#f5f4f1]';
+const FILTER_CONTROL_INACTIVE_BORDER = 'border-transparent bg-white text-[#414141]';
+/** Size opener stays on gold; only border/ring indicate active. */
+const SIZE_FILTER_BUTTON_ACTIVE =
+  'border-[#122a26] bg-[#c9b07a] text-[#122a26] ring-2 ring-[#122a26]/40 ring-offset-2 ring-offset-[#f5f4f1]';
 
 interface ProductsCatalogViewProps {
   products: CatalogProduct[];
@@ -67,32 +81,74 @@ function ChevronIcon() {
 export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const sizeMenuRef = useRef<HTMLDivElement>(null);
   const sectionScrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const [showSizeMenu, setShowSizeMenu] = useState(false);
+  const [catalogSizeModalOpen, setCatalogSizeModalOpen] = useState(false);
+  const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
+  const [language, setLanguage] = useState<LanguageCode>('en');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState(searchParams.get('size') ?? 'all');
   const [sectionPages, setSectionPages] = useState<Record<string, number>>({});
 
   const selectedCollection = searchParams.get('category') ?? 'all';
   const selectedColor = searchParams.get('color') ?? 'all';
+  const selectedSizeCatalogCategoryId = searchParams.get('sizeCat')?.trim() ?? '';
   const selectedSort = (searchParams.get('sort') as SortOption | null) ?? 'default';
+
+  const selectedSizeCatalogCategoryTitle = useMemo(() => {
+    const id = selectedSizeCatalogCategoryId.trim();
+    if (!id) {
+      return null;
+    }
+    for (const category of sizeCatalogCategories) {
+      const hit = category.items.find((item) => item.categoryId === id);
+      if (hit?.categoryTitle?.trim()) {
+        return hit.categoryTitle.trim();
+      }
+    }
+    return null;
+  }, [sizeCatalogCategories, selectedSizeCatalogCategoryId]);
   const isCategoryFilteredView = selectedCollection !== 'all';
   const selectedSectionTitle = resolveSectionLabelFromCollectionValue(selectedCollection);
+  const isCollectionFilterActive = selectedCollection !== 'all';
+  const isColorFilterActive = selectedColor !== 'all';
+  const isSizeFilterActive = selectedSize !== 'all';
+  const isSortFilterActive = selectedSort !== 'default';
+  const activeProductFiltersCount =
+    (isCollectionFilterActive ? 1 : 0) +
+    (isColorFilterActive ? 1 : 0) +
+    (isSizeFilterActive ? 1 : 0) +
+    (isSortFilterActive ? 1 : 0);
 
   useEffect(() => {
     setSelectedSize(searchParams.get('size') ?? 'all');
   }, [searchParams]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!sizeMenuRef.current?.contains(event.target as Node)) {
-        setShowSizeMenu(false);
-      }
+    setLanguage(getStoredLanguage());
+    const handleLanguageUpdate = () => {
+      setLanguage(getStoredLanguage());
     };
+    window.addEventListener('language-updated', handleLanguageUpdate);
+    return () => window.removeEventListener('language-updated', handleLanguageUpdate);
+  }, []);
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await apiClient.get<{ data: SizeCatalogCategoryDto[] }>('/api/v1/size-catalog');
+        if (!cancelled) {
+          setSizeCatalogCategories(Array.isArray(res.data) ? res.data : []);
+        }
+      } catch {
+        if (!cancelled) {
+          setSizeCatalogCategories([]);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const collectionOptions = useMemo(() => {
@@ -109,27 +165,95 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
     );
   }, [products]);
 
-  const sizeOptions = useMemo(() => {
-    return Array.from(new Set(products.map((product) => getSizeLabel(product))));
-  }, [products]);
+  const productsForSizeRelevance = useMemo(() => {
+    const gateByCollection = selectedCollection !== 'all';
+    return products.filter((product) => {
+      const colorLabel = getColorLabel(product);
+      if (gateByCollection && !productMatchesCategoryFilter(product, selectedCollection)) {
+        return false;
+      }
+      if (selectedColor !== 'all' && colorLabel !== selectedColor) {
+        return false;
+      }
+      return true;
+    });
+  }, [products, selectedCollection, selectedColor]);
+
+  const sizeCatalogForModal = useMemo(
+    () => filterSizeCatalogByProducts(sizeCatalogCategories, productsForSizeRelevance),
+    [sizeCatalogCategories, productsForSizeRelevance]
+  );
+
+  const selectedCatalogItemId = useMemo(() => {
+    if (selectedSize === 'all') {
+      return null;
+    }
+    const sizeNeedle = selectedSize.trim().toLowerCase();
+    const categoryNeedle = selectedSizeCatalogCategoryId.trim();
+    for (const category of sizeCatalogCategories) {
+      const exactTitleHit = category.items.find((item) => {
+        const titleMatch = item.title.trim().toLowerCase() === sizeNeedle;
+        if (!titleMatch) {
+          return false;
+        }
+        if (!categoryNeedle) {
+          return true;
+        }
+        return item.categoryId === categoryNeedle;
+      });
+      if (exactTitleHit) {
+        return exactTitleHit.id;
+      }
+      const bandTitleHit = category.items.find((item) => {
+        const bandMatch = item.categoryTitle.trim().toLowerCase() === sizeNeedle;
+        if (!bandMatch) {
+          return false;
+        }
+        if (!categoryNeedle) {
+          return true;
+        }
+        return item.categoryId === categoryNeedle;
+      });
+      if (bandTitleHit) {
+        return bandTitleHit.id;
+      }
+    }
+    return null;
+  }, [sizeCatalogCategories, selectedSize, selectedSizeCatalogCategoryId]);
 
   const visibleProducts = useMemo(() => {
-    const shouldApplyClientCategoryFilter = isClientSideCollectionFilterValue(selectedCollection);
+    const gateByCollection = selectedCollection !== 'all';
     const filtered = products.filter((product) => {
       const colorLabel = getColorLabel(product);
-      const sizeLabel = getSizeLabel(product);
 
-      if (shouldApplyClientCategoryFilter && !productMatchesCategoryFilter(product, selectedCollection)) {
+      if (gateByCollection && !productMatchesCategoryFilter(product, selectedCollection)) {
         return false;
       }
       if (selectedColor !== 'all' && colorLabel !== selectedColor) return false;
-      if (selectedSize !== 'all' && sizeLabel !== selectedSize) return false;
+      if (
+        !productMatchesSizeFilter(
+          product,
+          selectedSize,
+          selectedSizeCatalogCategoryId || null,
+          selectedSizeCatalogCategoryTitle
+        )
+      ) {
+        return false;
+      }
 
       return true;
     });
 
     return sortProducts(filtered, selectedSort);
-  }, [products, selectedCollection, selectedColor, selectedSize, selectedSort]);
+  }, [
+    products,
+    selectedCollection,
+    selectedColor,
+    selectedSize,
+    selectedSizeCatalogCategoryId,
+    selectedSizeCatalogCategoryTitle,
+    selectedSort,
+  ]);
 
   const sectionItemsByTitle = useMemo(() => {
     return visibleProducts.reduce<Record<string, CatalogProduct[]>>((accumulator, product) => {
@@ -214,9 +338,24 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
     router.replace(params.toString() ? `/products?${params.toString()}` : '/products', { scroll: false });
   };
 
+  const applyCatalogSizeFilter = (item: SizeCatalogItemDto) => {
+    const packTitle = item.title.trim();
+    const bandTitle = item.categoryTitle.trim();
+    const sizeQueryValue = bandTitle || packTitle;
+    const categoryId = item.categoryId.trim();
+    setSelectedSize(sizeQueryValue ? sizeQueryValue : 'all');
+    setCatalogSizeModalOpen(false);
+    setMobileFilterOpen(false);
+    if (!sizeQueryValue) {
+      updateQuery({ size: 'all', sizeCat: 'all' });
+      return;
+    }
+    updateQuery({ size: sizeQueryValue, sizeCat: categoryId || 'all' });
+  };
+
   const clearFilters = () => {
     setSelectedSize('all');
-    setShowSizeMenu(false);
+    setCatalogSizeModalOpen(false);
     setMobileFilterOpen(false);
     router.replace('/products', { scroll: false });
   };
@@ -287,14 +426,13 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
         selectedSize={selectedSize}
         collectionOptions={collectionOptions}
         colorOptions={colorOptions}
-        sizeOptions={sizeOptions}
         sortOptions={SORT_OPTIONS}
         onCollectionChange={(value) => updateQuery({ category: value })}
         onColorChange={(value) => updateQuery({ color: value })}
         onSortChange={(value) => updateQuery({ sort: value })}
-        onSizeChange={(value) => {
-          setSelectedSize(value === 'all' ? 'all' : value);
-          updateQuery({ size: value });
+        onOpenSizeCatalog={() => {
+          setMobileFilterOpen(false);
+          setCatalogSizeModalOpen(true);
         }}
         onClearAll={clearFilters}
       />
@@ -310,9 +448,22 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
               <button
                 type="button"
                 onClick={() => setMobileFilterOpen(true)}
-                className="mt-0.5 min-h-[2.5rem] shrink-0 rounded-md bg-[#DBC097] px-7 py-2 text-sm font-black uppercase leading-none tracking-[0.14em] text-[#1A1D1C] transition-colors hover:bg-[#d2b68c] active:bg-[#c9ac82] lg:hidden"
+                aria-label={
+                  activeProductFiltersCount > 0
+                    ? `Filter, ${activeProductFiltersCount} filter${activeProductFiltersCount === 1 ? '' : 's'} applied`
+                    : 'Open filters'
+                }
+                className="relative mt-0.5 min-h-[2.5rem] shrink-0 overflow-visible rounded-md bg-[#DBC097] px-7 py-2 text-sm font-black uppercase leading-none tracking-[0.14em] text-[#1A1D1C] transition-[colors,box-shadow] hover:bg-[#d2b68c] active:bg-[#c9ac82] lg:hidden"
               >
                 Filter
+                {activeProductFiltersCount > 0 ? (
+                  <span
+                    className="absolute -right-1.5 -top-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[0.6875rem] font-bold leading-none text-white tabular-nums"
+                    aria-hidden
+                  >
+                    {activeProductFiltersCount}
+                  </span>
+                ) : null}
               </button>
             </div>
 
@@ -325,7 +476,9 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <select
                   value={selectedCollection}
                   onChange={(event) => updateQuery({ category: event.target.value })}
-                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-semibold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
+                  className={`h-10 w-full appearance-none rounded-[0.375rem] border-2 px-4 pr-10 text-[0.9375rem] font-semibold leading-none shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-[box-shadow,ring,border-color,background-color,color] focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)] ${
+                    isCollectionFilterActive ? FILTER_CONTROL_ACTIVE : FILTER_CONTROL_INACTIVE_BORDER
+                  }`}
                 >
                   <option value="all">Collections</option>
                   {collectionOptions.filter((option) => option !== 'all').map((option) => (
@@ -343,7 +496,9 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <select
                   value={selectedColor}
                   onChange={(event) => updateQuery({ color: event.target.value })}
-                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-semibold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
+                  className={`h-10 w-full appearance-none rounded-[0.375rem] border-2 px-4 pr-10 text-[0.9375rem] font-semibold leading-none shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-[box-shadow,ring,border-color,background-color,color] focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)] ${
+                    isColorFilterActive ? FILTER_CONTROL_ACTIVE : FILTER_CONTROL_INACTIVE_BORDER
+                  }`}
                 >
                   <option value="all">Color</option>
                   {colorOptions.map((option) => (
@@ -357,45 +512,15 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 </span>
               </label>
 
-              <div className="relative" ref={sizeMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setShowSizeMenu((value) => !value)}
-                  className="h-10 w-full whitespace-nowrap rounded-[0.5rem] bg-[#dcc090] px-4 text-left text-[0.9375rem] font-semibold leading-none text-[#122a26]"
-                >
-                  {selectedSize === 'all' ? 'Select size' : selectedSize}
-                </button>
-
-                {showSizeMenu && (
-                  <div className="absolute left-0 top-[calc(100%+0.75rem)] z-20 min-w-full rounded-[1rem] bg-white p-3 shadow-[0_10px_32px_rgba(18,42,38,0.14)]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedSize('all');
-                        setShowSizeMenu(false);
-                        updateQuery({ size: 'all' });
-                      }}
-                      className="mb-2 block w-full rounded-[0.75rem] px-3 py-2 text-left text-sm font-extrabold text-[#414141] transition-colors hover:bg-[#f5f4f1]"
-                    >
-                      All Sizes
-                    </button>
-                    {sizeOptions.map((option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => {
-                          setSelectedSize(option);
-                          setShowSizeMenu(false);
-                          updateQuery({ size: option });
-                        }}
-                        className="block w-full rounded-[0.75rem] px-3 py-2 text-left text-sm font-extrabold text-[#414141] transition-colors hover:bg-[#f5f4f1]"
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <button
+                type="button"
+                onClick={() => setCatalogSizeModalOpen(true)}
+                className={`h-10 w-full whitespace-nowrap rounded-[0.5rem] border-2 px-4 text-left text-[0.9375rem] font-semibold leading-none transition-[box-shadow,ring,border-color,background-color,color] ${
+                  isSizeFilterActive ? SIZE_FILTER_BUTTON_ACTIVE : 'border-transparent bg-[#dcc090] text-[#122a26]'
+                }`}
+              >
+                {selectedSize === 'all' ? 'Select size' : selectedSize}
+              </button>
 
               <button
                 type="button"
@@ -411,7 +536,9 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                 <select
                   value={selectedSort}
                   onChange={(event) => updateQuery({ sort: event.target.value })}
-                  className="h-10 w-full appearance-none rounded-[0.375rem] bg-white px-4 pr-10 text-[0.9375rem] font-extrabold leading-none text-[#414141] shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-shadow focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)]"
+                  className={`h-10 w-full appearance-none rounded-[0.375rem] border-2 px-4 pr-10 text-[0.9375rem] font-extrabold leading-none shadow-[0_4px_22.5px_rgba(0,0,0,0.1)] outline-none transition-[box-shadow,ring,border-color,background-color,color] focus:shadow-[0_4px_24px_rgba(18,42,38,0.18)] ${
+                    isSortFilterActive ? FILTER_CONTROL_ACTIVE : FILTER_CONTROL_INACTIVE_BORDER
+                  }`}
                 >
                   {SORT_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -497,6 +624,18 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
           </div>
         </div>
       </div>
+
+      <CustomizeSizeModal
+        isOpen={catalogSizeModalOpen}
+        onClose={() => setCatalogSizeModalOpen(false)}
+        language={language}
+        sizeCategories={sizeCatalogForModal}
+        selectedSizeItemId={selectedCatalogItemId}
+        onSelectSizeCatalogItem={applyCatalogSizeFilter}
+        onSelectCustomSizeRequest={(_draft: CustomOrderDraft) => {
+          setCatalogSizeModalOpen(false);
+        }}
+      />
     </div>
   );
 }

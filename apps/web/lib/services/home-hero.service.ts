@@ -64,13 +64,7 @@ function normalizeSlides(value: unknown): HomeHeroSlide[] | null {
   if (!parsed.success || parsed.data.slides.length === 0) {
     return null;
   }
-  return parsed.data.slides.map((s) => ({
-    imageUrl: s.imageUrl.trim(),
-    title: s.title.trim(),
-    description: s.description.trim(),
-    ctaLabel: s.ctaLabel.trim(),
-    ctaHref: s.ctaHref.trim(),
-  }));
+  return parsed.data.slides.map((s) => ({ ...s }));
 }
 
 /**

@@ -92,6 +92,9 @@
       "loadError": "Failed to load voting items.",
       "updateError": "Failed to update vote.",
       "loginPrompt": "Please log in to vote.",
+      "earlyAccessNoProduct": "This choice is not linked to a shop product yet. Ask an admin to set the product slug in Voting.",
+      "earlyAccessProductLoadError": "Could not load the linked product. Check the slug or try again.",
+      "earlyAccessOutOfStock": "That product is out of stock right now.",
       "labels": {
         "kingSize": "King Size",
         "compact": "Compact",

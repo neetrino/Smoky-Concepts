@@ -56,8 +56,20 @@
     "subtotal": "Subtotal",
     "shipping": "Shipping",
     "collectionPrice": "Collection Price",
+    "couponDiscount": "Coupon discount",
     "tax": "Tax",
     "total": "Total"
+  },
+  "coupon": {
+    "sectionTitle": "Have a coupon?",
+    "placeholder": "Enter your coupon code",
+    "apply": "Apply",
+    "applying": "Applying…",
+    "invalid": "Invalid or expired coupon.",
+    "notEligibleUser": "This coupon is not available for your account.",
+    "cartEmpty": "Add items to your cart before applying a coupon.",
+    "applied": "Code {code} is applied.",
+    "remove": "Remove"
   },
   "buttons": {
     "placeOrder": "Place Order",

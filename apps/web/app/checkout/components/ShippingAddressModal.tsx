@@ -7,7 +7,7 @@ import { ContactInformation } from './ContactInformation';
 import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
 import { DeliveryRegionSelect } from './DeliveryRegionSelect';
-import { CheckoutFormData, Cart } from '../types';
+import type { CheckoutFormData, Cart, CheckoutOrderSummaryTotals } from '../types';
 import type { DeliveryLocationOption } from '../hooks/useDeliveryLocations';
 
 interface ShippingAddressModalProps {
@@ -21,13 +21,7 @@ interface ShippingAddressModalProps {
   shippingMethod: 'pickup' | 'delivery';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   cart: Cart | null;
-  orderSummary: {
-    subtotalDisplay: number;
-    taxDisplay: number;
-    shippingDisplay: number;
-    collectionPriceDisplay: number;
-    totalDisplay: number;
-  };
+  orderSummary: CheckoutOrderSummaryTotals;
   shippingRegion?: string;
   deliveryLocations: DeliveryLocationOption[];
   loadingDeliveryLocations: boolean;
