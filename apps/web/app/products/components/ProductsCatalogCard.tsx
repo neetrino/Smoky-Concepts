@@ -278,7 +278,7 @@ export function ProductsCatalogCard({
         <div className="min-w-0">
           {visibleDotCount > 0 ? (
             visibleDotCount === 1 ? (
-              <div className={dotsRowLayoutClassName} aria-hidden="true">
+              <div className={`${dotsRowLayoutClassName} justify-center`} aria-hidden="true">
                 <span className="block h-[0.25rem] w-[1.625rem] shrink-0 rounded-[0.15625rem] bg-[#122a26]" />
               </div>
             ) : (
