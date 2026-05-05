@@ -276,10 +276,8 @@ export default function AdminCouponsPage() {
                         <th className="py-2 pr-4">{t('admin.coupons.discountType')}</th>
                         <th className="py-2 pr-4">{t('admin.coupons.discountValue')}</th>
                         <th className="py-2 pr-4">{t('admin.coupons.quantity')}</th>
-                        <th className="py-2 pr-4">{t('admin.coupons.active')}</th>
                         <th className="py-2 pr-4">{t('admin.coupons.expiresAt')}</th>
-                        <th className="py-2 pr-4">{t('admin.coupons.actions')}</th>
-                        <th className="py-2">{t('admin.coupons.delete')}</th>
+                        <th className="py-2">{t('admin.coupons.actions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -289,19 +287,6 @@ export default function AdminCouponsPage() {
                           <td className="py-2 pr-4">{row.discountType}</td>
                           <td className="py-2 pr-4">{row.discountValue}</td>
                           <td className="py-2 pr-4">{row.quantity ?? '∞'}</td>
-                          <td className="py-2 pr-4">
-                            <span className={row.active ? 'text-emerald-700' : 'text-gray-500'}>
-                              {row.active ? t('admin.coupons.active') : t('admin.coupons.inactive')}
-                            </span>
-                            <button
-                              type="button"
-                              className="ml-2 text-[#122a26] underline"
-                              onClick={() => void toggleActive(row)}
-                              disabled={saving}
-                            >
-                              {t('admin.coupons.toggle')}
-                            </button>
-                          </td>
                           <td className="py-2 pr-4 text-[#414141]/80">
                             {row.expiresAt
                               ? new Date(row.expiresAt).toLocaleString(undefined, {
@@ -310,25 +295,53 @@ export default function AdminCouponsPage() {
                                 })
                               : '—'}
                           </td>
-                          <td className="py-2 pr-4">
-                            <button
-                              type="button"
-                              className="font-medium text-[#122a26] underline hover:text-[#0f221f]"
-                              onClick={() => void openEdit(row)}
-                              disabled={saving || editLoadingId !== null}
-                            >
-                              {editLoadingId === row.id ? t('admin.common.loading') : t('admin.coupons.edit')}
-                            </button>
-                          </td>
                           <td className="py-2">
-                            <button
-                              type="button"
-                              className="text-red-600 hover:underline"
-                              onClick={() => void handleDelete(row)}
-                              disabled={saving}
-                            >
-                              {t('admin.coupons.delete')}
-                            </button>
+                            <div className="flex flex-wrap items-center gap-3">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => void openEdit(row)}
+                                disabled={saving || editLoadingId !== null}
+                                className="text-[#122a26] hover:text-[#122a26] hover:bg-[#dcc090]/15 px-2"
+                                aria-label={t('admin.coupons.edit')}
+                                title={t('admin.coupons.edit')}
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => void handleDelete(row)}
+                                disabled={saving}
+                                className="text-red-600 hover:text-red-800 hover:bg-red-50 px-2"
+                                aria-label={t('admin.coupons.delete')}
+                                title={t('admin.coupons.delete')}
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </Button>
+                              <button
+                                type="button"
+                                onClick={() => void toggleActive(row)}
+                                disabled={saving}
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#dcc090] focus:ring-offset-2 ${
+                                  row.active ? 'bg-[#122a26]' : 'bg-[#414141]/25'
+                                }`}
+                                aria-label={
+                                  row.active ? t('admin.coupons.inactive') : t('admin.coupons.active')
+                                }
+                                title={row.active ? t('admin.coupons.inactive') : t('admin.coupons.active')}
+                              >
+                                <span
+                                  className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-200 ${
+                                    row.active ? 'translate-x-[18px]' : 'translate-x-0.5'
+                                  }`}
+                                />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
