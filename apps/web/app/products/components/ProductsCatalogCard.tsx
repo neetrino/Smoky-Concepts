@@ -69,6 +69,8 @@ interface ProductsCatalogCardProps {
    * card shows in the horizontal catalog strip (mobile / tablet scroll hint).
    */
   catalogStripMobilePeek?: boolean;
+  /** Products catalog: slightly narrower card + shorter image stack (more grid gap from parent). */
+  slimCatalogGrid?: boolean;
 }
 
 /**
@@ -92,6 +94,7 @@ export function ProductsCatalogCard({
   imageFrameClassName,
   eagerProductImage = false,
   catalogStripMobilePeek = false,
+  slimCatalogGrid = false,
 }: ProductsCatalogCardProps) {
   const displayCurrency = useCurrency();
   const isAmdCurrency = displayCurrency === 'AMD';
@@ -140,10 +143,13 @@ export function ProductsCatalogCard({
     PRODUCT_SECTION_BADGE_CLASS_NAMES[sectionLabel] ?? PRODUCT_SECTION_BADGE_CLASS_NAMES.Classic;
   const isCompactSize = sizeLabel === 'Compact';
 
+  const stripPeekMaxLg = slimCatalogGrid ? 'max-lg:max-w-[17.5rem]' : 'max-lg:max-w-[19rem]';
+  const stripPeekLgW = slimCatalogGrid ? 'lg:w-[11.25rem]' : 'lg:w-[12.75rem]';
+  const stripPeekXlW = slimCatalogGrid ? 'xl:w-[11.625rem]' : 'xl:w-[13rem]';
   const compactArticleWidth =
     catalogStripMobilePeek && compactLayout
-      ? // 3.75rem ≈ page px-4 (2rem) + strip gap-7 (1.75rem); /1.5 ≈ half of next card visible in viewport
-        'max-lg:w-[calc((100vw-3.75rem)/1.5)] max-lg:max-w-[19rem] lg:w-[12.75rem] xl:w-[13rem]'
+      ? // 3.75rem ≈ page px-4 (2rem) + strip gap; /1.5 ≈ half of next card visible in viewport
+        `max-lg:w-[calc((100vw-3.75rem)/1.5)] ${stripPeekMaxLg} ${stripPeekLgW} ${stripPeekXlW}`
       : widerCompactCard
         ? 'w-[12rem] max-sm:w-[10.75rem]'
         : 'w-[11rem] max-sm:w-[10.25rem]';
@@ -156,13 +162,17 @@ export function ProductsCatalogCard({
   const imageWrapperClassName = compactLayout
     ? widerCompactCard
       ? 'h-[15.25rem] sm:h-[18.5rem]'
-      : 'h-[14.75rem] sm:h-[17.75rem]'
+      : slimCatalogGrid
+        ? 'h-[13.5rem] sm:h-[16rem]'
+        : 'h-[14.75rem] sm:h-[17.75rem]'
     : isCompactSize
       ? 'h-[12.5rem] sm:h-60'
       : 'h-[15rem] sm:h-72';
 
   const baseImagePullUpClassName = compactLayout
-    ? '-mt-[5.125rem] sm:-mt-[6.25rem]'
+    ? slimCatalogGrid
+      ? '-mt-[4.75rem] sm:-mt-[5.75rem]'
+      : '-mt-[5.125rem] sm:-mt-[6.25rem]'
     : isCompactSize
       ? '-mt-12 sm:-mt-16'
       : '-mt-[4.5rem] sm:-mt-24';
@@ -170,7 +180,9 @@ export function ProductsCatalogCard({
 
   const compactInnerImageHeight = widerCompactCard
     ? 'h-[14.25rem] sm:h-[17.25rem]'
-    : 'h-[13.75rem] sm:h-[16.5rem]';
+    : slimCatalogGrid
+      ? 'h-[12.5rem] sm:h-[15rem]'
+      : 'h-[13.75rem] sm:h-[16.5rem]';
   const imageInnerClassName = compactLayout
     ? `${compactInnerImageHeight} w-full`
     : 'h-full w-full';
@@ -201,8 +213,12 @@ export function ProductsCatalogCard({
 
   const detailsOffsetClassName = compactLayout
     ? tightenDetailsUnderImage
-      ? '-mt-[4.125rem] sm:-mt-[5rem]'
-      : '-mt-[2.75rem] sm:-mt-[3.25rem]'
+      ? slimCatalogGrid
+        ? '-mt-[3.75rem] sm:-mt-[4.5rem]'
+        : '-mt-[4.125rem] sm:-mt-[5rem]'
+      : slimCatalogGrid
+        ? '-mt-[2.5rem] sm:-mt-[3rem]'
+        : '-mt-[2.75rem] sm:-mt-[3.25rem]'
     : '-mt-4';
   const dotsGapClassName = compactLayout ? 'gap-1' : 'gap-[0.3125rem]';
   const dotsMarginClassName = compactLayout ? 'mb-1' : 'mb-3';
