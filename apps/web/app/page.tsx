@@ -3,6 +3,9 @@ import type { HomeCoverCollectionItem } from '../components/home/homePage.types'
 import { categoriesService } from '../lib/services/categories.service';
 import { getHomeHeroSlidesForStorefront } from '../lib/services/home-hero.service';
 
+/** Hero and collections must reflect admin/DB changes immediately (avoid stale SSG on Vercel). */
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   const [rawCoverCollections, heroSlides] = await Promise.all([
     categoriesService.getHomeCollections(),
