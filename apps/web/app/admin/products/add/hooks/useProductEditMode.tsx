@@ -108,7 +108,7 @@ export function useProductEditMode({
             sku: buildAutoSkuBaseFromSlug(product.slug || ''),
             quantity: DEFAULT_SIMPLE_PRODUCT_DATA.quantity,
           });
-          setVariableProductTypeAllowed(false);
+          setVariableProductTypeAllowed(true);
         } else {
           const defaultPricingVariant = variants.find((variant) => isDefaultPricingVariant(variant));
           const selectableVariants = variants.filter((variant) => !isDefaultPricingVariant(variant));
@@ -144,7 +144,7 @@ export function useProductEditMode({
               sku: skuFromApi,
               quantity: String(stockNum),
             });
-            setVariableProductTypeAllowed(false);
+            setVariableProductTypeAllowed(true);
           } else {
             const slugForSku = product.slug || '';
             const generated: GeneratedVariant[] = selectableVariants.map((v: VariantItem, idx: number) => {
@@ -179,7 +179,7 @@ export function useProductEditMode({
                 quantity: sole.stock,
               });
               setProductType('simple');
-              setVariableProductTypeAllowed(false);
+              setVariableProductTypeAllowed(true);
             } else {
               setGeneratedVariants(generated);
               const defaultPriceNum =
