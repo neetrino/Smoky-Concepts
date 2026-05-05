@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-/** Figma: Group 1321315375 — “For” row (Smoky Covers product line). */
+/** Figma: Group 1321315375 — Smoky Covers product line row. */
 const CATALOG_FOR_CIGARETTE_PACK_IMAGE = '/assets/home/products/compact-figma.svg';
 /** Same asset + placement pattern as home “Will it fit mine?” Compact (`PackFitCard`). */
 const CATALOG_FOR_CIGARETTE_MARK_IMAGE = '/assets/home/icons/pack-mark-figma.webp';
@@ -34,7 +34,7 @@ function CatalogForCigarettePacksCard() {
         />
       </div>
       <p className="mt-auto mb-2 w-[76px] text-center text-[11px] font-medium leading-tight text-[#414141] lg:mb-3 lg:w-[86px] lg:text-[12px]">
-        For Cigarette
+        Cigarette
         <br />
         Packs
       </p>
@@ -88,7 +88,7 @@ export function CatalogForProductLineRow() {
   return (
     <div
       className="flex w-full flex-nowrap items-start justify-center gap-3 sm:gap-4 lg:flex-wrap lg:justify-start lg:gap-5"
-      aria-label="Product line for"
+      aria-label="Product line"
     >
       <CatalogForCigarettePacksCard />
       <CatalogForMoneyCard />
