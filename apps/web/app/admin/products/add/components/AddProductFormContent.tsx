@@ -92,6 +92,8 @@ interface AddProductFormContentProps {
   isClothingCategory: () => boolean;
   generateSlug: (text: string) => string;
   handleSubmit: (e: React.FormEvent) => void;
+  /** Suffix for t('admin.products.add.<key>') when client-side validation blocks save. */
+  submitErrorKey: string | null;
 }
 
 export function AddProductFormContent({
@@ -150,6 +152,7 @@ export function AddProductFormContent({
   isClothingCategory,
   generateSlug,
   handleSubmit,
+  submitErrorKey,
 }: AddProductFormContentProps) {
   const { t } = useTranslation();
 
@@ -320,6 +323,12 @@ export function AddProductFormContent({
         />
 
         <Publishing featured={formData.featured} onFeaturedChange={onFeaturedChange} upcoming={formData.upcoming} onUpcomingChange={onUpcomingChange} />
+
+        {submitErrorKey ? (
+          <p className="text-sm font-medium text-red-600" role="alert">
+            {t(`admin.products.add.${submitErrorKey}`)}
+          </p>
+        ) : null}
 
         <FormActions loading={loading} isEditMode={isEditMode} />
       </form>

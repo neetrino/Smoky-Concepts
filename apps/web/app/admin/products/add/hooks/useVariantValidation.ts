@@ -14,6 +14,8 @@ interface UseVariantValidationProps {
   productSlug: string;
   isClothingCategory: () => boolean;
   setLoading: (loading: boolean) => void;
+  /** Key suffix under admin.products.add (e.g. variableSubmitNeedVariants). */
+  setSubmitErrorKey: (key: string | null) => void;
 }
 
 export function useVariantValidation({
@@ -24,6 +26,7 @@ export function useVariantValidation({
   productSlug,
   isClothingCategory,
   setLoading,
+  setSubmitErrorKey,
 }: UseVariantValidationProps) {
   const validateVariants = (): boolean => {
     // Variable product: may use formData.variants (color/size matrix) OR generatedVariants (simple list from edit/add).
@@ -31,12 +34,14 @@ export function useVariantValidation({
     if (productType === 'variable' && variants.length === 0) {
       if (generatedVariants.length === 0) {
         setLoading(false);
+        setSubmitErrorKey('variableSubmitNeedVariants');
         return false;
       }
       const defaultPriceText = String(simpleProductData.price || '').trim();
       const defaultPriceValue = defaultPriceText !== '' ? parseFloat(defaultPriceText) : NaN;
       if (!Number.isFinite(defaultPriceValue) || defaultPriceValue <= 0) {
         setLoading(false);
+        setSubmitErrorKey('variableSubmitDefaultPriceInvalid');
         return false;
       }
       const skuSet = new Set<string>();
@@ -45,10 +50,12 @@ export function useVariantValidation({
         const sku = (gv.sku || '').trim() || buildAutoSkuForVariantIndex(productSlug, i);
         if (!sku) {
           setLoading(false);
+          setSubmitErrorKey('variableSubmitVariantRowInvalid');
           return false;
         }
         if (skuSet.has(sku)) {
           setLoading(false);
+          setSubmitErrorKey('variableSubmitDuplicateVariantSku');
           return false;
         }
         skuSet.add(sku);
@@ -57,6 +64,7 @@ export function useVariantValidation({
         const variantPriceValue = variantPriceText !== '' ? parseFloat(variantPriceText) : NaN;
         if (!Number.isFinite(variantPriceValue) || variantPriceValue <= 0) {
           setLoading(false);
+          setSubmitErrorKey('variableSubmitVariantRowInvalid');
           return false;
         }
       }

@@ -95,6 +95,20 @@ function AddProductPageContent() {
     formState.setVariableProductTypeAllowed,
   ]);
 
+  useEffect(() => {
+    if (formState.submitErrorKey !== 'variableSubmitNeedVariants') {
+      return;
+    }
+    if (formState.generatedVariants.length === 0) {
+      return;
+    }
+    formState.setSubmitErrorKey(null);
+  }, [
+    formState.submitErrorKey,
+    formState.generatedVariants.length,
+    formState.setSubmitErrorKey,
+  ]);
+
   const { applyToAllVariants } = useVariantGeneration({
     setGeneratedVariants: formState.setGeneratedVariants,
   });
@@ -294,6 +308,7 @@ function AddProductPageContent() {
     productId,
     isClothingCategory,
     categoryAttributes: formState.categoryAttributes,
+    setSubmitErrorKey: formState.setSubmitErrorKey,
   });
 
   if (isLoading || formState.loadingProduct) {
@@ -317,6 +332,7 @@ function AddProductPageContent() {
     if (!formState.variableProductTypeAllowed && type === 'variable') {
       return;
     }
+    formState.setSubmitErrorKey(null);
     formState.setProductType(type);
   };
 
@@ -386,6 +402,7 @@ function AddProductPageContent() {
             isClothingCategory={isClothingCategory}
             generateSlug={generateSlug}
             handleSubmit={handleSubmit}
+            submitErrorKey={formState.submitErrorKey}
           />
         </AdminShell>
       </div>

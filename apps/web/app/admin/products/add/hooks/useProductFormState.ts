@@ -47,6 +47,8 @@ export function useProductFormState() {
   const [enabledAttributeIds, setEnabledAttributeIds] = useState<Record<string, boolean>>({});
   /** When false (edit: product has no selectable variants), only Simple type is shown. */
   const [variableProductTypeAllowed, setVariableProductTypeAllowed] = useState(true);
+  /** i18n key under admin.products.add.* — client validation message above submit. */
+  const [submitErrorKey, setSubmitErrorKey] = useState<string | null>(null);
 
   return {
     loading,
@@ -87,6 +89,8 @@ export function useProductFormState() {
     setEnabledAttributeIds,
     variableProductTypeAllowed,
     setVariableProductTypeAllowed,
+    submitErrorKey,
+    setSubmitErrorKey,
   };
 }
 

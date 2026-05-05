@@ -46,6 +46,7 @@ interface UseProductFormHandlersProps {
   productId: string | null;
   isClothingCategory: () => boolean;
   categoryAttributes: CategoryAttribute[];
+  setSubmitErrorKey: (key: string | null) => void;
 }
 
 export function useProductFormHandlers({
@@ -62,6 +63,7 @@ export function useProductFormHandlers({
   productId,
   isClothingCategory,
   categoryAttributes,
+  setSubmitErrorKey,
 }: UseProductFormHandlersProps) {
   const router = useRouter();
 
@@ -81,11 +83,13 @@ export function useProductFormHandlers({
     productSlug: formData.slug,
     isClothingCategory,
     setLoading,
+    setSubmitErrorKey,
   });
 
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setSubmitErrorKey(null);
     setLoading(true);
 
     try {
@@ -100,11 +104,6 @@ export function useProductFormHandlers({
 
       const currentFormData = formData;
 
-      // Validate: variable product must have at least one variant
-      if (productType === 'variable' && generatedVariants.length === 0) {
-        setLoading(false);
-        return;
-      }
       if (!validateVariants()) {
         return;
       }
