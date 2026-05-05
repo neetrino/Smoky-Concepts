@@ -112,7 +112,8 @@ export function useProductEditMode({
         } else {
           const defaultPricingVariant = variants.find((variant) => isDefaultPricingVariant(variant));
           const selectableVariants = variants.filter((variant) => !isDefaultPricingVariant(variant));
-          const sizeCatalogSelection = extractSizeCatalogSelectionFromAttributes(defaultPricingVariant?.attributes);
+          const sizeCatalogSource = defaultPricingVariant ?? selectableVariants[0];
+          const sizeCatalogSelection = extractSizeCatalogSelectionFromAttributes(sizeCatalogSource?.attributes);
           setFormData((prev: unknown) => ({
             ...(typeof prev === 'object' && prev !== null ? prev : {}),
             sizeCatalogCategoryId: sizeCatalogSelection.categoryId || '',
@@ -164,46 +165,63 @@ export function useProductEditMode({
                 image: v.imageUrl ?? null,
               };
             });
-            setGeneratedVariants(generated);
-            const defaultPriceNum =
-              typeof defaultPricingVariant?.price === 'number'
-                ? defaultPricingVariant.price
-                : parseFloat(String(defaultPricingVariant?.price)) || 0;
-            const defaultPriceAmd = convertPrice(defaultPriceNum, 'USD', 'AMD');
-            const defaultCompareAtPriceNum =
-              typeof defaultPricingVariant?.compareAtPrice === 'number'
-                ? defaultPricingVariant.compareAtPrice
-                : parseFloat(String(defaultPricingVariant?.compareAtPrice)) || 0;
-            const defaultCompareAtPriceAmd =
-              defaultCompareAtPriceNum > 0 ? convertPrice(defaultCompareAtPriceNum, 'USD', 'AMD') : 0;
-            const fallbackPriceFromVariant = generated[0]?.price;
-            const resolvedPrice =
-              defaultPricingVariant !== undefined
-                ? String(defaultPriceAmd)
-                : fallbackPriceFromVariant && String(fallbackPriceFromVariant).trim() !== ''
-                  ? String(fallbackPriceFromVariant)
-                  : DEFAULT_SIMPLE_PRODUCT_DATA.price;
-            const defaultStockNum =
-              defaultPricingVariant !== undefined
-                ? typeof defaultPricingVariant.stock === 'number'
-                  ? defaultPricingVariant.stock
-                  : parseInt(String(defaultPricingVariant.stock ?? '0'), 10) || 0
-                : parseInt(DEFAULT_SIMPLE_PRODUCT_DATA.quantity, 10) || 0;
-            const defaultSkuFromApi =
-              defaultPricingVariant &&
-              typeof defaultPricingVariant.sku === 'string' &&
-              defaultPricingVariant.sku.trim() !== ''
-                ? defaultPricingVariant.sku.trim()
-                : buildAutoSkuBaseFromSlug(product.slug || '');
-            setSimpleProductData({
-              price: resolvedPrice,
-              compareAtPrice:
-                defaultPricingVariant && defaultCompareAtPriceAmd > 0 ? String(defaultCompareAtPriceAmd) : '',
-              sku: defaultSkuFromApi,
-              quantity: String(defaultStockNum),
-            });
-            setProductType('variable');
-            setVariableProductTypeAllowed(true);
+
+            const sole = generated.length === 1 ? generated[0] : null;
+            const isSoleVariantWithoutOptions =
+              sole !== null && sole.selectedValueIds.length === 0;
+
+            if (isSoleVariantWithoutOptions) {
+              setGeneratedVariants([]);
+              setSimpleProductData({
+                price: sole.price,
+                compareAtPrice: sole.compareAtPrice,
+                sku: sole.sku,
+                quantity: sole.stock,
+              });
+              setProductType('simple');
+              setVariableProductTypeAllowed(false);
+            } else {
+              setGeneratedVariants(generated);
+              const defaultPriceNum =
+                typeof defaultPricingVariant?.price === 'number'
+                  ? defaultPricingVariant.price
+                  : parseFloat(String(defaultPricingVariant?.price)) || 0;
+              const defaultPriceAmd = convertPrice(defaultPriceNum, 'USD', 'AMD');
+              const defaultCompareAtPriceNum =
+                typeof defaultPricingVariant?.compareAtPrice === 'number'
+                  ? defaultPricingVariant.compareAtPrice
+                  : parseFloat(String(defaultPricingVariant?.compareAtPrice)) || 0;
+              const defaultCompareAtPriceAmd =
+                defaultCompareAtPriceNum > 0 ? convertPrice(defaultCompareAtPriceNum, 'USD', 'AMD') : 0;
+              const fallbackPriceFromVariant = generated[0]?.price;
+              const resolvedPrice =
+                defaultPricingVariant !== undefined
+                  ? String(defaultPriceAmd)
+                  : fallbackPriceFromVariant && String(fallbackPriceFromVariant).trim() !== ''
+                    ? String(fallbackPriceFromVariant)
+                    : DEFAULT_SIMPLE_PRODUCT_DATA.price;
+              const defaultStockNum =
+                defaultPricingVariant !== undefined
+                  ? typeof defaultPricingVariant.stock === 'number'
+                    ? defaultPricingVariant.stock
+                    : parseInt(String(defaultPricingVariant.stock ?? '0'), 10) || 0
+                  : parseInt(DEFAULT_SIMPLE_PRODUCT_DATA.quantity, 10) || 0;
+              const defaultSkuFromApi =
+                defaultPricingVariant &&
+                typeof defaultPricingVariant.sku === 'string' &&
+                defaultPricingVariant.sku.trim() !== ''
+                  ? defaultPricingVariant.sku.trim()
+                  : buildAutoSkuBaseFromSlug(product.slug || '');
+              setSimpleProductData({
+                price: resolvedPrice,
+                compareAtPrice:
+                  defaultPricingVariant && defaultCompareAtPriceAmd > 0 ? String(defaultCompareAtPriceAmd) : '',
+                sku: defaultSkuFromApi,
+                quantity: String(defaultStockNum),
+              });
+              setProductType('variable');
+              setVariableProductTypeAllowed(true);
+            }
           }
         }
       } catch (err: unknown) {

@@ -270,6 +270,9 @@ export function VariantBuilder({
                     <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t('admin.products.add.image')}
                     </th>
+                    <th className="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('admin.products.add.deleteVariant')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -417,6 +420,29 @@ export function VariantBuilder({
                             className="hidden"
                           />
                         </div>
+                      </td>
+                      <td className="px-2 py-2 whitespace-nowrap text-right align-middle">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onVariantUpdate((prev) => prev.filter((v) => v.id !== variant.id));
+                            if (variantImageInputRefs.current) {
+                              delete variantImageInputRefs.current[variant.id];
+                            }
+                          }}
+                          className="inline-flex items-center justify-center rounded-md border border-red-200 bg-white p-1.5 text-red-600 hover:bg-red-50"
+                          title={t('admin.products.add.deleteVariant')}
+                          aria-label={t('admin.products.add.deleteVariant')}
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
                       </td>
                     </tr>
                   ))}

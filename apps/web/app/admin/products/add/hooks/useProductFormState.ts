@@ -32,7 +32,7 @@ export function useProductFormState() {
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [useNewCategory, setUseNewCategory] = useState(false);
-  const [productType, setProductType] = useState<'simple' | 'variable'>('variable');
+  const [productType, setProductType] = useState<'simple' | 'variable'>('simple');
   const [simpleProductData, setSimpleProductData] = useState({
     price: DEFAULT_SIMPLE_PRODUCT_DATA.price,
     compareAtPrice: DEFAULT_SIMPLE_PRODUCT_DATA.compareAtPrice,

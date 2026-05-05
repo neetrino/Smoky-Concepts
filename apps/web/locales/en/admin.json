@@ -605,6 +605,7 @@
       "applySkuToAll": "Apply SKU Pattern to All",
       "variantsReady": "Variants Ready",
       "addVariant": "Add",
+      "deleteVariant": "Delete variant",
       "image": "Image",
       "compareAtPrice": "Compare at Price",
       "pricePlaceholder": "0.00",

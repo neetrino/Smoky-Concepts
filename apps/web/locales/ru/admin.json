@@ -602,6 +602,7 @@
       "applySkuToAll": "Применить шаблон SKU ко всем",
       "variantsReady": "Варианты готовы",
       "addVariant": "Добавить",
+      "deleteVariant": "Удалить вариант",
       "image": "Изображение",
       "compareAtPrice": "Старая цена",
       "pricePlaceholder": "0.00",
@@ -634,8 +635,7 @@
       "enterDefaultStock": "Введите наличие по умолчанию для всех вариантов:",
       "enterSkuPrefix": "Введите префикс SKU (будет добавлено -color-size, если применимо):",
       "actions": "Действия",
-      "delete": "Удалить",
-      "deleteVariant": "Удалить вариант"
+      "delete": "Удалить"
     }
   },
   "settings": {

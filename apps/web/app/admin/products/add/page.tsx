@@ -72,6 +72,29 @@ function AddProductPageContent() {
     }
   }, [isEditMode, formState.setVariableProductTypeAllowed]);
 
+  /** Edit: variable product with zero variant rows → simple UI; keep Variable type available to add rows again. */
+  useEffect(() => {
+    if (!isEditMode || !productId || formState.loadingProduct) {
+      return;
+    }
+    if (formState.productType !== 'variable') {
+      return;
+    }
+    if (formState.generatedVariants.length > 0) {
+      return;
+    }
+    formState.setProductType('simple');
+    formState.setVariableProductTypeAllowed(true);
+  }, [
+    isEditMode,
+    productId,
+    formState.loadingProduct,
+    formState.productType,
+    formState.generatedVariants.length,
+    formState.setProductType,
+    formState.setVariableProductTypeAllowed,
+  ]);
+
   const { applyToAllVariants } = useVariantGeneration({
     setGeneratedVariants: formState.setGeneratedVariants,
   });
