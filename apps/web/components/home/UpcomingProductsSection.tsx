@@ -68,7 +68,7 @@ function UpcomingSectionHeader() {
   const { t } = useTranslation();
   return (
     <div className="relative flex min-h-[4rem] w-full items-center justify-between gap-3 sm:justify-end">
-      <div className="min-w-0 flex-1 translate-y-[2px] sm:absolute sm:left-1/2 sm:top-1/2 sm:w-max sm:max-w-[min(100%,calc(100%-7rem))] sm:-translate-x-1/2 sm:-translate-y-[46%]">
+      <div className="min-w-0 flex-1 translate-y-[2px] sm:absolute sm:left-1/2 sm:top-1/2 sm:w-max sm:max-w-[min(100%,calc(100%-7rem))] sm:-translate-x-[calc(50%+3.5rem)] sm:-translate-y-[46%]">
         <HomeSectionTitle
           title={t('home.homepage.upcoming.title')}
           centered={false}
