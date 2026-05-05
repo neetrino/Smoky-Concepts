@@ -191,6 +191,21 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     ),
   },
   {
+    id: 'messages',
+    label: t('admin.menu.messages'),
+    path: '/supersudo/messages',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 8l8.89 5.93a2 2 0 002.22 0L23 8m-18 10h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+        />
+      </svg>
+    ),
+  },
+  {
     id: 'analytics',
     label: t('admin.menu.analytics'),
     path: '/supersudo/analytics',
