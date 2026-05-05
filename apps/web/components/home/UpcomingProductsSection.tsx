@@ -41,6 +41,17 @@ const UPCOMING_LIMIT = 12;
 const UPCOMING_VIEWPORT_SM_QUERY = '(min-width: 640px)';
 const UPCOMING_CARDS_PER_PAGE_MOBILE = 2;
 const UPCOMING_CARDS_PER_PAGE_SM_UP = 6;
+const UPCOMING_IMAGE_SCALE_LARGE = 0.2;
+const UPCOMING_IMAGE_SCALE_SMALL = 0.15;
+const UPCOMING_IMAGE_SCALE_PATTERN_LENGTH = 6;
+const UPCOMING_SMALL_SCALE_POSITIONS = new Set([2, 5]);
+
+function getUpcomingImageScaleBoost(cardIndex: number): number {
+  const oneBasedPosition = (cardIndex % UPCOMING_IMAGE_SCALE_PATTERN_LENGTH) + 1;
+  return UPCOMING_SMALL_SCALE_POSITIONS.has(oneBasedPosition)
+    ? UPCOMING_IMAGE_SCALE_SMALL
+    : UPCOMING_IMAGE_SCALE_LARGE;
+}
 
 function subscribeUpcomingSmViewport(onStoreChange: () => void): () => void {
   if (typeof window === 'undefined') {
@@ -267,7 +278,6 @@ export function UpcomingProductsSection() {
               skus: item.skus,
             });
             const section = getSectionLabel(catalogProduct);
-            const isDarkCollection = section === 'Premium' || section === 'Atelier';
             return (
               <div
                 key={`upcoming-${index}-${item.id}`}
@@ -285,7 +295,7 @@ export function UpcomingProductsSection() {
                   categoryLabel={getCategoryLabel(catalogProduct, section)}
                   buyButtonLabel={t('home.homepage.upcoming.orderCta')}
                   imageNudgeDown={shouldNudgeCatalogProductImage(index)}
-                  imageScaleBoost={isDarkCollection ? 0.2 : 0.04}
+                  imageScaleBoost={getUpcomingImageScaleBoost(index)}
                   className="group h-full min-h-0 lg:w-[12.75rem] xl:w-[13rem]"
                   compactLayout
                   eagerProductImage
