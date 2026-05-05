@@ -12,6 +12,8 @@ interface HomeHeroSectionProps {
   slides: HomeHeroSlide[];
 }
 
+const HERO_AUTO_SLIDE_INTERVAL_MS = 3000;
+
 /**
  * Homepage hero: same layout/size as static Figma block; supports multiple slides and dot navigation.
  * Image area: 28rem / 32rem (was 36.125rem / 42.5rem) for a shorter above-the-fold block.
@@ -23,6 +25,20 @@ export function HomeHeroSection({ slides }: HomeHeroSectionProps) {
 
   useEffect(() => {
     setActiveIndex((prev) => Math.min(prev, Math.max(0, safeSlides.length - 1)));
+  }, [safeSlides.length]);
+
+  useEffect(() => {
+    if (safeSlides.length <= 1) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % safeSlides.length);
+    }, HERO_AUTO_SLIDE_INTERVAL_MS);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, [safeSlides.length]);
 
   const current = safeSlides[activeIndex] ?? safeSlides[0];

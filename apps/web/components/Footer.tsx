@@ -17,11 +17,11 @@ import { useTranslation } from '@/lib/i18n-client';
  */
 export function Footer() {
   const pathname = usePathname();
-  if (pathname.startsWith('/supersudo')) {
+  const { t } = useTranslation();
+  if (pathname?.startsWith('/supersudo')) {
     return null;
   }
 
-  const { t } = useTranslation();
   return (
     <footer className="bg-[#122a26]">
       <div className="mx-auto flex max-w-[120rem] flex-col gap-10 px-4 py-16 text-[#dcc090] sm:px-8 lg:px-[7.5rem]">
