@@ -5,6 +5,7 @@ import { useState } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
 import { apiClient } from '../../lib/api-client';
+import { sanitizeContactPhoneInput } from '../../lib/utils/contact-phone-input';
 import contactData from '../../../../json/contact.json';
 
 // Icons
@@ -75,6 +76,13 @@ export default function ContactPage() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      phone: sanitizeContactPhoneInput(e.target.value),
+    }));
   };
 
   return (
@@ -175,10 +183,11 @@ export default function ContactPage() {
                   id="phone"
                   name="phone"
                   type="tel"
+                  inputMode="tel"
                   autoComplete="tel"
                   required
                   value={formData.phone}
-                  onChange={handleChange}
+                  onChange={handlePhoneChange}
                   className="w-full"
                   placeholder={t('contact.form.phonePlaceholder')}
                 />

@@ -17,6 +17,7 @@ import { TrendingFeaturedSection } from './TrendingFeaturedSection';
 import { UpcomingProductsSection } from '@/components/home/UpcomingProductsSection';
 import type { HomeCoverCollectionItem } from './homePage.types';
 import type { HomeHeroSlide } from '@/lib/types/home-hero.types';
+import { getProductsPathWithSelectSizeAutopen } from '@/lib/constants/products-catalog.constants';
 import { useTranslation } from '@/lib/i18n-client';
 
 /**
@@ -328,7 +329,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           </div>
           <div className="flex justify-center pt-1 sm:pt-2">
             <HomeActionButton
-              href="/products"
+              href={getProductsPathWithSelectSizeAutopen()}
               label={t('home.homepage.packFit.cta')}
               className="min-w-[19rem] font-semibold sm:font-black"
             />
