@@ -45,7 +45,6 @@ export function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
   const [cart, setCart] = useState<Cart | null>(null);
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
-  const [recentlyAddedProductId, setRecentlyAddedProductId] = useState<string | null>(null);
   const isLocalUpdateRef = useRef(false);
 
   async function loadCart() {
@@ -54,8 +53,6 @@ export function CartDrawer() {
 
   useEffect(() => {
     const handleOpen = (event: Event) => {
-      const customEvent = event as CustomEvent<{ productId?: string }>;
-      setRecentlyAddedProductId(customEvent.detail?.productId ?? null);
       setIsOpen(true);
       void loadCart();
     };
@@ -87,20 +84,6 @@ export function CartDrawer() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
-
-  useEffect(() => {
-    if (!recentlyAddedProductId) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setRecentlyAddedProductId(null);
-    }, 2200);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [recentlyAddedProductId]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -179,14 +162,7 @@ export function CartDrawer() {
             {cart && cart.items.length > 0 ? (
               <div className="space-y-8">
                 {cart.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`flex gap-5 rounded-[1rem] px-2 py-2 transition-all ${
-                      item.variant.product.id === recentlyAddedProductId
-                        ? 'bg-white/70 ring-2 ring-[#dcc090]'
-                        : ''
-                    }`}
-                  >
+                  <div key={item.id} className="flex gap-5 rounded-[1rem] px-2 py-2 transition-all">
                     <Link
                       href={`/products/${item.variant.product.slug}`}
                       onClick={() => setIsOpen(false)}
@@ -228,24 +204,24 @@ export function CartDrawer() {
                         <div className="mt-2 flex h-6 w-[4.625rem] items-center overflow-hidden rounded-[0.25rem] bg-white">
                           <button
                             type="button"
-                            onClick={() => void onUpdateItemQuantity(item.id, item.quantity + 1)}
-                            disabled={updatingItems.has(item.id)}
-                            className="inline-flex h-full w-6 items-center justify-center text-[#122a26] disabled:opacity-50"
-                            aria-label="Increase quantity"
-                          >
-                            <PlusIcon />
-                          </button>
-                          <span className="inline-flex h-full flex-1 items-center justify-center text-[0.875rem] font-medium leading-none text-[#122a26]">
-                            {item.quantity}
-                          </span>
-                          <button
-                            type="button"
                             onClick={() => void onUpdateItemQuantity(item.id, item.quantity - 1)}
                             disabled={updatingItems.has(item.id)}
                             className="inline-flex h-full w-6 items-center justify-center text-[#122a26] disabled:opacity-50"
                             aria-label="Decrease quantity"
                           >
                             <MinusIcon />
+                          </button>
+                          <span className="inline-flex h-full flex-1 items-center justify-center text-[0.875rem] font-medium leading-none text-[#122a26]">
+                            {item.quantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => void onUpdateItemQuantity(item.id, item.quantity + 1)}
+                            disabled={updatingItems.has(item.id)}
+                            className="inline-flex h-full w-6 items-center justify-center text-[#122a26] disabled:opacity-50"
+                            aria-label="Increase quantity"
+                          >
+                            <PlusIcon />
                           </button>
                         </div>
 

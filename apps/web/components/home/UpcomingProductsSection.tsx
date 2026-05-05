@@ -41,6 +41,17 @@ const UPCOMING_LIMIT = 12;
 const UPCOMING_VIEWPORT_SM_QUERY = '(min-width: 640px)';
 const UPCOMING_CARDS_PER_PAGE_MOBILE = 2;
 const UPCOMING_CARDS_PER_PAGE_SM_UP = 6;
+const UPCOMING_IMAGE_SCALE_LARGE = 0.2;
+const UPCOMING_IMAGE_SCALE_SMALL = 0.15;
+const UPCOMING_IMAGE_SCALE_PATTERN_LENGTH = 6;
+const UPCOMING_SMALL_SCALE_POSITIONS = new Set([2, 5]);
+
+function getUpcomingImageScaleBoost(cardIndex: number): number {
+  const oneBasedPosition = (cardIndex % UPCOMING_IMAGE_SCALE_PATTERN_LENGTH) + 1;
+  return UPCOMING_SMALL_SCALE_POSITIONS.has(oneBasedPosition)
+    ? UPCOMING_IMAGE_SCALE_SMALL
+    : UPCOMING_IMAGE_SCALE_LARGE;
+}
 
 function subscribeUpcomingSmViewport(onStoreChange: () => void): () => void {
   if (typeof window === 'undefined') {
@@ -62,17 +73,18 @@ function getServerUpcomingSmViewportSnapshot(): boolean {
 
 /** Matches `TrendingFeaturedSection` shop CTA sizing and xl placement. */
 const UPCOMING_SHOP_BUTTON_CLASS_NAME =
-  '!w-fit !min-h-8 !translate-y-0 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-none !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!translate-y-[-0.25rem] sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-none sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:!translate-y-[-0.5rem]';
+  '!w-fit !min-h-8 !translate-y-0 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-none !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!translate-y-[2rem] sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-none sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:!translate-y-[2rem]';
 
 function UpcomingSectionHeader() {
   const { t } = useTranslation();
   return (
     <div className="relative flex min-h-[4rem] w-full items-center justify-between gap-3 sm:justify-end">
-      <div className="min-w-0 flex-1 translate-y-[2px] sm:absolute sm:left-1/2 sm:top-1/2 sm:w-max sm:max-w-[min(100%,calc(100%-7rem))] sm:-translate-x-1/2 sm:-translate-y-[46%]">
+      <div className="min-w-0 flex-1 translate-y-[2px] sm:absolute sm:left-1/2 sm:top-1/2 sm:w-max sm:max-w-[min(100%,calc(100%-7rem))] sm:-translate-x-[calc(50%+3.5rem)] sm:-translate-y-[46%]">
         <HomeSectionTitle
           title={t('home.homepage.upcoming.title')}
           centered={false}
           className="items-start text-left sm:items-center sm:text-center [&_h2]:text-left sm:[&_h2]:text-center"
+          titleClassName="relative top-8 sm:top-9"
         />
       </div>
       <HomeActionButton
@@ -234,13 +246,17 @@ export function UpcomingProductsSection() {
     setCurrentPage((current) => (current === nextPage ? current : nextPage));
   };
 
+  const scrollContainerClassName = `scrollbar-hide mt-3 snap-x snap-mandatory overflow-x-auto pt-[7.25rem] pb-4 transition-[margin-left] duration-300 ease-out sm:mt-6 sm:pt-[7.5rem] ${
+    safePage === 1 ? '' : 'xl:-ml-[7.5rem]'
+  }`;
+
   return (
     <section className="relative isolate flex flex-col gap-4 sm:gap-5 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2 xl:overflow-x-clip xl:pl-[7.5rem]">
       <UpcomingSectionHeader />
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="scrollbar-hide mt-3 snap-x snap-mandatory overflow-x-auto pt-[7.25rem] pb-4 sm:mt-6 sm:pt-[7.5rem]"
+        className={scrollContainerClassName}
       >
         <div className="flex min-w-max items-stretch gap-6">
           {items.map((item, index) => {
@@ -262,7 +278,6 @@ export function UpcomingProductsSection() {
               skus: item.skus,
             });
             const section = getSectionLabel(catalogProduct);
-            const isDarkCollection = section === 'Premium' || section === 'Atelier';
             return (
               <div
                 key={`upcoming-${index}-${item.id}`}
@@ -280,7 +295,7 @@ export function UpcomingProductsSection() {
                   categoryLabel={getCategoryLabel(catalogProduct, section)}
                   buyButtonLabel={t('home.homepage.upcoming.orderCta')}
                   imageNudgeDown={shouldNudgeCatalogProductImage(index)}
-                  imageScaleBoost={isDarkCollection ? 0.2 : 0.04}
+                  imageScaleBoost={getUpcomingImageScaleBoost(index)}
                   className="group h-full min-h-0 lg:w-[12.75rem] xl:w-[13rem]"
                   compactLayout
                   eagerProductImage

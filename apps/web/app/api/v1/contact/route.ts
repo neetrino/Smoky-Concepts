@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
+import { isContactPhoneAllowedCharacterSet } from "@/lib/utils/contact-phone-input";
 
 /** Stored in DB `subject` column (schema); form field is the visitor's phone. */
 const CONTACT_PHONE_MIN_LENGTH = 3;
@@ -55,6 +56,19 @@ export async function POST(req: NextRequest) {
           title: "Validation Error",
           status: 400,
           detail: "Field 'phone' is required and must be a valid length",
+          instance: req.url,
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!isContactPhoneAllowedCharacterSet(phone)) {
+      return NextResponse.json(
+        {
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Validation Error",
+          status: 400,
+          detail: "Field 'phone' may only contain digits and phone formatting characters",
           instance: req.url,
         },
         { status: 400 }

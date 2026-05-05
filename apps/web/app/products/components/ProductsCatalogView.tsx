@@ -12,6 +12,10 @@ import { CatalogForProductLineRow } from './CatalogForProductLineRow';
 import { ProductsCatalogMobileFilterSheet } from './ProductsCatalogMobileFilterSheet';
 import { ProductsCatalogCard } from './ProductsCatalogCard';
 import {
+  CATALOG_SELECT_SIZE_AUTOOPEN_QUERY,
+  CATALOG_SELECT_SIZE_AUTOOPEN_VALUE,
+} from '@/lib/constants/products-catalog.constants';
+import {
   type CatalogProduct,
   CATALOG_SECTION_PAGE_SIZE,
   filterSizeCatalogByProducts,
@@ -148,6 +152,17 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
   useEffect(() => {
     setSelectedSize(searchParams.get('size') ?? 'all');
   }, [searchParams]);
+
+  useEffect(() => {
+    if (searchParams.get(CATALOG_SELECT_SIZE_AUTOOPEN_QUERY) !== CATALOG_SELECT_SIZE_AUTOOPEN_VALUE) {
+      return;
+    }
+    setCatalogSizeModalOpen(true);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(CATALOG_SELECT_SIZE_AUTOOPEN_QUERY);
+    const nextPath = params.toString() ? `/products?${params.toString()}` : '/products';
+    router.replace(nextPath, { scroll: false });
+  }, [router, searchParams]);
 
   useEffect(() => {
     setLanguage(getStoredLanguage());
