@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
 import { adminService } from "@/lib/services/admin.service";
@@ -53,6 +54,14 @@ export async function PUT(req: NextRequest) {
 
     const data = await req.json();
     const result = await adminService.updateSettings(data);
+    if (
+      data &&
+      typeof data === "object" &&
+      "homeHero" in data &&
+      (data as { homeHero?: unknown }).homeHero !== undefined
+    ) {
+      revalidatePath("/");
+    }
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("❌ [ADMIN] Error:", error);
