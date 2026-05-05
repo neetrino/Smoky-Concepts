@@ -301,12 +301,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     key={item.title}
                     {...item}
                     title={t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.title`)}
-                    subtitle={
-                      packFitKeyByIndex[index] === 'kingSize' ||
-                      packFitKeyByIndex[index] === 'sticks'
-                        ? ''
-                        : t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.subtitle`)
-                    }
+                    subtitle={t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.subtitle`)}
                   />
                 ))}
               </div>
@@ -318,12 +313,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                 key={item.title}
                 {...item}
                 title={t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.title`)}
-                subtitle={
-                  packFitKeyByIndex[index] === 'kingSize' ||
-                  packFitKeyByIndex[index] === 'sticks'
-                    ? ''
-                    : t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.subtitle`)
-                }
+                subtitle={t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.subtitle`)}
               />
             ))}
           </div>
