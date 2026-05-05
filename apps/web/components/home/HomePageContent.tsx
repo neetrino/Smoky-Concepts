@@ -273,7 +273,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
   return (
     <div className="overflow-x-hidden overflow-y-hidden bg-[#efefef] text-[#414141]">
       <div className="mx-auto flex max-w-[120rem] flex-col gap-16 overflow-x-hidden overflow-y-hidden px-5 pb-20 pt-8 sm:gap-24 sm:px-8 sm:pb-24 sm:pt-10 lg:px-[7.5rem]">
-        <section className="flex flex-col gap-8 sm:gap-10">
+        <section className="flex flex-col gap-4 sm:gap-5">
           <HomeSectionTitle
             title={t('home.homepage.hero.title')}
             titleMobile={t('home.homepage.hero.titleMobile')}
@@ -301,12 +301,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     key={item.title}
                     {...item}
                     title={t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.title`)}
-                    subtitle={
-                      packFitKeyByIndex[index] === 'kingSize' ||
-                      packFitKeyByIndex[index] === 'sticks'
-                        ? ''
-                        : t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.subtitle`)
-                    }
+                    subtitle={t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.subtitle`)}
                   />
                 ))}
               </div>
@@ -318,12 +313,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                 key={item.title}
                 {...item}
                 title={t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.title`)}
-                subtitle={
-                  packFitKeyByIndex[index] === 'kingSize' ||
-                  packFitKeyByIndex[index] === 'sticks'
-                    ? ''
-                    : t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.subtitle`)
-                }
+                subtitle={t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.subtitle`)}
               />
             ))}
           </div>
@@ -386,7 +376,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           </section>
         ) : null}
 
-        <section className="flex flex-col gap-8 sm:gap-10">
+        <section className="flex flex-col gap-4 sm:gap-5">
           <HomeSectionTitle
             title={t('home.homepage.ritual.title')}
             descriptionTwoLine={{

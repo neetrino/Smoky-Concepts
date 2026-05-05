@@ -538,7 +538,11 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
         onClearAll={clearFilters}
       />
 
-      <div className="mx-auto max-w-[120rem] px-4 pb-20 pt-12 sm:px-8 lg:pl-[7.5rem] lg:pr-0 lg:pt-[5.25rem]">
+      <div
+        className={`mx-auto max-w-[120rem] px-4 pb-20 pt-12 sm:px-8 lg:pt-[5.25rem] ${
+          isCategoryFilteredView ? 'lg:px-[7.5rem]' : 'lg:pl-[7.5rem] lg:pr-0'
+        }`}
+      >
         <div className="font-montserrat">
           <div className="flex flex-col gap-8">
             <div className="flex items-start justify-between gap-4">
@@ -572,7 +576,11 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
               <CatalogForProductLineRow />
             </div>
 
-            <div className="hidden gap-3 lg:grid lg:grid-cols-[12.5rem_11rem_11.75rem_4.75rem_1fr_11rem] lg:items-center lg:pr-[7.5rem]">
+            <div
+              className={`hidden gap-3 lg:grid lg:grid-cols-[12.5rem_11rem_11.75rem_4.75rem_1fr_11rem] lg:items-center ${
+                isCategoryFilteredView ? '' : 'lg:pr-[7.5rem]'
+              }`}
+            >
               <label className="relative block">
                 <select
                   value={selectedCollection}
@@ -680,8 +688,8 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                     <div
                       className={
                         isCategoryFilteredView
-                          ? 'grid grid-cols-2 items-start gap-x-3 gap-y-20 md:grid-cols-3 lg:grid-cols-6'
-                          : 'flex min-w-max gap-7 max-lg:pr-4'
+                          ? 'grid grid-cols-2 items-start gap-x-5 gap-y-24 md:grid-cols-3 md:gap-x-6 lg:grid-cols-6 lg:gap-x-8 lg:gap-y-28'
+                          : 'flex min-w-max gap-10 max-lg:pr-4'
                       }
                     >
                       {(isCategoryFilteredView ? section.items : section.items).map((product, index) => (
@@ -696,6 +704,7 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                           className="group"
                           catalogStripMobilePeek
                           compactLayout
+                          slimCatalogGrid
                         />
                       ))}
                     </div>

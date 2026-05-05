@@ -605,6 +605,7 @@
       "applySkuToAll": "Apply SKU Pattern to All",
       "variantsReady": "Variants Ready",
       "addVariant": "Add",
+      "deleteVariant": "Delete variant",
       "image": "Image",
       "compareAtPrice": "Compare at Price",
       "pricePlaceholder": "0.00",
@@ -635,7 +636,11 @@
       "defoultPricing": "Default Pricing",
       "enterDefaultPrice": "Enter default price for all variants:",
       "enterDefaultStock": "Enter default stock for all variants:",
-      "enterSkuPrefix": "Enter SKU prefix (will auto-add -color-size if applicable):"
+      "enterSkuPrefix": "Enter SKU prefix (will auto-add -color-size if applicable):",
+      "variableSubmitNeedVariants": "Variable product: add at least one variant (use “Add variant”), fill Default pricing with a valid price, then complete each variant row (price greater than zero, stock, SKU) before saving.",
+      "variableSubmitDefaultPriceInvalid": "Variable product: enter a valid default price (greater than zero) in the Default pricing section.",
+      "variableSubmitVariantRowInvalid": "Variable product: every variant row needs a valid price greater than zero and a SKU.",
+      "variableSubmitDuplicateVariantSku": "Variable product: each variant must have a unique SKU — remove or change duplicate SKUs."
     }
   },
   "settings": {

@@ -2,19 +2,26 @@
  * Utility functions for product management
  */
 
+import { apiClient } from '@/lib/api-client';
+
 /**
  * Checks slug availability and returns the first free candidate.
  * If the slug is taken, tries slug-2, slug-3, … until one is free.
+ * Sends the admin JWT via apiClient (required by check-slug route).
  */
 export async function ensureUniqueSlug(slug: string, excludeId?: string): Promise<string> {
-  const params = new URLSearchParams({ slug });
-  if (excludeId) params.set('excludeId', excludeId);
+  const params: Record<string, string> = { slug };
+  if (excludeId) params.excludeId = excludeId;
 
-  const res = await fetch(`/api/v1/admin/products/check-slug?${params.toString()}`);
-  if (!res.ok) return slug;
-
-  const data = (await res.json()) as { available: boolean; suggestion: string };
-  return data.suggestion;
+  try {
+    const data = await apiClient.get<{ available: boolean; suggestion: string }>(
+      '/api/v1/admin/products/check-slug',
+      { params }
+    );
+    return data.suggestion;
+  } catch {
+    return slug;
+  }
 }
 
 export const generateSlug = (title: string): string => {

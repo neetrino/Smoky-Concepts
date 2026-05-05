@@ -5,7 +5,6 @@ import { AdminMenuDrawer } from '../../../../components/AdminMenuDrawer';
 import { getAdminMenuTABS } from '../../admin-menu.config';
 import {
   adminNavContainerClass,
-  adminNavDividerClass,
   adminNavIconClass,
   adminNavItemActiveClass,
   adminNavItemInactiveClass,
@@ -15,7 +14,6 @@ import {
   ADMIN_FIXED_SIDEBAR_SPACER_CLASS,
 } from '../../constants/adminShell.constants';
 import { useAdminTheme } from '../../context/AdminThemeContext';
-import { AdminThemeToggleButton } from '../../components/AdminThemeToggleButton';
 import { getAdminSidebarNavIndentClass } from '../../utils/adminMenuIndent';
 
 interface AdminSidebarProps {
@@ -56,9 +54,6 @@ export function AdminSidebar({ t }: AdminSidebarProps) {
               </button>
             );
           })}
-          <div className={adminNavDividerClass(theme)}>
-            <AdminThemeToggleButton variant="sidebar" />
-          </div>
         </nav>
       </aside>
       <div className={ADMIN_FIXED_SIDEBAR_SPACER_CLASS} aria-hidden="true" />

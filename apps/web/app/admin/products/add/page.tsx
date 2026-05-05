@@ -30,6 +30,8 @@ function AddProductPageContent() {
   const productId = searchParams.get('id');
   const isEditMode = !!productId;
   const attributePoolSeededForProductRef = useRef<string | null>(null);
+  /** True after user picks Variable while rows are still empty — skips auto-revert to Simple (edit mode). */
+  const variableChosenWithEmptyRowsRef = useRef(false);
 
   const formState = useProductFormState();
   const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
@@ -71,6 +73,59 @@ function AddProductPageContent() {
       formState.setVariableProductTypeAllowed(true);
     }
   }, [isEditMode, formState.setVariableProductTypeAllowed]);
+
+  useEffect(() => {
+    variableChosenWithEmptyRowsRef.current = false;
+  }, [productId]);
+
+  useEffect(() => {
+    if (formState.generatedVariants.length > 0) {
+      variableChosenWithEmptyRowsRef.current = false;
+    }
+  }, [formState.generatedVariants.length]);
+
+  /**
+   * Edit: variable product with zero rows → Simple (e.g. last row deleted).
+   * Skip when the user just chose Variable from Simple (empty rows until they click Add variant).
+   */
+  useEffect(() => {
+    if (!isEditMode || !productId || formState.loadingProduct) {
+      return;
+    }
+    if (formState.productType !== 'variable') {
+      return;
+    }
+    if (formState.generatedVariants.length > 0) {
+      return;
+    }
+    if (variableChosenWithEmptyRowsRef.current) {
+      return;
+    }
+    formState.setProductType('simple');
+    formState.setVariableProductTypeAllowed(true);
+  }, [
+    isEditMode,
+    productId,
+    formState.loadingProduct,
+    formState.productType,
+    formState.generatedVariants.length,
+    formState.setProductType,
+    formState.setVariableProductTypeAllowed,
+  ]);
+
+  useEffect(() => {
+    if (formState.submitErrorKey !== 'variableSubmitNeedVariants') {
+      return;
+    }
+    if (formState.generatedVariants.length === 0) {
+      return;
+    }
+    formState.setSubmitErrorKey(null);
+  }, [
+    formState.submitErrorKey,
+    formState.generatedVariants.length,
+    formState.setSubmitErrorKey,
+  ]);
 
   const { applyToAllVariants } = useVariantGeneration({
     setGeneratedVariants: formState.setGeneratedVariants,
@@ -271,6 +326,7 @@ function AddProductPageContent() {
     productId,
     isClothingCategory,
     categoryAttributes: formState.categoryAttributes,
+    setSubmitErrorKey: formState.setSubmitErrorKey,
   });
 
   if (isLoading || formState.loadingProduct) {
@@ -293,6 +349,12 @@ function AddProductPageContent() {
   const handleProductTypeChange = (type: 'simple' | 'variable') => {
     if (!formState.variableProductTypeAllowed && type === 'variable') {
       return;
+    }
+    formState.setSubmitErrorKey(null);
+    if (type === 'variable') {
+      variableChosenWithEmptyRowsRef.current = true;
+    } else {
+      variableChosenWithEmptyRowsRef.current = false;
     }
     formState.setProductType(type);
   };
@@ -363,6 +425,7 @@ function AddProductPageContent() {
             isClothingCategory={isClothingCategory}
             generateSlug={generateSlug}
             handleSubmit={handleSubmit}
+            submitErrorKey={formState.submitErrorKey}
           />
         </AdminShell>
       </div>
