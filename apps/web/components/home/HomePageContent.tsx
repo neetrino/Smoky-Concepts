@@ -154,18 +154,18 @@ function UpcomingLineCard({
         : 'pointer-events-none absolute left-1/2 top-2 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[28%] sm:top-4 sm:h-36 sm:w-36 sm:-translate-y-[24%] xl:top-5 xl:h-44 xl:w-44 xl:-translate-y-[28%]'
       : imageKeysLayout
         ? masonryTile === 'keys'
-          ? 'pointer-events-none absolute left-[57%] top-0 h-64 w-64 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:left-[56%] sm:top-0 sm:h-[20rem] sm:w-[20rem] sm:-translate-y-[30%]'
-          : 'pointer-events-none absolute left-[57%] top-0 h-40 w-40 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:left-[56%] sm:top-0 sm:h-52 sm:w-52 sm:-translate-y-[30%] xl:left-[56%] xl:top-0 xl:h-[16rem] xl:w-[16rem] xl:-translate-y-[34%]'
+          ? 'pointer-events-none absolute left-[60%] top-0 h-56 w-56 origin-bottom -translate-x-1/2 -translate-y-[36%] sm:left-[59%] sm:top-0 sm:h-[18rem] sm:w-[18rem] sm:-translate-y-[34%]'
+          : 'pointer-events-none absolute left-[60%] top-0 h-36 w-36 origin-bottom -translate-x-1/2 -translate-y-[36%] sm:left-[59%] sm:top-0 sm:h-48 sm:w-48 sm:-translate-y-[34%] xl:left-[59%] xl:top-0 xl:h-[14rem] xl:w-[14rem] xl:-translate-y-[38%]'
         : imagePhonesLayout
           ? masonryTile === 'phones'
             ? 'pointer-events-none absolute left-1/2 top-1 h-36 w-36 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:top-2 sm:h-[11.5rem] sm:w-[11.5rem] sm:-translate-y-[28%]'
             : 'pointer-events-none absolute left-1/2 top-2 h-40 w-40 origin-bottom -translate-x-1/2 -translate-y-[32%] sm:top-3 sm:h-52 sm:w-52 sm:-translate-y-[28%] xl:top-4 xl:h-[15.5rem] xl:w-[15.5rem] xl:-translate-y-[32%]'
           : imageKnifesLayout
             ? masonryTile === 'knifes'
-              ? 'pointer-events-none absolute left-[68%] top-3 h-36 w-36 origin-bottom -translate-x-1/2 -translate-y-[19%] sm:left-[68%] sm:top-2 sm:h-40 sm:w-40 sm:-translate-y-[17%]'
-              : 'pointer-events-none absolute left-[68%] top-4 h-36 w-36 origin-bottom -translate-x-1/2 -translate-y-[12%] sm:left-[68%] sm:top-4 sm:h-40 sm:w-40 sm:-translate-y-[12%] xl:left-[68%] xl:top-1 xl:h-40 xl:w-40 xl:-translate-y-[30%]'
+              ? 'pointer-events-none absolute left-[68%] top-3 h-32 w-32 origin-bottom -translate-x-1/2 -translate-y-[19%] sm:left-[68%] sm:top-2 sm:h-36 sm:w-36 sm:-translate-y-[17%]'
+              : 'pointer-events-none absolute left-[68%] top-4 h-32 w-32 origin-bottom -translate-x-1/2 -translate-y-[12%] sm:left-[68%] sm:top-4 sm:h-36 sm:w-36 sm:-translate-y-[12%] xl:left-[68%] xl:top-1 xl:h-36 xl:w-36 xl:-translate-y-[30%]'
             : masonryTile === 'wallets' || imageWalletsLayout
-              ? 'pointer-events-none absolute left-1/2 top-2 h-[11.25rem] w-[11.25rem] origin-bottom -translate-x-1/2 -translate-y-[40%] sm:top-2 sm:h-[14rem] sm:w-[14rem] sm:-translate-y-[36%] xl:top-1 xl:h-[15rem] xl:w-[15rem] xl:-translate-y-[42%]'
+              ? 'pointer-events-none absolute left-1/2 top-0 h-[10rem] w-[10rem] origin-bottom -translate-x-1/2 -translate-y-[44%] sm:top-0 sm:h-[12.5rem] sm:w-[12.5rem] sm:-translate-y-[40%] xl:top-0 xl:h-[13.5rem] xl:w-[13.5rem] xl:-translate-y-[46%]'
               : 'pointer-events-none absolute left-1/2 top-0 h-24 w-24 origin-bottom -translate-x-1/2 -translate-y-[40%] sm:h-36 sm:w-36 sm:-translate-y-[38%] xl:h-44 xl:w-44 xl:-translate-y-[42%]';
   const imageSizes = imagePhonesLayout
     ? masonryTile === 'phones'
