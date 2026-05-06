@@ -399,7 +399,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                   key={step.step}
                   className={`flex gap-3 ${
                     index < RITUAL_STEPS.length - 1
-                      ? 'border-b border-[#eeeeee] pb-6 xl:border-b-0 xl:border-r xl:border-[#eeeeee] xl:pb-0 xl:pr-6'
+                      ? 'border-b border-[#dddddd] pb-6 xl:border-b-0 xl:border-r xl:border-[#dddddd] xl:pb-0 xl:pr-6'
                       : ''
                   }`}
                 >
@@ -407,10 +407,10 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     {step.step}
                   </span>
                   <div className="min-w-0 pt-0.5">
-                    <h3 className="text-base font-bold leading-snug text-[#333333] sm:text-lg">
+                    <h3 className="text-base font-bold leading-snug text-[#1f1f1f] sm:text-lg">
                       {t(`home.homepage.ritual.steps.${ritualStepKeys[index]}.title`)}
                     </h3>
-                    <p className="mt-0.5 text-xs font-normal leading-relaxed text-[#333333] sm:text-sm">
+                    <p className="mt-0.5 text-xs font-normal leading-relaxed text-[#2a2a2a] sm:text-sm">
                       {t(`home.homepage.ritual.steps.${ritualStepKeys[index]}.description`)}
                     </p>
                   </div>
