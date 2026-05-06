@@ -296,7 +296,7 @@ export function VariantBuilder({
                     if (stock !== null) onApplyToAll('stock', stock);
                   }}
                 >
-                  {t('admin.products.add.applyStockToAll')}
+                  Apply Quantity to All
                 </Button>
                 <Button
                   type="button"
@@ -341,7 +341,7 @@ export function VariantBuilder({
                       </th>
                     ) : null}
                     <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('admin.products.add.stock')}
+                      {t('admin.products.add.quantity')}
                     </th>
                     <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t('admin.products.add.sku')}
