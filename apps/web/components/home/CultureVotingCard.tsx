@@ -171,7 +171,7 @@ export function CultureVotingCard({
       className={`relative z-10 mx-auto flex h-full min-h-0 w-full max-w-[8.75rem] flex-col overflow-visible rounded-3xl bg-white p-2 ${mobileTopPaddingClassName} sm:max-w-[10.75rem] sm:p-3 sm:pt-3 lg:max-w-none`}
     >
       <div
-        className={`absolute left-3 right-3 top-[-3.5rem] z-10 h-[15rem] shrink-0 overflow-visible rounded-2xl sm:relative sm:left-auto sm:right-auto sm:top-auto sm:-mt-[4.9rem] sm:mb-2 sm:h-[12.4rem] ${imageNudgeClassName}`.trim()}
+        className={`absolute left-3 right-3 top-[-1.5rem] z-10 h-[15rem] shrink-0 overflow-visible rounded-2xl sm:relative sm:left-auto sm:right-auto sm:top-auto sm:-mt-[4.9rem] sm:mb-2 sm:h-[12.4rem] ${imageNudgeClassName}`.trim()}
       >
         {activeSrc && !imageError ? (
           <img

@@ -275,7 +275,7 @@ export function CultureVotingSection() {
         </div>
       </div>
       <div className="mx-auto w-full max-w-[24rem] px-4 pt-2 sm:max-w-[52rem] sm:pt-3">
-        <div className="mx-auto grid grid-cols-2 items-stretch justify-items-center gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-8 lg:max-w-[42rem] lg:[grid-template-columns:repeat(3,minmax(0,1fr))]">
+        <div className="mx-auto grid grid-cols-2 items-stretch justify-items-center gap-x-4 gap-y-16 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-8 lg:max-w-[42rem] lg:[grid-template-columns:repeat(3,minmax(0,1fr))]">
           {items.map((item, index) => {
             const sizeLabel =
               index === 0 || index === 2
