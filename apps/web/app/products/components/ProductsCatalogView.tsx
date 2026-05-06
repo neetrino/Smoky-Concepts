@@ -701,8 +701,8 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                           categoryLabel={getCategoryLabel(product, section.title)}
                           imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                           imageScaleBoost={0.04}
-                          className="group"
-                          catalogStripMobilePeek
+                          className={`group ${isCategoryFilteredView ? '!w-full !max-w-none !min-w-0 !shrink' : ''}`}
+                          catalogStripMobilePeek={!isCategoryFilteredView}
                           compactLayout
                           slimCatalogGrid
                         />
