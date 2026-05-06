@@ -4,7 +4,15 @@ import { useEffect, useState } from 'react';
 import { Button } from '@shop/ui';
 import type { CategoryAttribute, CategoryAttributeValue } from '@/lib/category-attributes';
 
-function ValueRowPreview({ value }: { value: CategoryAttributeValue }) {
+const SIZE_ATTRIBUTE_KEY = 'size';
+
+function ValueRowPreview({
+  value,
+  showImage,
+}: {
+  value: CategoryAttributeValue;
+  showImage: boolean;
+}) {
   return (
     <span className="flex min-w-0 flex-1 items-center gap-2">
       {value.colors && value.colors.length > 0 ? (
@@ -18,7 +26,7 @@ function ValueRowPreview({ value }: { value: CategoryAttributeValue }) {
           ))}
         </span>
       ) : null}
-      {value.imageUrl ? (
+      {showImage && value.imageUrl ? (
         <img
           src={value.imageUrl}
           alt=""
@@ -55,6 +63,7 @@ export function AttributeValuesModal({
   labels,
 }: AttributeValuesModalProps) {
   const [draftIds, setDraftIds] = useState<string[]>(initialSelectedIds);
+  const showValueImage = attribute.key !== SIZE_ATTRIBUTE_KEY;
 
   useEffect(() => {
     if (open) {
@@ -133,7 +142,7 @@ export function AttributeValuesModal({
                       onChange={() => toggleId(value.id)}
                       className="h-4 w-4 rounded border-[#dcc090]/40 text-[#122a26] focus:ring-[#dcc090]"
                     />
-                    <ValueRowPreview value={value} />
+                    <ValueRowPreview value={value} showImage={showValueImage} />
                   </label>
                 );
               })}
