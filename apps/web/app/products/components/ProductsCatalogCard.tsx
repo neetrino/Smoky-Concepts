@@ -143,13 +143,16 @@ export function ProductsCatalogCard({
     PRODUCT_SECTION_BADGE_CLASS_NAMES[sectionLabel] ?? PRODUCT_SECTION_BADGE_CLASS_NAMES.Classic;
   const isCompactSize = sizeLabel === 'Compact';
 
-  const stripPeekMaxLg = slimCatalogGrid ? 'max-lg:max-w-[17.5rem]' : 'max-lg:max-w-[19rem]';
+  const stripPeekMaxLg = slimCatalogGrid ? 'max-lg:max-w-[16.5rem]' : 'max-lg:max-w-[19rem]';
   const stripPeekLgW = slimCatalogGrid ? 'lg:w-[11.25rem]' : 'lg:w-[12.75rem]';
   const stripPeekXlW = slimCatalogGrid ? 'xl:w-[11.625rem]' : 'xl:w-[13rem]';
+  const stripPeekMobileWidth = slimCatalogGrid
+    ? 'max-lg:w-[calc((100vw-3.75rem)/1.65)]'
+    : 'max-lg:w-[calc((100vw-3.75rem)/1.5)]';
   const compactArticleWidth =
     catalogStripMobilePeek && compactLayout
       ? // 3.75rem ≈ page px-4 (2rem) + strip gap; /1.5 ≈ half of next card visible in viewport
-        `max-lg:w-[calc((100vw-3.75rem)/1.5)] ${stripPeekMaxLg} ${stripPeekLgW} ${stripPeekXlW}`
+        `${stripPeekMobileWidth} ${stripPeekMaxLg} ${stripPeekLgW} ${stripPeekXlW}`
       : widerCompactCard
         ? 'w-[12rem] max-sm:w-[10.75rem]'
         : 'w-[11rem] max-sm:w-[10.25rem]';
