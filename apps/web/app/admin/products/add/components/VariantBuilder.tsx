@@ -14,6 +14,30 @@ import {
   removeAttributeValuesFromVariant,
 } from '../utils/variantAttributeHelpers';
 
+const SIZE_ATTRIBUTE_KEY = 'size';
+const SIZE_VERSION_ATTRIBUTE_KEY = 'size_version';
+const SIZE_COLLECTION_ID_PREFIX = 'size-catalog-collection:';
+const SIZE_VERSION_ID_PREFIX = 'size-catalog-version:';
+
+function parseCollectionTokenFromSizeValueId(valueId: string): string | null {
+  if (!valueId.startsWith(SIZE_COLLECTION_ID_PREFIX)) {
+    return null;
+  }
+  return valueId.slice(SIZE_COLLECTION_ID_PREFIX.length) || null;
+}
+
+function parseCollectionTokenFromVersionValueId(valueId: string): string | null {
+  if (!valueId.startsWith(SIZE_VERSION_ID_PREFIX)) {
+    return null;
+  }
+  const payload = valueId.slice(SIZE_VERSION_ID_PREFIX.length);
+  const separatorIdx = payload.indexOf(':');
+  if (separatorIdx === -1) {
+    return null;
+  }
+  return payload.slice(0, separatorIdx) || null;
+}
+
 interface VariantBuilderProps {
   generatedVariants: GeneratedVariant[];
   categoryAttributes: CategoryAttribute[];
@@ -57,24 +81,74 @@ export function VariantBuilder({
   const [isAttributeSelectionSectionOpen, setIsAttributeSelectionSectionOpen] = useState(false);
   const [attributeCombinationError, setAttributeCombinationError] = useState<string | null>(null);
   const hasAttributeDrivenVariants = categoryAttributes.length > 0;
-  const attributesInUse = categoryAttributes.filter((attribute) => enabledAttributeIds[attribute.id] === true);
+  const sizeAttribute = categoryAttributes.find((attribute) => attribute.key === SIZE_ATTRIBUTE_KEY);
+  const sizeVersionAttribute = categoryAttributes.find(
+    (attribute) => attribute.key === SIZE_VERSION_ATTRIBUTE_KEY
+  );
+  const isSizeEnabled = sizeAttribute ? enabledAttributeIds[sizeAttribute.id] === true : false;
+  const attributeToggles = categoryAttributes.filter(
+    (attribute) => attribute.key !== SIZE_VERSION_ATTRIBUTE_KEY
+  );
+  const attributesInUse = categoryAttributes.filter((attribute) => {
+    if (attribute.key === SIZE_VERSION_ATTRIBUTE_KEY) {
+      return isSizeEnabled;
+    }
+    return enabledAttributeIds[attribute.id] === true;
+  });
+
+  const enforceSizeVersionCompatibility = (selectedValueIds: string[]): string[] => {
+    if (!sizeVersionAttribute) {
+      return selectedValueIds;
+    }
+    const sizeVersionValueIdSet = new Set(sizeVersionAttribute.values.map((value) => value.id));
+    const selectedCollectionTokens = selectedValueIds
+      .map((valueId) => parseCollectionTokenFromSizeValueId(valueId))
+      .filter((token): token is string => Boolean(token));
+
+    if (selectedCollectionTokens.length === 0) {
+      return selectedValueIds.filter((valueId) => !sizeVersionValueIdSet.has(valueId));
+    }
+
+    const selectedCollectionTokenSet = new Set(selectedCollectionTokens);
+    return selectedValueIds.filter((valueId) => {
+      if (!sizeVersionValueIdSet.has(valueId)) {
+        return true;
+      }
+      const token = parseCollectionTokenFromVersionValueId(valueId);
+      return token !== null && selectedCollectionTokenSet.has(token);
+    });
+  };
 
   const handleToggleAttributeEnabled = (attributeId: string, checked: boolean) => {
     setAttributeCombinationError(null);
-    onEnabledAttributeIdsChange({
+    const nextEnabledAttributeIds = {
       ...enabledAttributeIds,
       [attributeId]: checked,
-    });
+    };
+
+    if (sizeAttribute && attributeId === sizeAttribute.id) {
+      nextEnabledAttributeIds[sizeAttribute.id] = checked;
+      if (sizeVersionAttribute) {
+        nextEnabledAttributeIds[sizeVersionAttribute.id] = checked;
+      }
+    }
+    onEnabledAttributeIdsChange(nextEnabledAttributeIds);
+
     if (!checked) {
       const attribute = categoryAttributes.find((a) => a.id === attributeId);
       const nextPool = { ...selectedAttributeValueIds };
       delete nextPool[attributeId];
+      if (sizeAttribute && sizeVersionAttribute && attributeId === sizeAttribute.id) {
+        delete nextPool[sizeVersionAttribute.id];
+      }
       onSelectedAttributeValueIdsChange(nextPool);
-      if (attribute) {
+      if (attribute || (sizeAttribute && sizeVersionAttribute && attributeId === sizeAttribute.id)) {
         onVariantUpdate((prev) =>
           prev.map((v) => ({
             ...v,
-            selectedValueIds: removeAttributeValuesFromVariant(v, attribute),
+            selectedValueIds: enforceSizeVersionCompatibility(
+              attribute ? removeAttributeValuesFromVariant(v, attribute) : v.selectedValueIds
+            ),
           }))
         );
       }
@@ -91,7 +165,9 @@ export function VariantBuilder({
       return;
     }
 
-    const nextIds = mergeVariantAttributeValues(variant, attribute, valueIds);
+    const nextIds = enforceSizeVersionCompatibility(
+      mergeVariantAttributeValues(variant, attribute, valueIds)
+    );
 
     if (nextIds.length > 0 && isDuplicateVariantCombination(nextIds, generatedVariants, variantId)) {
       setAttributeCombinationError(t('admin.products.add.duplicateVariantCombination'));
@@ -155,7 +231,7 @@ export function VariantBuilder({
                 </div>
 
                 <div className="space-y-3">
-                  {categoryAttributes.map((attribute) => {
+                  {attributeToggles.map((attribute) => {
                     const enabled = enabledAttributeIds[attribute.id] === true;
                     return (
                       <div key={attribute.id} className="rounded-lg border border-gray-200 bg-white p-3">

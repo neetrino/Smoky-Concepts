@@ -48,6 +48,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     canAddToCart,
     handleColorSelect,
     handleSizeSelect,
+    handleCatalogVariantSelect,
   } = useProductPage(params);
 
   const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
@@ -200,6 +201,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             sizeOptions={sizeOptions}
             onColorSelect={handleColorSelect}
             onSizeSelect={handleSizeSelect}
+            onCatalogVariantSelect={handleCatalogVariantSelect}
             onAddToCart={handleAddToCart}
             onBuyNow={handleBuyNow}
             onSelectedCatalogSizeChange={setSelectedCatalogSize}

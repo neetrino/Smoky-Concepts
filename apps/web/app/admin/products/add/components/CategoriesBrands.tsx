@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Input } from '@shop/ui';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import type { Category, Variant } from '../types';
-import type { SizeCatalogCategoryDto } from '@/lib/types/size-catalog';
 
 interface CategoriesBrandsProps {
   categories: Category[];
@@ -18,9 +17,6 @@ interface CategoriesBrandsProps {
   onCategoryIdsChange: (ids: string[]) => void;
   onPrimaryCategoryIdChange: (id: string) => void;
   onCreateCategory: (name: string) => Promise<void>;
-  sizeCatalogCategories: SizeCatalogCategoryDto[];
-  selectedSizeCatalogCategoryId: string;
-  onSizeCatalogCategoryChange: (categoryId: string, categoryTitle: string) => void;
   isClothingCategory: () => boolean;
   onVariantsUpdate?: (updater: (prev: Variant[]) => Variant[]) => void;
 }
@@ -37,9 +33,6 @@ export function CategoriesBrands({
   onCategoryIdsChange,
   onPrimaryCategoryIdChange,
   onCreateCategory,
-  sizeCatalogCategories,
-  selectedSizeCatalogCategoryId,
-  onSizeCatalogCategoryChange,
   isClothingCategory,
   onVariantsUpdate,
 }: CategoriesBrandsProps) {
@@ -192,7 +185,7 @@ export function CategoriesBrands({
             </label>
           </div>
           {!useNewCategory ? (
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3">
               <div className="relative" data-category-dropdown>
                 <button
                   type="button"
@@ -240,22 +233,6 @@ export function CategoriesBrands({
                   </div>
                 )}
               </div>
-
-              <select
-                value={selectedSizeCatalogCategoryId}
-                onChange={(event) => {
-                  const selected = sizeCatalogCategories.find((category) => category.id === event.target.value);
-                  onSizeCatalogCategoryChange(selected?.id ?? '', selected?.title ?? '');
-                }}
-                className="w-full rounded-md border border-[#dcc090]/35 bg-white px-3 py-2 text-sm text-gray-700 focus:border-[#dcc090] focus:outline-none focus:ring-2 focus:ring-[#dcc090]"
-              >
-                <option value="">{t('admin.products.add.selectSizeCollection') || 'Select size collection'}</option>
-                {sizeCatalogCategories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.title}
-                  </option>
-                ))}
-              </select>
             </div>
           ) : (
             <div className="space-y-3">

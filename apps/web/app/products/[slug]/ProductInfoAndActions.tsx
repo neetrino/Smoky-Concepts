@@ -68,6 +68,8 @@ interface ProductInfoAndActionsProps {
   sizeOptions: ProductOptionValue[];
   onColorSelect: (color: string) => void;
   onSizeSelect: (size: string) => void;
+  /** Select variant by size collection + version from size catalog modal item. */
+  onCatalogVariantSelect?: (sizeCollectionTitle: string, version: string) => void;
   /** Quick add (e.g. bag icon) — stay on page. */
   onAddToCart: () => Promise<void>;
   /** Primary CTA — add line then continue to checkout. */
@@ -136,6 +138,30 @@ function matchVariantSizeFromCatalogTitle(title: string, options: ProductOptionV
   return byValue?.value ?? null;
 }
 
+function getVariantOptionValueByKey(variant: ProductVariant | null, key: string): string | null {
+  if (!variant?.options || variant.options.length === 0) {
+    return null;
+  }
+  const normalizedKey = key.trim().toLowerCase();
+  const option = variant.options.find((item) => {
+    const optionKey = (item.key || item.attribute || '').trim().toLowerCase();
+    return optionKey === normalizedKey;
+  });
+  return option?.value?.trim() ?? null;
+}
+
+function normalizeVersionToken(value: string): string {
+  const normalized = value.toLowerCase().trim().replace(/\s+/g, '');
+  if (!normalized) {
+    return '';
+  }
+  const numericMatch = normalized.match(/(\d+)/);
+  if (!numericMatch) {
+    return normalized;
+  }
+  return `v${numericMatch[1]}`;
+}
+
 function getCustomizeCopy(language: LanguageCode): string {
   switch (language) {
     case 'hy':
@@ -167,6 +193,7 @@ export function ProductInfoAndActions({
   sizeOptions,
   onColorSelect,
   onSizeSelect,
+  onCatalogVariantSelect,
   onAddToCart,
   onBuyNow,
   onSelectedCatalogSizeChange,
@@ -272,12 +299,42 @@ export function ProductInfoAndActions({
     t(language, 'product.choose_size');
   const selectedCollectionTitle = selectedCatalogSize?.categoryTitle?.trim() ?? '';
   const selectedCollectionPriceAmd = selectedCatalogSize?.categoryPriceAmd ?? 0;
+  const selectedCollectionFromVariant = selectedSize?.trim().toLowerCase() ?? '';
+  const selectedVersionFromVariant = normalizeVersionToken(
+    getVariantOptionValueByKey(currentVariant, 'size_version') ?? ''
+  );
+  const filteredSizeCatalogCategories = useMemo(() => {
+    if (!selectedCollectionFromVariant && !selectedVersionFromVariant) {
+      return sizeCatalogCategories;
+    }
+
+    return sizeCatalogCategories
+      .filter((category) => {
+        if (!selectedCollectionFromVariant) {
+          return true;
+        }
+        return category.title.trim().toLowerCase() === selectedCollectionFromVariant;
+      })
+      .map((category) => ({
+        ...category,
+        items: selectedVersionFromVariant
+          ? category.items.filter(
+              (item) => normalizeVersionToken(item.version) === selectedVersionFromVariant
+            )
+          : category.items,
+      }))
+      .filter((category) => category.items.length > 0);
+  }, [sizeCatalogCategories, selectedCollectionFromVariant, selectedVersionFromVariant]);
 
   const handleSelectCatalogSizeItem = (item: SizeCatalogItemDto) => {
     setSelectedCatalogSize(item);
     setSelectedCustomSizeRequest(null);
+    if (onCatalogVariantSelect) {
+      onCatalogVariantSelect(item.categoryTitle, item.version);
+      return;
+    }
     if (sizeOptions.length > 0) {
-      const matched = matchVariantSizeFromCatalogTitle(item.title, sizeOptions);
+      const matched = matchVariantSizeFromCatalogTitle(item.categoryTitle, sizeOptions);
       if (matched) {
         onSizeSelect(matched);
       }
@@ -746,7 +803,7 @@ export function ProductInfoAndActions({
       isOpen={isCustomizeSizeModalOpen}
       onClose={() => setIsCustomizeSizeModalOpen(false)}
       language={language}
-      sizeCategories={sizeCatalogCategories}
+      sizeCategories={filteredSizeCatalogCategories}
       selectedSizeItemId={selectedCatalogSize?.id ?? null}
       onSelectSizeCatalogItem={handleSelectCatalogSizeItem}
       onSelectCustomSizeRequest={handleSelectCustomSizeRequest}
