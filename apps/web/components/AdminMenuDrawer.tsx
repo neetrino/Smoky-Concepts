@@ -146,7 +146,10 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
                     key={tab.id}
                     type="button"
                     onClick={() => {
-                      if (isParent) toggleGroup(tab.id);
+                      if (isParent) {
+                        toggleGroup(tab.id);
+                        return;
+                      }
                       handleNavigate(tab.path);
                     }}
                     className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium ${getAdminDrawerNavIndentClass(tab)} ${isActive ? adminDrawerRowActiveClass(theme) : adminDrawerRowInactiveClass(theme)}`}

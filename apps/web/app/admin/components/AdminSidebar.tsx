@@ -100,7 +100,10 @@ export function AdminSidebar({ currentPath, router, t }: AdminSidebarProps) {
                 key={tab.id}
                 type="button"
                 onClick={() => {
-                  if (isParent) toggleGroup(tab.id);
+                  if (isParent) {
+                    toggleGroup(tab.id);
+                    return;
+                  }
                   router.push(tab.path);
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${getAdminSidebarNavIndentClass(tab)} ${isActive ? adminNavItemActiveClass(theme) : adminNavItemInactiveClass(theme)}`}
