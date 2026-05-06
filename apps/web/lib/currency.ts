@@ -26,6 +26,7 @@ const DEFAULT_CURRENCY_RATES: Record<CurrencyCode, number> = {
   USD: 1 / LEGACY_AMD_PER_USD,
   RUB: 0.2,
 };
+let canReadClientCurrencyStorage = false;
 
 function isCurrencyCode(value: string): value is CurrencyCode {
   return value in CURRENCIES;
@@ -53,7 +54,7 @@ function normalizeCurrencyRates(rawRates: Partial<Record<CurrencyCode, number>> 
 }
 
 function getStoredCurrencyRates(): Record<CurrencyCode, number> {
-  if (typeof window === 'undefined') {
+  if (typeof window === 'undefined' || !canReadClientCurrencyStorage) {
     return DEFAULT_CURRENCY_RATES;
   }
   try {
@@ -66,6 +67,14 @@ function getStoredCurrencyRates(): Record<CurrencyCode, number> {
   } catch {
     return DEFAULT_CURRENCY_RATES;
   }
+}
+
+/**
+ * Enable localStorage-backed currency reads after hydration.
+ * Keeps SSR and first client render deterministic to avoid hydration mismatches.
+ */
+export function enableClientCurrencyStorageReads(): void {
+  canReadClientCurrencyStorage = true;
 }
 
 function setStoredCurrencyRates(rates: Partial<Record<CurrencyCode, number>>): void {

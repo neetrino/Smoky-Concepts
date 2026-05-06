@@ -76,8 +76,8 @@ function PackFitCard({
         )}
       </div>
       <div className="flex min-h-[2.75rem] flex-col justify-end text-center">
-        <h3 className="text-xs font-extrabold leading-none text-[#414141]">{title}</h3>
-        {subtitle ? <p className="mt-1 text-[0.5rem] font-medium text-black">{subtitle}</p> : null}
+        <h3 className="text-xs font-black leading-none text-[#414141]">{title}</h3>
+        {subtitle ? <p className="mt-1 text-[0.5rem] font-semibold text-black">{subtitle}</p> : null}
       </div>
     </div>
   );
@@ -321,7 +321,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             <HomeActionButton
               href={getProductsPathWithSelectSizeAutopen()}
               label={t('home.homepage.packFit.cta')}
-              className="min-w-[19rem] font-semibold sm:font-black"
+              className="min-w-[19rem] text-[1.2rem] font-black text-[#0f201d] sm:text-base"
             />
           </div>
         </section>
