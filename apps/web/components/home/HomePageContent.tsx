@@ -330,14 +330,14 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <section className="flex flex-col gap-8 overflow-visible pt-3 sm:gap-10 sm:pt-6">
             <HomeSectionTitle
               title={t('home.homepage.coverCollections.title')}
-              className="-translate-y-1 sm:-translate-y-3"
+              className="-translate-y-9 sm:-translate-y-3"
             />
             <div className="mt-4 grid grid-cols-2 items-start gap-x-2 gap-y-20 overflow-visible sm:mt-0 sm:grid-cols-4 sm:gap-8">
               {coverCollections.map((item) => (
                 <Link
                   key={item.slug}
                   href={`/products?category=${item.slug}`}
-                  className="group relative z-0 mt-5 -translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1rem] max-sm:bg-transparent bg-white px-2.5 pb-1 pt-0 shadow-none transition-shadow duration-200 hover:z-10 hover:shadow-none focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2rem] sm:px-6 sm:pb-8 sm:shadow-[0_6px_24px_rgba(18,42,38,0.05)] sm:hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)]"
+                  className="group relative z-0 mt-5 max-sm:translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1rem] max-sm:bg-transparent bg-white px-2.5 pb-10 pt-0 shadow-none transition-shadow duration-200 hover:z-10 hover:shadow-none focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2rem] sm:px-6 sm:pb-8 sm:shadow-[0_6px_24px_rgba(18,42,38,0.05)] sm:hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)]"
                 >
                   <span
                     aria-hidden
@@ -364,7 +364,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     )}
                   </div>
                   <h3
-                    className={`relative z-[1] mt-6 text-lg font-black leading-tight text-[#414141] max-sm:translate-y-1 sm:mt-12 sm:translate-y-3 sm:text-2xl lg:text-3xl ${
+                    className={`relative z-[1] max-sm:-mt-1 text-lg font-black leading-tight text-[#414141] sm:mt-12 sm:translate-y-3 sm:text-2xl lg:text-3xl ${
                       item.slug === 'special-edition' ? 'line-clamp-1 whitespace-nowrap' : 'line-clamp-2'
                     }`}
                   >
