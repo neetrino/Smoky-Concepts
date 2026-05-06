@@ -13,6 +13,7 @@ import {
   mergeVariantAttributeValues,
   removeAttributeValuesFromVariant,
 } from '../utils/variantAttributeHelpers';
+import { SHOW_COMPARE_AT_PRICE_FIELD } from '../constants/compareAtPriceVisibility.constants';
 
 const SIZE_ATTRIBUTE_KEY = 'size';
 const SIZE_VERSION_ATTRIBUTE_KEY = 'size_version';
@@ -334,9 +335,11 @@ export function VariantBuilder({
                     <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t('admin.products.add.price')}
                     </th>
-                    <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('admin.products.add.compareAtPrice')}
-                    </th>
+                    {SHOW_COMPARE_AT_PRICE_FIELD ? (
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {t('admin.products.add.compareAtPrice')}
+                      </th>
+                    ) : null}
                     <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t('admin.products.add.stock')}
                     </th>
@@ -399,24 +402,26 @@ export function VariantBuilder({
                           <span className="text-xs text-gray-500">{CURRENCIES[ADMIN_PRODUCT_INPUT_CURRENCY].symbol}</span>
                         </div>
                       </td>
-                      <td className="px-2 py-2 whitespace-nowrap">
-                        <div className="flex items-center gap-1">
-                          <Input
-                            type="number"
-                            value={variant.compareAtPrice}
-                            onChange={(e) => {
-                              onVariantUpdate((prev) =>
-                                prev.map((v) => (v.id === variant.id ? { ...v, compareAtPrice: e.target.value } : v))
-                              );
-                            }}
-                            placeholder={t('admin.products.add.pricePlaceholder')}
-                            className="w-20 text-xs"
-                            min="0"
-                            step="0.01"
-                          />
-                          <span className="text-xs text-gray-500">{CURRENCIES[ADMIN_PRODUCT_INPUT_CURRENCY].symbol}</span>
-                        </div>
-                      </td>
+                      {SHOW_COMPARE_AT_PRICE_FIELD ? (
+                        <td className="px-2 py-2 whitespace-nowrap">
+                          <div className="flex items-center gap-1">
+                            <Input
+                              type="number"
+                              value={variant.compareAtPrice}
+                              onChange={(e) => {
+                                onVariantUpdate((prev) =>
+                                  prev.map((v) => (v.id === variant.id ? { ...v, compareAtPrice: e.target.value } : v))
+                                );
+                              }}
+                              placeholder={t('admin.products.add.pricePlaceholder')}
+                              className="w-20 text-xs"
+                              min="0"
+                              step="0.01"
+                            />
+                            <span className="text-xs text-gray-500">{CURRENCIES[ADMIN_PRODUCT_INPUT_CURRENCY].symbol}</span>
+                          </div>
+                        </td>
+                      ) : null}
                       <td className="px-2 py-2 whitespace-nowrap">
                         <Input
                           type="number"
