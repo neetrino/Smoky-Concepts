@@ -716,14 +716,14 @@ export function ProductInfoAndActions({
         <div className="pt-7 sm:pt-8">{renderedTabContent}</div>
       </div>
 
-      <div className="mt-[48px] flex w-full min-w-0 max-w-[763px] flex-col gap-3 sm:flex-row sm:items-end sm:gap-12">
-        <div className="flex min-w-0 w-full flex-wrap items-end gap-2 sm:max-w-[291px] sm:gap-3">
+      <div className="mt-[48px] flex w-full min-w-0 max-w-[763px] items-end justify-between gap-3">
+        <div className="flex min-w-0 flex-1 flex-wrap items-end gap-2 sm:max-w-[291px] sm:gap-3">
           <p className="font-montserrat text-[30px] font-extrabold leading-none text-black sm:text-[32px]">
             {formatCatalogPrice(price, displayCurrency)}
           </p>
         </div>
 
-        <div className="flex w-full shrink-0 items-center gap-0.5 sm:w-auto sm:gap-1.5">
+        <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1.5">
           <Button
             type="button"
             disabled={!canAddToCart || isAddingToCart}
