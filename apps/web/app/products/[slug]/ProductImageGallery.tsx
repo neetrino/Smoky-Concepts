@@ -28,6 +28,9 @@ const HERO_PULL_ABOVE_CARD = '-mt-20 sm:-mt-24 lg:-mt-32';
 /** Max rendered height for the hero product image (Tailwind arbitrary values). */
 const MAIN_IMAGE_MAX_HEIGHT_CLASSES = 'max-h-[420px] sm:max-h-[480px] lg:max-h-[650px]';
 
+/** Fixed hero frame height so thumbnail row doesn't jump when image aspect changes. */
+const HERO_IMAGE_FRAME_HEIGHT_CLASSES = 'h-[420px] sm:h-[480px] lg:h-[650px]';
+
 /** Nudge only the hero `<img>` upward (thumbnails / card layout unchanged). */
 const HERO_IMAGE_SHIFT_UP = '-translate-y-2 sm:-translate-y-3 lg:-translate-y-4';
 
@@ -98,14 +101,14 @@ export function ProductImageGallery({
           >
             {images.length > 0 ? (
               <div
-                className={`relative inline-block max-w-full origin-bottom transition-transform duration-300 ease-out ${HERO_IMAGE_SHIFT_UP} group-hover:scale-110 group-hover:drop-shadow-[0_12px_24px_rgba(18,42,38,0.18)]`}
+                className={`relative flex w-full max-w-full items-start justify-center origin-bottom transition-transform duration-300 ease-out ${HERO_IMAGE_FRAME_HEIGHT_CLASSES} ${HERO_IMAGE_SHIFT_UP} group-hover:scale-110 group-hover:drop-shadow-[0_12px_24px_rgba(18,42,38,0.18)]`}
               >
                 <img
                   src={images[currentImageIndex]}
                   alt={product.title}
                   decoding="async"
                   draggable={false}
-                  className={`relative block h-auto w-auto max-w-full object-contain object-top ${MAIN_IMAGE_MAX_HEIGHT_CLASSES}`}
+                  className={`relative block h-auto w-auto max-h-full max-w-full object-contain object-top ${MAIN_IMAGE_MAX_HEIGHT_CLASSES}`}
                 />
                 {customizeOverlayHtml ? <CustomizeProductOverlay html={customizeOverlayHtml} /> : null}
               </div>
