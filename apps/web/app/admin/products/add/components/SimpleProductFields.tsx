@@ -3,6 +3,7 @@
 import { Input } from '@shop/ui';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import { ADMIN_PRODUCT_INPUT_CURRENCY, CURRENCIES } from '../../../../../lib/currency';
+import { SHOW_COMPARE_AT_PRICE_FIELD } from '../constants/compareAtPriceVisibility.constants';
 
 interface SimpleProductFieldsProps {
   price: string;
@@ -52,24 +53,25 @@ export function SimpleProductFields({
             </div>
           </div>
 
-          {/* Compare At Price */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('admin.products.add.compareAtPrice')}
-            </label>
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                value={compareAtPrice}
-                onChange={(e) => onCompareAtPriceChange(e.target.value)}
-                placeholder={t('admin.products.add.pricePlaceholder')}
-                className="flex-1"
-                min="0"
-                step="0.01"
-              />
-              <span className="text-sm text-gray-500 whitespace-nowrap">{CURRENCIES[ADMIN_PRODUCT_INPUT_CURRENCY].symbol}</span>
+          {SHOW_COMPARE_AT_PRICE_FIELD ? (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('admin.products.add.compareAtPrice')}
+              </label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  value={compareAtPrice}
+                  onChange={(e) => onCompareAtPriceChange(e.target.value)}
+                  placeholder={t('admin.products.add.pricePlaceholder')}
+                  className="flex-1"
+                  min="0"
+                  step="0.01"
+                />
+                <span className="text-sm text-gray-500 whitespace-nowrap">{CURRENCIES[ADMIN_PRODUCT_INPUT_CURRENCY].symbol}</span>
+              </div>
             </div>
-          </div>
+          ) : null}
 
           {/* SKU */}
           <div>

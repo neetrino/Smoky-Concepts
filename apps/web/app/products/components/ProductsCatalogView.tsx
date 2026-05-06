@@ -688,8 +688,8 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                     <div
                       className={
                         isCategoryFilteredView
-                          ? 'grid grid-cols-2 items-start gap-x-5 gap-y-24 md:grid-cols-3 md:gap-x-6 lg:grid-cols-6 lg:gap-x-8 lg:gap-y-28'
-                          : 'flex min-w-max gap-10 max-lg:pr-4'
+                          ? 'grid grid-cols-2 items-start gap-x-4 gap-y-24 md:grid-cols-3 md:gap-x-6 lg:grid-cols-6 lg:gap-x-8 lg:gap-y-28'
+                          : 'flex min-w-max gap-6 lg:gap-10 max-lg:pr-4'
                       }
                     >
                       {(isCategoryFilteredView ? section.items : section.items).map((product, index) => (
@@ -701,8 +701,8 @@ export function ProductsCatalogView({ products }: ProductsCatalogViewProps) {
                           categoryLabel={getCategoryLabel(product, section.title)}
                           imageNudgeDown={shouldNudgeCatalogProductImage(index)}
                           imageScaleBoost={0.04}
-                          className="group"
-                          catalogStripMobilePeek
+                          className={`group ${isCategoryFilteredView ? '!w-full !max-w-none !min-w-0 !shrink' : ''}`}
+                          catalogStripMobilePeek={!isCategoryFilteredView}
                           compactLayout
                           slimCatalogGrid
                         />

@@ -383,7 +383,7 @@ export function TrendingFeaturedSection() {
                 index === 1
                   ? 'pt-[14rem]'
                   : index === 2
-                    ? '-mt-[10rem] pt-2'
+                    ? '-mt-[10rem] pt-4'
                     : 'pt-4'
               }`}
             >

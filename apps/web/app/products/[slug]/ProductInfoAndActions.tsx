@@ -53,9 +53,6 @@ interface ProductInfoAndActionsProps {
   onCustomizeDraftTextChange: (value: string) => void;
   customizeTextMaxLength: number;
   price: number;
-  originalPrice: number | null;
-  compareAtPrice: number | null;
-  discountPercent: number | null;
   language: LanguageCode;
   isOutOfStock: boolean;
   canAddToCart: boolean;
@@ -68,6 +65,8 @@ interface ProductInfoAndActionsProps {
   sizeOptions: ProductOptionValue[];
   onColorSelect: (color: string) => void;
   onSizeSelect: (size: string) => void;
+  /** Select variant by size collection + version from size catalog modal item. */
+  onCatalogVariantSelect?: (sizeCollectionTitle: string, version: string) => void;
   /** Quick add (e.g. bag icon) — stay on page. */
   onAddToCart: () => Promise<void>;
   /** Primary CTA — add line then continue to checkout. */
@@ -136,6 +135,30 @@ function matchVariantSizeFromCatalogTitle(title: string, options: ProductOptionV
   return byValue?.value ?? null;
 }
 
+function getVariantOptionValueByKey(variant: ProductVariant | null, key: string): string | null {
+  if (!variant?.options || variant.options.length === 0) {
+    return null;
+  }
+  const normalizedKey = key.trim().toLowerCase();
+  const option = variant.options.find((item) => {
+    const optionKey = (item.key || item.attribute || '').trim().toLowerCase();
+    return optionKey === normalizedKey;
+  });
+  return option?.value?.trim() ?? null;
+}
+
+function normalizeVersionToken(value: string): string {
+  const normalized = value.toLowerCase().trim().replace(/\s+/g, '');
+  if (!normalized) {
+    return '';
+  }
+  const numericMatch = normalized.match(/(\d+)/);
+  if (!numericMatch) {
+    return normalized;
+  }
+  return `v${numericMatch[1]}`;
+}
+
 function getCustomizeCopy(language: LanguageCode): string {
   switch (language) {
     case 'hy':
@@ -152,9 +175,6 @@ export function ProductInfoAndActions({
   appliedCustomize,
   onCustomizeApplied,
   price,
-  originalPrice,
-  compareAtPrice,
-  discountPercent,
   language,
   isOutOfStock,
   canAddToCart,
@@ -167,6 +187,7 @@ export function ProductInfoAndActions({
   sizeOptions,
   onColorSelect,
   onSizeSelect,
+  onCatalogVariantSelect,
   onAddToCart,
   onBuyNow,
   onSelectedCatalogSizeChange,
@@ -272,12 +293,42 @@ export function ProductInfoAndActions({
     t(language, 'product.choose_size');
   const selectedCollectionTitle = selectedCatalogSize?.categoryTitle?.trim() ?? '';
   const selectedCollectionPriceAmd = selectedCatalogSize?.categoryPriceAmd ?? 0;
+  const selectedCollectionFromVariant = selectedSize?.trim().toLowerCase() ?? '';
+  const selectedVersionFromVariant = normalizeVersionToken(
+    getVariantOptionValueByKey(currentVariant, 'size_version') ?? ''
+  );
+  const filteredSizeCatalogCategories = useMemo(() => {
+    if (!selectedCollectionFromVariant && !selectedVersionFromVariant) {
+      return sizeCatalogCategories;
+    }
+
+    return sizeCatalogCategories
+      .filter((category) => {
+        if (!selectedCollectionFromVariant) {
+          return true;
+        }
+        return category.title.trim().toLowerCase() === selectedCollectionFromVariant;
+      })
+      .map((category) => ({
+        ...category,
+        items: selectedVersionFromVariant
+          ? category.items.filter(
+              (item) => normalizeVersionToken(item.version) === selectedVersionFromVariant
+            )
+          : category.items,
+      }))
+      .filter((category) => category.items.length > 0);
+  }, [sizeCatalogCategories, selectedCollectionFromVariant, selectedVersionFromVariant]);
 
   const handleSelectCatalogSizeItem = (item: SizeCatalogItemDto) => {
     setSelectedCatalogSize(item);
     setSelectedCustomSizeRequest(null);
+    if (onCatalogVariantSelect) {
+      onCatalogVariantSelect(item.categoryTitle, item.version);
+      return;
+    }
     if (sizeOptions.length > 0) {
-      const matched = matchVariantSizeFromCatalogTitle(item.title, sizeOptions);
+      const matched = matchVariantSizeFromCatalogTitle(item.categoryTitle, sizeOptions);
       if (matched) {
         onSizeSelect(matched);
       }
@@ -323,11 +374,11 @@ export function ProductInfoAndActions({
     onCustomizeApplied(null);
   }, [clearAppliedPreviewTimer, onCustomizeApplied]);
 
-  /** EN labels are shorter — slightly larger type; HY/RU/KA stay compact so four tabs stay on one row. */
+  /** EN labels are shorter — slightly larger type; HY/RU/KA stay compact enough for horizontal tab scrolling. */
   const productTabLabelClass =
     language === 'en'
-      ? 'pb-2.5 font-montserrat text-[15px] font-extrabold leading-none sm:text-[16px] md:text-[17px]'
-      : 'pb-2.5 font-montserrat text-[14px] font-extrabold leading-none sm:text-[15px] md:text-[16px]';
+      ? 'pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:text-[18px] md:text-[19px]'
+      : 'pb-3 font-montserrat text-[16px] font-extrabold leading-none sm:text-[17px] md:text-[18px]';
 
   const collectionBadgeItems = useMemo(() => getProductCollectionBadgeItems(product), [product]);
 
@@ -597,10 +648,10 @@ export function ProductInfoAndActions({
         </div>
       )}
 
-      <div className="mt-12 min-w-0 w-full">
+      <div className="mt-14 min-w-0 w-full">
         <div className="w-full min-w-0 touch-pan-x overflow-x-auto overscroll-x-contain scroll-px-1 pb-2 scrollbar-hide [-webkit-overflow-scrolling:touch] sm:touch-auto sm:pb-0">
           <div
-            className="flex w-max max-w-none snap-x snap-mandatory flex-nowrap items-end gap-3 pr-3 sm:snap-none sm:gap-4 sm:pr-4"
+            className="flex w-max max-w-none snap-x snap-mandatory flex-nowrap items-end gap-5 pr-4 sm:snap-none sm:gap-7 sm:pr-5"
             role="tablist"
           >
             <button
@@ -662,27 +713,17 @@ export function ProductInfoAndActions({
           </div>
         </div>
 
-        <div className="pt-5 sm:pt-6">{renderedTabContent}</div>
+        <div className="pt-7 sm:pt-8">{renderedTabContent}</div>
       </div>
 
-      <div className="mt-[48px] flex w-full min-w-0 max-w-[763px] flex-col gap-3 sm:flex-row sm:items-end sm:gap-12">
-        <div className="flex min-w-0 w-full flex-wrap items-end gap-2 sm:max-w-[291px] sm:gap-3">
+      <div className="mt-[48px] flex w-full min-w-0 max-w-[763px] items-end justify-between gap-3">
+        <div className="flex min-w-0 flex-1 flex-wrap items-end gap-2 sm:max-w-[291px] sm:gap-3">
           <p className="font-montserrat text-[30px] font-extrabold leading-none text-black sm:text-[32px]">
             {formatCatalogPrice(price, displayCurrency)}
           </p>
-          {(originalPrice || (compareAtPrice && compareAtPrice > price)) && (
-            <p className="pb-0.5 text-[15px] leading-none text-[#9d9d9d] line-through sm:text-[16px]">
-              {formatCatalogPrice(originalPrice || compareAtPrice || 0, displayCurrency)}
-            </p>
-          )}
-          {discountPercent && discountPercent > 0 && (
-            <span className="rounded-[6px] bg-[#122a26] px-2 py-1 text-[12px] font-medium text-white">
-              -{discountPercent}%
-            </span>
-          )}
         </div>
 
-        <div className="flex w-full shrink-0 items-center gap-0.5 sm:w-auto sm:gap-1.5">
+        <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1.5">
           <Button
             type="button"
             disabled={!canAddToCart || isAddingToCart}
@@ -746,7 +787,7 @@ export function ProductInfoAndActions({
       isOpen={isCustomizeSizeModalOpen}
       onClose={() => setIsCustomizeSizeModalOpen(false)}
       language={language}
-      sizeCategories={sizeCatalogCategories}
+      sizeCategories={filteredSizeCatalogCategories}
       selectedSizeItemId={selectedCatalogSize?.id ?? null}
       onSelectSizeCatalogItem={handleSelectCatalogSizeItem}
       onSelectCustomSizeRequest={handleSelectCustomSizeRequest}

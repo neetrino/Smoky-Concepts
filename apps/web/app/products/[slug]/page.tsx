@@ -42,12 +42,11 @@ export default function ProductPage({ params }: ProductPageProps) {
     currentVariant,
     price,
     originalPrice,
-    compareAtPrice,
-    discountPercent,
     isOutOfStock,
     canAddToCart,
     handleColorSelect,
     handleSizeSelect,
+    handleCatalogVariantSelect,
   } = useProductPage(params);
 
   const [selectedCatalogSize, setSelectedCatalogSize] = useState<SizeCatalogItemDto | null>(null);
@@ -185,9 +184,6 @@ export default function ProductPage({ params }: ProductPageProps) {
             customizeFormat={customizeFormat}
             onCustomizeFormatChange={setCustomizeFormat}
             price={price}
-            originalPrice={originalPrice}
-            compareAtPrice={compareAtPrice}
-            discountPercent={discountPercent}
             language={language}
             isOutOfStock={isOutOfStock}
             canAddToCart={canAddToCart}
@@ -200,6 +196,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             sizeOptions={sizeOptions}
             onColorSelect={handleColorSelect}
             onSizeSelect={handleSizeSelect}
+            onCatalogVariantSelect={handleCatalogVariantSelect}
             onAddToCart={handleAddToCart}
             onBuyNow={handleBuyNow}
             onSelectedCatalogSizeChange={setSelectedCatalogSize}

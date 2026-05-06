@@ -6,7 +6,6 @@ import { ADMIN_PRODUCT_INPUT_CURRENCY, CURRENCIES } from '@/lib/currency';
 import { useTranslation } from '@/lib/i18n-client';
 import type { Category, Variant, ProductLabel, GeneratedVariant } from '../types';
 import type { CategoryAttribute } from '@/lib/category-attributes';
-import type { SizeCatalogCategoryDto } from '@/lib/types/size-catalog';
 import { BasicInformation } from './BasicInformation';
 import { ProductImages } from './ProductImages';
 import { CategoriesBrands } from './CategoriesBrands';
@@ -15,6 +14,7 @@ import { VariantBuilder } from './VariantBuilder';
 import { ProductLabels } from './ProductLabels';
 import { Publishing } from './Publishing';
 import { FormActions } from './FormActions';
+import { SHOW_COMPARE_AT_PRICE_FIELD } from '../constants/compareAtPriceVisibility.constants';
 
 interface AddProductFormContentProps {
   formData: {
@@ -42,7 +42,6 @@ interface AddProductFormContentProps {
     quantity: string;
   };
   categories: Category[];
-  sizeCatalogCategories: SizeCatalogCategoryDto[];
   isEditMode: boolean;
   loading: boolean;
   imageUploadLoading: boolean;
@@ -72,7 +71,6 @@ interface AddProductFormContentProps {
   onNewCategoryNameChange: (name: string) => void;
   onCategoryIdsChange: (ids: string[]) => void;
   onPrimaryCategoryIdChange: (id: string) => void;
-  onSizeCatalogCategoryChange: (categoryId: string, categoryTitle: string) => void;
   onCreateCategory: (name: string) => Promise<void>;
   onPriceChange: (value: string) => void;
   onCompareAtPriceChange: (value: string) => void;
@@ -102,7 +100,6 @@ export function AddProductFormContent({
   variableProductTypeAllowed,
   simpleProductData,
   categories,
-  sizeCatalogCategories,
   isEditMode,
   loading,
   imageUploadLoading,
@@ -132,7 +129,6 @@ export function AddProductFormContent({
   onNewCategoryNameChange,
   onCategoryIdsChange,
   onPrimaryCategoryIdChange,
-  onSizeCatalogCategoryChange,
   onCreateCategory,
   onPriceChange,
   onCompareAtPriceChange,
@@ -189,25 +185,29 @@ export function AddProductFormContent({
             <p className="mb-3 text-sm font-semibold text-gray-700">
               {t('admin.products.add.defaultPricing') || 'Default Pricing'}
             </p>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap gap-6">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-gray-600 shrink-0">
-                    {t('admin.products.add.price')}
-                  </label>
-                  <Input
-                    type="number"
-                    value={simpleProductData.price}
-                    onChange={(e) => {
-                      onPriceChange(e.target.value);
-                    }}
-                    placeholder={t('admin.products.add.pricePlaceholder')}
-                    className="w-32 text-sm"
-                    min="0"
-                    step="0.01"
-                  />
-                  <span className="text-sm text-gray-500">{CURRENCIES[ADMIN_PRODUCT_INPUT_CURRENCY].symbol}</span>
-                </div>
+            <div
+              className={`grid gap-4 ${
+                SHOW_COMPARE_AT_PRICE_FIELD ? 'grid-cols-1 xl:grid-cols-4' : 'grid-cols-1 md:grid-cols-3'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-600 shrink-0">
+                  {t('admin.products.add.price')}
+                </label>
+                <Input
+                  type="number"
+                  value={simpleProductData.price}
+                  onChange={(e) => {
+                    onPriceChange(e.target.value);
+                  }}
+                  placeholder={t('admin.products.add.pricePlaceholder')}
+                  className="w-32 text-sm"
+                  min="0"
+                  step="0.01"
+                />
+                <span className="text-sm text-gray-500">{CURRENCIES[ADMIN_PRODUCT_INPUT_CURRENCY].symbol}</span>
+              </div>
+              {SHOW_COMPARE_AT_PRICE_FIELD ? (
                 <div className="flex items-center gap-2">
                   <label className="text-sm font-medium text-gray-600 shrink-0">
                     {t('admin.products.add.compareAtPrice')}
@@ -225,37 +225,35 @@ export function AddProductFormContent({
                   />
                   <span className="text-sm text-gray-500">{CURRENCIES[ADMIN_PRODUCT_INPUT_CURRENCY].symbol}</span>
                 </div>
+              ) : null}
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-600 shrink-0">
+                  {t('admin.products.add.sku')}
+                </label>
+                <Input
+                  type="text"
+                  value={simpleProductData.sku}
+                  onChange={(e) => {
+                    onSkuChange(e.target.value);
+                  }}
+                  placeholder={t('admin.products.add.autoGenerated')}
+                  className="w-40 min-w-[8rem] text-sm"
+                />
               </div>
-              <div className="flex flex-wrap gap-6">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-gray-600 shrink-0">
-                    {t('admin.products.add.sku')}
-                  </label>
-                  <Input
-                    type="text"
-                    value={simpleProductData.sku}
-                    onChange={(e) => {
-                      onSkuChange(e.target.value);
-                    }}
-                    placeholder={t('admin.products.add.autoGenerated')}
-                    className="w-40 min-w-[8rem] text-sm"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-gray-600 shrink-0">
-                    {t('admin.products.add.quantity')}
-                  </label>
-                  <Input
-                    type="number"
-                    value={simpleProductData.quantity}
-                    onChange={(e) => {
-                      onQuantityChange(e.target.value);
-                    }}
-                    placeholder={t('admin.products.add.quantityPlaceholder')}
-                    className="w-28 text-sm"
-                    min="0"
-                  />
-                </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-600 shrink-0">
+                  {t('admin.products.add.quantity')}
+                </label>
+                <Input
+                  type="number"
+                  value={simpleProductData.quantity}
+                  onChange={(e) => {
+                    onQuantityChange(e.target.value);
+                  }}
+                  placeholder={t('admin.products.add.quantityPlaceholder')}
+                  className="w-28 text-sm"
+                  min="0"
+                />
               </div>
             </div>
           </div>
@@ -273,9 +271,6 @@ export function AddProductFormContent({
           onCategoryIdsChange={onCategoryIdsChange}
           onPrimaryCategoryIdChange={onPrimaryCategoryIdChange}
           onCreateCategory={onCreateCategory}
-          sizeCatalogCategories={sizeCatalogCategories}
-          selectedSizeCatalogCategoryId={formData.sizeCatalogCategoryId}
-          onSizeCatalogCategoryChange={onSizeCatalogCategoryChange}
           isClothingCategory={isClothingCategory}
           onVariantsUpdate={onVariantsUpdate}
         />

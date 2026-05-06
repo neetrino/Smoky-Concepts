@@ -76,8 +76,8 @@ function PackFitCard({
         )}
       </div>
       <div className="flex min-h-[2.75rem] flex-col justify-end text-center">
-        <h3 className="text-xs font-extrabold leading-none text-[#414141]">{title}</h3>
-        {subtitle ? <p className="mt-1 text-[0.5rem] font-medium text-black">{subtitle}</p> : null}
+        <h3 className="text-xs font-black leading-none text-[#414141]">{title}</h3>
+        {subtitle ? <p className="mt-1 text-[0.5rem] font-semibold text-black">{subtitle}</p> : null}
       </div>
     </div>
   );
@@ -321,7 +321,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             <HomeActionButton
               href={getProductsPathWithSelectSizeAutopen()}
               label={t('home.homepage.packFit.cta')}
-              className="min-w-[19rem] font-semibold sm:font-black"
+              className="min-w-[19rem] text-[1.2rem] font-black text-[#0f201d] sm:text-base"
             />
           </div>
         </section>
@@ -330,14 +330,14 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <section className="flex flex-col gap-8 overflow-visible pt-3 sm:gap-10 sm:pt-6">
             <HomeSectionTitle
               title={t('home.homepage.coverCollections.title')}
-              className="-translate-y-6 sm:-translate-y-8"
+              className="-translate-y-9 sm:-translate-y-3"
             />
-            <div className="mt-12 grid grid-cols-2 items-start gap-x-2 gap-y-20 overflow-visible sm:mt-0 sm:grid-cols-4 sm:gap-8">
+            <div className="mt-4 grid grid-cols-2 items-start gap-x-2 gap-y-20 overflow-visible sm:mt-0 sm:grid-cols-4 sm:gap-8">
               {coverCollections.map((item) => (
                 <Link
                   key={item.slug}
                   href={`/products?category=${item.slug}`}
-                  className="group relative z-0 mt-5 -translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1rem] max-sm:bg-transparent bg-white px-2.5 pb-1 pt-0 shadow-none transition-shadow duration-200 hover:z-10 hover:shadow-none focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2rem] sm:px-6 sm:pb-8 sm:shadow-[0_6px_24px_rgba(18,42,38,0.05)] sm:hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)]"
+                  className="group relative z-0 mt-5 max-sm:translate-y-2 flex min-h-0 w-full min-w-0 justify-self-center flex-col overflow-visible rounded-[1rem] max-sm:bg-transparent bg-white px-2.5 pb-10 pt-0 shadow-none transition-shadow duration-200 hover:z-10 hover:shadow-none focus-visible:z-10 focus-within:z-10 sm:mt-8 sm:w-full sm:translate-y-0 sm:rounded-[2rem] sm:px-6 sm:pb-8 sm:shadow-[0_6px_24px_rgba(18,42,38,0.05)] sm:hover:shadow-[0_12px_32px_rgba(18,42,38,0.12)]"
                 >
                   <span
                     aria-hidden
@@ -364,7 +364,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     )}
                   </div>
                   <h3
-                    className={`relative z-[1] mt-6 text-lg font-black leading-tight text-[#414141] max-sm:-translate-y-6 sm:mt-12 sm:translate-y-0 sm:text-2xl lg:text-3xl ${
+                    className={`relative z-[1] max-sm:-mt-1 text-lg font-black leading-tight text-[#414141] sm:mt-12 sm:translate-y-3 sm:text-2xl lg:text-3xl ${
                       item.slug === 'special-edition' ? 'line-clamp-1 whitespace-nowrap' : 'line-clamp-2'
                     }`}
                   >
@@ -384,21 +384,22 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               line1Rest: t('home.homepage.ritual.description.line1Rest'),
               line2: t('home.homepage.ritual.description.line2'),
             }}
+            className="[&_p]:text-[0.95rem] sm:[&_p]:text-[0.95rem] [&_p]:font-medium"
             titleClassName="sm:whitespace-normal !font-black"
           />
-          <div className="overflow-hidden rounded-[1.5rem] sm:rounded-[2.25rem]">
+          <div className="overflow-hidden rounded-t-[1.5rem] rounded-b-[0.4rem] sm:rounded-t-[2.25rem] sm:rounded-b-[0.55rem]">
             <div className="relative h-[24rem] sm:h-[30rem]">
               <Image src={HOME_ASSET_PATHS.ritualBanner} alt={t('home.homepage.ritual.bannerAlt')} fill className="object-cover" sizes="1680px" />
             </div>
           </div>
-          <div className="-mt-5 rounded-[1.5rem] rounded-t-xl bg-white px-5 pb-6 pt-5 font-montserrat shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:-mt-7 sm:rounded-[2.25rem] sm:px-8 sm:pb-7 sm:pt-6">
+          <div className="-mt-2 rounded-b-[1.5rem] rounded-t-[0.4rem] bg-white px-5 pb-6 pt-5 font-montserrat shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:-mt-2 sm:rounded-b-[2.25rem] sm:rounded-t-[0.55rem] sm:px-8 sm:pb-7 sm:pt-6">
             <div className="grid max-xl:gap-0 gap-6 xl:grid-cols-4">
               {RITUAL_STEPS.map((step, index) => (
                 <div
                   key={step.step}
                   className={`flex gap-3 ${
                     index < RITUAL_STEPS.length - 1
-                      ? 'border-b border-[#eeeeee] pb-6 xl:border-b-0 xl:border-r xl:border-[#eeeeee] xl:pb-0 xl:pr-6'
+                      ? 'border-b border-[#dddddd] pb-6 xl:border-b-0 xl:border-r xl:border-[#dddddd] xl:pb-0 xl:pr-6'
                       : ''
                   }`}
                 >
@@ -406,10 +407,10 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     {step.step}
                   </span>
                   <div className="min-w-0 pt-0.5">
-                    <h3 className="text-base font-bold leading-snug text-[#333333] sm:text-lg">
+                    <h3 className="text-base font-bold leading-snug text-[#1f1f1f] sm:text-lg">
                       {t(`home.homepage.ritual.steps.${ritualStepKeys[index]}.title`)}
                     </h3>
-                    <p className="mt-0.5 text-xs font-normal leading-relaxed text-[#333333] sm:text-sm">
+                    <p className="mt-0.5 text-xs font-normal leading-relaxed text-[#2a2a2a] sm:text-sm">
                       {t(`home.homepage.ritual.steps.${ritualStepKeys[index]}.description`)}
                     </p>
                   </div>
@@ -469,7 +470,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     src="/assets/home/concepts/behind-creation.webp"
                     alt={t('home.homepage.behindCreation.imageAlt')}
                     fill
-                    className="object-cover"
+                    className="object-cover object-[58%_center] sm:object-center"
                     sizes="(max-width: 896px) 100vw, 896px"
                   />
                   <div className="absolute inset-0 bg-black/15" />
@@ -478,18 +479,36 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                 <button
                   type="button"
-                  className="pointer-events-auto flex min-h-[4rem] min-w-[4rem] items-center justify-center rounded-full bg-transparent p-2 transition-transform hover:scale-105 sm:min-h-[6rem] sm:min-w-[6rem] sm:p-4"
+                  className="pointer-events-auto flex min-h-[3.4rem] min-w-[3.4rem] translate-x-6 items-center justify-center rounded-full p-2 transition-transform hover:scale-105 sm:min-h-[4.7rem] sm:min-w-[4.7rem] sm:translate-x-7 sm:p-3"
                 >
-                  <img
-                    src={HOME_ASSET_PATHS.youtubeIcon}
-                    alt={t('home.homepage.behindCreation.youtubeAlt')}
-                    className="h-10 w-10 max-h-none max-w-none object-contain drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)] sm:h-16 sm:w-16"
-                  />
+                  <span
+                    aria-hidden="true"
+                    className="relative flex h-[3.15rem] w-[3.15rem] items-center justify-center rounded-full bg-[#dcc090] drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)] sm:h-[4.25rem] sm:w-[4.25rem]"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="ml-[0.3rem] h-[2.7rem] w-[2.7rem] sm:ml-[0.34rem] sm:h-[3.2rem] sm:w-[3.2rem]"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M8 6.5c0-.83.94-1.3 1.6-.8l7.2 5.5a1 1 0 0 1 0 1.6l-7.2 5.5A1 1 0 0 1 8 17.5v-11Z"
+                        fill="#1f2442"
+                        stroke="#1f2442"
+                        strokeWidth="0.9"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <span className="sr-only">{t('home.homepage.behindCreation.youtubeAlt')}</span>
                 </button>
               </div>
             </div>
             <div className="mt-4 flex justify-center sm:mt-5">
-              <HomeActionButton href="/about" label={t('home.homepage.behindCreation.cta')} />
+              <HomeActionButton
+                href="/about"
+                label={t('home.homepage.behindCreation.cta')}
+                className="min-w-[13.75rem] !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-semibold !tracking-[0.14em] sm:min-w-[14.25rem] sm:!text-[1.12rem] sm:!tracking-[0.16em]"
+              />
             </div>
           </div>
         </section>
@@ -497,7 +516,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
         <CultureVotingSection />
 
         <section className="grid gap-8 overflow-visible sm:gap-10 xl:grid-cols-[minmax(0,32rem)_minmax(0,1fr)]">
-          <div className="flex flex-col justify-center gap-6 sm:gap-8">
+          <div className="flex flex-col justify-start gap-6 pt-8 sm:gap-8 sm:pt-10 xl:pt-16">
             <HomeSectionTitle
               title={t('home.homepage.upcomingLines.title')}
               description={t('home.homepage.upcomingLines.description')}

@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useRef, useState, type SetStateAction } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, type SetStateAction } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../../lib/i18n-client';
@@ -22,6 +22,107 @@ import type { CategoryAttribute } from '@/lib/category-attributes';
 import type { SizeCatalogCategoryDto } from '@/lib/types/size-catalog';
 import type { Category } from './types';
 
+const DYNAMIC_SIZE_ATTRIBUTE_ID = '__dynamic_size_catalog_attribute__';
+const DYNAMIC_SIZE_VERSION_ATTRIBUTE_ID = '__dynamic_size_catalog_version_attribute__';
+const DYNAMIC_SIZE_ATTRIBUTE_KEY = 'size';
+const DYNAMIC_SIZE_VERSION_ATTRIBUTE_KEY = 'size_version';
+const DYNAMIC_SIZE_ATTRIBUTE_TITLE = 'Sizes';
+const DYNAMIC_SIZE_VERSION_ATTRIBUTE_TITLE = 'Version';
+
+function normalizeCatalogToken(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, '-');
+}
+
+function buildCategoryAttributesWithSizeCatalog(
+  categoryAttributes: CategoryAttribute[],
+  sizeCatalogCategories: SizeCatalogCategoryDto[]
+): CategoryAttribute[] {
+  const baseAttributes = categoryAttributes.filter(
+    (attribute) =>
+      attribute.key !== DYNAMIC_SIZE_ATTRIBUTE_KEY &&
+      attribute.key !== DYNAMIC_SIZE_VERSION_ATTRIBUTE_KEY
+  );
+  if (sizeCatalogCategories.length === 0) {
+    return baseAttributes;
+  }
+
+  const collectionMap = new Map<
+    string,
+    {
+      title: string;
+      token: string;
+      previewImageUrl: string | null;
+      versions: Set<string>;
+    }
+  >();
+
+  sizeCatalogCategories.forEach((category) => {
+    const title = category.title.trim();
+    if (!title) {
+      return;
+    }
+    const normalizedTitle = title.toLowerCase();
+    const token = normalizeCatalogToken(title);
+    const current = collectionMap.get(normalizedTitle) ?? {
+      title,
+      token,
+      previewImageUrl: null,
+      versions: new Set<string>(),
+    };
+
+    if (!current.previewImageUrl) {
+      const firstImage = category.items.find((item) => item.imageUrl)?.imageUrl ?? null;
+      current.previewImageUrl = firstImage;
+    }
+
+    category.items.forEach((item) => {
+      const version = item.version.trim();
+      if (version) {
+        current.versions.add(version);
+      }
+    });
+
+    collectionMap.set(normalizedTitle, current);
+  });
+
+  const collections = Array.from(collectionMap.values()).sort((a, b) => a.title.localeCompare(b.title));
+  if (collections.length === 0) {
+    return baseAttributes;
+  }
+
+  const sizeAttribute: CategoryAttribute = {
+    id: DYNAMIC_SIZE_ATTRIBUTE_ID,
+    key: DYNAMIC_SIZE_ATTRIBUTE_KEY,
+    title: DYNAMIC_SIZE_ATTRIBUTE_TITLE,
+    values: collections.map((collection) => ({
+      id: `size-catalog-collection:${collection.token}`,
+      value: collection.title,
+      label: collection.title,
+      colors: [],
+      imageUrl: collection.previewImageUrl,
+    })),
+  };
+
+  const versionAttribute: CategoryAttribute = {
+    id: DYNAMIC_SIZE_VERSION_ATTRIBUTE_ID,
+    key: DYNAMIC_SIZE_VERSION_ATTRIBUTE_KEY,
+    title: DYNAMIC_SIZE_VERSION_ATTRIBUTE_TITLE,
+    values: collections.flatMap((collection) =>
+      Array.from(collection.versions)
+        .sort((a, b) => a.localeCompare(b))
+        .map((version) => ({
+          id: `size-catalog-version:${collection.token}:${normalizeCatalogToken(version)}`,
+          value: version,
+          label: version,
+          colors: [],
+          imageUrl: null,
+        }))
+    ),
+  };
+
+  return [...baseAttributes, sizeAttribute, versionAttribute];
+}
+
 function AddProductPageContent() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
@@ -35,6 +136,10 @@ function AddProductPageContent() {
 
   const formState = useProductFormState();
   const [sizeCatalogCategories, setSizeCatalogCategories] = useState<SizeCatalogCategoryDto[]>([]);
+  const categoryAttributesForVariants = useMemo(
+    () => buildCategoryAttributesWithSizeCatalog(formState.categoryAttributes, sizeCatalogCategories),
+    [formState.categoryAttributes, sizeCatalogCategories]
+  );
 
   useProductDataLoading({
     isLoggedIn,
@@ -180,7 +285,7 @@ function AddProductPageContent() {
     if (formState.loadingProduct) {
       return;
     }
-    if (formState.categoryAttributes.length === 0 || formState.generatedVariants.length === 0) {
+    if (categoryAttributesForVariants.length === 0 || formState.generatedVariants.length === 0) {
       return;
     }
     if (attributePoolSeededForProductRef.current === productId) {
@@ -188,7 +293,7 @@ function AddProductPageContent() {
     }
 
     const derived = buildSelectedAttributeValueIdsMap(
-      formState.categoryAttributes,
+      categoryAttributesForVariants,
       formState.generatedVariants
     );
     if (Object.keys(derived).length === 0) {
@@ -198,7 +303,7 @@ function AddProductPageContent() {
 
     formState.setSelectedAttributeValueIds(derived);
     const enabled: Record<string, boolean> = {};
-    formState.categoryAttributes.forEach((attribute) => {
+    categoryAttributesForVariants.forEach((attribute) => {
       enabled[attribute.id] = Object.prototype.hasOwnProperty.call(derived, attribute.id);
     });
     formState.setEnabledAttributeIds(enabled);
@@ -207,26 +312,71 @@ function AddProductPageContent() {
     isEditMode,
     productId,
     formState.loadingProduct,
-    formState.categoryAttributes,
+    categoryAttributesForVariants,
     formState.generatedVariants,
     formState.setSelectedAttributeValueIds,
     formState.setEnabledAttributeIds,
   ]);
 
   useEffect(() => {
-    if (formState.categoryAttributes.length === 0 && Object.keys(formState.selectedAttributeValueIds).length > 0) {
+    if (
+      categoryAttributesForVariants.length === 0 &&
+      Object.keys(formState.selectedAttributeValueIds).length > 0
+    ) {
       formState.setSelectedAttributeValueIds({});
     }
-    if (formState.categoryAttributes.length === 0 && Object.keys(formState.enabledAttributeIds).length > 0) {
+    if (
+      categoryAttributesForVariants.length === 0 &&
+      Object.keys(formState.enabledAttributeIds).length > 0
+    ) {
       formState.setEnabledAttributeIds({});
     }
   }, [
-    formState.categoryAttributes,
+    categoryAttributesForVariants,
     formState.selectedAttributeValueIds,
     formState.enabledAttributeIds,
     formState.setSelectedAttributeValueIds,
     formState.setEnabledAttributeIds,
   ]);
+
+  useEffect(() => {
+    const allowedValueIds = new Set(
+      categoryAttributesForVariants.flatMap((attribute) => attribute.values.map((value) => value.id))
+    );
+    if (allowedValueIds.size === 0) {
+      return;
+    }
+
+    formState.setGeneratedVariants((prev) => {
+      let hasChanges = false;
+      const nextVariants = prev.map((variant) => {
+        const nextSelectedValueIds = variant.selectedValueIds.filter((valueId) => allowedValueIds.has(valueId));
+        if (nextSelectedValueIds.length === variant.selectedValueIds.length) {
+          return variant;
+        }
+        hasChanges = true;
+        return { ...variant, selectedValueIds: nextSelectedValueIds };
+      });
+      return hasChanges ? nextVariants : prev;
+    });
+
+    formState.setSelectedAttributeValueIds((prev) => {
+      let hasChanges = false;
+      const next: Record<string, string[]> = {};
+
+      Object.entries(prev).forEach(([attributeId, valueIds]) => {
+        const filtered = valueIds.filter((valueId) => allowedValueIds.has(valueId));
+        if (filtered.length > 0) {
+          next[attributeId] = filtered;
+        }
+        if (filtered.length !== valueIds.length) {
+          hasChanges = true;
+        }
+      });
+
+      return hasChanges ? next : prev;
+    });
+  }, [categoryAttributesForVariants, formState.setGeneratedVariants, formState.setSelectedAttributeValueIds]);
 
   const {
     handleTitleChange,
@@ -325,7 +475,7 @@ function AddProductPageContent() {
     isEditMode,
     productId,
     isClothingCategory,
-    categoryAttributes: formState.categoryAttributes,
+    categoryAttributes: categoryAttributesForVariants,
     setSubmitErrorKey: formState.setSubmitErrorKey,
   });
 
@@ -368,7 +518,6 @@ function AddProductPageContent() {
             productType={formState.productType}
             simpleProductData={formState.simpleProductData}
             categories={formState.categories}
-            sizeCatalogCategories={sizeCatalogCategories}
             isEditMode={isEditMode}
             loading={formState.loading}
             imageUploadLoading={formState.imageUploadLoading}
@@ -377,7 +526,7 @@ function AddProductPageContent() {
             useNewCategory={formState.useNewCategory}
             newCategoryName={formState.newCategoryName}
             generatedVariants={formState.generatedVariants}
-            categoryAttributes={formState.categoryAttributes}
+            categoryAttributes={categoryAttributesForVariants}
             selectedAttributeValueIds={formState.selectedAttributeValueIds}
             enabledAttributeIds={formState.enabledAttributeIds}
             onEnabledAttributeIdsChange={formState.setEnabledAttributeIds}
@@ -399,13 +548,6 @@ function AddProductPageContent() {
             onNewCategoryNameChange={formState.setNewCategoryName}
             onCategoryIdsChange={(ids) => formState.setFormData((prev) => ({ ...prev, categoryIds: ids }))}
             onPrimaryCategoryIdChange={(id) => formState.setFormData((prev) => ({ ...prev, primaryCategoryId: id }))}
-            onSizeCatalogCategoryChange={(categoryId, categoryTitle) =>
-              formState.setFormData((prev) => ({
-                ...prev,
-                sizeCatalogCategoryId: categoryId,
-                sizeCatalogCategoryTitle: categoryTitle,
-              }))
-            }
             onCreateCategory={handleCreateCategory}
             onPriceChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, price: value }))}
             onCompareAtPriceChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, compareAtPrice: value }))}

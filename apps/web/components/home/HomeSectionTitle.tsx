@@ -71,7 +71,7 @@ export function HomeSectionTitle({
           {descriptionTwoLine.line2}
         </p>
       ) : descriptionEmphasis ? (
-        <p className="max-w-[52rem] whitespace-pre-line text-base font-normal leading-[1.375] text-[#414141] sm:leading-relaxed">
+        <p className="max-w-[52rem] whitespace-nowrap text-[15px] font-normal leading-[1.375] text-[#414141] sm:whitespace-pre-line sm:text-base sm:leading-relaxed">
           {descriptionEmphasis.lead}
           <span className="font-black">{descriptionEmphasis.bold1}</span>
           {descriptionEmphasis.mid}

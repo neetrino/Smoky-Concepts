@@ -21,7 +21,7 @@ interface RelatedProductsProps {
 
 /** Same strip as products catalog (non-filtered): horizontal scroll row. */
 const CATALOG_ROW_SCROLL_CLASS = 'scrollbar-hide mt-4 overflow-x-auto pt-10 pb-4';
-const CATALOG_ROW_FLEX_CLASS = 'flex min-w-max gap-6';
+const CATALOG_ROW_FLEX_CLASS = 'flex min-w-max gap-7 sm:gap-8';
 
 /**
  * Related products on the PDP — same card row spacing as the products catalog page.

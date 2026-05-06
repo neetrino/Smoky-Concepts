@@ -8,6 +8,7 @@ import { useVariantSelection } from './hooks/useVariantSelection';
 import { useProductQuantity } from './hooks/useProductQuantity';
 import { useProductCalculations } from './hooks/useProductCalculations';
 import { useAttributeGroups } from './useAttributeGroups';
+import type { ProductVariant } from './types';
 import { getOptionValue } from './utils/variant-helpers';
 import { findVariantByAllAttributes } from './utils/variant-finders';
 import { switchToVariantImage } from './utils/image-switching';
@@ -20,6 +21,7 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedSizeVersion, setSelectedSizeVersion] = useState<string | null>(null);
 
   const resolvedParams = use(params);
   const rawSlug = resolvedParams?.slug ?? '';
@@ -36,9 +38,57 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   });
 
   const images = useProductImages(product);
-  const selectedAttributeValues = useMemo(() => new Map<string, string>(), []);
+  const selectedAttributeValues = useMemo(() => {
+    const map = new Map<string, string>();
+    if (selectedSizeVersion) {
+      map.set('size_version', selectedSizeVersion);
+    }
+    return map;
+  }, [selectedSizeVersion]);
+
+  const normalizeVersionToken = (value: string | null): string | null => {
+    if (!value) {
+      return null;
+    }
+    const normalized = value.toLowerCase().trim();
+    if (!normalized) {
+      return null;
+    }
+    const compact = normalized.replace(/\s+/g, '');
+    const numericMatch = compact.match(/(\d+)/);
+    if (!numericMatch) {
+      return compact;
+    }
+    return `v${numericMatch[1]}`;
+  };
 
   const { setSelectedVariant, currentVariant } = useVariantSelection({ product });
+  const fallbackDefaultVariant = useMemo<ProductVariant | null>(() => {
+    if (!product || currentVariant) {
+      return null;
+    }
+    if ((product.variants?.length ?? 0) > 0) {
+      return null;
+    }
+    if (!product.defaultVariantId) {
+      return null;
+    }
+
+    const stock = Math.max(0, product.defaultVariantStock ?? 0);
+    return {
+      id: product.defaultVariantId,
+      sku: product.defaultVariantSku ?? '',
+      price: product.defaultPrice ?? 0,
+      originalPrice: product.defaultOriginalPrice ?? null,
+      compareAtPrice: product.defaultCompareAtPrice ?? undefined,
+      stock,
+      available: stock > 0,
+      options: [],
+      productDiscount: product.productDiscount ?? null,
+      globalDiscount: product.globalDiscount ?? null,
+    };
+  }, [currentVariant, product]);
+  const variantForPurchase = currentVariant ?? fallbackDefaultVariant;
   const attributeGroups = useAttributeGroups({
     product,
     selectedColor,
@@ -56,10 +106,10 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     isOutOfStock,
     isVariationRequired,
     canAddToCart,
-  } = useProductCalculations({ product, currentVariant });
+  } = useProductCalculations({ product, currentVariant: variantForPurchase });
 
   const { quantity, maxQuantity, adjustQuantity } = useProductQuantity({
-    currentVariant,
+    currentVariant: variantForPurchase,
     isOutOfStock,
     isVariationRequired,
   });
@@ -82,6 +132,7 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
       setSelectedVariant(initialVariant);
       setSelectedColor(getOptionValue(initialVariant.options, 'color'));
       setSelectedSize(getOptionValue(initialVariant.options, 'size'));
+      setSelectedSizeVersion(getOptionValue(initialVariant.options, 'size_version'));
       setCurrentImageIndex(0);
       setThumbnailStartIndex(0);
       return;
@@ -93,12 +144,14 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
         setSelectedVariant(null);
         setSelectedColor(null);
         setSelectedSize(null);
+        setSelectedSizeVersion(null);
         return;
       }
       const fallbackVariant = product.variants[0];
       setSelectedVariant(fallbackVariant);
       setSelectedColor(getOptionValue(fallbackVariant.options, 'color'));
       setSelectedSize(getOptionValue(fallbackVariant.options, 'size'));
+      setSelectedSizeVersion(getOptionValue(fallbackVariant.options, 'size_version'));
     }
   }, [product?.id, product?.variants, variantIdFromUrl, setSelectedVariant]);
 
@@ -151,9 +204,11 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
 
     const nextColor = getOptionValue(currentVariant.options, 'color');
     const nextSize = getOptionValue(currentVariant.options, 'size');
+    const nextSizeVersion = getOptionValue(currentVariant.options, 'size_version');
 
     setSelectedColor((prev) => (prev === nextColor ? prev : nextColor));
     setSelectedSize((prev) => (prev === nextSize ? prev : nextSize));
+    setSelectedSizeVersion((prev) => (prev === nextSizeVersion ? prev : nextSizeVersion));
   }, [currentVariant?.id]);
 
   const handleColorSelect = (color: string) => {
@@ -162,15 +217,43 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
 
   const handleSizeSelect = (size: string) => {
     setSelectedSize(size.toLowerCase().trim());
+    setSelectedSizeVersion(null);
+  };
+
+  const handleCatalogVariantSelect = (sizeCollectionTitle: string, version: string) => {
+    const normalizedSize = sizeCollectionTitle.toLowerCase().trim();
+    const normalizedVersion = normalizeVersionToken(version);
+    if (!product?.variants?.length || !normalizedSize || !normalizedVersion) {
+      return;
+    }
+
+    const exactMatches = product.variants.filter((variant) => {
+      const variantSize = getOptionValue(variant.options, 'size');
+      const variantVersion = normalizeVersionToken(getOptionValue(variant.options, 'size_version'));
+      return variantSize === normalizedSize && variantVersion === normalizedVersion;
+    });
+
+    if (exactMatches.length === 0) {
+      return;
+    }
+
+    const colorPreferredMatch =
+      selectedColor != null
+        ? exactMatches.find((variant) => getOptionValue(variant.options, 'color') === selectedColor)
+        : null;
+    const inStockMatch = exactMatches.find((variant) => variant.stock > 0);
+    const nextVariant = colorPreferredMatch || inStockMatch || exactMatches[0];
+
+    setSelectedVariant(nextVariant);
+    setSelectedSize(normalizedSize);
+    setSelectedSizeVersion(normalizedVersion);
+    const nextColor = getOptionValue(nextVariant.options, 'color');
+    setSelectedColor(nextColor);
+    switchToVariantImage(nextVariant, product, images, setCurrentImageIndex);
   };
 
   const handleImageIndexChange = (index: number) => {
     setCurrentImageIndex(index);
-    if (index === 0) {
-      setSelectedVariant(null);
-      setSelectedColor(null);
-      setSelectedSize(null);
-    }
   };
 
   return {
@@ -192,7 +275,7 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     setShowMessage,
     quantity,
     slug,
-    currentVariant,
+    currentVariant: variantForPurchase,
     price,
     originalPrice,
     compareAtPrice,
@@ -203,5 +286,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     adjustQuantity,
     handleColorSelect,
     handleSizeSelect,
+    handleCatalogVariantSelect,
   };
 }
