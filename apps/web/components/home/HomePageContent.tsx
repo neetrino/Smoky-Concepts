@@ -330,9 +330,9 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <section className="flex flex-col gap-8 overflow-visible pt-3 sm:gap-10 sm:pt-6">
             <HomeSectionTitle
               title={t('home.homepage.coverCollections.title')}
-              className="-translate-y-6 sm:-translate-y-8"
+              className="-translate-y-1 sm:-translate-y-3"
             />
-            <div className="mt-12 grid grid-cols-2 items-start gap-x-2 gap-y-20 overflow-visible sm:mt-0 sm:grid-cols-4 sm:gap-8">
+            <div className="mt-4 grid grid-cols-2 items-start gap-x-2 gap-y-20 overflow-visible sm:mt-0 sm:grid-cols-4 sm:gap-8">
               {coverCollections.map((item) => (
                 <Link
                   key={item.slug}
@@ -364,7 +364,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     )}
                   </div>
                   <h3
-                    className={`relative z-[1] mt-6 text-lg font-black leading-tight text-[#414141] max-sm:-translate-y-6 sm:mt-12 sm:translate-y-0 sm:text-2xl lg:text-3xl ${
+                    className={`relative z-[1] mt-6 text-lg font-black leading-tight text-[#414141] max-sm:translate-y-1 sm:mt-12 sm:translate-y-3 sm:text-2xl lg:text-3xl ${
                       item.slug === 'special-edition' ? 'line-clamp-1 whitespace-nowrap' : 'line-clamp-2'
                     }`}
                   >
@@ -384,14 +384,15 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               line1Rest: t('home.homepage.ritual.description.line1Rest'),
               line2: t('home.homepage.ritual.description.line2'),
             }}
+            className="[&_p]:text-[0.95rem] sm:[&_p]:text-[0.95rem] [&_p]:font-medium"
             titleClassName="sm:whitespace-normal !font-black"
           />
-          <div className="overflow-hidden rounded-[1.5rem] sm:rounded-[2.25rem]">
+          <div className="overflow-hidden rounded-t-[1.5rem] rounded-b-[0.4rem] sm:rounded-t-[2.25rem] sm:rounded-b-[0.55rem]">
             <div className="relative h-[24rem] sm:h-[30rem]">
               <Image src={HOME_ASSET_PATHS.ritualBanner} alt={t('home.homepage.ritual.bannerAlt')} fill className="object-cover" sizes="1680px" />
             </div>
           </div>
-          <div className="-mt-5 rounded-[1.5rem] rounded-t-xl bg-white px-5 pb-6 pt-5 font-montserrat shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:-mt-7 sm:rounded-[2.25rem] sm:px-8 sm:pb-7 sm:pt-6">
+          <div className="-mt-2 rounded-b-[1.5rem] rounded-t-[0.4rem] bg-white px-5 pb-6 pt-5 font-montserrat shadow-[0_8px_30px_rgba(18,42,38,0.06)] sm:-mt-2 sm:rounded-b-[2.25rem] sm:rounded-t-[0.55rem] sm:px-8 sm:pb-7 sm:pt-6">
             <div className="grid max-xl:gap-0 gap-6 xl:grid-cols-4">
               {RITUAL_STEPS.map((step, index) => (
                 <div
