@@ -8,6 +8,7 @@ import { useVariantSelection } from './hooks/useVariantSelection';
 import { useProductQuantity } from './hooks/useProductQuantity';
 import { useProductCalculations } from './hooks/useProductCalculations';
 import { useAttributeGroups } from './useAttributeGroups';
+import type { ProductVariant } from './types';
 import { getOptionValue } from './utils/variant-helpers';
 import { findVariantByAllAttributes } from './utils/variant-finders';
 import { switchToVariantImage } from './utils/image-switching';
@@ -62,6 +63,32 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   };
 
   const { setSelectedVariant, currentVariant } = useVariantSelection({ product });
+  const fallbackDefaultVariant = useMemo<ProductVariant | null>(() => {
+    if (!product || currentVariant) {
+      return null;
+    }
+    if ((product.variants?.length ?? 0) > 0) {
+      return null;
+    }
+    if (!product.defaultVariantId) {
+      return null;
+    }
+
+    const stock = Math.max(0, product.defaultVariantStock ?? 0);
+    return {
+      id: product.defaultVariantId,
+      sku: product.defaultVariantSku ?? '',
+      price: product.defaultPrice ?? 0,
+      originalPrice: product.defaultOriginalPrice ?? null,
+      compareAtPrice: product.defaultCompareAtPrice ?? undefined,
+      stock,
+      available: stock > 0,
+      options: [],
+      productDiscount: product.productDiscount ?? null,
+      globalDiscount: product.globalDiscount ?? null,
+    };
+  }, [currentVariant, product]);
+  const variantForPurchase = currentVariant ?? fallbackDefaultVariant;
   const attributeGroups = useAttributeGroups({
     product,
     selectedColor,
@@ -79,10 +106,10 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     isOutOfStock,
     isVariationRequired,
     canAddToCart,
-  } = useProductCalculations({ product, currentVariant });
+  } = useProductCalculations({ product, currentVariant: variantForPurchase });
 
   const { quantity, maxQuantity, adjustQuantity } = useProductQuantity({
-    currentVariant,
+    currentVariant: variantForPurchase,
     isOutOfStock,
     isVariationRequired,
   });
@@ -227,12 +254,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
 
   const handleImageIndexChange = (index: number) => {
     setCurrentImageIndex(index);
-    if (index === 0) {
-      setSelectedVariant(null);
-      setSelectedColor(null);
-      setSelectedSize(null);
-      setSelectedSizeVersion(null);
-    }
   };
 
   return {
@@ -254,7 +275,7 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     setShowMessage,
     quantity,
     slug,
-    currentVariant,
+    currentVariant: variantForPurchase,
     price,
     originalPrice,
     compareAtPrice,

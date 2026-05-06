@@ -53,9 +53,6 @@ interface ProductInfoAndActionsProps {
   onCustomizeDraftTextChange: (value: string) => void;
   customizeTextMaxLength: number;
   price: number;
-  originalPrice: number | null;
-  compareAtPrice: number | null;
-  discountPercent: number | null;
   language: LanguageCode;
   isOutOfStock: boolean;
   canAddToCart: boolean;
@@ -178,9 +175,6 @@ export function ProductInfoAndActions({
   appliedCustomize,
   onCustomizeApplied,
   price,
-  originalPrice,
-  compareAtPrice,
-  discountPercent,
   language,
   isOutOfStock,
   canAddToCart,
@@ -727,16 +721,6 @@ export function ProductInfoAndActions({
           <p className="font-montserrat text-[30px] font-extrabold leading-none text-black sm:text-[32px]">
             {formatCatalogPrice(price, displayCurrency)}
           </p>
-          {(originalPrice || (compareAtPrice && compareAtPrice > price)) && (
-            <p className="pb-0.5 text-[15px] leading-none text-[#9d9d9d] line-through sm:text-[16px]">
-              {formatCatalogPrice(originalPrice || compareAtPrice || 0, displayCurrency)}
-            </p>
-          )}
-          {discountPercent && discountPercent > 0 && (
-            <span className="rounded-[6px] bg-[#122a26] px-2 py-1 text-[12px] font-medium text-white">
-              -{discountPercent}%
-            </span>
-          )}
         </div>
 
         <div className="flex w-full shrink-0 items-center gap-0.5 sm:w-auto sm:gap-1.5">

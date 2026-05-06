@@ -42,8 +42,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     currentVariant,
     price,
     originalPrice,
-    compareAtPrice,
-    discountPercent,
     isOutOfStock,
     canAddToCart,
     handleColorSelect,
@@ -186,9 +184,6 @@ export default function ProductPage({ params }: ProductPageProps) {
             customizeFormat={customizeFormat}
             onCustomizeFormatChange={setCustomizeFormat}
             price={price}
-            originalPrice={originalPrice}
-            compareAtPrice={compareAtPrice}
-            discountPercent={discountPercent}
             language={language}
             isOutOfStock={isOutOfStock}
             canAddToCart={canAddToCart}
