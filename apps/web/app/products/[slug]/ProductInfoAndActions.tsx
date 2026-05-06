@@ -380,11 +380,11 @@ export function ProductInfoAndActions({
     onCustomizeApplied(null);
   }, [clearAppliedPreviewTimer, onCustomizeApplied]);
 
-  /** EN labels are shorter — slightly larger type; HY/RU/KA stay compact so four tabs stay on one row. */
+  /** EN labels are shorter — slightly larger type; HY/RU/KA stay compact enough for horizontal tab scrolling. */
   const productTabLabelClass =
     language === 'en'
-      ? 'pb-2.5 font-montserrat text-[15px] font-extrabold leading-none sm:text-[16px] md:text-[17px]'
-      : 'pb-2.5 font-montserrat text-[14px] font-extrabold leading-none sm:text-[15px] md:text-[16px]';
+      ? 'pb-3 font-montserrat text-[17px] font-extrabold leading-none sm:text-[18px] md:text-[19px]'
+      : 'pb-3 font-montserrat text-[16px] font-extrabold leading-none sm:text-[17px] md:text-[18px]';
 
   const collectionBadgeItems = useMemo(() => getProductCollectionBadgeItems(product), [product]);
 
@@ -654,10 +654,10 @@ export function ProductInfoAndActions({
         </div>
       )}
 
-      <div className="mt-12 min-w-0 w-full">
+      <div className="mt-14 min-w-0 w-full">
         <div className="w-full min-w-0 touch-pan-x overflow-x-auto overscroll-x-contain scroll-px-1 pb-2 scrollbar-hide [-webkit-overflow-scrolling:touch] sm:touch-auto sm:pb-0">
           <div
-            className="flex w-max max-w-none snap-x snap-mandatory flex-nowrap items-end gap-3 pr-3 sm:snap-none sm:gap-4 sm:pr-4"
+            className="flex w-max max-w-none snap-x snap-mandatory flex-nowrap items-end gap-5 pr-4 sm:snap-none sm:gap-7 sm:pr-5"
             role="tablist"
           >
             <button
@@ -719,7 +719,7 @@ export function ProductInfoAndActions({
           </div>
         </div>
 
-        <div className="pt-5 sm:pt-6">{renderedTabContent}</div>
+        <div className="pt-7 sm:pt-8">{renderedTabContent}</div>
       </div>
 
       <div className="mt-[48px] flex w-full min-w-0 max-w-[763px] flex-col gap-3 sm:flex-row sm:items-end sm:gap-12">
