@@ -67,11 +67,17 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     if (!product || currentVariant) {
       return null;
     }
-    if ((product.variants?.length ?? 0) > 0) {
-      return null;
-    }
     if (!product.defaultVariantId) {
       return null;
+    }
+
+    const defaultVariantFromList =
+      product.variants?.find(
+        (variant) =>
+          variant.id === product.defaultVariantId || variant.id.endsWith(product.defaultVariantId)
+      ) ?? null;
+    if (defaultVariantFromList) {
+      return defaultVariantFromList;
     }
 
     const stock = Math.max(0, product.defaultVariantStock ?? 0);
@@ -223,30 +229,44 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   const handleCatalogVariantSelect = (sizeCollectionTitle: string, version: string) => {
     const normalizedSize = sizeCollectionTitle.toLowerCase().trim();
     const normalizedVersion = normalizeVersionToken(version);
-    if (!product?.variants?.length || !normalizedSize || !normalizedVersion) {
+    if (!product?.variants?.length || !normalizedSize) {
       return;
     }
 
     const exactMatches = product.variants.filter((variant) => {
       const variantSize = getOptionValue(variant.options, 'size');
       const variantVersion = normalizeVersionToken(getOptionValue(variant.options, 'size_version'));
+      if (!normalizedVersion) {
+        return variantSize === normalizedSize;
+      }
       return variantSize === normalizedSize && variantVersion === normalizedVersion;
     });
 
-    if (exactMatches.length === 0) {
+    const sizeOnlyMatches = product.variants.filter((variant) => {
+      const variantSize = getOptionValue(variant.options, 'size');
+      return variantSize === normalizedSize;
+    });
+
+    const candidateMatches = exactMatches.length > 0 ? exactMatches : sizeOnlyMatches;
+
+    if (candidateMatches.length === 0) {
       return;
     }
 
     const colorPreferredMatch =
       selectedColor != null
-        ? exactMatches.find((variant) => getOptionValue(variant.options, 'color') === selectedColor)
+        ? candidateMatches.find((variant) => getOptionValue(variant.options, 'color') === selectedColor)
         : null;
-    const inStockMatch = exactMatches.find((variant) => variant.stock > 0);
-    const nextVariant = colorPreferredMatch || inStockMatch || exactMatches[0];
+    const inStockMatch = candidateMatches.find((variant) => variant.stock > 0);
+    const nextVariant = colorPreferredMatch || inStockMatch || candidateMatches[0];
+    const nextVariantSize = getOptionValue(nextVariant.options, 'size') ?? normalizedSize;
+    const nextVariantVersion = normalizeVersionToken(
+      getOptionValue(nextVariant.options, 'size_version')
+    );
 
     setSelectedVariant(nextVariant);
-    setSelectedSize(normalizedSize);
-    setSelectedSizeVersion(normalizedVersion);
+    setSelectedSize(nextVariantSize);
+    setSelectedSizeVersion(nextVariantVersion ?? normalizedVersion);
     const nextColor = getOptionValue(nextVariant.options, 'color');
     setSelectedColor(nextColor);
     switchToVariantImage(nextVariant, product, images, setCurrentImageIndex);

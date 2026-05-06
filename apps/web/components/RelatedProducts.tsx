@@ -10,7 +10,6 @@ import {
   getCategoryLabel,
   getSectionLabel,
   getSizeLabel,
-  shouldNudgeCatalogProductImage,
   toCatalogProduct,
 } from '../app/products/components/catalogProductLabels';
 
@@ -21,7 +20,7 @@ interface RelatedProductsProps {
 
 /** Same strip as products catalog (non-filtered): horizontal scroll row. */
 const CATALOG_ROW_SCROLL_CLASS = 'scrollbar-hide mt-4 overflow-x-auto pt-10 pb-4';
-const CATALOG_ROW_FLEX_CLASS = 'flex min-w-max gap-7 sm:gap-8';
+const CATALOG_ROW_FLEX_CLASS = 'flex min-w-max gap-7 sm:gap-9';
 
 /**
  * Related products on the PDP — same card row spacing as the products catalog page.
@@ -132,9 +131,8 @@ export function RelatedProducts({ categorySlug, currentProductId }: RelatedProdu
                   sectionLabel={section}
                   sizeLabel={getSizeLabel(catalogProduct)}
                   categoryLabel={getCategoryLabel(catalogProduct, section)}
-                  imageNudgeDown={shouldNudgeCatalogProductImage(index)}
+                  tightenDetailsUnderImage
                   compactLayout
-                  widerCompactCard
                 />
               );
             })}
