@@ -34,6 +34,11 @@ interface VotingLikeResponse {
   };
 }
 
+const CULTURE_SECTION_TITLE_CLASS_NAME =
+  'text-[1.55rem] font-black leading-[1.12] tracking-[-0.01em] sm:text-[2.35rem] sm:leading-[1.06]';
+const CULTURE_SECTION_COPY_CLASS_NAME =
+  'gap-3 [&_p]:max-w-[40rem] [&_p]:text-[0.98rem] [&_p]:font-semibold [&_p]:leading-[1.45] sm:[&_p]:text-[1.02rem]';
+
 export function CultureVotingSection() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -208,6 +213,8 @@ export function CultureVotingSection() {
               title={t('home.homepage.culture.title')}
               description={t('home.homepage.culture.description')}
               centered
+              className={CULTURE_SECTION_COPY_CLASS_NAME}
+              titleClassName={CULTURE_SECTION_TITLE_CLASS_NAME}
             />
           </div>
         </div>
@@ -234,6 +241,8 @@ export function CultureVotingSection() {
               title={t('home.homepage.culture.title')}
               description={t('home.homepage.culture.description')}
               centered
+              className={CULTURE_SECTION_COPY_CLASS_NAME}
+              titleClassName={CULTURE_SECTION_TITLE_CLASS_NAME}
             />
           </div>
         </div>
@@ -260,11 +269,13 @@ export function CultureVotingSection() {
             title={t('home.homepage.culture.title')}
             description={t('home.homepage.culture.description')}
             centered
+            className={CULTURE_SECTION_COPY_CLASS_NAME}
+            titleClassName={CULTURE_SECTION_TITLE_CLASS_NAME}
           />
         </div>
       </div>
-      <div className="mx-auto w-full max-w-[24rem] px-4 sm:max-w-[80rem]">
-        <div className="mx-auto grid grid-cols-2 items-stretch justify-items-center gap-x-8 gap-y-10 sm:grid-cols-3 sm:gap-x-10 sm:gap-y-10 lg:max-w-[52rem] lg:grid-cols-3 lg:gap-x-12 lg:[grid-template-columns:repeat(3,minmax(10rem,1fr))]">
+      <div className="mx-auto w-full max-w-[24rem] px-4 pt-2 sm:max-w-[52rem] sm:pt-3">
+        <div className="mx-auto grid grid-cols-2 items-stretch justify-items-center gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-8 lg:max-w-[42rem] lg:[grid-template-columns:repeat(3,minmax(0,1fr))]">
           {items.map((item, index) => {
             const sizeLabel =
               index === 0 || index === 2

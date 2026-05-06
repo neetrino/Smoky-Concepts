@@ -160,24 +160,25 @@ export function CultureVotingCard({
     onHeroImageError,
   } = useCultureVotingCardGallery(images, id);
 
-  const imageNudgeClassName = imageNudgeDown ? 'sm:translate-y-3' : '';
-  const mobileTopPaddingClassName = mobileCompactBack ? 'pt-[8.25rem]' : 'pt-[9.25rem]';
+  const imageNudgeClassName = imageNudgeDown ? 'sm:translate-y-2' : '';
+  const imageScaleClassName = imageNudgeDown ? 'scale-[1.28] sm:scale-[1.32]' : 'scale-[1.34] sm:scale-[1.38]';
+  const mobileTopPaddingClassName = mobileCompactBack ? 'pt-[7.6rem]' : 'pt-[8.25rem]';
   const mobileContentOffsetClassName = mobileCompactBack ? 'translate-y-1' : 'translate-y-0';
   const mobileTitleOffsetClassName = mobileCompactBack ? 'translate-y-1' : '';
 
   return (
     <article
-      className={`relative z-10 mx-auto flex h-full min-h-0 w-full max-w-[10rem] flex-col overflow-visible rounded-3xl bg-white p-2 ${mobileTopPaddingClassName} sm:max-w-[15rem] sm:p-4 sm:pt-4 lg:max-w-none`}
+      className={`relative z-10 mx-auto flex h-full min-h-0 w-full max-w-[8.75rem] flex-col overflow-visible rounded-3xl bg-white p-2 ${mobileTopPaddingClassName} sm:max-w-[10.75rem] sm:p-3 sm:pt-3 lg:max-w-none`}
     >
       <div
-        className={`absolute left-3 right-3 top-[-3.5rem] z-10 h-[15rem] shrink-0 overflow-visible rounded-2xl sm:relative sm:left-auto sm:right-auto sm:top-auto sm:-mt-[5.5rem] sm:mb-2 sm:h-64 ${imageNudgeClassName}`.trim()}
+        className={`absolute left-3 right-3 top-[-3.5rem] z-10 h-[15rem] shrink-0 overflow-visible rounded-2xl sm:relative sm:left-auto sm:right-auto sm:top-auto sm:-mt-[4.9rem] sm:mb-2 sm:h-[12.4rem] ${imageNudgeClassName}`.trim()}
       >
         {activeSrc && !imageError ? (
           <img
             key={`${id}-${activeImageIndex}-${activeSrc}`}
             src={activeSrc}
             alt={title}
-            className="h-full w-full object-cover"
+            className={`h-full w-full translate-y-1 object-contain object-top sm:translate-y-1.5 ${imageScaleClassName}`}
             loading="lazy"
             onError={onHeroImageError}
           />
@@ -188,9 +189,7 @@ export function CultureVotingCard({
         )}
       </div>
 
-      <div
-        className={`mt-0 flex min-h-0 flex-1 flex-col gap-2 sm:gap-3 ${mobileContentOffsetClassName} sm:mt-3 sm:translate-y-0`}
-      >
+      <div className={`mt-0 flex min-h-0 flex-1 flex-col gap-2 sm:gap-2.5 ${mobileContentOffsetClassName} sm:mt-2 sm:translate-y-0`}>
         <CultureVotingImageDots
           itemId={id}
           visibleDotCount={visibleDotCount}
@@ -200,15 +199,15 @@ export function CultureVotingCard({
 
         <div className="flex min-w-0 flex-1 flex-col gap-1 sm:gap-2">
           <h3
-            className={`min-h-[1.85rem] text-[16px] font-extrabold leading-[1.15] text-[#414141] line-clamp-2 sm:min-h-0 sm:text-xl sm:leading-none ${mobileTitleOffsetClassName}`}
+            className={`min-h-[1.1rem] text-[11px] font-extrabold leading-[1.1] text-[#414141] line-clamp-2 sm:min-h-0 sm:text-[1.06rem] sm:leading-[1.1] ${mobileTitleOffsetClassName}`}
           >
             {title}
           </h3>
           {sizeLabel || variantLabel ? (
-            <div className="flex flex-wrap items-center gap-1.5">
-              {sizeLabel ? <span className="whitespace-nowrap text-xs font-medium text-[#9d9d9d]">{sizeLabel}</span> : null}
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-1">
+              {sizeLabel ? <span className="whitespace-nowrap text-xs font-medium text-[#9d9d9d] sm:text-[11px]">{sizeLabel}</span> : null}
               {variantLabel ? (
-                <span className="rounded-md bg-[#122a26] px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
+                <span className="rounded-md bg-[#122a26] px-1.5 py-0.5 text-[10px] font-bold leading-none text-white sm:text-[9.5px]">
                   {variantLabel}
                 </span>
               ) : null}
@@ -224,7 +223,7 @@ export function CultureVotingCard({
               type="button"
               onClick={() => onEarlyAccess?.(id)}
               disabled={pending || earlyAccessPending}
-              className={`whitespace-nowrap rounded-md border border-[#dcc090] px-2 py-1 text-xs font-extrabold leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10 ${
+              className={`whitespace-nowrap rounded-md border border-[#dcc090] px-2 py-1 text-xs font-extrabold leading-none text-[#dcc090] transition-colors hover:bg-[#dcc090]/10 sm:px-2 sm:py-0.5 sm:text-[11px] ${
                 pending || earlyAccessPending ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
               }`}
               aria-label={earlyAccessLabel}
@@ -236,7 +235,7 @@ export function CultureVotingCard({
             type="button"
             onClick={() => onToggleLike(id, likedByCurrentUser)}
             disabled={pending}
-            className={`inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 text-[#731818] transition-colors hover:bg-[#731818]/10 ${
+            className={`inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 text-[#731818] transition-colors hover:bg-[#731818]/10 sm:p-1 ${
               pending ? 'cursor-not-allowed opacity-60' : ''
             }`}
             aria-pressed={likedByCurrentUser}
