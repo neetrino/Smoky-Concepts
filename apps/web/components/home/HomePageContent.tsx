@@ -388,7 +388,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             titleClassName="sm:whitespace-normal !font-black"
           />
           <div className="overflow-hidden rounded-t-[1.5rem] rounded-b-[0.4rem] sm:rounded-t-[2.25rem] sm:rounded-b-[0.55rem]">
-            <div className="relative h-[24rem] sm:h-[30rem]">
+            <div className="relative h-[24rem] sm:h-[30rem] lg:h-[25.5rem]">
               <Image src={HOME_ASSET_PATHS.ritualBanner} alt={t('home.homepage.ritual.bannerAlt')} fill className="object-cover" sizes="1680px" />
             </div>
           </div>
@@ -429,7 +429,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <div className="relative min-h-[20.5rem] overflow-hidden rounded-t-[2rem] rounded-b-[1rem] sm:min-h-[32rem] sm:rounded-[2rem] lg:rounded-r-[0.625rem]">
             <Image src={HOME_ASSET_PATHS.craftTools} alt={t('home.homepage.bringing.imageAltLeft')} fill className="object-cover object-left" sizes="472px" />
           </div>
-          <div className="flex h-full min-h-[23rem] flex-col bg-[#f2f2f2] px-5 py-7 shadow-[0_8px_30px_rgba(18,42,38,0.08)] sm:min-h-[32rem] sm:px-8 sm:py-9 lg:px-9 rounded-[1.5rem] sm:rounded-[1rem]">
+          <div className="flex h-full min-h-[23rem] flex-col bg-white px-5 py-7 shadow-[0_8px_30px_rgba(18,42,38,0.08)] sm:min-h-[32rem] sm:px-8 sm:py-9 lg:px-9 rounded-[1.5rem] sm:rounded-[1rem]">
             <h2 className="max-w-[20rem] whitespace-pre-line text-[1.82rem] font-black leading-[1.04] tracking-[-0.01em] text-[#434347] sm:text-[2.4rem]">
               {t('home.homepage.bringing.title')}
             </h2>
