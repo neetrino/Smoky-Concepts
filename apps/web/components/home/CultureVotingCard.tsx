@@ -165,6 +165,11 @@ export function CultureVotingCard({
   const mobileTopPaddingClassName = mobileCompactBack ? 'pt-[7.6rem]' : 'pt-[8.25rem]';
   const mobileContentOffsetClassName = mobileCompactBack ? 'translate-y-1' : 'translate-y-0';
   const mobileTitleOffsetClassName = mobileCompactBack ? 'translate-y-1' : '';
+  const heartButtonClassName = `inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 transition-colors sm:p-1 ${
+    likedByCurrentUser
+      ? 'text-[#731818] hover:bg-[#731818]/10'
+      : 'text-[#CBCBCB] hover:bg-[#CBCBCB]/20'
+  } ${pending ? 'cursor-not-allowed opacity-60' : ''}`;
 
   return (
     <article
@@ -204,21 +209,33 @@ export function CultureVotingCard({
             {title}
           </h3>
           {sizeLabel || variantLabel ? (
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-1">
-              {sizeLabel ? <span className="whitespace-nowrap text-[11px] font-medium text-[#9d9d9d] sm:text-[10px]">{sizeLabel}</span> : null}
-              {variantLabel ? (
-                <span className="rounded-md bg-[#122a26] px-1.5 py-0.5 text-[9.5px] font-bold leading-none text-white sm:text-[9px]">
-                  {variantLabel}
-                </span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-1">
+                {sizeLabel ? <span className="whitespace-nowrap text-[11px] font-medium text-[#9d9d9d] sm:text-[10px]">{sizeLabel}</span> : null}
+                {variantLabel ? (
+                  <span className="rounded-md bg-[#122a26] px-1.5 py-0.5 text-[9.5px] font-bold leading-none text-white sm:text-[9px]">
+                    {variantLabel}
+                  </span>
+                ) : null}
+              </div>
+              {!showEarlyAccess ? (
+                <button
+                  type="button"
+                  onClick={() => onToggleLike(id, likedByCurrentUser)}
+                  disabled={pending}
+                  className={heartButtonClassName}
+                  aria-pressed={likedByCurrentUser}
+                  aria-label={likedByCurrentUser ? `Remove like from ${title}` : `Like ${title}`}
+                >
+                  <HeartIcon filled={likedByCurrentUser} />
+                </button>
               ) : null}
             </div>
           ) : null}
         </div>
 
-        <div
-          className={`flex min-h-[1.75rem] shrink-0 items-center gap-2 ${showEarlyAccess ? 'justify-between' : 'justify-end'}`}
-        >
-          {showEarlyAccess ? (
+        {showEarlyAccess ? (
+          <div className="flex min-h-[1.75rem] shrink-0 items-center justify-between gap-2">
             <button
               type="button"
               onClick={() => onEarlyAccess?.(id)}
@@ -230,24 +247,18 @@ export function CultureVotingCard({
             >
               {earlyAccessLabel}
             </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => onToggleLike(id, likedByCurrentUser)}
-            disabled={pending}
-            className={`inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 transition-colors sm:p-1 ${
-              likedByCurrentUser
-                ? 'text-[#731818] hover:bg-[#731818]/10'
-                : 'text-[#CBCBCB] hover:bg-[#CBCBCB]/20'
-            } ${
-              pending ? 'cursor-not-allowed opacity-60' : ''
-            }`}
-            aria-pressed={likedByCurrentUser}
-            aria-label={likedByCurrentUser ? `Remove like from ${title}` : `Like ${title}`}
-          >
-            <HeartIcon filled={likedByCurrentUser} />
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => onToggleLike(id, likedByCurrentUser)}
+              disabled={pending}
+              className={heartButtonClassName}
+              aria-pressed={likedByCurrentUser}
+              aria-label={likedByCurrentUser ? `Remove like from ${title}` : `Like ${title}`}
+            >
+              <HeartIcon filled={likedByCurrentUser} />
+            </button>
+          </div>
+        ) : null}
       </div>
     </article>
   );

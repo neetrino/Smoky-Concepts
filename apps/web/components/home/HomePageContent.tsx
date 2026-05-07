@@ -216,7 +216,7 @@ function UpcomingLineCard({
             loading="eager"
           />
         </div>
-        <h3 className="text-[1.125rem] font-extrabold leading-none text-[#36373a] sm:text-[1.65rem]">{title}</h3>
+        <h3 className="translate-y-1 text-[1rem] font-extrabold leading-none text-[#36373a] sm:text-[1.45rem]">{title}</h3>
       </div>
     </div>
   );
