@@ -259,7 +259,11 @@ export function CartDrawer() {
               </div>
               <div className="flex items-center justify-between font-medium">
                 <span>Shipping</span>
-                <span>{formatStorePriceForDisplay(cart?.totals.shipping ?? 0)}</span>
+                <span>
+                  {(cart?.totals.shipping ?? 0) > 0
+                    ? formatStorePriceForDisplay(cart?.totals.shipping ?? 0)
+                    : 'No Calculated'}
+                </span>
               </div>
             </div>
 
