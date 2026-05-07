@@ -24,7 +24,7 @@ interface CultureVotingCardProps {
 }
 
 const DOTS_ROW_CLASS =
-  'flex min-h-3 items-center gap-[0.3125rem] mb-1 sm:mb-2';
+  '-mt-7 mb-0.5 flex min-h-3 w-full items-center justify-center gap-[0.3125rem] sm:-mt-5 sm:mb-1';
 
 interface CultureVotingImageDotsProps {
   itemId: string;
@@ -81,7 +81,7 @@ function HeartIcon({ filled }: { filled: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      fill={filled ? 'currentColor' : 'none'}
+      fill="currentColor"
       stroke="currentColor"
       strokeWidth={1.8}
       className="h-5 w-5"
@@ -161,17 +161,22 @@ export function CultureVotingCard({
   } = useCultureVotingCardGallery(images, id);
 
   const imageNudgeClassName = imageNudgeDown ? 'sm:translate-y-2' : '';
-  const imageScaleClassName = imageNudgeDown ? 'scale-[1.28] sm:scale-[1.32]' : 'scale-[1.34] sm:scale-[1.38]';
+  const imageScaleClassName = imageNudgeDown ? 'scale-[1.18] sm:scale-[1.22]' : 'scale-[1.22] sm:scale-[1.26]';
   const mobileTopPaddingClassName = mobileCompactBack ? 'pt-[7.6rem]' : 'pt-[8.25rem]';
   const mobileContentOffsetClassName = mobileCompactBack ? 'translate-y-1' : 'translate-y-0';
   const mobileTitleOffsetClassName = mobileCompactBack ? 'translate-y-1' : '';
+  const heartButtonClassName = `inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 transition-colors sm:p-1 ${
+    likedByCurrentUser
+      ? 'text-[#731818] hover:bg-[#731818]/10'
+      : 'text-[#CBCBCB] hover:bg-[#CBCBCB]/20'
+  } ${pending ? 'cursor-not-allowed opacity-60' : ''}`;
 
   return (
     <article
-      className={`relative z-10 mx-auto flex h-full min-h-0 w-full max-w-[8.75rem] flex-col overflow-visible rounded-3xl bg-white p-2 ${mobileTopPaddingClassName} sm:max-w-[10.75rem] sm:p-3 sm:pt-3 lg:max-w-none`}
+      className={`relative z-10 mx-auto flex h-full min-h-0 w-full max-w-[8.9rem] flex-col overflow-visible rounded-3xl bg-white p-2 ${mobileTopPaddingClassName} sm:max-w-[11rem] sm:p-3 sm:pt-2.5 lg:max-w-[10.9rem]`}
     >
       <div
-        className={`absolute left-3 right-3 top-[-1.5rem] z-10 h-[15rem] shrink-0 overflow-visible rounded-2xl sm:relative sm:left-auto sm:right-auto sm:top-auto sm:-mt-[4.9rem] sm:mb-2 sm:h-[12.4rem] ${imageNudgeClassName}`.trim()}
+        className={`absolute left-3 right-3 top-[-1.5rem] z-10 h-[14.6rem] shrink-0 overflow-visible rounded-2xl sm:relative sm:left-auto sm:right-auto sm:top-auto sm:-mt-[4.6rem] sm:mb-1.5 sm:h-[11.7rem] ${imageNudgeClassName}`.trim()}
       >
         {activeSrc && !imageError ? (
           <img
@@ -199,26 +204,38 @@ export function CultureVotingCard({
 
         <div className="flex min-w-0 flex-1 flex-col gap-1 sm:gap-2">
           <h3
-            className={`min-h-[1.1rem] text-[11px] font-extrabold leading-[1.1] text-[#414141] line-clamp-2 sm:min-h-0 sm:text-[1.06rem] sm:leading-[1.1] ${mobileTitleOffsetClassName}`}
+            className={`min-h-[1.1rem] text-[10.5px] font-extrabold leading-[1.1] text-[#414141] line-clamp-2 sm:min-h-0 sm:text-[0.98rem] sm:leading-[1.1] ${mobileTitleOffsetClassName}`}
           >
             {title}
           </h3>
           {sizeLabel || variantLabel ? (
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-1">
-              {sizeLabel ? <span className="whitespace-nowrap text-xs font-medium text-[#9d9d9d] sm:text-[11px]">{sizeLabel}</span> : null}
-              {variantLabel ? (
-                <span className="rounded-md bg-[#122a26] px-1.5 py-0.5 text-[10px] font-bold leading-none text-white sm:text-[9.5px]">
-                  {variantLabel}
-                </span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-1">
+                {sizeLabel ? <span className="whitespace-nowrap text-[11px] font-medium text-[#9d9d9d] sm:text-[10px]">{sizeLabel}</span> : null}
+                {variantLabel ? (
+                  <span className="rounded-md bg-[#122a26] px-1.5 py-0.5 text-[9.5px] font-bold leading-none text-white sm:text-[9px]">
+                    {variantLabel}
+                  </span>
+                ) : null}
+              </div>
+              {!showEarlyAccess ? (
+                <button
+                  type="button"
+                  onClick={() => onToggleLike(id, likedByCurrentUser)}
+                  disabled={pending}
+                  className={heartButtonClassName}
+                  aria-pressed={likedByCurrentUser}
+                  aria-label={likedByCurrentUser ? `Remove like from ${title}` : `Like ${title}`}
+                >
+                  <HeartIcon filled={likedByCurrentUser} />
+                </button>
               ) : null}
             </div>
           ) : null}
         </div>
 
-        <div
-          className={`flex min-h-[1.75rem] shrink-0 items-center gap-2 ${showEarlyAccess ? 'justify-between' : 'justify-end'}`}
-        >
-          {showEarlyAccess ? (
+        {showEarlyAccess ? (
+          <div className="flex min-h-[1.75rem] shrink-0 items-center justify-between gap-2">
             <button
               type="button"
               onClick={() => onEarlyAccess?.(id)}
@@ -230,20 +247,18 @@ export function CultureVotingCard({
             >
               {earlyAccessLabel}
             </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => onToggleLike(id, likedByCurrentUser)}
-            disabled={pending}
-            className={`inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 text-[#731818] transition-colors hover:bg-[#731818]/10 sm:p-1 ${
-              pending ? 'cursor-not-allowed opacity-60' : ''
-            }`}
-            aria-pressed={likedByCurrentUser}
-            aria-label={likedByCurrentUser ? `Remove like from ${title}` : `Like ${title}`}
-          >
-            <HeartIcon filled={likedByCurrentUser} />
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => onToggleLike(id, likedByCurrentUser)}
+              disabled={pending}
+              className={heartButtonClassName}
+              aria-pressed={likedByCurrentUser}
+              aria-label={likedByCurrentUser ? `Remove like from ${title}` : `Like ${title}`}
+            >
+              <HeartIcon filled={likedByCurrentUser} />
+            </button>
+          </div>
+        ) : null}
       </div>
     </article>
   );
