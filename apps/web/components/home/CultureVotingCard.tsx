@@ -24,7 +24,7 @@ interface CultureVotingCardProps {
 }
 
 const DOTS_ROW_CLASS =
-  'flex min-h-3 items-center gap-[0.3125rem] mb-1 sm:mb-2';
+  '-mt-7 mb-0.5 flex min-h-3 w-full items-center justify-center gap-[0.3125rem] sm:-mt-5 sm:mb-1';
 
 interface CultureVotingImageDotsProps {
   itemId: string;
@@ -81,7 +81,7 @@ function HeartIcon({ filled }: { filled: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      fill={filled ? 'currentColor' : 'none'}
+      fill="currentColor"
       stroke="currentColor"
       strokeWidth={1.8}
       className="h-5 w-5"
@@ -235,7 +235,11 @@ export function CultureVotingCard({
             type="button"
             onClick={() => onToggleLike(id, likedByCurrentUser)}
             disabled={pending}
-            className={`inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 text-[#731818] transition-colors hover:bg-[#731818]/10 sm:p-1 ${
+            className={`inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 transition-colors sm:p-1 ${
+              likedByCurrentUser
+                ? 'text-[#731818] hover:bg-[#731818]/10'
+                : 'text-[#CBCBCB] hover:bg-[#CBCBCB]/20'
+            } ${
               pending ? 'cursor-not-allowed opacity-60' : ''
             }`}
             aria-pressed={likedByCurrentUser}
