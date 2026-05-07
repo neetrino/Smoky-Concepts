@@ -58,18 +58,17 @@ export function ProductImageGallery({
   }, [currentImageIndex, images.length, thumbnailStartIndex, onThumbnailStartIndexChange]);
 
   const visibleThumbnails = images.slice(thumbnailStartIndex, thumbnailStartIndex + THUMBNAILS_PER_VIEW);
-  const canGoBackward = thumbnailStartIndex > 0;
-  const canGoForward = thumbnailStartIndex < images.length - THUMBNAILS_PER_VIEW;
+  const canNavigateImages = images.length > 1;
 
-  const shiftThumbnails = (direction: 'previous' | 'next') => {
-    if (direction === 'previous') {
-      onThumbnailStartIndexChange(Math.max(0, thumbnailStartIndex - 1));
+  const navigateImageByArrow = (direction: 'previous' | 'next') => {
+    if (!canNavigateImages) {
       return;
     }
-
-    onThumbnailStartIndexChange(
-      Math.min(Math.max(images.length - THUMBNAILS_PER_VIEW, 0), thumbnailStartIndex + 1)
-    );
+    const nextIndex =
+      direction === 'previous'
+        ? (currentImageIndex - 1 + images.length) % images.length
+        : (currentImageIndex + 1) % images.length;
+    selectThumbnailByIndex(nextIndex);
   };
 
   /** Sets main image to this gallery index and keeps the thumbnail strip window aligned. */
@@ -125,9 +124,9 @@ export function ProductImageGallery({
             >
               <button
                 type="button"
-                onClick={() => shiftThumbnails('previous')}
+                onClick={() => navigateImageByArrow('previous')}
                 aria-label={t(language, 'common.ariaLabels.previousThumbnail')}
-                disabled={!canGoBackward}
+                disabled={!canNavigateImages}
                 className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-[#122a26] transition-opacity disabled:cursor-not-allowed disabled:opacity-30 sm:h-16 sm:w-16"
               >
                 <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,9 +169,9 @@ export function ProductImageGallery({
 
               <button
                 type="button"
-                onClick={() => shiftThumbnails('next')}
+                onClick={() => navigateImageByArrow('next')}
                 aria-label={t(language, 'common.ariaLabels.nextThumbnail')}
-                disabled={!canGoForward}
+                disabled={!canNavigateImages}
                 className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-[#122a26] transition-opacity disabled:cursor-not-allowed disabled:opacity-30 sm:h-16 sm:w-16"
               >
                 <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
