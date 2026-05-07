@@ -95,28 +95,10 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     ),
   },
   {
-    id: 'products-list',
-    label: t('admin.menu.products'),
-    path: '/supersudo/products',
-    isSubCategory: true,
-    parentId: 'products',
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-        />
-      </svg>
-    ),
-  },
-  {
     id: 'categories',
     label: t('admin.menu.categories'),
     path: '/supersudo/categories',
     isSubCategory: true,
-    parentId: 'products',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -133,7 +115,6 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     label: t('admin.menu.attributes'),
     path: '/supersudo/attributes',
     isSubCategory: true,
-    parentId: 'products',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -150,7 +131,6 @@ export function getAdminMenuTABS(t: (path: string) => string): AdminMenuItem[] {
     label: t('admin.menu.sizes'),
     path: '/supersudo/sizes',
     isSubCategory: true,
-    parentId: 'products',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
