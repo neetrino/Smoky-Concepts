@@ -15,15 +15,13 @@ import { HomeSectionTitle } from './HomeSectionTitle';
 import { HomeActionButton } from './HomeActionButton';
 import { HOME_ASSET_PATHS } from './homePage.data';
 import { useTranslation } from '@/lib/i18n-client';
-
-const TRENDING_ITEMS_PER_PAGE = 3;
-/** Desktop track width — matches products catalog `xl:w-[13rem]` (see ProductsCatalogView). */
-const TRENDING_CARD_WIDTH_REM = 13;
-const TRENDING_CARD_GAP_REM = 0.75;
-const TRENDING_TRACK_STEP_REM = TRENDING_CARD_WIDTH_REM + TRENDING_CARD_GAP_REM;
-/** Viewport for three cards (3×width + 2×gap) + small buffer so the right card is not clipped */
-const TRENDING_VIEWPORT_WIDTH_REM =
-  TRENDING_CARD_WIDTH_REM * 3 + TRENDING_CARD_GAP_REM * 2 + 0.25;
+import {
+  buildTrendingPageStartIndices,
+  TRENDING_ITEMS_PER_PAGE,
+  TRENDING_PAGE_SHIFT_REM,
+  TRENDING_VIEWPORT_WIDTH_REM,
+} from './trendingFeaturedCarousel';
+import { useTrendingTripletSlide } from './useTrendingTripletSlide';
 
 interface ApiProduct {
   id: string;
@@ -50,6 +48,21 @@ interface ProductsResponse {
 
 const TRENDING_FEATURED_PAGE_SIZE = 100;
 const PLACEHOLDER_IMAGE = HOME_ASSET_PATHS.packMark;
+
+function getTrendingTripletForPage(
+  pageIndex: number,
+  catalogItems: CatalogProduct[],
+  pageStartIndices: number[]
+): CatalogProduct[] {
+  const n = catalogItems.length;
+  if (n <= TRENDING_ITEMS_PER_PAGE) return catalogItems;
+  const start = pageStartIndices[pageIndex] ?? 0;
+  return [
+    catalogItems[start],
+    catalogItems[(start + 1) % n],
+    catalogItems[(start + 2) % n],
+  ].filter(Boolean);
+}
 
 function mapApiProductToCatalogProduct(product: ApiProduct): CatalogProduct {
   const base = toCatalogProduct({
@@ -99,11 +112,8 @@ export function TrendingFeaturedSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [suppressTrackTransition, setSuppressTrackTransition] = useState(false);
 
-  const pageStartIndices = Array.from({ length: Math.max(1, Math.ceil(items.length / TRENDING_ITEMS_PER_PAGE)) }, (_, index) =>
-    Math.min(index * TRENDING_ITEMS_PER_PAGE, Math.max(0, items.length - TRENDING_ITEMS_PER_PAGE))
-  ).filter((startIndex, index, allStartIndices) => index === 0 || startIndex !== allStartIndices[index - 1]);
+  const pageStartIndices = buildTrendingPageStartIndices(items.length, TRENDING_ITEMS_PER_PAGE);
   const maxPage = Math.max(0, pageStartIndices.length - 1);
   const startIndex = pageStartIndices[currentPage] ?? 0;
   const n = items.length;
@@ -180,36 +190,14 @@ export function TrendingFeaturedSection() {
     }
   }, []);
 
-  const goPrev = useCallback(() => {
-    playCircularTransition('prev');
-    const shouldWrapToEnd = currentPage === 0;
-    if (shouldWrapToEnd) {
-      setSuppressTrackTransition(true);
-    }
-    setCurrentPage((p) => (p === 0 ? maxPage : p - 1));
-    if (shouldWrapToEnd) {
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          setSuppressTrackTransition(false);
-        });
-      });
-    }
-  }, [currentPage, maxPage, playCircularTransition]);
-  const goNext = useCallback(() => {
-    playCircularTransition('next');
-    const shouldWrapToStart = currentPage >= maxPage;
-    if (shouldWrapToStart) {
-      setSuppressTrackTransition(true);
-    }
-    setCurrentPage((p) => (p >= maxPage ? 0 : p + 1));
-    if (shouldWrapToStart) {
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          setSuppressTrackTransition(false);
-        });
-      });
-    }
-  }, [currentPage, maxPage, playCircularTransition]);
+  const {
+    slideAnim,
+    desktopSlideTrackRef,
+    mobileSlideTrackRef,
+    startSlide,
+    onSlideTransitionEnd,
+    resetSlideState,
+  } = useTrendingTripletSlide(currentPage, setCurrentPage, maxPage, hasMultiplePages, playCircularTransition);
 
   const fetchFeatured = useCallback(async () => {
     try {
@@ -265,15 +253,8 @@ export function TrendingFeaturedSection() {
 
   useEffect(() => {
     setCurrentPage(0);
-  }, [items.length]);
-
-  /** Duplicating the track lets the carousel loop when there are many items; with ≤3, it shows the same product twice in the viewport. */
-  const duplicateDesktopTrack = n > TRENDING_ITEMS_PER_PAGE;
-  const desktopTrackItems = duplicateDesktopTrack ? [...items, ...items] : items;
-  const desktopTrackWidthRem =
-    desktopTrackItems.length > 0
-      ? desktopTrackItems.length * TRENDING_TRACK_STEP_REM - TRENDING_CARD_GAP_REM
-      : undefined;
+    resetSlideState();
+  }, [items.length, resetSlideState]);
 
   const firstVisible = visibleItems[0];
   const firstSection = firstVisible ? getSectionLabel(firstVisible) : '';
@@ -337,21 +318,26 @@ export function TrendingFeaturedSection() {
     );
   }
 
-  /** Prev + visible + next page along the desktop track — avoids lazy-loading only after translate. */
-  const trendingTrackEagerMin =
-    desktopTrackItems.length === 0
-      ? 0
-      : Math.max(0, startIndex - TRENDING_ITEMS_PER_PAGE);
-  const trendingTrackEagerMax =
-    desktopTrackItems.length === 0
-      ? 0
-      : Math.min(
-          desktopTrackItems.length - 1,
-          startIndex + TRENDING_ITEMS_PER_PAGE * 2 - 1
-        );
+  const isSlideRunning = slideAnim.phase === 'running';
+  const slideKeySalt =
+    slideAnim.phase === 'running' ? `${slideAnim.fromPage}-${slideAnim.toPage}` : `${currentPage}`;
+  const desktopSlideProducts: CatalogProduct[] =
+    slideAnim.phase === 'running'
+      ? slideAnim.dir === 'next'
+        ? [
+            ...getTrendingTripletForPage(slideAnim.fromPage, items, pageStartIndices),
+            ...getTrendingTripletForPage(slideAnim.toPage, items, pageStartIndices),
+          ]
+        : [
+            ...getTrendingTripletForPage(slideAnim.toPage, items, pageStartIndices),
+            ...getTrendingTripletForPage(slideAnim.fromPage, items, pageStartIndices),
+          ]
+      : visibleItems;
+
+  const navDisabled = !hasMultiplePages || isSlideRunning;
 
   return (
-    <section className="relative isolate flex min-w-0 flex-col gap-8 overflow-x-clip overflow-y-visible pb-6 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2">
+    <section className="relative isolate z-10 flex min-w-0 flex-col gap-8 overflow-x-clip overflow-y-visible pb-6 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2">
       <div className="flex min-h-[4rem] min-w-0 items-center justify-between gap-3 xl:relative xl:z-20 xl:-translate-y-4 xl:justify-center">
         <HomeSectionTitle
           title={t('home.homepage.trending.title')}
@@ -367,50 +353,115 @@ export function TrendingFeaturedSection() {
         />
       </div>
 
-      <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-start justify-items-center gap-x-4 gap-y-3 sm:gap-x-5 sm:gap-y-4 xl:hidden">
-        {visibleItems.map((product, index) => {
-          const isMiddleOfThree = visibleItems.length === 3 && index === 1;
-          const isSideCard = index !== 1;
-          const section = getSectionLabel(product);
-          // #3 uses -mt and would paint over #1 without explicit order; middle stays on top.
-          const mobileCellZ =
-            index === 1 ? 'relative z-[3]' : index === 0 ? 'relative z-[2]' : 'relative z-[1]';
-
-          return (
-            <div
-              key={`trending-mobile-${product.id}-${index}`}
-              className={`${mobileCellZ} ${
-                index === 1
-                  ? 'pt-[14rem]'
-                  : index === 2
-                    ? '-mt-[10rem] pt-4'
-                    : 'pt-4'
-              }`}
-            >
-              <ProductsCatalogCard
-                product={product}
-                sectionLabel={section}
-                sizeLabel={getSizeLabel(product)}
-                categoryLabel={getCategoryLabel(product, section)}
-                className={isSideCard ? '!h-auto w-full max-w-[10.25rem]' : '!h-auto w-full max-w-[11rem]'}
-                tightenDetailsUnderImage
-                imageScaleBoost={0.15}
-                imageNudgeDown={isMiddleOfThree}
-                compactLayout
-                suppressShadow
-                eagerProductImage
-                imageFrameClassName="max-sm:origin-bottom max-sm:scale-[0.9] max-sm:-translate-y-2"
-              />
-            </div>
-          );
-        })}
+      <div className="relative z-50 w-full min-w-0 overflow-x-clip xl:hidden">
+        <div
+          ref={mobileSlideTrackRef}
+          onTransitionEnd={onSlideTransitionEnd}
+          className={
+            isSlideRunning
+              ? 'flex w-[200%] touch-pan-y items-end will-change-transform'
+              : 'flex w-full touch-pan-y items-end justify-center gap-3 will-change-transform'
+          }
+        >
+          {slideAnim.phase === 'running' ? (
+            <>
+              <div className="flex w-1/2 items-end justify-center gap-2 sm:gap-3">
+                {(slideAnim.dir === 'next'
+                  ? getTrendingTripletForPage(slideAnim.fromPage, items, pageStartIndices)
+                  : getTrendingTripletForPage(slideAnim.toPage, items, pageStartIndices)
+                ).map((product, slotIndex) => {
+                  const isMiddle = slotIndex === 1;
+                  const section = getSectionLabel(product);
+                  return (
+                    <div
+                      key={`trending-mob-a-${product.id}-${slotIndex}-${slideKeySalt}`}
+                      className={`relative z-10 shrink-0 ${isMiddle ? 'z-20 pt-6' : 'z-10 pt-4'}`}
+                    >
+                      <ProductsCatalogCard
+                        product={product}
+                        sectionLabel={section}
+                        sizeLabel={getSizeLabel(product)}
+                        categoryLabel={getCategoryLabel(product, section)}
+                        className={isMiddle ? '!h-auto w-[11rem] max-w-[11rem]' : '!h-auto w-[10.25rem] max-w-[10.25rem]'}
+                        tightenDetailsUnderImage
+                        imageScaleBoost={0.15}
+                        imageNudgeDown={isMiddle}
+                        compactLayout
+                        suppressShadow
+                        eagerProductImage
+                        imageFrameClassName="max-sm:origin-bottom max-sm:scale-[0.9] max-sm:-translate-y-2"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex w-1/2 items-end justify-center gap-2 sm:gap-3">
+                {(slideAnim.dir === 'next'
+                  ? getTrendingTripletForPage(slideAnim.toPage, items, pageStartIndices)
+                  : getTrendingTripletForPage(slideAnim.fromPage, items, pageStartIndices)
+                ).map((product, slotIndex) => {
+                  const isMiddle = slotIndex === 1;
+                  const section = getSectionLabel(product);
+                  return (
+                    <div
+                      key={`trending-mob-b-${product.id}-${slotIndex}-${slideKeySalt}`}
+                      className={`relative z-10 shrink-0 ${isMiddle ? 'z-20 pt-6' : 'z-10 pt-4'}`}
+                    >
+                      <ProductsCatalogCard
+                        product={product}
+                        sectionLabel={section}
+                        sizeLabel={getSizeLabel(product)}
+                        categoryLabel={getCategoryLabel(product, section)}
+                        className={isMiddle ? '!h-auto w-[11rem] max-w-[11rem]' : '!h-auto w-[10.25rem] max-w-[10.25rem]'}
+                        tightenDetailsUnderImage
+                        imageScaleBoost={0.15}
+                        imageNudgeDown={isMiddle}
+                        compactLayout
+                        suppressShadow
+                        eagerProductImage
+                        imageFrameClassName="max-sm:origin-bottom max-sm:scale-[0.9] max-sm:-translate-y-2"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            visibleItems.map((product, slotIndex) => {
+              const isMiddle = visibleItems.length === 3 && slotIndex === 1;
+              const isSideCard = !isMiddle;
+              const section = getSectionLabel(product);
+              return (
+                <div
+                  key={`trending-mobile-idle-${product.id}-${slotIndex}-${slideKeySalt}`}
+                  className={`relative shrink-0 ${isMiddle ? 'z-20 pt-6' : 'z-10 pt-4'}`}
+                >
+                  <ProductsCatalogCard
+                    product={product}
+                    sectionLabel={section}
+                    sizeLabel={getSizeLabel(product)}
+                    categoryLabel={getCategoryLabel(product, section)}
+                    className={isSideCard ? '!h-auto w-[10.25rem] max-w-[10.25rem]' : '!h-auto w-[11rem] max-w-[11rem]'}
+                    tightenDetailsUnderImage
+                    imageScaleBoost={0.15}
+                    imageNudgeDown={isMiddle}
+                    compactLayout
+                    suppressShadow
+                    eagerProductImage
+                    imageFrameClassName="max-sm:origin-bottom max-sm:scale-[0.9] max-sm:-translate-y-2"
+                  />
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
 
       <div
-        className="relative z-0 mt-2 hidden min-w-0 xl:block xl:w-full"
+        className="relative z-40 mt-2 hidden min-w-0 xl:block xl:w-full"
         style={{ perspective: '1800px', transformStyle: 'preserve-3d' }}
       >
-        <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-[calc(150%+11.75rem)]">
+        <div className="pointer-events-none absolute left-1/2 top-0 z-30 -translate-x-[calc(150%+11.75rem)]">
           <div
             ref={leftPreviewRef}
             className="will-change-transform"
@@ -445,47 +496,41 @@ export function TrendingFeaturedSection() {
         </div>
 
         <div
-          className="-mt-24 mx-auto shrink-0 overflow-x-clip"
+          className="relative z-50 -mt-24 mx-auto shrink-0 overflow-x-clip"
           style={{ width: `${TRENDING_VIEWPORT_WIDTH_REM}rem` }}
         >
           <div
-            className={`flex touch-pan-y items-end justify-start gap-3 ${
-              suppressTrackTransition ? '' : 'transition-transform duration-300 ease-out'
-            }`}
-            style={{
-              transform: `translateX(-${startIndex * TRENDING_TRACK_STEP_REM}rem)`,
-              width: desktopTrackWidthRem !== undefined ? `${desktopTrackWidthRem}rem` : undefined,
-            }}
+            ref={desktopSlideTrackRef}
+            onTransitionEnd={onSlideTransitionEnd}
+            className="flex touch-pan-y items-end justify-start gap-3 will-change-transform"
+            style={isSlideRunning ? { width: `${TRENDING_PAGE_SHIFT_REM * 2}rem` } : undefined}
           >
-            {n > 0 &&
-              desktopTrackItems.map((product, index) => {
-                const isMiddle = index === startIndex + 1;
-                const section = getSectionLabel(product);
-                return (
-                  <div
-                    key={`trending-${product.id}-${index}`}
-                    className={`w-[13rem] shrink-0 ${isMiddle ? 'pt-28' : 'pt-20'}`}
-                  >
-                    <ProductsCatalogCard
-                      product={product}
-                      sectionLabel={section}
-                      sizeLabel={getSizeLabel(product)}
-                      categoryLabel={getCategoryLabel(product, section)}
-                      className="w-[13rem]"
-                      imageNudgeDown={isMiddle}
-                      compactLayout
-                      suppressShadow
-                      eagerProductImage={
-                        index >= trendingTrackEagerMin && index <= trendingTrackEagerMax
-                      }
-                    />
-                  </div>
-                );
-              })}
+            {desktopSlideProducts.map((product, slotIndex) => {
+              const isMiddle = slotIndex % 3 === 1;
+              const section = getSectionLabel(product);
+              return (
+                <div
+                  key={`trending-dsk-${product.id}-${slotIndex}-${slideKeySalt}`}
+                  className={`relative z-10 w-[13rem] shrink-0 ${isMiddle ? 'z-20 pt-28' : 'z-10 pt-20'}`}
+                >
+                  <ProductsCatalogCard
+                    product={product}
+                    sectionLabel={section}
+                    sizeLabel={getSizeLabel(product)}
+                    categoryLabel={getCategoryLabel(product, section)}
+                    className="w-[13rem]"
+                    imageNudgeDown={isMiddle}
+                    compactLayout
+                    suppressShadow
+                    eagerProductImage
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        <div className="pointer-events-none absolute right-1/2 top-0 translate-x-[calc(150%+11.75rem)]">
+        <div className="pointer-events-none absolute right-1/2 top-0 z-30 translate-x-[calc(150%+11.75rem)]">
           <div
             ref={rightPreviewRef}
             className="will-change-transform"
@@ -520,11 +565,11 @@ export function TrendingFeaturedSection() {
         </div>
       </div>
 
-      <div className="relative z-20 mx-auto grid w-full max-w-[28rem] grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] items-center gap-3 sm:max-w-[34rem] sm:gap-5">
+      <div className="relative z-[60] mx-auto grid w-full max-w-[28rem] grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] items-center gap-3 sm:max-w-[34rem] sm:gap-5">
         <button
           type="button"
-          onClick={goPrev}
-          disabled={!hasMultiplePages}
+          onClick={() => startSlide('prev')}
+          disabled={navDisabled}
           className="col-start-1 row-start-1 flex h-10 w-10 items-center justify-center justify-self-start text-[#122a26] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label={t('home.homepage.trending.previousAria')}
         >
@@ -537,8 +582,8 @@ export function TrendingFeaturedSection() {
         </p>
         <button
           type="button"
-          onClick={goNext}
-          disabled={!hasMultiplePages}
+          onClick={() => startSlide('next')}
+          disabled={navDisabled}
           className="col-start-3 row-start-1 flex h-10 w-10 items-center justify-center justify-self-end text-[#122a26] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label={t('home.homepage.trending.nextAria')}
         >
