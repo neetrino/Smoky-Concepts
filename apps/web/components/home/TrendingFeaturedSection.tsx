@@ -274,8 +274,8 @@ export function TrendingFeaturedSection() {
   const mobileItems = pages[safeCurrent]?.items ?? [];
 
   return (
-    <section className="relative isolate flex min-w-0 flex-col gap-8 overflow-x-clip overflow-y-visible pb-6 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2">
-      <div className="flex min-h-[4rem] min-w-0 items-center justify-between gap-3 xl:relative xl:z-20 xl:translate-y-8 xl:justify-center">
+    <section className="relative isolate flex min-w-0 flex-col gap-8 overflow-x-clip overflow-y-visible pb-6 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2 xl:gap-5">
+      <div className="flex min-h-[4rem] min-w-0 items-center justify-between gap-3 xl:relative xl:z-20 xl:translate-y-4 xl:justify-center">
         <HomeSectionTitle
           title={t('home.homepage.trending.title')}
           centered={false}
@@ -286,7 +286,7 @@ export function TrendingFeaturedSection() {
           href="/products"
           label={t('home.homepage.trending.shopCta')}
           variant="outline"
-          className="!w-fit !min-h-8 !-translate-y-3 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-tight !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!-translate-y-4 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-tight sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:z-30 xl:!translate-y-12"
+          className="!w-fit !min-h-8 !-translate-y-3 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-tight !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!-translate-y-4 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-tight sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:z-30 xl:!translate-y-10"
         />
       </div>
 
@@ -494,7 +494,7 @@ function TrendingPageSlider({
         type="button"
         onClick={onPrev}
         disabled={disabled}
-        className="col-start-1 row-start-1 flex h-10 w-10 items-center justify-center justify-self-start text-[#122a26] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40 xl:-translate-y-20"
+        className="col-start-1 row-start-1 flex h-10 w-10 items-center justify-center justify-self-start text-[#122a26] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40 xl:-translate-y-16"
         aria-label={prevAria}
       >
         <ChevronLeft className="h-8 w-8" strokeWidth={2.5} />
@@ -517,7 +517,7 @@ function TrendingPageSlider({
         type="button"
         onClick={onNext}
         disabled={disabled}
-        className="col-start-3 row-start-1 flex h-10 w-10 items-center justify-center justify-self-end text-[#122a26] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40 xl:-translate-y-20"
+        className="col-start-3 row-start-1 flex h-10 w-10 items-center justify-center justify-self-end text-[#122a26] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40 xl:-translate-y-16"
         aria-label={nextAria}
       >
         <ChevronRight className="h-8 w-8" strokeWidth={2.5} />

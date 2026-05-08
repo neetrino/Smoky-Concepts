@@ -67,14 +67,15 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     if (!product || currentVariant) {
       return null;
     }
-    if (!product.defaultVariantId) {
+    const defaultVariantId = product.defaultVariantId;
+    if (!defaultVariantId) {
       return null;
     }
 
     const defaultVariantFromList =
       product.variants?.find(
         (variant) =>
-          variant.id === product.defaultVariantId || variant.id.endsWith(product.defaultVariantId)
+          variant.id === defaultVariantId || variant.id.endsWith(defaultVariantId)
       ) ?? null;
     if (defaultVariantFromList) {
       return defaultVariantFromList;
@@ -82,7 +83,7 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
 
     const stock = Math.max(0, product.defaultVariantStock ?? 0);
     return {
-      id: product.defaultVariantId,
+      id: defaultVariantId,
       sku: product.defaultVariantSku ?? '',
       price: product.defaultPrice ?? 0,
       originalPrice: product.defaultOriginalPrice ?? null,
