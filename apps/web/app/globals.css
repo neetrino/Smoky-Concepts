@@ -67,6 +67,23 @@
     animation: fade-in 0.3s ease-out;
   }
 
+  @keyframes trending-label-pop {
+    0% {
+      opacity: 0.4;
+      transform: translateY(6px) scale(0.92);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trending-current-label {
+      animation: none !important;
+    }
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
