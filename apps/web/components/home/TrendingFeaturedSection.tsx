@@ -301,7 +301,7 @@ export function TrendingFeaturedSection() {
             <div
               key={`trending-mobile-${product.id}-${index}`}
               className={`${mobileCellZ} ${
-                index === 1 ? 'pt-[14rem]' : index === 2 ? '-mt-[10rem] pt-4' : 'pt-4'
+                index === 1 ? 'pt-[12.5rem]' : index === 2 ? '-mt-[9rem] pt-3' : 'pt-3'
               }`}
             >
               <ProductsCatalogCard
@@ -362,7 +362,7 @@ function DesktopCoverflowTrack({ pages, currentIndex, suppressTransition }: Desk
     : `opacity ${TRACK_TRANSITION_MS}ms ${TRACK_EASING}, transform ${TRACK_TRANSITION_MS}ms ${TRACK_EASING}`;
 
   return (
-    <div className="relative z-0 mt-2 hidden min-w-0 overflow-x-hidden xl:block xl:w-full">
+    <div className="relative z-0 mt-1 hidden min-w-0 overflow-x-hidden xl:block xl:w-full">
       <div
         className="flex items-end will-change-transform"
         style={{
@@ -424,7 +424,7 @@ function DesktopPageCluster({ items, eager, label, isFocal }: DesktopPageCluster
   return (
     <div
       className={`mx-auto flex flex-col items-center transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-        isFocal ? 'translate-y-8' : 'translate-y-0'
+        isFocal ? '-translate-y-2' : '-translate-y-7'
       }`}
       style={{ width: `${CLUSTER_INNER_REM}rem` }}
     >
@@ -435,7 +435,7 @@ function DesktopPageCluster({ items, eager, label, isFocal }: DesktopPageCluster
           return (
             <div
               key={`${product.id}-${index}`}
-              className={`w-[13rem] shrink-0 ${isMiddle ? 'pt-28' : 'pt-20'}`}
+              className={`w-[13rem] shrink-0 ${isMiddle ? 'pt-14' : 'pt-8'}`}
             >
               <ProductsCatalogCard
                 product={product}
@@ -453,7 +453,7 @@ function DesktopPageCluster({ items, eager, label, isFocal }: DesktopPageCluster
         })}
       </div>
       <span
-        className={`mt-6 max-w-full truncate leading-none text-[#122a26] ${
+        className={`mt-10 max-w-full truncate leading-none text-[#122a26] ${
           isFocal ? 'text-[2rem] font-black' : 'text-[1.5rem] font-extrabold'
         }`}
       >
