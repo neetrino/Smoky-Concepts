@@ -13,10 +13,10 @@
     "build": "turbo run build",
     "start": "turbo run start",
     "lint": "turbo run lint",
-    "migrate:mongo-to-postgres": "tsx scripts/migrate-mongo-to-postgres.ts",
-    "create-admin": "tsx scripts/create-admin.ts",
-    "deploy:neon-migrations": "tsx scripts/deploy-neon-migrations.ts",
-    "setup:neon-db": "tsx scripts/setup-neon-db.ts"
+    "migrate:mongo-to-postgres": "npx tsx scripts/migrate-mongo-to-postgres.ts",
+    "create-admin": "npx tsx scripts/create-admin.ts",
+    "deploy:neon-migrations": "npx tsx scripts/deploy-neon-migrations.ts",
+    "setup:neon-db": "npx tsx scripts/setup-neon-db.ts"
   },
   "dependencies": {
     "@shop/web": "^1.0.0",
