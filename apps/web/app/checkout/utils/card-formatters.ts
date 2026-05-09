@@ -4,7 +4,7 @@
  * @returns Formatted card number (e.g., "1234 5678 9012 3456")
  */
 export function formatCardNumber(value: string): string {
-  const cleaned = value.replace(/\s/g, '');
+  const cleaned = value.replace(/\D/g, '').slice(0, 16);
   return cleaned.replace(/(.{4})/g, '$1 ').trim();
 }
 
@@ -14,7 +14,7 @@ export function formatCardNumber(value: string): string {
  * @returns Formatted expiry date (e.g., "12/25")
  */
 export function formatCardExpiry(value: string): string {
-  const cleaned = value.replace(/\D/g, '');
+  const cleaned = value.replace(/\D/g, '').slice(0, 4);
   if (cleaned.length >= 2) {
     return cleaned.substring(0, 2) + '/' + cleaned.substring(2, 4);
   }
@@ -27,7 +27,7 @@ export function formatCardExpiry(value: string): string {
  * @returns Numeric-only CVV
  */
 export function formatCardCvv(value: string): string {
-  return value.replace(/\D/g, '');
+  return value.replace(/\D/g, '').slice(0, 4);
 }
 
 

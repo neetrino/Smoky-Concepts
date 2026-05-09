@@ -38,10 +38,13 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
   );
 
   const getAttributeLabel = (key: string): string => {
-    const attributeType = getAttributeType(key);
+    const normalizedKey = key.toLowerCase().trim();
+    const attributeType = getAttributeType(normalizedKey);
     if (attributeType === 'color') return t('orders.itemDetails.color');
     if (attributeType === 'size') return t('orders.itemDetails.size');
     if (attributeType === 'category') return t('orders.itemDetails.category');
+    if (normalizedKey === '__default_pricing__') return t('orders.itemDetails.default_pricing');
+    if (normalizedKey === '__size_catalog_category_id__') return t('orders.itemDetails.size_catalog_category_id');
     return key.charAt(0).toUpperCase() + key.slice(1);
   };
 
@@ -60,9 +63,7 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
   };
 
   const priceUsd = amountToUsd(item.price, orderTotalsCurrency);
-  const totalUsd = amountToUsd(item.total, orderTotalsCurrency);
   const itemPriceDisplay = formatOrderMoneyUsd(priceUsd);
-  const itemTotalDisplay = formatOrderMoneyUsd(totalUsd);
 
   return (
     <div className="flex gap-4 pb-4 border-b border-gray-200 last:border-0">
@@ -79,11 +80,13 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
         <h3 className="text-lg font-semibold text-gray-900 mb-1">{item.productTitle}</h3>
 
         {allOptions.length > 0 && (
-          <div className="flex flex-wrap gap-3 mt-2 mb-2">
+          <div className="mt-2 mb-2 flex flex-col gap-1">
             {orderedOptions.map((opt, optIndex) => {
               if (!opt.attributeKey || !opt.value) return null;
+              const normalizedAttributeKey = opt.attributeKey.toLowerCase().trim();
+              if (normalizedAttributeKey === '__default_pricing__') return null;
 
-              const isColor = getAttributeType(opt.attributeKey) === 'color';
+              const isColor = getAttributeType(normalizedAttributeKey) === 'color';
               const displayLabel = opt.label || opt.value;
               const hasImage = opt.imageUrl && opt.imageUrl.trim() !== '';
               const colors = getColorsArray(opt.colors);
@@ -134,10 +137,7 @@ export function OrderItem({ item, orderTotalsCurrency }: OrderItemProps) {
 
         <p className="text-sm text-gray-600">{t('orders.itemDetails.sku').replace('{sku}', item.sku)}</p>
         <p className="text-sm text-gray-600 mt-2">
-          {t('orders.itemDetails.quantity')
-            .replace('{qty}', item.quantity.toString())
-            .replace('{price}', itemPriceDisplay)
-            .replace('{total}', itemTotalDisplay)}
+          {t('orders.itemDetails.quantity').replace('{price}', itemPriceDisplay)}
         </p>
       </div>
     </div>

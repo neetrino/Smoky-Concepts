@@ -35,6 +35,9 @@
   "itemDetails": {
     "color": "Գույն:",
     "size": "Չափ:",
+    "category": "Կատեգորիա:",
+    "default_pricing": "Ստանդարտ գին:",
+    "size_catalog_category_id": "Չափի կատեգորիայի ID:",
     "customization": "Անհատականացում",
     "customize_text": "Տեքստ",
     "version": "Տարբերակ",
@@ -43,7 +46,7 @@
     "customize_style": "Ձևաչափ",
     "customize_preview": "Նախադիտում",
     "sku": "SKU: {sku}",
-    "quantity": "Քանակ: {qty} × {price} = {total}"
+    "quantity": "Քանակ: {price}"
   }
 }
 

@@ -14,7 +14,6 @@ interface OrderSummaryProps {
   deliveryPrice: number | null;
   error: string | null;
   isSubmitting: boolean;
-  onPlaceOrder: (e?: React.FormEvent) => void;
   couponDraft: string;
   onCouponDraftChange: (value: string) => void;
   onApplyCoupon: () => void;
@@ -32,7 +31,6 @@ export function OrderSummary({
   deliveryPrice,
   error,
   isSubmitting,
-  onPlaceOrder,
   couponDraft,
   onCouponDraftChange,
   onApplyCoupon,
@@ -153,7 +151,6 @@ export function OrderSummary({
           className="w-full"
           size="lg"
           disabled={isSubmitting}
-          onClick={onPlaceOrder}
         >
           {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
         </Button>

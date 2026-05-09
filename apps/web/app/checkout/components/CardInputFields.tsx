@@ -13,6 +13,34 @@ interface CardInputFieldsProps {
   isSubmitting: boolean;
 }
 
+function getCursorPositionForCardNumber(formattedValue: string, digitsBeforeCursor: number): number {
+  if (digitsBeforeCursor <= 0) {
+    return 0;
+  }
+
+  let digitsSeen = 0;
+  for (let index = 0; index < formattedValue.length; index += 1) {
+    if (/\d/.test(formattedValue[index])) {
+      digitsSeen += 1;
+    }
+    if (digitsSeen === digitsBeforeCursor) {
+      return index + 1;
+    }
+  }
+
+  return formattedValue.length;
+}
+
+function getCursorPositionForCardExpiry(formattedValue: string, digitsBeforeCursor: number): number {
+  if (digitsBeforeCursor <= 0) {
+    return 0;
+  }
+  if (digitsBeforeCursor <= 2) {
+    return digitsBeforeCursor;
+  }
+  return Math.min(formattedValue.length, digitsBeforeCursor + 1);
+}
+
 export function CardInputFields({
   register,
   setValue,
@@ -33,8 +61,17 @@ export function CardInputFields({
           error={errors.cardNumber?.message}
           disabled={isSubmitting}
           onChange={(e) => {
-            const formatted = formatCardNumber(e.target.value);
-            setValue('cardNumber', formatted);
+            const rawValue = e.target.value;
+            const cursorPosition = e.target.selectionStart ?? rawValue.length;
+            const digitsBeforeCursor = rawValue.slice(0, cursorPosition).replace(/\D/g, '').length;
+            const formatted = formatCardNumber(rawValue);
+
+            setValue('cardNumber', formatted, { shouldDirty: true, shouldTouch: true });
+
+            const nextCursorPosition = getCursorPositionForCardNumber(formatted, digitsBeforeCursor);
+            requestAnimationFrame(() => {
+              e.target.setSelectionRange(nextCursorPosition, nextCursorPosition);
+            });
           }}
         />
       </div>
@@ -49,8 +86,17 @@ export function CardInputFields({
             error={errors.cardExpiry?.message}
             disabled={isSubmitting}
             onChange={(e) => {
-              const formatted = formatCardExpiry(e.target.value);
-              setValue('cardExpiry', formatted);
+              const rawValue = e.target.value;
+              const cursorPosition = e.target.selectionStart ?? rawValue.length;
+              const digitsBeforeCursor = rawValue.slice(0, cursorPosition).replace(/\D/g, '').length;
+              const formatted = formatCardExpiry(rawValue);
+
+              setValue('cardExpiry', formatted, { shouldDirty: true, shouldTouch: true });
+
+              const nextCursorPosition = getCursorPositionForCardExpiry(formatted, digitsBeforeCursor);
+              requestAnimationFrame(() => {
+                e.target.setSelectionRange(nextCursorPosition, nextCursorPosition);
+              });
             }}
           />
         </div>
@@ -65,7 +111,7 @@ export function CardInputFields({
             disabled={isSubmitting}
             onChange={(e) => {
               const formatted = formatCardCvv(e.target.value);
-              setValue('cardCvv', formatted);
+              setValue('cardCvv', formatted, { shouldDirty: true, shouldTouch: true });
             }}
           />
         </div>

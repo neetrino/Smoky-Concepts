@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { getCartMerchandiseSubtotalUsd } from './utils/getCartBaseSubtotalUsd';
 import { apiClient } from '../../lib/api-client';
 import { useForm } from 'react-hook-form';
+import type { FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getStoredLanguage } from '../../lib/language';
 import { useAuth } from '../../lib/auth/AuthContext';
@@ -41,6 +42,7 @@ export function useCheckout() {
     watch,
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
+    shouldFocusError: false,
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -182,26 +184,39 @@ export function useCheckout() {
 
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const formData = watch();
-    const hasShippingAddress = formData.shippingAddress && formData.shippingAddress.trim().length > 0;
-    const hasShippingRegion = formData.shippingRegion && formData.shippingRegion.trim().length > 0;
+    setError(null);
 
-    if (!hasShippingAddress || !hasShippingRegion) {
-      setError(t('checkout.errors.fillShippingAddress'));
-      const shippingSection = document.querySelector('[data-shipping-section]');
-      if (shippingSection) {
-        shippingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const handleValidationError = (validationErrors: FieldErrors<CheckoutFormData>) => {
+      if (validationErrors.shippingAddress || validationErrors.shippingRegion) {
+        setError(t('checkout.errors.fillShippingAddress'));
       }
-      return;
-    }
-    
-    if (paymentMethod === 'arca' || paymentMethod === 'idram') {
-      setShowCardModal(true);
-      return;
-    }
-    
-    handleSubmit(submitOrder)(e);
+
+      const firstErrorField = Object.keys(validationErrors)[0] as keyof CheckoutFormData | undefined;
+      if (!firstErrorField) {
+        return;
+      }
+
+      const errorElement = document.querySelector<HTMLElement>(`[name="${firstErrorField}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        requestAnimationFrame(() => {
+          if ('focus' in errorElement) {
+            errorElement.focus();
+          }
+        });
+      }
+    };
+
+    handleSubmit(
+      (data) => {
+        if (data.paymentMethod === 'arca' || data.paymentMethod === 'idram') {
+          setShowCardModal(true);
+          return;
+        }
+        submitOrder(data);
+      },
+      handleValidationError,
+    )(e);
   };
 
   const onSubmit = (data: CheckoutFormData) => {

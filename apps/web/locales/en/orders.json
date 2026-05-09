@@ -15,7 +15,7 @@
   },
   "shippingAddress": {
     "title": "Shipping Address",
-    "region": "Region (marz): {region}",
+    "region": "Region: {region}",
     "phone": "Phone: {phone}"
   },
   "orderSummary": {
@@ -35,6 +35,9 @@
   "itemDetails": {
     "color": "Color:",
     "size": "Size:",
+    "category": "Category:",
+    "default_pricing": "Default pricing:",
+    "size_catalog_category_id": "Size catalog category ID:",
     "customization": "Customization",
     "customize_text": "Text",
     "version": "Version",
@@ -43,7 +46,7 @@
     "customize_style": "Style",
     "customize_preview": "Preview",
     "sku": "SKU: {sku}",
-    "quantity": "Quantity: {qty} × {price} = {total}"
+    "quantity": "Quantity: {price}"
   }
 }
 

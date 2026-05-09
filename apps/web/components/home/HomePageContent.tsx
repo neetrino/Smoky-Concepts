@@ -45,7 +45,7 @@ function PackFitCard({
   useCompactImage,
 }: (typeof PACK_FIT_ITEMS)[number]) {
   return (
-    <div className="flex shrink-0 snap-center flex-col items-center gap-3">
+    <div className="flex shrink-0 snap-center scale-[0.88] flex-col items-center gap-2 sm:scale-100 sm:gap-3">
       <div className={`relative flex items-end justify-center ${heightClassName} ${widthClassName}`}>
         {useCompactImage ? (
           <>
@@ -272,7 +272,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
 
   return (
     <div className="overflow-x-hidden overflow-y-hidden bg-[#efefef] text-[#414141]">
-      <div className="mx-auto flex max-w-[120rem] flex-col gap-16 overflow-x-hidden overflow-y-hidden px-5 pb-20 pt-8 sm:gap-24 sm:px-8 sm:pb-24 sm:pt-10 lg:px-[7.5rem]">
+      <div className="mx-auto flex max-w-[120rem] flex-col gap-[140px] overflow-x-hidden overflow-y-hidden px-5 pb-20 pt-8 sm:px-8 sm:pb-24 sm:pt-10 lg:px-[7.5rem]">
         <section className="flex flex-col gap-4 sm:gap-5">
           <HomeSectionTitle
             title={t('home.homepage.hero.title')}
@@ -288,14 +288,15 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <HomeHeroSection slides={heroSlides} />
         </section>
 
-        <section className="-mt-10 flex flex-col gap-8 pb-8 sm:-mt-12 sm:gap-10 sm:pb-10">
+        <section className="-mt-10 flex flex-col gap-8 pb-8 sm:mt-1 sm:gap-10 sm:pb-10">
           <HomeSectionTitle
             title={t('home.homepage.packFit.title')}
             description={t('home.homepage.packFit.description')}
           />
           <div className="sm:hidden">
             <div className="-mx-5 overflow-x-auto px-5 pb-2 scrollbar-hide">
-              <div className="flex min-w-max snap-x snap-mandatory items-end gap-x-6">
+              <div className="flex min-w-max snap-x snap-mandatory items-end gap-x-5">
+                <div aria-hidden="true" className="w-[calc(50vw-4.5rem)] shrink-0" />
                 {PACK_FIT_ITEMS.map((item, index) => (
                   <PackFitCard
                     key={item.title}
@@ -304,6 +305,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     subtitle={t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.subtitle`)}
                   />
                 ))}
+                <div aria-hidden="true" className="w-[calc(50vw-4.5rem)] shrink-0" />
               </div>
             </div>
           </div>
@@ -330,7 +332,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <section className="flex flex-col gap-8 overflow-visible pt-3 sm:gap-10 sm:pt-6">
             <HomeSectionTitle
               title={t('home.homepage.coverCollections.title')}
-              className="-translate-y-9 sm:-translate-y-3 lg:-translate-y-5"
+              className="-translate-y-10 sm:-translate-y-4 lg:-translate-y-6"
             />
             <div className="mt-4 grid grid-cols-2 items-start gap-x-2 gap-y-20 overflow-visible sm:mt-0 sm:grid-cols-4 sm:gap-8">
               {coverCollections.map((item) => (
@@ -423,7 +425,9 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           </div>
         </section>
 
-        <TrendingFeaturedSection />
+        <div className="sm:mt-16">
+          <TrendingFeaturedSection />
+        </div>
 
         <section className="grid gap-y-6 sm:gap-y-8 lg:gap-x-2 lg:grid-cols-[minmax(0,1.28fr)_minmax(30rem,33.5rem)_minmax(0,1.28fr)]">
           <div className="relative min-h-[20.5rem] overflow-hidden rounded-t-[2rem] rounded-b-[1rem] sm:min-h-[32rem] sm:rounded-[2rem] lg:rounded-r-[0.625rem]">
@@ -516,7 +520,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
         <CultureVotingSection />
 
         <section className="grid gap-8 overflow-visible sm:gap-10 xl:grid-cols-[minmax(0,32rem)_minmax(0,1fr)]">
-          <div className="flex flex-col justify-start gap-6 pt-8 sm:gap-8 sm:pt-10 xl:pt-16">
+          <div className="flex flex-col justify-start gap-6 pt-5 sm:gap-8 sm:pt-7 xl:pt-12">
             <HomeSectionTitle
               title={t('home.homepage.upcomingLines.title')}
               description={t('home.homepage.upcomingLines.description')}
@@ -526,7 +530,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             <HomeActionButton
               href="/contact"
               label={t('home.homepage.upcomingLines.cta')}
-              className="mx-auto hidden w-fit !rounded-xl sm:inline-flex sm:mx-0"
+              className="mx-auto hidden w-fit !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-semibold !tracking-[0.14em] sm:mx-0 sm:inline-flex sm:!text-[1.12rem] sm:!tracking-[0.16em]"
             />
           </div>
           <div className="overflow-visible pt-3 sm:pt-10">
@@ -580,7 +584,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <HomeActionButton
             href="/contact"
             label={t('home.homepage.upcomingLines.cta')}
-            className="w-fit !rounded-xl"
+            className="w-fit !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-semibold !tracking-[0.14em] sm:!text-[1.12rem] sm:!tracking-[0.16em]"
           />
         </div>
 
@@ -592,7 +596,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <HomeActionButton
             href="/contact"
             label={t('home.homepage.sayHi.cta')}
-            className="min-w-[13.75rem] !min-h-11 sm:!min-h-12 font-semibold"
+            className="min-w-[13.75rem] !min-h-11 sm:!min-h-12 !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-semibold !tracking-[0.14em] sm:!text-[1.12rem] sm:!tracking-[0.16em]"
           />
         </section>
       </div>

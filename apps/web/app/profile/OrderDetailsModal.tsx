@@ -140,12 +140,12 @@ export function OrderDetailsModal({
                 <div className="lg:col-span-2 space-y-6">
                   {/* Status */}
                   <Card className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('profile.orderDetails.orderStatus')}</h3>
-                    <div className="flex flex-wrap items-center gap-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedOrder.status)}`}>
+                    <div className="flex items-center gap-3 max-sm:flex-nowrap">
+                      <h3 className="text-lg font-semibold text-gray-900">{t('profile.orderDetails.orderStatus')}</h3>
+                      <span className={`whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium ${getStatusColor(selectedOrder.status)}`}>
                         {selectedOrder.status}
                       </span>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getPaymentStatusColor(selectedOrder.paymentStatus)}`}>
+                      <span className={`whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium ${getPaymentStatusColor(selectedOrder.paymentStatus)}`}>
                         {t('profile.orderDetails.payment')}: {selectedOrder.paymentStatus}
                       </span>
                     </div>
