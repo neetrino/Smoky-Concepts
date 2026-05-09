@@ -35,6 +35,9 @@
   "itemDetails": {
     "color": "Цвет:",
     "size": "Размер:",
+    "category": "Категория:",
+    "default_pricing": "Базовая цена:",
+    "size_catalog_category_id": "ID категории размера:",
     "customization": "Персонализация",
     "customize_text": "Текст",
     "version": "Версия",
@@ -43,7 +46,7 @@
     "customize_style": "Стиль",
     "customize_preview": "Предпросмотр",
     "sku": "Артикул: {sku}",
-    "quantity": "Количество: {qty} × {price} = {total}"
+    "quantity": "Количество: {price}"
   }
 }
 
