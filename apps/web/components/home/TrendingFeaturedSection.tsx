@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { apiClient } from '../../lib/api-client';
 import { ProductsCatalogCard } from '../../app/products/components/ProductsCatalogCard';
@@ -125,13 +125,23 @@ export function TrendingFeaturedSection() {
   const [items, setItems] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [activeDisplayIndex, setActiveDisplayIndex] = useState(0);
   const [suppressTransition, setSuppressTransition] = useState(false);
+  const wrapResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pages = useMemo(() => buildTrendingPages(items), [items]);
   const totalPages = pages.length;
   const hasMultiplePages = totalPages > 1;
-  const safeCurrent = totalPages > 0 ? Math.min(currentPage, totalPages - 1) : 0;
+  const safeDisplayIndex =
+    totalPages > 1 ? Math.min(Math.max(activeDisplayIndex, 0), totalPages + 1) : 0;
+  const safeCurrent =
+    totalPages <= 1
+      ? 0
+      : safeDisplayIndex === 0
+        ? totalPages - 1
+        : safeDisplayIndex === totalPages + 1
+          ? 0
+          : safeDisplayIndex - 1;
 
   const prevIdx = totalPages > 0 ? (safeCurrent - 1 + totalPages) % totalPages : 0;
   const nextIdx = totalPages > 0 ? (safeCurrent + 1) % totalPages : 0;
@@ -191,33 +201,47 @@ export function TrendingFeaturedSection() {
   }, [fetchFeatured]);
 
   useEffect(() => {
-    setCurrentPage(0);
-  }, [items.length]);
+    setSuppressTransition(false);
+    setActiveDisplayIndex(items.length > 0 && totalPages > 1 ? 1 : 0);
+  }, [items.length, totalPages]);
 
-  /** Wrap-around uses a 1-frame transition suppression so the visual "snap" isn't a long animated rewind. */
-  const transitionToPage = useCallback((nextPageValue: number, isWrap: boolean) => {
-    if (isWrap) {
+  useEffect(() => {
+    if (totalPages <= 1) return;
+    if (wrapResetTimeoutRef.current) {
+      clearTimeout(wrapResetTimeoutRef.current);
+      wrapResetTimeoutRef.current = null;
+    }
+
+    if (safeDisplayIndex !== 0 && safeDisplayIndex !== totalPages + 1) return;
+
+    const normalizedDisplayIndex = safeDisplayIndex === 0 ? totalPages : 1;
+    wrapResetTimeoutRef.current = setTimeout(() => {
       setSuppressTransition(true);
-      setCurrentPage(nextPageValue);
+      setActiveDisplayIndex(normalizedDisplayIndex);
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => setSuppressTransition(false));
       });
-      return;
-    }
-    setCurrentPage(nextPageValue);
-  }, []);
+    }, TRACK_TRANSITION_MS);
+
+    return () => {
+      if (wrapResetTimeoutRef.current) {
+        clearTimeout(wrapResetTimeoutRef.current);
+        wrapResetTimeoutRef.current = null;
+      }
+    };
+  }, [safeDisplayIndex, totalPages]);
 
   const goPrev = useCallback(() => {
     if (!hasMultiplePages) return;
-    const willWrap = safeCurrent === 0;
-    transitionToPage(willWrap ? totalPages - 1 : safeCurrent - 1, willWrap);
-  }, [hasMultiplePages, safeCurrent, totalPages, transitionToPage]);
+    if (suppressTransition) return;
+    setActiveDisplayIndex((prev) => prev - 1);
+  }, [hasMultiplePages, suppressTransition]);
 
   const goNext = useCallback(() => {
     if (!hasMultiplePages) return;
-    const willWrap = safeCurrent >= totalPages - 1;
-    transitionToPage(willWrap ? 0 : safeCurrent + 1, willWrap);
-  }, [hasMultiplePages, safeCurrent, totalPages, transitionToPage]);
+    if (suppressTransition) return;
+    setActiveDisplayIndex((prev) => prev + 1);
+  }, [hasMultiplePages, suppressTransition]);
 
   if (error) {
     return (
@@ -325,7 +349,8 @@ export function TrendingFeaturedSection() {
 
       <DesktopCoverflowTrack
         pages={pages}
-        currentIndex={safeCurrent}
+        currentDisplayIndex={safeDisplayIndex}
+        currentLogicalIndex={safeCurrent}
         suppressTransition={suppressTransition}
       />
 
@@ -345,14 +370,29 @@ export function TrendingFeaturedSection() {
 
 interface DesktopCoverflowTrackProps {
   pages: TrendingPage[];
-  currentIndex: number;
+  currentDisplayIndex: number;
+  currentLogicalIndex: number;
   suppressTransition: boolean;
 }
 
 /** Single horizontal track containing all category clusters; only neighbours of the focal cluster fade in. */
-function DesktopCoverflowTrack({ pages, currentIndex, suppressTransition }: DesktopCoverflowTrackProps) {
+function DesktopCoverflowTrack({
+  pages,
+  currentDisplayIndex,
+  currentLogicalIndex,
+  suppressTransition,
+}: DesktopCoverflowTrackProps) {
   const totalPages = pages.length;
   if (totalPages === 0) return null;
+
+  const displaySlots =
+    totalPages > 1
+      ? [
+          { key: `clone-left-${pages[totalPages - 1].key}`, page: pages[totalPages - 1], logicalIndex: totalPages - 1 },
+          ...pages.map((page, logicalIndex) => ({ key: page.key, page, logicalIndex })),
+          { key: `clone-right-${pages[0].key}`, page: pages[0], logicalIndex: 0 },
+        ]
+      : [{ key: pages[0].key, page: pages[0], logicalIndex: 0 }];
 
   const trackTransition = suppressTransition
     ? 'none'
@@ -366,16 +406,16 @@ function DesktopCoverflowTrack({ pages, currentIndex, suppressTransition }: Desk
       <div
         className="flex items-end will-change-transform"
         style={{
-          width: `${totalPages * PAGE_FRAME_REM}rem`,
+          width: `${displaySlots.length * PAGE_FRAME_REM}rem`,
           // marginLeft: 50% pins track's left edge to parent's horizontal center;
           // translateX then shifts so the focal cluster's center sits at parent center.
           marginLeft: '50%',
-          transform: `translateX(-${(currentIndex + 0.5) * PAGE_FRAME_REM}rem)`,
+          transform: `translateX(-${(currentDisplayIndex + 0.5) * PAGE_FRAME_REM}rem)`,
           transition: trackTransition,
         }}
       >
-        {pages.map((page, idx) => {
-          const rawDistance = Math.abs(idx - currentIndex);
+        {displaySlots.map(({ key, page, logicalIndex }) => {
+          const rawDistance = Math.abs(logicalIndex - currentLogicalIndex);
           const distance = totalPages > 0
             ? Math.min(rawDistance, totalPages - rawDistance)
             : 0;
@@ -386,7 +426,7 @@ function DesktopCoverflowTrack({ pages, currentIndex, suppressTransition }: Desk
 
           return (
             <div
-              key={page.key}
+              key={key}
               aria-hidden={!isFocal}
               className="shrink-0"
               style={{
