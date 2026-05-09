@@ -109,13 +109,6 @@ export default function CheckoutPage() {
             deliveryPrice={deliveryPrice}
             error={error}
             isSubmitting={isSubmitting}
-            onPlaceOrder={(e) => {
-              if (e) {
-                handlePlaceOrder(e);
-              } else {
-                handlePlaceOrder({ preventDefault: () => {} } as React.FormEvent);
-              }
-            }}
             couponDraft={couponDraft}
             onCouponDraftChange={setCouponDraft}
             onApplyCoupon={applyCoupon}
