@@ -295,7 +295,8 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           />
           <div className="sm:hidden">
             <div className="-mx-5 overflow-x-auto px-5 pb-2 scrollbar-hide">
-              <div className="flex min-w-max snap-x snap-mandatory items-end gap-x-0 -space-x-1 sm:gap-x-6 sm:space-x-0">
+              <div className="flex min-w-max snap-x snap-mandatory items-end gap-x-5">
+                <div aria-hidden="true" className="w-[calc(50vw-4.5rem)] shrink-0" />
                 {PACK_FIT_ITEMS.map((item, index) => (
                   <PackFitCard
                     key={item.title}
@@ -304,6 +305,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
                     subtitle={t(`home.homepage.packFit.items.${packFitKeyByIndex[index]}.subtitle`)}
                   />
                 ))}
+                <div aria-hidden="true" className="w-[calc(50vw-4.5rem)] shrink-0" />
               </div>
             </div>
           </div>
