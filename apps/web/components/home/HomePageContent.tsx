@@ -272,7 +272,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
 
   return (
     <div className="overflow-x-hidden overflow-y-hidden bg-[#efefef] text-[#414141]">
-      <div className="mx-auto flex max-w-[120rem] flex-col gap-16 overflow-x-hidden overflow-y-hidden px-5 pb-20 pt-8 sm:gap-24 sm:px-8 sm:pb-24 sm:pt-10 lg:px-[7.5rem]">
+      <div className="mx-auto flex max-w-[120rem] flex-col gap-[140px] overflow-x-hidden overflow-y-hidden px-5 pb-20 pt-8 sm:px-8 sm:pb-24 sm:pt-10 lg:px-[7.5rem]">
         <section className="flex flex-col gap-4 sm:gap-5">
           <HomeSectionTitle
             title={t('home.homepage.hero.title')}
@@ -288,7 +288,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <HomeHeroSection slides={heroSlides} />
         </section>
 
-        <section className="-mt-10 flex flex-col gap-8 pb-8 sm:-mt-12 sm:gap-10 sm:pb-10">
+        <section className="-mt-10 flex flex-col gap-8 pb-8 sm:mt-1 sm:gap-10 sm:pb-10">
           <HomeSectionTitle
             title={t('home.homepage.packFit.title')}
             description={t('home.homepage.packFit.description')}
@@ -330,7 +330,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <section className="flex flex-col gap-8 overflow-visible pt-3 sm:gap-10 sm:pt-6">
             <HomeSectionTitle
               title={t('home.homepage.coverCollections.title')}
-              className="-translate-y-9 sm:-translate-y-3 lg:-translate-y-5"
+              className="-translate-y-10 sm:-translate-y-4 lg:-translate-y-6"
             />
             <div className="mt-4 grid grid-cols-2 items-start gap-x-2 gap-y-20 overflow-visible sm:mt-0 sm:grid-cols-4 sm:gap-8">
               {coverCollections.map((item) => (
@@ -423,7 +423,9 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           </div>
         </section>
 
-        <TrendingFeaturedSection />
+        <div className="sm:mt-16">
+          <TrendingFeaturedSection />
+        </div>
 
         <section className="grid gap-y-6 sm:gap-y-8 lg:gap-x-2 lg:grid-cols-[minmax(0,1.28fr)_minmax(30rem,33.5rem)_minmax(0,1.28fr)]">
           <div className="relative min-h-[20.5rem] overflow-hidden rounded-t-[2rem] rounded-b-[1rem] sm:min-h-[32rem] sm:rounded-[2rem] lg:rounded-r-[0.625rem]">
