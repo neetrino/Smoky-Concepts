@@ -45,7 +45,7 @@ function PackFitCard({
   useCompactImage,
 }: (typeof PACK_FIT_ITEMS)[number]) {
   return (
-    <div className="flex shrink-0 snap-center flex-col items-center gap-3">
+    <div className="flex shrink-0 snap-center scale-[0.88] flex-col items-center gap-2 sm:scale-100 sm:gap-3">
       <div className={`relative flex items-end justify-center ${heightClassName} ${widthClassName}`}>
         {useCompactImage ? (
           <>
@@ -295,7 +295,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           />
           <div className="sm:hidden">
             <div className="-mx-5 overflow-x-auto px-5 pb-2 scrollbar-hide">
-              <div className="flex min-w-max snap-x snap-mandatory items-end gap-x-6">
+              <div className="flex min-w-max snap-x snap-mandatory items-end gap-x-0 -space-x-1 sm:gap-x-6 sm:space-x-0">
                 {PACK_FIT_ITEMS.map((item, index) => (
                   <PackFitCard
                     key={item.title}

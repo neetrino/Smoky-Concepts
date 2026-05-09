@@ -23,7 +23,7 @@ const CARD_GAP_REM = 0.75;
 /** Tight cluster width: 3 cards + 2 gaps (one focal page's product row). */
 const CLUSTER_INNER_REM = CARD_WIDTH_REM * 3 + CARD_GAP_REM * 2;
 /** Each track slot reserves a bit more than the cluster so adjacent (faded) clusters breathe. */
-const PAGE_FRAME_REM = CLUSTER_INNER_REM + 4;
+const PAGE_FRAME_REM = CLUSTER_INNER_REM + 2;
 const TRACK_TRANSITION_MS = 520;
 const TRACK_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
@@ -286,7 +286,7 @@ export function TrendingFeaturedSection() {
           href="/products"
           label={t('home.homepage.trending.shopCta')}
           variant="outline"
-          className="!w-fit !min-h-8 !-translate-y-3 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-tight !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!-translate-y-4 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-tight sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:z-30 xl:!translate-y-10"
+          className="!w-fit !min-h-8 !translate-y-0 !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-tight !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!translate-y-0 sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-tight sm:!tracking-[0.14em] xl:absolute xl:!top-1/2 xl:right-[7.5rem] xl:z-30 xl:!-translate-y-1/2"
         />
       </div>
 
@@ -382,7 +382,7 @@ function DesktopCoverflowTrack({ pages, currentIndex, suppressTransition }: Desk
           const isFocal = distance === 0;
           const isAdjacent = distance === 1;
           const opacity = isFocal ? 1 : isAdjacent ? 0.5 : 0;
-          const scale = isFocal ? 1 : 0.84;
+          const scale = isFocal ? 1 : 0.78;
 
           return (
             <div
@@ -424,7 +424,7 @@ function DesktopPageCluster({ items, eager, label, isFocal }: DesktopPageCluster
   return (
     <div
       className={`mx-auto flex flex-col items-center transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-        isFocal ? '-translate-y-2' : '-translate-y-12'
+        isFocal ? '-translate-y-2' : '-translate-y-[6.25rem]'
       }`}
       style={{ width: `${CLUSTER_INNER_REM}rem` }}
     >
@@ -500,8 +500,8 @@ function TrendingPageSlider({
         <ChevronLeft className="h-8 w-8" strokeWidth={2.5} />
       </button>
       {/* Mobile-only label strip: on xl labels live under each cluster inside the coverflow. */}
-      <div className="col-start-2 row-start-1 flex w-full items-end justify-around gap-3 sm:gap-6 xl:hidden">
-        <span className={sideLabelBase}>{prevLabel}</span>
+      <div className="col-start-2 row-start-1 flex w-full items-end justify-center gap-3 sm:justify-around sm:gap-6 xl:hidden">
+        <span className={`hidden sm:inline ${sideLabelBase}`}>{prevLabel}</span>
         <span
           key={currentLabel}
           className="trending-current-label truncate text-2xl font-black leading-none text-[#122a26] sm:text-[1.75rem]"
@@ -511,7 +511,7 @@ function TrendingPageSlider({
         >
           {currentLabel && currentLabel !== 'Featured' ? currentLabel : '—'}
         </span>
-        <span className={sideLabelBase}>{nextLabel}</span>
+        <span className={`hidden sm:inline ${sideLabelBase}`}>{nextLabel}</span>
       </div>
       <button
         type="button"
