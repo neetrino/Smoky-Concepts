@@ -1,5 +1,7 @@
+'use client';
+
 import Image from 'next/image';
-import type { ReactNode } from 'react';
+import { useCallback, useRef, useState, type ReactNode } from 'react';
 
 type Pillar = {
   readonly id: string;
@@ -12,6 +14,8 @@ type Pillar = {
     height: number;
     topOffset: string;
     hideWhiteBg?: boolean;
+    mobileScaleClass?: string;
+    mobileTopClass?: string;
   };
   readonly body: ReactNode;
 };
@@ -28,6 +32,8 @@ const PILLARS: readonly Pillar[] = [
       height: 300,
       topOffset: '-top-[76px]',
       hideWhiteBg: true,
+      mobileScaleClass: 'scale-100',
+      mobileTopClass: '-top-[78px]',
     },
     body: (
       <>
@@ -75,6 +81,8 @@ const PILLARS: readonly Pillar[] = [
       height: 341,
       topOffset: '-top-[117px]',
       hideWhiteBg: true,
+      mobileScaleClass: 'scale-[0.6]',
+      mobileTopClass: '-top-[58px]',
     },
     body: (
       <>
@@ -114,6 +122,8 @@ const PILLARS: readonly Pillar[] = [
       width: 300,
       height: 338,
       topOffset: '-top-[114px]',
+      mobileScaleClass: 'scale-100',
+      mobileTopClass: '-top-[78px]',
     },
     body: (
       <>
@@ -135,15 +145,15 @@ const PILLARS: readonly Pillar[] = [
   },
 ];
 
-function PillarCard({ pillar }: { pillar: Pillar }) {
+function PillarCard({ pillar, className = '' }: { pillar: Pillar; className?: string }) {
   const imageClassName = pillar.image.hideWhiteBg
     ? 'object-contain object-bottom mix-blend-multiply'
     : 'object-contain object-bottom';
 
   return (
-    <article className="relative pt-[96px] lg:pt-[78px] xl:pt-[86px]">
+    <article className={`relative pt-[96px] lg:pt-[78px] xl:pt-[86px] ${className}`}>
       <div
-        className={`relative ${pillar.bg} rounded-[30px] px-5 pb-6 pt-[168px] sm:px-6 lg:h-[510px] lg:px-6 lg:pt-[173px] xl:h-[615px] xl:w-[408px] xl:rounded-[36px] xl:px-7 xl:pt-[190px]`}
+        className={`relative ${pillar.bg} h-[620px] rounded-[30px] px-5 pb-6 pt-[168px] sm:h-[640px] sm:px-6 lg:h-[510px] lg:px-6 lg:pt-[173px] xl:h-[615px] xl:w-[408px] xl:rounded-[36px] xl:px-7 xl:pt-[190px]`}
       >
         <div
           className={`pointer-events-none absolute left-1/2 hidden -translate-x-1/2 xl:block xl:scale-[0.78] ${pillar.image.topOffset}`}
@@ -157,7 +167,13 @@ function PillarCard({ pillar }: { pillar: Pillar }) {
             className={imageClassName}
           />
         </div>
-        <div className="pointer-events-none absolute -top-[78px] left-1/2 h-[200px] w-[200px] -translate-x-1/2 sm:-top-[86px] sm:h-[230px] sm:w-[230px] xl:hidden">
+        <div
+          className={`pointer-events-none absolute left-1/2 h-[200px] w-[200px] -translate-x-1/2 sm:-top-[86px] sm:h-[230px] sm:w-[230px] xl:hidden ${
+            pillar.image.mobileTopClass ?? '-top-[78px]'
+          } ${
+            pillar.image.mobileScaleClass ?? 'scale-100'
+          }`}
+        >
           <Image
             src={pillar.image.src}
             alt={pillar.image.alt}
@@ -184,9 +200,96 @@ function PillarCard({ pillar }: { pillar: Pillar }) {
  * Mirrors Figma node 6466:303 (1680 × 919 desktop block).
  */
 export function AboutPillars() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const mobileScrollerRef = useRef<HTMLDivElement | null>(null);
+  const mobileCardRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  const scrollToCard = useCallback((index: number) => {
+    const scroller = mobileScrollerRef.current;
+    const target = mobileCardRefs.current[index];
+
+    if (!scroller || !target) {
+      return;
+    }
+
+    scroller.scrollTo({
+      left: target.offsetLeft - 16,
+      behavior: 'smooth',
+    });
+    setActiveIndex(index);
+  }, []);
+
+  const handleMobileScroll = useCallback(() => {
+    const scroller = mobileScrollerRef.current;
+
+    if (!scroller) {
+      return;
+    }
+
+    const center = scroller.scrollLeft + scroller.clientWidth / 2;
+    let nearestIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    mobileCardRefs.current.forEach((card, index) => {
+      if (!card) {
+        return;
+      }
+
+      const cardCenter = card.offsetLeft + card.clientWidth / 2;
+      const distance = Math.abs(cardCenter - center);
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = index;
+      }
+    });
+
+    if (nearestIndex !== activeIndex) {
+      setActiveIndex(nearestIndex);
+    }
+  }, [activeIndex]);
+
   return (
     <section className="mt-16 lg:mt-[92px] xl:mt-[120px]">
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-9 xl:gap-[72px]">
+      <div
+        ref={mobileScrollerRef}
+        onScroll={handleMobileScroll}
+        className="-mx-4 overflow-x-auto px-4 pb-1 sm:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        <div className="flex snap-x snap-mandatory gap-4">
+          {PILLARS.map((pillar, index) => (
+            <div
+              key={pillar.id}
+              ref={(element) => {
+                mobileCardRefs.current[index] = element;
+              }}
+              className="w-[82vw] min-w-[82vw] shrink-0 snap-center"
+            >
+              <PillarCard pillar={pillar} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center justify-center gap-2 sm:hidden">
+        {PILLARS.map((pillar, index) => {
+          const isActive = index === activeIndex;
+
+          return (
+            <button
+              key={pillar.id}
+              type="button"
+              onClick={() => scrollToCard(index)}
+              className={`h-[4px] w-[44px] rounded-full transition-colors ${
+                isActive ? 'bg-[#122a26]' : 'bg-[#cbcbcb]'
+              }`}
+              aria-label={`Go to ${pillar.id}`}
+            />
+          );
+        })}
+      </div>
+
+      <div className="hidden sm:grid sm:grid-cols-2 sm:gap-8 lg:grid-cols-3 lg:gap-9 xl:gap-[72px]">
         {PILLARS.map((pillar) => (
           <PillarCard key={pillar.id} pillar={pillar} />
         ))}
