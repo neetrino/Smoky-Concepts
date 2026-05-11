@@ -48,15 +48,15 @@ const INTRO_PARAGRAPHS: readonly string[] = [
 function NextTile({ card }: { card: NextCard }) {
   return (
     <article
-      className={`relative ${card.bg} flex h-[240px] flex-col justify-end rounded-[30px] p-5 text-white sm:h-[270px] lg:h-[300px] lg:rounded-[32px] lg:p-6`}
+      className={`relative ${card.bg} flex h-[262px] flex-col justify-end rounded-[30px] p-5 text-white sm:h-[298px] lg:h-[344px] lg:rounded-[34px] lg:p-6`}
     >
-      <div className="absolute right-5 top-5 h-[82px] w-[82px] sm:h-[96px] sm:w-[96px] lg:h-[112px] lg:w-[112px]">
+      <div className="absolute right-5 top-5 h-[94px] w-[94px] sm:h-[110px] sm:w-[110px] lg:h-[133px] lg:w-[133px]">
         <Image src={card.icon} alt="" fill className="object-contain" />
       </div>
-      <p className="text-[16px] font-extrabold tracking-[0.08em] sm:text-[18px] lg:text-[20px]">
+      <p className="text-[16px] font-extrabold tracking-[0.08em] sm:text-[18px] lg:text-[21px]">
         {card.tag}
       </p>
-      <p className="mt-1.5 max-w-[260px] text-[13px] font-medium leading-[19px] sm:text-[14px] lg:text-[15px] lg:leading-[22px]">
+      <p className="mt-1.5 max-w-[280px] text-[13px] font-semibold leading-[19px] sm:text-[14px] lg:text-[16px] lg:leading-[22px]">
         {card.body}
       </p>
     </article>
@@ -70,24 +70,24 @@ function NextTile({ card }: { card: NextCard }) {
 export function AboutNext() {
   return (
     <section className="mt-16 text-[#414141] lg:mt-[110px]">
-      <div className="mx-auto max-w-[1120px] text-center">
-        <h2 className="text-left text-[24px] font-extrabold sm:text-[28px] lg:text-[34px]">
+      <div className="mx-auto max-w-[1260px] text-center">
+        <h2 className="text-center text-[22px] font-extrabold tracking-[-0.02em] sm:text-[24px] lg:text-[30px]">
           What Comes Next
         </h2>
-        <div className="mt-5 space-y-3 text-[14px] font-medium leading-[23px] sm:text-[16px] lg:mt-6 lg:text-[16px] lg:leading-[24px]">
+        <div className="mx-auto mt-5 max-w-[1180px] space-y-2.5 text-center text-[12px] font-semibold leading-[20px] tracking-[-0.01em] sm:text-[14px] sm:leading-[22px] lg:mt-6 lg:text-[15px] lg:leading-[23px]">
           {INTRO_PARAGRAPHS.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
       </div>
 
-      <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-9 lg:grid-cols-4 lg:gap-5">
+      <div className="mx-auto mt-7 grid max-w-[1260px] grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-9 lg:grid-cols-4 lg:gap-6">
         {NEXT_CARDS.map((card) => (
           <NextTile key={card.id} card={card} />
         ))}
       </div>
 
-      <div className="mx-auto mt-7 max-w-[1120px] space-y-1.5 text-center text-[14px] font-medium leading-[23px] sm:text-[16px] lg:mt-8 lg:text-[16px] lg:leading-[24px]">
+      <div className="mx-auto mt-7 max-w-[1260px] space-y-1.5 text-center text-[13px] font-semibold leading-[22px] sm:text-[15px] lg:mt-8 lg:text-[15px] lg:leading-[23px]">
         <p>We build with patience. We release when the concept is complete.</p>
         <p>Every object we bring into the world is one we would carry ourselves.</p>
       </div>

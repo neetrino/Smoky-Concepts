@@ -16,6 +16,18 @@ const HERO_PARAGRAPHS: readonly string[] = [
   'We build with clarity. We release with purpose.',
 ];
 
+function getBannerRadiusClass(index: number): string {
+  if (index === 0) {
+    return 'rounded-l-[30px] rounded-r-none';
+  }
+
+  if (index === HERO_BANNERS.length - 1) {
+    return 'rounded-r-[12px] rounded-l-none';
+  }
+
+  return 'rounded-none';
+}
+
 /**
  * Hero — three vertical banners on the left, white "ritual" card on the right.
  * Mirrors Figma node 6466:286 (1680 × 648 desktop block).
@@ -24,10 +36,10 @@ export function AboutHero() {
   return (
     <section className="mx-auto mt-8 grid max-w-[1460px] grid-cols-1 gap-4 lg:mt-[56px] lg:grid-cols-2 lg:gap-3 xl:gap-4 lg:h-[500px]">
       <div className="grid grid-cols-3 gap-2 lg:gap-[9px]">
-        {HERO_BANNERS.map((banner) => (
+        {HERO_BANNERS.map((banner, index) => (
           <div
             key={banner.src}
-            className="relative h-[200px] overflow-hidden rounded-[12px] sm:h-[280px] lg:h-[500px]"
+            className={`relative h-[200px] overflow-hidden sm:h-[280px] lg:h-[500px] ${getBannerRadiusClass(index)}`}
           >
             <Image
               src={banner.src}
