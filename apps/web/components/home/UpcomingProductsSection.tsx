@@ -73,7 +73,7 @@ function getServerUpcomingSmViewportSnapshot(): boolean {
 
 /** Matches `TrendingFeaturedSection` shop CTA sizing and xl placement. */
 const UPCOMING_SHOP_BUTTON_CLASS_NAME =
-  '!w-fit !min-h-8 !translate-y-[3rem] !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-none !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!translate-y-[3rem] sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-none sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:!translate-y-[3rem]';
+  '!w-fit !min-h-8 !translate-y-[2rem] !rounded-[0.5rem] !border-[2.5px] !border-[#dcc090] !px-2.5 !py-2 !text-[0.75rem] !font-black !uppercase !leading-none !tracking-[0.07em] sm:!w-auto sm:!min-h-9 sm:!translate-y-[2rem] sm:!rounded-[0.5rem] sm:!border-[2.5px] sm:!border-[#dcc090] sm:!px-5 sm:!py-0 sm:!text-[0.75rem] sm:!font-black sm:!leading-none sm:!tracking-[0.14em] xl:absolute xl:right-[7.5rem] xl:!translate-y-[2rem]';
 
 function UpcomingSectionHeader() {
   const { t } = useTranslation();
@@ -84,7 +84,7 @@ function UpcomingSectionHeader() {
           title={t('home.homepage.upcoming.title')}
           centered={false}
           className="items-start text-left sm:items-center sm:text-center [&_h2]:text-left sm:[&_h2]:text-center"
-          titleClassName="relative top-12 sm:top-14"
+          titleClassName="relative top-8 sm:top-10"
         />
       </div>
       <HomeActionButton
