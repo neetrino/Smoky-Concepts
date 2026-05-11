@@ -39,7 +39,7 @@
     "deliveryDescription": "We will deliver your order to your address",
     "freePickup": "Free (Store Pickup)",
     "loading": "Loading...",
-    "enterRegion": "Enter region"
+    "enterRegion": "Not calculated"
   },
   "payment": {
     "cashOnDelivery": "Cash on Delivery",
