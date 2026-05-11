@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type TouchEvent } from 'react';
 
 import { HomeActionButton } from './HomeActionButton';
 import { getHomeHeroSlideLines } from '@/lib/home-hero-display';
@@ -13,6 +13,7 @@ interface HomeHeroSectionProps {
 }
 
 const HERO_AUTO_SLIDE_INTERVAL_MS = 3000;
+const HERO_SWIPE_THRESHOLD_PX = 40;
 
 /**
  * Homepage hero: same layout/size as static Figma block; supports multiple slides and dot navigation.
@@ -21,7 +22,19 @@ const HERO_AUTO_SLIDE_INTERVAL_MS = 3000;
 export function HomeHeroSection({ slides }: HomeHeroSectionProps) {
   const { t, lang } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchCurrentXRef = useRef<number | null>(null);
   const safeSlides = slides.length > 0 ? slides : [];
+
+  const goToPrevious = useCallback(() => {
+    if (safeSlides.length <= 1) return;
+    setActiveIndex((prev) => (prev === 0 ? safeSlides.length - 1 : prev - 1));
+  }, [safeSlides.length]);
+
+  const goToNext = useCallback(() => {
+    if (safeSlides.length <= 1) return;
+    setActiveIndex((prev) => (prev + 1) % safeSlides.length);
+  }, [safeSlides.length]);
 
   useEffect(() => {
     setActiveIndex((prev) => Math.min(prev, Math.max(0, safeSlides.length - 1)));
@@ -33,13 +46,13 @@ export function HomeHeroSection({ slides }: HomeHeroSectionProps) {
     }
 
     const intervalId = window.setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % safeSlides.length);
+      goToNext();
     }, HERO_AUTO_SLIDE_INTERVAL_MS);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [safeSlides.length]);
+  }, [goToNext, safeSlides.length]);
 
   const current = safeSlides[activeIndex] ?? safeSlides[0];
 
@@ -49,30 +62,65 @@ export function HomeHeroSection({ slides }: HomeHeroSectionProps) {
 
   const lines = getHomeHeroSlideLines(current, lang);
 
+  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    touchStartXRef.current = event.touches[0]?.clientX ?? null;
+    touchCurrentXRef.current = touchStartXRef.current;
+  };
+
+  const handleTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+    touchCurrentXRef.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartXRef.current === null || touchCurrentXRef.current === null) {
+      touchStartXRef.current = null;
+      touchCurrentXRef.current = null;
+      return;
+    }
+
+    const deltaX = touchCurrentXRef.current - touchStartXRef.current;
+    if (Math.abs(deltaX) >= HERO_SWIPE_THRESHOLD_PX) {
+      if (deltaX > 0) {
+        goToPrevious();
+      } else {
+        goToNext();
+      }
+    }
+
+    touchStartXRef.current = null;
+    touchCurrentXRef.current = null;
+  };
+
   return (
     <div className="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2.25rem]">
       <div className="relative h-[28rem] sm:h-[32rem]">
-        {safeSlides.map((slide, index) => (
+        <div
+          className="h-full overflow-hidden"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <div
-            key={`${slide.imageUrl}-${index}`}
-            className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
-              index === activeIndex ? 'z-[1] opacity-100' : 'z-0 opacity-0'
-            }`}
-            aria-hidden={index !== activeIndex}
+            className="flex h-full transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${activeIndex * 100}%)` }}
           >
-            <Image
-              src={slide.imageUrl}
-              alt={getHomeHeroSlideLines(slide, lang).title || t('home.homepage.hero.imageAlt')}
-              fill
-              className="object-cover"
-              priority={index === 0}
-              sizes="1680px"
-              unoptimized={
-                slide.imageUrl.startsWith('http://') || slide.imageUrl.startsWith('https://')
-              }
-            />
+            {safeSlides.map((slide, index) => (
+              <div key={`${slide.imageUrl}-${index}`} className="relative h-full w-full shrink-0">
+                <Image
+                  src={slide.imageUrl}
+                  alt={getHomeHeroSlideLines(slide, lang).title || t('home.homepage.hero.imageAlt')}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                  sizes="1680px"
+                  unoptimized={
+                    slide.imageUrl.startsWith('http://') || slide.imageUrl.startsWith('https://')
+                  }
+                />
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
         <div className="absolute inset-0 z-[2] bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
         <div className="absolute bottom-10 left-7 z-[3] max-w-[22.625rem] text-white sm:bottom-12 sm:left-12 sm:max-w-[33rem]">
           <h1 className="text-4xl font-extrabold leading-none sm:text-5xl">{lines.title}</h1>

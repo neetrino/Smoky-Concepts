@@ -180,7 +180,7 @@ export function CartDrawer() {
                       ) : null}
                     </Link>
 
-                    <div className="flex flex-1 justify-between gap-4">
+                    <div className="grid flex-1 grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-4">
                       <div className="min-w-0">
                         <Link
                           href={`/products/${item.variant.product.slug}`}
@@ -200,43 +200,43 @@ export function CartDrawer() {
                             {item.variant.product.categoryLabel || 'Classic'}
                           </span>
                         </div>
-
-                        <div className="mt-2 flex h-6 w-[4.625rem] items-center overflow-hidden rounded-[0.25rem] bg-white">
-                          <button
-                            type="button"
-                            onClick={() => void onUpdateItemQuantity(item.id, item.quantity - 1)}
-                            disabled={updatingItems.has(item.id)}
-                            className="inline-flex h-full w-6 items-center justify-center text-[#122a26] disabled:opacity-50"
-                            aria-label="Decrease quantity"
-                          >
-                            <MinusIcon />
-                          </button>
-                          <span className="inline-flex h-full flex-1 items-center justify-center text-[0.875rem] font-medium leading-none text-[#122a26]">
-                            {item.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => void onUpdateItemQuantity(item.id, item.quantity + 1)}
-                            disabled={updatingItems.has(item.id)}
-                            className="inline-flex h-full w-6 items-center justify-center text-[#122a26] disabled:opacity-50"
-                            aria-label="Increase quantity"
-                          >
-                            <PlusIcon />
-                          </button>
-                        </div>
-
-                        <div className="mt-2 text-[1.125rem] font-extrabold leading-none text-black">
-                          {formatStorePriceForDisplay(item.total)}
-                        </div>
                       </div>
 
                       <button
                         type="button"
                         onClick={() => void onRemoveItem(item.id)}
-                        className="mt-[0.25rem] h-[1.375rem] shrink-0 rounded-[0.5rem] border-2 border-[#d83e3e] px-2 text-[0.625rem] font-extrabold leading-none text-[#d83e3e] transition-colors hover:bg-[#d83e3e]/5"
+                        className="mt-[0.25rem] h-[1.375rem] rounded-[0.5rem] border-2 border-[#d83e3e] px-2 text-[0.625rem] font-extrabold leading-none text-[#d83e3e] transition-colors hover:bg-[#d83e3e]/5"
                       >
                         Remove
                       </button>
+
+                      <div className="flex h-6 w-[4.625rem] items-center overflow-hidden rounded-[0.25rem] bg-white">
+                        <button
+                          type="button"
+                          onClick={() => void onUpdateItemQuantity(item.id, item.quantity - 1)}
+                          disabled={updatingItems.has(item.id)}
+                          className="inline-flex h-full w-6 items-center justify-center text-[#122a26] disabled:opacity-50"
+                          aria-label="Decrease quantity"
+                        >
+                          <MinusIcon />
+                        </button>
+                        <span className="inline-flex h-full flex-1 items-center justify-center text-[0.875rem] font-medium leading-none text-[#122a26]">
+                          {item.quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => void onUpdateItemQuantity(item.id, item.quantity + 1)}
+                          disabled={updatingItems.has(item.id)}
+                          className="inline-flex h-full w-6 items-center justify-center text-[#122a26] disabled:opacity-50"
+                          aria-label="Increase quantity"
+                        >
+                          <PlusIcon />
+                        </button>
+                      </div>
+
+                      <div className="justify-self-end self-center -translate-y-0.5 text-[1.125rem] font-extrabold leading-none text-black">
+                        {formatStorePriceForDisplay(item.total)}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -262,7 +262,7 @@ export function CartDrawer() {
                 <span>
                   {(cart?.totals.shipping ?? 0) > 0
                     ? formatStorePriceForDisplay(cart?.totals.shipping ?? 0)
-                    : 'No Calculated'}
+                    : 'Not Calculated'}
                 </span>
               </div>
             </div>
