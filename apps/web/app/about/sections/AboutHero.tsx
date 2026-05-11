@@ -1,9 +1,21 @@
 import Image from 'next/image';
 
 const HERO_BANNERS = [
-  { src: '/assets/about/banner-1.png', alt: 'Premium leather rolls in earthy tones' },
-  { src: '/assets/about/banner-2.png', alt: 'Studio precision tooling' },
-  { src: '/assets/about/banner-3.png', alt: 'Smoky Concepts artisan workshop' },
+  {
+    src: '/assets/about/banner-1.png',
+    alt: 'Premium leather rolls in earthy tones',
+    imageClassName: 'object-cover scale-x-[-1]',
+  },
+  {
+    src: '/assets/about/banner-2.png',
+    alt: 'Studio precision tooling',
+    imageClassName: 'object-cover object-[70%_center]',
+  },
+  {
+    src: '/assets/about/banner-3.png',
+    alt: 'Smoky Concepts artisan workshop',
+    imageClassName: 'object-cover object-[42%_center]',
+  },
 ] as const;
 
 const HERO_TITLE = 'We build objects with a reason to exist.';
@@ -47,7 +59,7 @@ export function AboutHero() {
               fill
               priority
               sizes="(min-width: 1024px) 272px, 33vw"
-              className="object-cover"
+              className={banner.imageClassName}
             />
           </div>
         ))}
