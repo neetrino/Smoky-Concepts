@@ -34,6 +34,32 @@ interface VotingLikeResponse {
   };
 }
 
+function applyOptimisticLike(
+  currentItems: VotingItem[],
+  itemId: string,
+  nextLikedState: boolean,
+): VotingItem[] {
+  return currentItems.map((item) => {
+    if (item.id === itemId) {
+      return {
+        ...item,
+        likedByCurrentUser: nextLikedState,
+        likeCount: Math.max(0, item.likeCount + (nextLikedState ? 1 : -1)),
+      };
+    }
+
+    if (nextLikedState && item.likedByCurrentUser) {
+      return {
+        ...item,
+        likedByCurrentUser: false,
+        likeCount: Math.max(0, item.likeCount - 1),
+      };
+    }
+
+    return item;
+  });
+}
+
 const CULTURE_SECTION_TITLE_CLASS_NAME =
   'text-[1.45rem] font-black leading-[1.12] tracking-[-0.01em] sm:text-[2.1rem] sm:leading-[1.06]';
 const CULTURE_SECTION_COPY_CLASS_NAME =
@@ -126,15 +152,26 @@ export function CultureVotingSection() {
         return;
       }
 
+      const previousItems = items;
+      const previousEarlyAccessItemId = earlyAccessItemId;
+
       try {
         setPendingItemId(itemId);
+        const nextLikedState = !likedByCurrentUser;
+        const optimisticItems = applyOptimisticLike(items, itemId, nextLikedState);
+        const optimisticLikedItem = optimisticItems.find((item) => item.likedByCurrentUser);
+        setItems(optimisticItems);
+        setEarlyAccessItemId(optimisticLikedItem?.id ?? optimisticItems[0]?.id ?? null);
+
         const updatesByItemId = new Map<string, VotingLikeResponse['data']>();
 
-        if (likedByCurrentUser) {
+        if (!nextLikedState) {
           const unlikeResponse = await apiClient.delete<VotingLikeResponse>(`/api/v1/voting/${itemId}/like`);
           updatesByItemId.set(itemId, unlikeResponse.data);
         } else {
-          const previouslyLikedItem = items.find((item) => item.likedByCurrentUser && item.id !== itemId);
+          const previouslyLikedItem = previousItems.find(
+            (item) => item.likedByCurrentUser && item.id !== itemId,
+          );
           if (previouslyLikedItem) {
             const previousUnlikeResponse = await apiClient.delete<VotingLikeResponse>(
               `/api/v1/voting/${previouslyLikedItem.id}/like`,
@@ -173,6 +210,8 @@ export function CultureVotingSection() {
           setEarlyAccessItemId(nextEarlyAccessItemId);
         }
       } catch {
+        setItems(previousItems);
+        setEarlyAccessItemId(previousEarlyAccessItemId);
         showToast(t('home.homepage.culture.updateError'), 'error');
       } finally {
         setPendingItemId(null);

@@ -34,7 +34,7 @@ function getBannerRadiusClass(index: number): string {
   }
 
   if (index === HERO_BANNERS.length - 1) {
-    return 'rounded-r-[12px] rounded-l-none';
+    return 'rounded-r-[30px] rounded-l-none lg:rounded-r-[12px]';
   }
 
   return 'rounded-none';
@@ -51,7 +51,7 @@ export function AboutHero() {
         {HERO_BANNERS.map((banner, index) => (
           <div
             key={banner.src}
-            className={`relative h-[200px] overflow-hidden sm:h-[280px] lg:h-[500px] ${getBannerRadiusClass(index)}`}
+            className={`relative h-[420px] overflow-hidden sm:h-[420px] lg:h-[500px] ${getBannerRadiusClass(index)}`}
           >
             <Image
               src={banner.src}
@@ -69,7 +69,7 @@ export function AboutHero() {
         <h2 className="text-[22px] font-extrabold leading-tight text-[#414141] sm:text-[28px] lg:text-[30px]">
           {HERO_TITLE}
         </h2>
-        <div className="mt-3 space-y-2.5 text-[13px] font-medium leading-[21px] text-[#414141] sm:text-[15px] lg:mt-4 lg:space-y-3 lg:text-[15px] lg:leading-[22px]">
+        <div className="mt-3 space-y-2.5 text-[13px] font-semibold leading-[21px] text-[#414141] sm:text-[15px] lg:mt-4 lg:space-y-3 lg:text-[15px] lg:leading-[22px] lg:font-medium">
           {HERO_PARAGRAPHS.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}

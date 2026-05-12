@@ -32,8 +32,8 @@ const PILLARS: readonly Pillar[] = [
       height: 300,
       topOffset: '-top-[76px]',
       hideWhiteBg: true,
-      mobileScaleClass: 'scale-100',
-      mobileTopClass: '-top-[78px]',
+      mobileScaleClass: 'scale-[0.9]',
+      mobileTopClass: '-top-[74px]',
     },
     body: (
       <>
@@ -81,8 +81,8 @@ const PILLARS: readonly Pillar[] = [
       height: 341,
       topOffset: '-top-[117px]',
       hideWhiteBg: true,
-      mobileScaleClass: 'scale-[0.6]',
-      mobileTopClass: '-top-[58px]',
+      mobileScaleClass: 'scale-[0.84]',
+      mobileTopClass: '-top-[66px]',
     },
     body: (
       <>
@@ -149,14 +149,16 @@ function PillarCard({ pillar, className = '' }: { pillar: Pillar; className?: st
   const imageClassName = pillar.image.hideWhiteBg
     ? 'object-contain object-bottom mix-blend-multiply'
     : 'object-contain object-bottom';
+  const contentTopPaddingClass =
+    pillar.id === 'engineering' ? 'pt-[142px] sm:pt-[150px]' : 'pt-[156px] sm:pt-[164px]';
 
   return (
     <article className={`relative pt-[96px] lg:pt-[78px] xl:pt-[86px] ${className}`}>
       <div
-        className={`relative ${pillar.bg} h-[620px] rounded-[30px] px-5 pb-6 pt-[168px] sm:h-[640px] sm:px-6 lg:h-[510px] lg:px-6 lg:pt-[173px] xl:h-[615px] xl:w-[408px] xl:rounded-[36px] xl:px-7 xl:pt-[190px]`}
+        className={`relative ${pillar.bg} h-[620px] rounded-[30px] pl-5 pr-7 pb-6 sm:h-[640px] sm:px-6 lg:h-[510px] lg:px-6 lg:pt-[173px] xl:h-[615px] xl:w-[408px] xl:rounded-[36px] xl:px-7 xl:pt-[190px] ${contentTopPaddingClass}`}
       >
         <div
-          className={`pointer-events-none absolute left-1/2 hidden -translate-x-1/2 xl:block xl:scale-[0.78] ${pillar.image.topOffset}`}
+          className={`pointer-events-none absolute left-1/2 hidden -translate-x-1/2 xl:block xl:scale-[0.88] ${pillar.image.topOffset}`}
           style={{ width: pillar.image.width, height: pillar.image.height }}
         >
           <Image
@@ -168,7 +170,7 @@ function PillarCard({ pillar, className = '' }: { pillar: Pillar; className?: st
           />
         </div>
         <div
-          className={`pointer-events-none absolute left-1/2 h-[200px] w-[200px] -translate-x-1/2 sm:-top-[86px] sm:h-[230px] sm:w-[230px] xl:hidden ${
+          className={`pointer-events-none absolute left-1/2 h-[224px] w-[224px] -translate-x-1/2 sm:-top-[90px] sm:h-[252px] sm:w-[252px] xl:hidden ${
             pillar.image.mobileTopClass ?? '-top-[78px]'
           } ${
             pillar.image.mobileScaleClass ?? 'scale-100'
@@ -183,11 +185,11 @@ function PillarCard({ pillar, className = '' }: { pillar: Pillar; className?: st
           />
         </div>
 
-        <h3 className="mt-3 text-center text-[22px] font-extrabold leading-tight tracking-[-0.02em] text-[#122a26] sm:mt-4 sm:text-[24px] lg:text-[26px] xl:mt-5 xl:text-[29px] xl:leading-[1.08]">
+        <h3 className="mt-1 text-center text-[24px] font-extrabold leading-tight tracking-[-0.02em] text-[#122a26] sm:mt-2 sm:text-[24px] lg:text-[26px] xl:mt-3 xl:text-[29px] xl:leading-[1.08]">
           {pillar.title}
         </h3>
 
-        <div className="mt-3 space-y-[9px] text-[11px] font-bold leading-[1.34] tracking-[-0.01em] text-[#122a26] sm:text-[12px] lg:mt-4 lg:space-y-[10px] xl:mt-5 xl:space-y-[12px] xl:text-[13px] xl:leading-[18px]">
+        <div className="mt-2 space-y-[12px] break-words text-[13px] font-bold leading-[1.4] tracking-[-0.01em] text-[#122a26] sm:text-[12px] lg:mt-3 lg:space-y-[10px] xl:mt-4 xl:space-y-[12px] xl:text-[13px] xl:leading-[18px]">
           {pillar.body}
         </div>
       </div>
@@ -254,7 +256,7 @@ export function AboutPillars() {
       <div
         ref={mobileScrollerRef}
         onScroll={handleMobileScroll}
-        className="-mx-4 overflow-x-auto px-4 pb-1 sm:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 overflow-x-auto px-4 pb-1 touch-pan-x overscroll-x-contain sm:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         <div className="flex snap-x snap-mandatory gap-4">
           {PILLARS.map((pillar, index) => (
@@ -263,7 +265,7 @@ export function AboutPillars() {
               ref={(element) => {
                 mobileCardRefs.current[index] = element;
               }}
-              className="w-[82vw] min-w-[82vw] shrink-0 snap-center"
+              className="w-[82vw] min-w-[82vw] shrink-0 snap-center last:mr-3"
             >
               <PillarCard pillar={pillar} />
             </div>

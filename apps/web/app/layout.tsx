@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Montserrat } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
@@ -23,6 +23,13 @@ export const metadata: Metadata = {
     shortcut: '/assets/home/Asset%202@4x-8.webp',
     apple: '/assets/home/Asset%202@4x-8.webp',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
