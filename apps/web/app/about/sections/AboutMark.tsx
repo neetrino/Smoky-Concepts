@@ -49,7 +49,7 @@ function ShieldCard({ shield }: { shield: Shield }) {
       <p className="text-[20px] font-extrabold leading-[1.1] sm:text-[22px] lg:text-[27px]">
         {shield.title}
       </p>
-      <p className="mt-4 max-w-[380px] text-[13px] font-semibold leading-[22px] sm:text-[14px] lg:text-[15px] lg:leading-[23px]">
+      <p className="mt-4 max-w-[380px] text-[13px] font-bold leading-[22px] sm:text-[14px] lg:text-[15px] lg:font-semibold lg:leading-[23px]">
         {shield.body}
       </p>
     </article>
@@ -64,7 +64,7 @@ export function AboutMark() {
   return (
     <section className="mx-auto mt-16 max-w-[1500px] text-center text-[#414141] lg:mt-[110px]">
       <h2 className="text-[22px] font-extrabold sm:text-[26px] lg:text-[30px]">The Mark</h2>
-      <p className="mt-2 text-[13px] font-semibold leading-[22px] sm:text-[15px] lg:text-[15px] lg:leading-[23px]">
+      <p className="mt-2 text-[13px] font-bold leading-[22px] sm:text-[15px] lg:text-[15px] lg:font-semibold lg:leading-[23px]">
         Look at our logo and you will see everything we are.
       </p>
 

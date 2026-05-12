@@ -74,7 +74,7 @@ export function AboutNext() {
         <h2 className="text-left text-[22px] font-extrabold tracking-[-0.02em] sm:text-[24px] lg:text-[30px] lg:text-center">
           What Comes Next
         </h2>
-        <div className="mt-3 max-w-[1180px] space-y-1.5 text-left text-[12px] font-semibold leading-[20px] tracking-[-0.01em] sm:mt-5 sm:space-y-2.5 sm:text-[14px] sm:leading-[22px] lg:mx-auto lg:mt-6 lg:text-center lg:text-[15px] lg:leading-[23px]">
+        <div className="mt-3 max-w-[1180px] space-y-1.5 text-left text-[12px] font-bold leading-[20px] tracking-[-0.01em] sm:mt-5 sm:space-y-2.5 sm:text-[14px] sm:leading-[22px] lg:mx-auto lg:mt-6 lg:text-center lg:text-[15px] lg:font-semibold lg:leading-[23px]">
           {INTRO_PARAGRAPHS.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
@@ -87,7 +87,7 @@ export function AboutNext() {
         ))}
       </div>
 
-      <div className="mx-auto mt-6 max-w-[1260px] space-y-1 text-left text-[12px] font-semibold leading-[20px] sm:mt-7 sm:space-y-1.5 sm:text-[15px] sm:leading-[23px] lg:mt-8 lg:text-center lg:text-[15px] lg:leading-[23px]">
+      <div className="mx-auto mt-6 max-w-[1260px] space-y-1 text-left text-[12px] font-bold leading-[20px] sm:mt-7 sm:space-y-1.5 sm:text-[15px] sm:leading-[23px] lg:mt-8 lg:text-center lg:text-[15px] lg:font-semibold lg:leading-[23px]">
         <p>We build with patience. We release when the concept is complete.</p>
         <p>Every object we bring into the world is one we would carry ourselves.</p>
       </div>
