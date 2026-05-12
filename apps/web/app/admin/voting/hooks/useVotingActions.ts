@@ -29,8 +29,8 @@ export function useVotingActions() {
   };
 
   const validateForm = () => {
-    if (!formData.title.trim()) {
-      showToast(t('admin.voting.titleRequired'), 'warning');
+    if (!formData.productSlug.trim()) {
+      showToast(t('admin.voting.productRequired'), 'warning');
       return false;
     }
 

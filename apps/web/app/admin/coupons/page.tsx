@@ -6,6 +6,7 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
 import { AdminMenuDrawer } from '../../../components/AdminMenuDrawer';
+import { showToast } from '../../../components/Toast';
 import { useTranslation } from '../../../lib/i18n-client';
 import { getAdminMenuTABS } from '../admin-menu.config';
 import {
@@ -188,6 +189,22 @@ export default function AdminCouponsPage() {
     }
   };
 
+  const handleCopyCode = useCallback(
+    async (code: string) => {
+      const trimmedCode = code.trim();
+      if (!trimmedCode) {
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(trimmedCode);
+        showToast(t('admin.coupons.copySuccess'), 'success');
+      } catch {
+        showToast(t('admin.coupons.copyError'), 'error');
+      }
+    },
+    [t],
+  );
+
   if (isLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -283,7 +300,32 @@ export default function AdminCouponsPage() {
                     <tbody>
                       {rows.map((row) => (
                         <tr key={row.id} className="border-b border-[#dcc090]/15">
-                          <td className="py-2 pr-4 font-medium text-[#122a26]">{row.code}</td>
+                          <td className="py-2 pr-4 font-medium text-[#122a26]">
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => void handleCopyCode(row.code)}
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[#dcc090]/45 text-[#122a26] transition-colors hover:bg-[#dcc090]/20"
+                                aria-label={t('admin.coupons.copyCode')}
+                                title={t('admin.coupons.copyCode')}
+                              >
+                                <svg
+                                  className="h-3.5 w-3.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2M10 20h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              </button>
+                              <span>{row.code}</span>
+                            </div>
+                          </td>
                           <td className="py-2 pr-4">{row.discountType}</td>
                           <td className="py-2 pr-4">{row.discountValue}</td>
                           <td className="py-2 pr-4">{row.quantity ?? '∞'}</td>
