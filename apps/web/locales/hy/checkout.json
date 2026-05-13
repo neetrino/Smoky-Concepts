@@ -71,6 +71,11 @@
     "applied": "{code} կոդը կիրառված է։",
     "remove": "Հանել"
   },
+  "productsStrip": {
+    "title": "Ձեր պատվերի ապրանքները",
+    "itemCountSingle": "{count} ապրանք",
+    "itemCountPlural": "{count} ապրանք"
+  },
   "buttons": {
     "placeOrder": "Պատվիրել",
     "processing": "Մշակվում է...",

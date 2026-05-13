@@ -45,9 +45,8 @@ export function OrderSummary({
     formatPriceInCurrency(convertPrice(amountUsd, 'USD', displayCurrency), displayCurrency);
 
   return (
-    <div className="lg:col-span-1">
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 lg:sticky lg:top-24">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.orderSummary')}</h2>
+    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.orderSummary')}</h2>
 
         <div className="mb-6 rounded-2xl border border-[#dcc090]/25 bg-[#dcc090]/8 p-4">
           <p className="mb-2 text-xs font-medium text-[#122a26]/80">{t('checkout.coupon.sectionTitle')}</p>
@@ -145,16 +144,15 @@ export function OrderSummary({
           </div>
         )}
 
-        <Button
-          type="submit"
-          variant="gold"
-          className="w-full"
-          size="lg"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
-        </Button>
-      </div>
+      <Button
+        type="submit"
+        variant="gold"
+        className="w-full"
+        size="lg"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
+      </Button>
     </div>
   );
 }
