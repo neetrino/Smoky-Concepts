@@ -32,8 +32,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <input
           ref={ref}
-          className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed ${
-            error ? 'border-error focus:ring-error' : 'border-gray-300'
+          className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:cursor-not-allowed ${
+            error ? 'border-error focus:ring-error focus:border-error' : 'border-gray-300 focus:border-gray-900'
           } ${className}`}
           onKeyDown={handleKeyDown}
           {...props}
