@@ -45,6 +45,16 @@ const UPCOMING_IMAGE_SCALE_LARGE = 0.2;
 const UPCOMING_IMAGE_SCALE_SMALL = 0.15;
 const UPCOMING_IMAGE_SCALE_PATTERN_LENGTH = 6;
 const UPCOMING_SMALL_SCALE_POSITIONS = new Set([2, 5]);
+const UPCOMING_PAGE_ANIMATION_DURATION_MS = 300;
+const UPCOMING_SCROLL_IDLE_UPDATE_DELAY_MS = 90;
+const UPCOMING_PAGE_STAGGER_DELAY_CLASSES = [
+  'delay-[10ms]',
+  'delay-[50ms]',
+  'delay-[154ms]',
+  'delay-[296ms]',
+  'delay-[428ms]',
+  'delay-[516ms]',
+] as const;
 
 function getUpcomingImageScaleBoost(cardIndex: number): number {
   const oneBasedPosition = (cardIndex % UPCOMING_IMAGE_SCALE_PATTERN_LENGTH) + 1;
@@ -108,6 +118,10 @@ export function UpcomingProductsSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isPageTransitioning, setIsPageTransitioning] = useState(false);
+  const [pageDirection, setPageDirection] = useState<1 | -1>(1);
+  const pageTransitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isSmUp = useSyncExternalStore(
     subscribeUpcomingSmViewport,
     getUpcomingSmViewportSnapshot,
@@ -146,6 +160,17 @@ export function UpcomingProductsSection() {
     setCurrentPage(1);
     scrollContainerRef.current?.scrollTo({ left: 0 });
   }, [isSmUp]);
+
+  useEffect(() => {
+    return () => {
+      if (pageTransitionTimerRef.current) {
+        clearTimeout(pageTransitionTimerRef.current);
+      }
+      if (scrollIdleTimerRef.current) {
+        clearTimeout(scrollIdleTimerRef.current);
+      }
+    };
+  }, []);
 
   if (error) {
     return (
@@ -223,12 +248,25 @@ export function UpcomingProductsSection() {
 
   const handlePageChange = (page: number) => {
     const container = scrollContainerRef.current;
+    const clampedPage = Math.max(1, Math.min(totalPages, page));
+    const current = safePage;
+
+    if (clampedPage !== current) {
+      setPageDirection(clampedPage > current ? 1 : -1);
+      setIsPageTransitioning(true);
+      if (pageTransitionTimerRef.current) {
+        clearTimeout(pageTransitionTimerRef.current);
+      }
+      pageTransitionTimerRef.current = setTimeout(() => {
+        setIsPageTransitioning(false);
+      }, UPCOMING_PAGE_ANIMATION_DURATION_MS);
+    }
+
     if (!container) {
-      setCurrentPage(page);
+      setCurrentPage(clampedPage);
       return;
     }
 
-    const clampedPage = Math.max(1, Math.min(totalPages, page));
     container.scrollTo({
       left: getScrollLeftForPage(clampedPage, container),
       behavior: 'smooth',
@@ -242,16 +280,21 @@ export function UpcomingProductsSection() {
       return;
     }
 
-    const nextPage = resolvePageFromScrollLeft(container);
-    setCurrentPage((current) => (current === nextPage ? current : nextPage));
+    if (scrollIdleTimerRef.current) {
+      clearTimeout(scrollIdleTimerRef.current);
+    }
+
+    scrollIdleTimerRef.current = setTimeout(() => {
+      const nextPage = resolvePageFromScrollLeft(container);
+      setCurrentPage((current) => (current === nextPage ? current : nextPage));
+    }, UPCOMING_SCROLL_IDLE_UPDATE_DELAY_MS);
   };
 
-  const scrollContainerClassName = `scrollbar-hide mt-3 snap-x snap-mandatory overflow-x-auto pt-[7.25rem] pb-4 transition-[margin-left] duration-300 ease-out sm:mt-6 sm:pt-[7.5rem] ${
-    safePage === 1 ? '' : 'xl:-ml-[7.5rem]'
-  }`;
+  const scrollContainerClassName =
+    'scrollbar-hide mt-3 snap-x snap-mandatory overflow-x-auto pt-[7.25rem] pb-4 sm:mt-6 sm:pt-[7.5rem]';
 
   return (
-    <section className="relative isolate flex flex-col gap-4 sm:gap-5 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2 xl:overflow-x-clip xl:pl-[7.5rem]">
+    <section className="relative isolate flex flex-col gap-4 sm:gap-5 xl:mr-[calc(50%_-_50vw)] xl:overflow-x-clip">
       <UpcomingSectionHeader />
       <div
         ref={scrollContainerRef}
@@ -261,7 +304,24 @@ export function UpcomingProductsSection() {
         <div className="flex min-w-max items-stretch gap-6">
           {items.map((item, index) => {
             const pageIndex = Math.floor(index / cardsPerPage);
+            const indexInPage = index % cardsPerPage;
             const isPageStart = index % cardsPerPage === 0;
+            const isActivePageCard = pageIndex === safePage - 1;
+            const shouldAnimateCard = isSmUp && isPageTransitioning && isActivePageCard;
+            const activePageMotionClass =
+              pageDirection === 1
+                ? 'translate-x-[0.35rem] scale-[0.992] rotate-[0.35deg] shadow-[0_10px_26px_rgba(18,42,38,0.16)]'
+                : '-translate-x-[0.35rem] scale-[0.992] -rotate-[0.35deg] shadow-[0_10px_26px_rgba(18,42,38,0.16)]';
+            const pageMotionClass =
+              shouldAnimateCard
+                ? activePageMotionClass
+                : 'translate-x-0 scale-100 rotate-0 shadow-none';
+            const pageDelayClass =
+              shouldAnimateCard
+                ? UPCOMING_PAGE_STAGGER_DELAY_CLASSES[
+                    Math.min(indexInPage, UPCOMING_PAGE_STAGGER_DELAY_CLASSES.length - 1)
+                  ]
+                : 'delay-0';
             const catalogProduct = toCatalogProduct({
               id: item.id,
               slug: item.slug,
@@ -286,7 +346,9 @@ export function UpcomingProductsSection() {
                     pageStartRefs.current[pageIndex] = el;
                   }
                 }}
-                className={`flex min-h-0 shrink-0 flex-col self-stretch ${isPageStart ? 'snap-start snap-always' : ''}`}
+                className={`flex min-h-0 shrink-0 flex-col self-stretch transition-transform transition-shadow duration-300 ease-out will-change-transform ${pageMotionClass} ${pageDelayClass} ${
+                  isPageStart ? 'snap-start snap-always' : ''
+                }`}
               >
                 <ProductsCatalogCard
                   product={catalogProduct}
