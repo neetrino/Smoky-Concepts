@@ -246,12 +246,11 @@ export function UpcomingProductsSection() {
     setCurrentPage((current) => (current === nextPage ? current : nextPage));
   };
 
-  const scrollContainerClassName = `scrollbar-hide mt-3 snap-x snap-mandatory overflow-x-auto pt-[7.25rem] pb-4 transition-[margin-left] duration-300 ease-out sm:mt-6 sm:pt-[7.5rem] ${
-    safePage === 1 ? '' : 'xl:-ml-[7.5rem]'
-  }`;
+  const scrollContainerClassName =
+    'scrollbar-hide mt-3 snap-x snap-mandatory overflow-x-auto pt-[7.25rem] pb-4 sm:mt-6 sm:pt-[7.5rem]';
 
   return (
-    <section className="relative isolate flex flex-col gap-4 sm:gap-5 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2 xl:overflow-x-clip xl:pl-[7.5rem]">
+    <section className="relative isolate flex flex-col gap-4 sm:gap-5 xl:mr-[calc(50%_-_50vw)] xl:overflow-x-clip">
       <UpcomingSectionHeader />
       <div
         ref={scrollContainerRef}
