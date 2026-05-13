@@ -71,6 +71,11 @@
     "applied": "Code {code} is applied.",
     "remove": "Remove"
   },
+  "productsStrip": {
+    "title": "Products in your order",
+    "itemCountSingle": "{count} item",
+    "itemCountPlural": "{count} items"
+  },
   "buttons": {
     "placeOrder": "Place Order",
     "processing": "Processing...",

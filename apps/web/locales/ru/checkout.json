@@ -71,6 +71,11 @@
     "applied": "Код {code} применён.",
     "remove": "Убрать"
   },
+  "productsStrip": {
+    "title": "Товары в вашем заказе",
+    "itemCountSingle": "{count} товар",
+    "itemCountPlural": "{count} товаров"
+  },
   "buttons": {
     "placeOrder": "Оформить заказ",
     "processing": "Обработка...",
