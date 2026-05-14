@@ -67,13 +67,21 @@ type Pillar = {
   readonly body: ReactNode;
 };
 
-/** Title scale for pillar cards — Armenian + English (Latin copy reads small at the old en sizes). */
-const PILLAR_TITLE_PROMINENT =
+/** Title scale — Armenian pillar cards. */
+const PILLAR_TITLE_HY =
   'text-[22px] sm:text-[23px] lg:text-[24px] xl:text-[26px]';
 
-/** Body scale for pillar cards — Armenian + English. */
-const PILLAR_BODY_PROMINENT =
+/** Title scale — English (slightly larger than HY for Latin copy). */
+const PILLAR_TITLE_EN =
+  'text-[23px] sm:text-[24px] lg:text-[25px] xl:text-[28px]';
+
+/** Body scale — Armenian pillar cards. */
+const PILLAR_BODY_HY =
   'mt-2 space-y-[10px] text-[12px] sm:text-[12px] leading-[1.38] xl:space-y-[10px] xl:text-[12px] xl:leading-[17px]';
+
+/** Body scale — English (slightly larger than HY). */
+const PILLAR_BODY_EN =
+  'mt-2 space-y-[11px] text-[13px] sm:text-[13px] leading-[1.38] xl:space-y-[11px] xl:text-[13px] xl:leading-[18px]';
 
 function pillarImageRowMarginClass(lang: LanguageCode): string {
   if (lang === 'hy') {
@@ -87,8 +95,12 @@ function pillarTitleClassName(lang: LanguageCode): string {
   const base =
     'shrink-0 text-center font-extrabold leading-tight tracking-[-0.02em] text-[#122a26] xl:leading-[1.08]';
 
-  if (lang === 'hy' || lang === 'en') {
-    return `${base} ${PILLAR_TITLE_PROMINENT}`;
+  if (lang === 'hy') {
+    return `${base} ${PILLAR_TITLE_HY}`;
+  }
+
+  if (lang === 'en') {
+    return `${base} ${PILLAR_TITLE_EN}`;
   }
 
   return `${base} text-[20px] sm:text-[21px] lg:text-[22px] xl:text-[24px]`;
@@ -98,8 +110,12 @@ function pillarBodyClassName(lang: LanguageCode): string {
   const base =
     'flex-1 break-words font-bold tracking-[-0.01em] text-[#122a26] lg:mt-2.5 lg:space-y-[9px] xl:mt-3';
 
-  if (lang === 'hy' || lang === 'en') {
-    return `${base} ${PILLAR_BODY_PROMINENT}`;
+  if (lang === 'hy') {
+    return `${base} ${PILLAR_BODY_HY}`;
+  }
+
+  if (lang === 'en') {
+    return `${base} ${PILLAR_BODY_EN}`;
   }
 
   return `${base} mt-1.5 space-y-[9px] text-[11px] sm:text-[11px] leading-[1.36] xl:space-y-[9px] xl:text-[11px] xl:leading-[16px]`;
