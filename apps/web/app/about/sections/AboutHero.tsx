@@ -1,39 +1,41 @@
-import Image from 'next/image';
+'use client';
 
-const HERO_BANNERS = [
+import Image from 'next/image';
+import { useMemo } from 'react';
+import { useTranslation } from '@/lib/i18n-client';
+
+const HERO_BANNER_KEYS = [
   {
     src: '/assets/about/banner-1.png',
-    alt: 'Premium leather rolls in earthy tones',
     imageClassName: 'object-cover scale-x-[-1]',
+    altKey: 'about.story.hero.banner_1_alt',
   },
   {
     src: '/assets/about/banner-2.png',
-    alt: 'Studio precision tooling',
     imageClassName: 'object-cover object-[70%_center]',
+    altKey: 'about.story.hero.banner_2_alt',
   },
   {
     src: '/assets/about/banner-3.png',
-    alt: 'Smoky Concepts artisan workshop',
     imageClassName: 'object-cover object-[42%_center]',
+    altKey: 'about.story.hero.banner_3_alt',
   },
 ] as const;
 
-const HERO_TITLE = 'We build objects with a reason to exist.';
-
-const HERO_PARAGRAPHS: readonly string[] = [
-  'Smoky Concepts is a premium accessories brand shaped by intention, precision, and material honesty. We work with leather, carbon fiber, natural wood, gold and silver hardware — and anything else the concept demands. There is no fixed palette. There is only the right choice.',
-  'We don\u2019t create to fill categories. We create to define them.',
-  'Every object begins with a single question: what should it feel like in the hand, how should it be carried, what should it say without words?',
-  'The answer defines everything — form, material, balance, weight, and presence.',
-  'We build with clarity. We release with purpose.',
-];
+const HERO_PARAGRAPH_KEYS = [
+  'about.story.hero.paragraph_1',
+  'about.story.hero.paragraph_2',
+  'about.story.hero.paragraph_3',
+  'about.story.hero.paragraph_4',
+  'about.story.hero.paragraph_5',
+] as const;
 
 function getBannerRadiusClass(index: number): string {
   if (index === 0) {
     return 'rounded-l-[30px] rounded-r-none';
   }
 
-  if (index === HERO_BANNERS.length - 1) {
+  if (index === HERO_BANNER_KEYS.length - 1) {
     return 'rounded-r-[30px] rounded-l-none lg:rounded-r-[12px]';
   }
 
@@ -45,17 +47,23 @@ function getBannerRadiusClass(index: number): string {
  * Mirrors Figma node 6466:286 (1680 × 648 desktop block).
  */
 export function AboutHero() {
+  const { t } = useTranslation();
+  const heroParagraphs = useMemo(
+    () => HERO_PARAGRAPH_KEYS.map((key) => t(key)),
+    [t],
+  );
+
   return (
-    <section className="mx-auto mt-8 grid max-w-[1460px] grid-cols-1 gap-4 lg:mt-[56px] lg:grid-cols-2 lg:gap-3 xl:gap-4 lg:h-[500px]">
+    <section className="mx-auto mt-8 grid max-w-[1460px] grid-cols-1 gap-4 lg:mt-[56px] lg:grid-cols-2 lg:gap-1.5 xl:gap-2.5 lg:h-[500px]">
       <div className="grid grid-cols-3 gap-2 lg:gap-[9px]">
-        {HERO_BANNERS.map((banner, index) => (
+        {HERO_BANNER_KEYS.map((banner, index) => (
           <div
             key={banner.src}
             className={`relative h-[420px] overflow-hidden sm:h-[420px] lg:h-[500px] ${getBannerRadiusClass(index)}`}
           >
             <Image
               src={banner.src}
-              alt={banner.alt}
+              alt={t(banner.altKey)}
               fill
               priority
               sizes="(min-width: 1024px) 272px, 33vw"
@@ -67,10 +75,10 @@ export function AboutHero() {
 
       <div className="flex flex-col rounded-[12px] bg-white p-5 sm:p-8 lg:rounded-[12px_28px_28px_12px] lg:p-[38px]">
         <h2 className="text-[22px] font-extrabold leading-tight text-[#414141] sm:text-[28px] lg:text-[30px]">
-          {HERO_TITLE}
+          {t('about.story.hero.title')}
         </h2>
         <div className="mt-3 space-y-2.5 text-[13px] font-semibold leading-[21px] text-[#414141] sm:text-[15px] lg:mt-4 lg:space-y-3 lg:text-[15px] lg:leading-[22px] lg:font-medium">
-          {HERO_PARAGRAPHS.map((paragraph) => (
+          {heroParagraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>

@@ -1,7 +1,59 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useTranslation } from '@/lib/i18n-client';
+import type { LanguageCode } from '@/lib/language';
+import { renderPillarTitleLines, renderStoryRichParagraphs } from '../utils/renderStoryRichText';
+
+/** Image slot (margins below image tuned per language in PillarCard). */
+const PILLAR_IMAGE_ROW_BASE_CLASS =
+  'pointer-events-none -mt-16 flex h-[212px] shrink-0 items-end justify-center px-1 sm:-mt-20 sm:h-[228px] lg:-mt-14 lg:h-[236px] xl:-mt-16 xl:h-[244px]';
+
+/** Nudge artwork up without changing flex flow (card + heading stay put). */
+const PILLAR_IMAGE_ART_SHIFT_CLASS =
+  '-translate-y-4 sm:-translate-y-5 lg:-translate-y-5 xl:-translate-y-6';
+
+type PillarLocaleId = 'first' | 'mission' | 'engineering';
+
+type PillarBase = {
+  readonly id: string;
+  readonly localeId: PillarLocaleId;
+  readonly bg: string;
+  readonly image: {
+    src: string;
+    hideWhiteBg?: boolean;
+  };
+};
+
+const PILLAR_BASE: readonly PillarBase[] = [
+  {
+    id: 'first-concept',
+    localeId: 'first',
+    bg: 'bg-[#dcc090]',
+    image: {
+      src: '/assets/about/first-concept.png',
+      hideWhiteBg: true,
+    },
+  },
+  {
+    id: 'mission',
+    localeId: 'mission',
+    bg: 'bg-[#95c48a]',
+    image: {
+      src: '/assets/about/mission.png',
+      hideWhiteBg: true,
+    },
+  },
+  {
+    id: 'engineering',
+    localeId: 'engineering',
+    bg: 'bg-[#cbcbcb]',
+    image: {
+      src: '/assets/about/engineering.png',
+    },
+  },
+];
 
 type Pillar = {
   readonly id: string;
@@ -10,188 +62,78 @@ type Pillar = {
   readonly image: {
     src: string;
     alt: string;
-    width: number;
-    height: number;
-    topOffset: string;
     hideWhiteBg?: boolean;
-    mobileScaleClass?: string;
-    mobileTopClass?: string;
   };
   readonly body: ReactNode;
 };
 
-const PILLARS: readonly Pillar[] = [
-  {
-    id: 'first-concept',
-    title: 'The First Concept',
-    bg: 'bg-[#dcc090]',
-    image: {
-      src: '/assets/about/first-concept.png',
-      alt: 'A young plant emerging from soil — the first concept',
-      width: 322,
-      height: 300,
-      topOffset: '-top-[76px]',
-      hideWhiteBg: true,
-      mobileScaleClass: 'scale-[0.9]',
-      mobileTopClass: '-top-[74px]',
-    },
-    body: (
-      <>
-        <p>
-          Every strong system starts with a clear idea.
-          <br />
-          Ours began with a ritual:
-          <br />
-          the objects people return to — again and again — without thinking, yet never without
-          meaning.
-        </p>
-        <p>
-          We call it <strong className="font-black">Covering.</strong>
-        </p>
-        <p>
-          Our first expression is{' '}
-          <strong className="font-black">Smoky Covers.</strong>
-        </p>
-        <p>Covers for cigarette packs — the center of the ritual.</p>
-        <p>
-          Extended to the objects that move with you — money, documents, cards, and beyond.
-        </p>
-        <p>
-          These are objects you live with.
-          <br />
-          They should feel right.
-          <br />
-          They should hold their place.
-          <br />
-          Covering is where we began.
-          <br />
-          It is only the beginning.
-        </p>
-      </>
-    ),
-  },
-  {
-    id: 'mission',
-    title: 'The Mission',
-    bg: 'bg-[#95c48a]',
-    image: {
-      src: '/assets/about/mission.png',
-      alt: 'A floating mountain — the mission',
-      width: 373,
-      height: 341,
-      topOffset: '-top-[117px]',
-      hideWhiteBg: true,
-      mobileScaleClass: 'scale-[0.84]',
-      mobileTopClass: '-top-[66px]',
-    },
-    body: (
-      <>
-        <p>
-          We work with rituals and the culture around them — bringing clarity, care, and
-          meaning to what people return to.
-        </p>
-        <p>Our first mission begins within smoking culture.</p>
-        <p>Not only for the one holding it, but for everyone around them.</p>
-        <p>
-          {
-            'We protect you and those close to you from visual noise and what\u2019s behind it.'
-          }
-        </p>
-        <p>This approach does not stay in one place.</p>
-        <p>
-          {
-            'Wherever rituals exist, we look for what\u2019s missing — and introduce clarity, beauty, and meaning.'
-          }
-        </p>
-      </>
-    ),
-  },
-  {
-    id: 'engineering',
-    title: (
-      <>
-        When Engineering
-        <br />
-        Meets Craft
-      </>
-    ),
-    bg: 'bg-[#cbcbcb]',
-    image: {
-      src: '/assets/about/engineering.png',
-      alt: 'A precision 3D printer — engineering meets craft',
-      width: 300,
-      height: 338,
-      topOffset: '-top-[114px]',
-      mobileScaleClass: 'scale-100',
-      mobileTopClass: '-top-[78px]',
-    },
-    body: (
-      <>
-        <p>We grow objects layer by layer, with precision.</p>
-        <p>Structure takes form — controlled, exact, uncompromised.</p>
-        <p>
-          {'Solutions from the nature, applied through technology, expand what\u2019s possible.'}
-        </p>
-        <p>In the hands of the creator, it becomes a new brush.</p>
-        <p>
-          Advanced materials like PETG carbon fiber bring the accuracy required — enabling
-          forms beyond the limits of traditional manufacturing.
-        </p>
-        <p>The result is composed — balanced, intentional, complete.</p>
-        <p>Technology gives us freedom.</p>
-        <p>Craft gives it soul.</p>
-      </>
-    ),
-  },
-];
+function pillarImageRowMarginClass(lang: LanguageCode): string {
+  if (lang === 'hy') {
+    return 'mb-4 sm:mb-5 lg:mb-4 xl:mb-4';
+  }
 
-function PillarCard({ pillar, className = '' }: { pillar: Pillar; className?: string }) {
+  return 'mb-2.5 sm:mb-3 lg:mb-2.5 xl:mb-3';
+}
+
+function pillarTitleClassName(lang: LanguageCode): string {
+  const base =
+    'shrink-0 text-center font-extrabold leading-tight tracking-[-0.02em] text-[#122a26] xl:leading-[1.08]';
+
+  if (lang === 'hy') {
+    return `${base} text-[22px] sm:text-[23px] lg:text-[24px] xl:text-[26px]`;
+  }
+
+  return `${base} text-[20px] sm:text-[21px] lg:text-[22px] xl:text-[24px]`;
+}
+
+function pillarBodyClassName(lang: LanguageCode): string {
+  const base =
+    'flex-1 break-words font-bold tracking-[-0.01em] text-[#122a26] lg:mt-2.5 lg:space-y-[9px] xl:mt-3';
+
+  if (lang === 'hy') {
+    return `${base} mt-2 space-y-[10px] text-[12px] sm:text-[12px] leading-[1.38] xl:space-y-[10px] xl:text-[12px] xl:leading-[17px]`;
+  }
+
+  return `${base} mt-1.5 space-y-[9px] text-[11px] sm:text-[11px] leading-[1.36] xl:space-y-[9px] xl:text-[11px] xl:leading-[16px]`;
+}
+
+function PillarCard({
+  pillar,
+  className = '',
+  lang,
+}: {
+  pillar: Pillar;
+  className?: string;
+  lang: LanguageCode;
+}) {
   const imageClassName = pillar.image.hideWhiteBg
     ? 'object-contain object-bottom mix-blend-multiply'
     : 'object-contain object-bottom';
-  const contentTopPaddingClass =
-    pillar.id === 'engineering' ? 'pt-[142px] sm:pt-[150px]' : 'pt-[156px] sm:pt-[164px]';
 
   return (
-    <article className={`relative pt-[96px] lg:pt-[78px] xl:pt-[86px] ${className}`}>
+    <article
+      className={`relative flex h-full flex-col pt-[88px] lg:pt-[72px] xl:pt-[80px] ${className}`}
+    >
       <div
-        className={`relative ${pillar.bg} h-[620px] rounded-[30px] pl-5 pr-7 pb-6 sm:h-[640px] sm:px-6 lg:h-[510px] lg:px-6 lg:pt-[173px] xl:h-[615px] xl:w-[408px] xl:rounded-[36px] xl:px-7 xl:pt-[190px] ${contentTopPaddingClass}`}
+        className={`relative flex min-h-[600px] flex-1 flex-col rounded-[30px] pl-5 pr-7 pb-6 sm:min-h-[620px] sm:px-6 lg:min-h-[500px] lg:px-6 xl:min-h-[595px] xl:w-[392px] xl:rounded-[36px] xl:px-7 ${pillar.bg} pt-5 sm:pt-7 lg:pt-5 xl:pt-6`}
       >
-        <div
-          className={`pointer-events-none absolute left-1/2 hidden -translate-x-1/2 xl:block xl:scale-[0.88] ${pillar.image.topOffset}`}
-          style={{ width: pillar.image.width, height: pillar.image.height }}
-        >
-          <Image
-            src={pillar.image.src}
-            alt={pillar.image.alt}
-            fill
-            sizes={`${pillar.image.width}px`}
-            className={imageClassName}
-          />
-        </div>
-        <div
-          className={`pointer-events-none absolute left-1/2 h-[224px] w-[224px] -translate-x-1/2 sm:-top-[90px] sm:h-[252px] sm:w-[252px] xl:hidden ${
-            pillar.image.mobileTopClass ?? '-top-[78px]'
-          } ${
-            pillar.image.mobileScaleClass ?? 'scale-100'
-          }`}
-        >
-          <Image
-            src={pillar.image.src}
-            alt={pillar.image.alt}
-            fill
-            sizes="300px"
-            className={imageClassName}
-          />
+        <div className={`${PILLAR_IMAGE_ROW_BASE_CLASS} ${pillarImageRowMarginClass(lang)}`}>
+          <div
+            className={`relative h-full w-full max-w-[min(100%,432px)] xl:max-w-[min(100%,388px)] ${PILLAR_IMAGE_ART_SHIFT_CLASS}`}
+          >
+            <Image
+              src={pillar.image.src}
+              alt={pillar.image.alt}
+              fill
+              sizes="(min-width: 1280px) 388px, (min-width: 1024px) 30vw, 92vw"
+              className={imageClassName}
+            />
+          </div>
         </div>
 
-        <h3 className="mt-1 text-center text-[24px] font-extrabold leading-tight tracking-[-0.02em] text-[#122a26] sm:mt-2 sm:text-[24px] lg:text-[26px] xl:mt-3 xl:text-[29px] xl:leading-[1.08]">
-          {pillar.title}
-        </h3>
+        <h3 className={pillarTitleClassName(lang)}>{pillar.title}</h3>
 
-        <div className="mt-2 space-y-[12px] break-words text-[13px] font-bold leading-[1.4] tracking-[-0.01em] text-[#122a26] sm:text-[12px] lg:mt-3 lg:space-y-[10px] xl:mt-4 xl:space-y-[12px] xl:text-[13px] xl:leading-[18px]">
-          {pillar.body}
-        </div>
+        <div className={pillarBodyClassName(lang)}>{pillar.body}</div>
       </div>
     </article>
   );
@@ -202,6 +144,29 @@ function PillarCard({ pillar, className = '' }: { pillar: Pillar; className?: st
  * Mirrors Figma node 6466:303 (1680 × 919 desktop block).
  */
 export function AboutPillars() {
+  const { t, lang } = useTranslation();
+  const pillars = useMemo<Pillar[]>(
+    () =>
+      PILLAR_BASE.map((base) => ({
+        id: base.id,
+        bg: base.bg,
+        image: {
+          ...base.image,
+          alt: t(`about.story.pillars.${base.localeId}.image_alt`),
+        },
+        title: renderPillarTitleLines(t(`about.story.pillars.${base.localeId}.title`)),
+        body: (
+          <>
+            {renderStoryRichParagraphs(
+              t(`about.story.pillars.${base.localeId}.body`),
+              base.localeId,
+            )}
+          </>
+        ),
+      })),
+    [t, lang],
+  );
+
   const [activeIndex, setActiveIndex] = useState(0);
   const mobileScrollerRef = useRef<HTMLDivElement | null>(null);
   const mobileCardRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -259,7 +224,7 @@ export function AboutPillars() {
         className="-mx-4 overflow-x-auto px-4 pb-1 touch-pan-x overscroll-x-contain sm:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         <div className="flex snap-x snap-mandatory gap-4">
-          {PILLARS.map((pillar, index) => (
+          {pillars.map((pillar, index) => (
             <div
               key={pillar.id}
               ref={(element) => {
@@ -267,14 +232,14 @@ export function AboutPillars() {
               }}
               className="w-[82vw] min-w-[82vw] shrink-0 snap-center last:mr-3"
             >
-              <PillarCard pillar={pillar} />
+              <PillarCard pillar={pillar} lang={lang} />
             </div>
           ))}
         </div>
       </div>
 
       <div className="mt-4 flex items-center justify-center gap-2 sm:hidden">
-        {PILLARS.map((pillar, index) => {
+        {pillars.map((pillar, index) => {
           const isActive = index === activeIndex;
 
           return (
@@ -291,9 +256,9 @@ export function AboutPillars() {
         })}
       </div>
 
-      <div className="hidden sm:grid sm:grid-cols-2 sm:gap-8 lg:grid-cols-3 lg:gap-9 xl:gap-[72px]">
-        {PILLARS.map((pillar) => (
-          <PillarCard key={pillar.id} pillar={pillar} />
+      <div className="hidden sm:grid sm:grid-cols-2 sm:items-stretch sm:gap-8 lg:grid-cols-3 lg:gap-9 xl:gap-[72px]">
+        {pillars.map((pillar) => (
+          <PillarCard key={pillar.id} pillar={pillar} className="min-h-0" lang={lang} />
         ))}
       </div>
     </section>
