@@ -67,6 +67,14 @@ type Pillar = {
   readonly body: ReactNode;
 };
 
+/** Title scale for pillar cards — Armenian + English (Latin copy reads small at the old en sizes). */
+const PILLAR_TITLE_PROMINENT =
+  'text-[22px] sm:text-[23px] lg:text-[24px] xl:text-[26px]';
+
+/** Body scale for pillar cards — Armenian + English. */
+const PILLAR_BODY_PROMINENT =
+  'mt-2 space-y-[10px] text-[12px] sm:text-[12px] leading-[1.38] xl:space-y-[10px] xl:text-[12px] xl:leading-[17px]';
+
 function pillarImageRowMarginClass(lang: LanguageCode): string {
   if (lang === 'hy') {
     return 'mb-4 sm:mb-5 lg:mb-4 xl:mb-4';
@@ -79,8 +87,8 @@ function pillarTitleClassName(lang: LanguageCode): string {
   const base =
     'shrink-0 text-center font-extrabold leading-tight tracking-[-0.02em] text-[#122a26] xl:leading-[1.08]';
 
-  if (lang === 'hy') {
-    return `${base} text-[22px] sm:text-[23px] lg:text-[24px] xl:text-[26px]`;
+  if (lang === 'hy' || lang === 'en') {
+    return `${base} ${PILLAR_TITLE_PROMINENT}`;
   }
 
   return `${base} text-[20px] sm:text-[21px] lg:text-[22px] xl:text-[24px]`;
@@ -90,8 +98,8 @@ function pillarBodyClassName(lang: LanguageCode): string {
   const base =
     'flex-1 break-words font-bold tracking-[-0.01em] text-[#122a26] lg:mt-2.5 lg:space-y-[9px] xl:mt-3';
 
-  if (lang === 'hy') {
-    return `${base} mt-2 space-y-[10px] text-[12px] sm:text-[12px] leading-[1.38] xl:space-y-[10px] xl:text-[12px] xl:leading-[17px]`;
+  if (lang === 'hy' || lang === 'en') {
+    return `${base} ${PILLAR_BODY_PROMINENT}`;
   }
 
   return `${base} mt-1.5 space-y-[9px] text-[11px] sm:text-[11px] leading-[1.36] xl:space-y-[9px] xl:text-[11px] xl:leading-[16px]`;
@@ -223,7 +231,7 @@ export function AboutPillars() {
         onScroll={handleMobileScroll}
         className="-mx-4 overflow-x-auto px-4 pb-1 touch-pan-x overscroll-x-contain sm:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        <div className="flex snap-x snap-mandatory gap-4">
+        <div className="flex snap-x snap-mandatory gap-6">
           {pillars.map((pillar, index) => (
             <div
               key={pillar.id}
@@ -256,7 +264,7 @@ export function AboutPillars() {
         })}
       </div>
 
-      <div className="hidden sm:grid sm:grid-cols-2 sm:items-stretch sm:gap-8 lg:grid-cols-3 lg:gap-9 xl:gap-[72px]">
+      <div className="hidden sm:grid sm:grid-cols-2 sm:items-stretch sm:gap-8 lg:grid-cols-3 lg:gap-8 xl:grid-cols-[repeat(3,max-content)] xl:items-start xl:justify-center xl:gap-12">
         {pillars.map((pillar) => (
           <PillarCard key={pillar.id} pillar={pillar} className="min-h-0" lang={lang} />
         ))}
