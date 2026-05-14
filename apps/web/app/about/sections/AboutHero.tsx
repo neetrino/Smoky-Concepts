@@ -46,7 +46,7 @@ function getBannerRadiusClass(index: number): string {
  */
 export function AboutHero() {
   return (
-    <section className="mx-auto mt-8 grid max-w-[1460px] grid-cols-1 gap-4 lg:mt-[56px] lg:grid-cols-2 lg:gap-3 xl:gap-4 lg:h-[500px]">
+    <section className="mx-auto mt-8 grid max-w-[1460px] grid-cols-1 gap-4 lg:mt-[56px] lg:grid-cols-2 lg:gap-1.5 xl:gap-2.5 lg:h-[500px]">
       <div className="grid grid-cols-3 gap-2 lg:gap-[9px]">
         {HERO_BANNERS.map((banner, index) => (
           <div

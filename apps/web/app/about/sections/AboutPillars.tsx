@@ -3,6 +3,14 @@
 import Image from 'next/image';
 import { useCallback, useRef, useState, type ReactNode } from 'react';
 
+/** Same visual gap from image baseline to heading on every pillar card. */
+const PILLAR_IMAGE_ROW_CLASS =
+  'pointer-events-none -mt-16 mb-4 flex h-[232px] shrink-0 items-end justify-center px-1 sm:-mt-20 sm:mb-5 sm:h-[248px] lg:-mt-14 lg:mb-4 lg:h-[256px] xl:-mt-16 xl:mb-4 xl:h-[264px]';
+
+/** Nudge artwork up without changing flex flow (card + heading stay put). */
+const PILLAR_IMAGE_ART_SHIFT_CLASS =
+  '-translate-y-4 sm:-translate-y-5 lg:-translate-y-5 xl:-translate-y-6';
+
 type Pillar = {
   readonly id: string;
   readonly title: ReactNode;
@@ -10,12 +18,7 @@ type Pillar = {
   readonly image: {
     src: string;
     alt: string;
-    width: number;
-    height: number;
-    topOffset: string;
     hideWhiteBg?: boolean;
-    mobileScaleClass?: string;
-    mobileTopClass?: string;
   };
   readonly body: ReactNode;
 };
@@ -28,12 +31,7 @@ const PILLARS: readonly Pillar[] = [
     image: {
       src: '/assets/about/first-concept.png',
       alt: 'A young plant emerging from soil — the first concept',
-      width: 322,
-      height: 300,
-      topOffset: '-top-[76px]',
       hideWhiteBg: true,
-      mobileScaleClass: 'scale-[0.9]',
-      mobileTopClass: '-top-[74px]',
     },
     body: (
       <>
@@ -77,12 +75,7 @@ const PILLARS: readonly Pillar[] = [
     image: {
       src: '/assets/about/mission.png',
       alt: 'A floating mountain — the mission',
-      width: 373,
-      height: 341,
-      topOffset: '-top-[117px]',
       hideWhiteBg: true,
-      mobileScaleClass: 'scale-[0.84]',
-      mobileTopClass: '-top-[66px]',
     },
     body: (
       <>
@@ -119,11 +112,6 @@ const PILLARS: readonly Pillar[] = [
     image: {
       src: '/assets/about/engineering.png',
       alt: 'A precision 3D printer — engineering meets craft',
-      width: 300,
-      height: 338,
-      topOffset: '-top-[114px]',
-      mobileScaleClass: 'scale-100',
-      mobileTopClass: '-top-[78px]',
     },
     body: (
       <>
@@ -149,43 +137,27 @@ function PillarCard({ pillar, className = '' }: { pillar: Pillar; className?: st
   const imageClassName = pillar.image.hideWhiteBg
     ? 'object-contain object-bottom mix-blend-multiply'
     : 'object-contain object-bottom';
-  const contentTopPaddingClass =
-    pillar.id === 'engineering' ? 'pt-[142px] sm:pt-[150px]' : 'pt-[156px] sm:pt-[164px]';
 
   return (
     <article className={`relative pt-[96px] lg:pt-[78px] xl:pt-[86px] ${className}`}>
       <div
-        className={`relative ${pillar.bg} h-[620px] rounded-[30px] pl-5 pr-7 pb-6 sm:h-[640px] sm:px-6 lg:h-[510px] lg:px-6 lg:pt-[173px] xl:h-[615px] xl:w-[408px] xl:rounded-[36px] xl:px-7 xl:pt-[190px] ${contentTopPaddingClass}`}
+        className={`relative flex h-[620px] flex-col rounded-[30px] pl-5 pr-7 pb-6 sm:h-[640px] sm:px-6 lg:h-[510px] lg:px-6 xl:h-[615px] xl:w-[408px] xl:rounded-[36px] xl:px-7 ${pillar.bg} pt-5 sm:pt-7 lg:pt-5 xl:pt-6`}
       >
-        <div
-          className={`pointer-events-none absolute left-1/2 hidden -translate-x-1/2 xl:block xl:scale-[0.88] ${pillar.image.topOffset}`}
-          style={{ width: pillar.image.width, height: pillar.image.height }}
-        >
-          <Image
-            src={pillar.image.src}
-            alt={pillar.image.alt}
-            fill
-            sizes={`${pillar.image.width}px`}
-            className={imageClassName}
-          />
-        </div>
-        <div
-          className={`pointer-events-none absolute left-1/2 h-[224px] w-[224px] -translate-x-1/2 sm:-top-[90px] sm:h-[252px] sm:w-[252px] xl:hidden ${
-            pillar.image.mobileTopClass ?? '-top-[78px]'
-          } ${
-            pillar.image.mobileScaleClass ?? 'scale-100'
-          }`}
-        >
-          <Image
-            src={pillar.image.src}
-            alt={pillar.image.alt}
-            fill
-            sizes="300px"
-            className={imageClassName}
-          />
+        <div className={PILLAR_IMAGE_ROW_CLASS}>
+          <div
+            className={`relative h-full w-full max-w-[min(100%,448px)] xl:max-w-[min(100%,404px)] ${PILLAR_IMAGE_ART_SHIFT_CLASS}`}
+          >
+            <Image
+              src={pillar.image.src}
+              alt={pillar.image.alt}
+              fill
+              sizes="(min-width: 1280px) 404px, (min-width: 1024px) 38vw, 92vw"
+              className={imageClassName}
+            />
+          </div>
         </div>
 
-        <h3 className="mt-1 text-center text-[24px] font-extrabold leading-tight tracking-[-0.02em] text-[#122a26] sm:mt-2 sm:text-[24px] lg:text-[26px] xl:mt-3 xl:text-[29px] xl:leading-[1.08]">
+        <h3 className="text-center text-[24px] font-extrabold leading-tight tracking-[-0.02em] text-[#122a26] sm:text-[24px] lg:text-[26px] xl:text-[29px] xl:leading-[1.08]">
           {pillar.title}
         </h3>
 
