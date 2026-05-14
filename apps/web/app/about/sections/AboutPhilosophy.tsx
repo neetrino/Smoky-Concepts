@@ -21,9 +21,10 @@ export function AboutPhilosophy() {
 
       <p className="mx-auto mt-2 max-w-[470px] text-center text-[13px] font-bold leading-[1.42] sm:text-[14px] lg:max-w-[1300px] lg:text-[15px] lg:font-semibold lg:leading-[24px]">
         An idea, before it becomes real, exists the way smoke does: present, shapeable,
-        impossible to ignore — but not yet solid. That tension is where we live. Between the
-        invisible and the held. Between what exists in the mind and what the hand can finally
-        touch.
+        impossible to ignore — but not yet solid. That 
+        <br />
+        tension is where we live. Between the invisible and the held. Between what exists in the mind and what the hand
+        can finally touch.
       </p>
 
       <p className="mt-8 text-center text-[13px] font-bold leading-[22px] sm:text-[14px] lg:mt-[30px] lg:text-[15px] lg:font-semibold lg:leading-[24px]">
@@ -32,9 +33,14 @@ export function AboutPhilosophy() {
       </p>
 
       <p className="mx-auto mt-2 max-w-[470px] text-center text-[13px] font-bold leading-[1.42] sm:text-[14px] lg:max-w-[980px] lg:text-[15px] lg:font-semibold lg:leading-[24px]">
-        {
-          'We start with questions. A concept is an idea with enough clarity to become something real. When it\u2019s ready — truly ready — we build it, release it, and stand behind it completely. The name is not aesthetic. It is a process. Smoky Concepts is what happens when an idea stops being invisible.'
-        }
+        We start with questions. A concept is an idea with enough clarity to become something
+        real. 
+        <br />
+        When it{'\u2019'}s ready — truly ready — We build it, release it, and stand behind it completely.
+        <br />
+        The name is not aesthetic.It is a process. Smoky Concepts is what happens when an idea stops
+        <br />
+         being invisible.
       </p>
     </section>
   );

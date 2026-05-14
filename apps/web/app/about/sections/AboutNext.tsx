@@ -74,9 +74,14 @@ export function AboutNext() {
         <h2 className="text-left text-[22px] font-extrabold tracking-[-0.02em] sm:text-[24px] lg:text-[30px] lg:text-center">
           What Comes Next
         </h2>
-        <div className="mt-3 max-w-[1180px] space-y-1.5 text-left text-[12px] font-bold leading-[20px] tracking-[-0.01em] sm:mt-5 sm:space-y-2.5 sm:text-[14px] sm:leading-[22px] lg:mx-auto lg:mt-6 lg:text-center lg:text-[15px] lg:font-semibold lg:leading-[23px]">
-          {INTRO_PARAGRAPHS.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
+        <div className="mt-3 flex max-w-[1180px] flex-col gap-0 text-left text-[12px] font-bold leading-[20px] tracking-[-0.01em] sm:mt-5 sm:text-[14px] sm:leading-[22px] lg:mx-auto lg:mt-6 lg:text-center lg:text-[15px] lg:font-semibold lg:leading-[23px]">
+          {INTRO_PARAGRAPHS.map((paragraph, index) => (
+            <p
+              key={paragraph}
+              className={`m-0 ${index > 0 ? '-mt-1.5 sm:-mt-2 lg:-mt-2.5' : ''}`}
+            >
+              {paragraph}
+            </p>
           ))}
         </div>
       </div>
