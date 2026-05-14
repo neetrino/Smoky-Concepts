@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n-client';
 import { type LanguageCode } from '@/lib/language';
 
-/** Locales where the CTA label is longer in Latin/Cyrillic script — slightly smaller type. */
-const ABOUT_CTA_BUTTON_COMPACT_LANGS: ReadonlySet<LanguageCode> = new Set(['en', 'ru']);
+/** Locales where the CTA uses a smaller label size (Armenian + Russian). English stays at the default size. */
+const ABOUT_CTA_BUTTON_COMPACT_LANGS: ReadonlySet<LanguageCode> = new Set(['hy', 'ru']);
 
 function aboutCtaButtonTextClass(lang: LanguageCode): string {
   return ABOUT_CTA_BUTTON_COMPACT_LANGS.has(lang)
