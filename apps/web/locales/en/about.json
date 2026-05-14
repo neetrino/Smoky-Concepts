@@ -10,11 +10,92 @@
     "subtitle": "ABOUT US",
     "title": "Our team",
     "description": "Our team consists of experienced professionals who are dedicated to their work and strive to provide the best service for our customers"
+  },
+  "story": {
+    "page_title": "Story",
+    "hero": {
+      "banner_1_alt": "Premium leather rolls in earthy tones",
+      "banner_2_alt": "Studio precision tooling",
+      "banner_3_alt": "Smoky Concepts artisan workshop",
+      "title": "We build objects with a reason to exist.",
+      "paragraph_1": "Smoky Concepts is a premium accessories brand shaped by intention, precision, and material honesty. We work with leather, carbon fiber, natural wood, gold and silver hardware — and anything else the concept demands. There is no fixed palette. There is only the right choice.",
+      "paragraph_2": "We don\u2019t create to fill categories. We create to define them.",
+      "paragraph_3": "Every object begins with a single question: what should it feel like in the hand, how should it be carried, what should it say without words?",
+      "paragraph_4": "The answer defines everything — form, material, balance, weight, and presence.",
+      "paragraph_5": "We build with clarity. We release with purpose."
+    },
+    "philosophy": {
+      "headline_mobile_line_1": "Smoky. Concepts. Two",
+      "headline_mobile_line_2": "words. One intention",
+      "headline_desktop": "Smoky. Concepts. Two words. One intention",
+      "smoky_word": "Smoky",
+      "smoky_lead": " — because not everything begins visible.",
+      "smoke_paragraph": "An idea, before it becomes real, exists the way smoke does: present, shapeable,\nimpossible to ignore — but not yet solid. That\ntension is where we live. Between the invisible and the held. Between what exists in the mind and what the hand\ncan finally touch.",
+      "concepts_word": "Concepts",
+      "concepts_lead": " — because we don\u2019t start with products.",
+      "closing_1": "We start with questions. A concept is an idea with enough clarity to become something real.",
+      "closing_2": "When it\u2019s ready — truly ready — We build it, release it, and stand behind it completely.",
+      "closing_3": "The name is not aesthetic. It is a process. Smoky Concepts is what happens when an idea stops",
+      "closing_4": "being invisible."
+    },
+    "pillars": {
+      "first": {
+        "title": "The First Concept",
+        "image_alt": "A young plant emerging from soil — the first concept",
+        "body": "Every strong system starts with a clear idea.\nOurs began with a ritual:\nthe objects people return to — again and again — without thinking, yet never without meaning.\n\nWe call it **Covering.**\n\nOur first expression is **Smoky Covers.**\n\nCovers for cigarette packs — the center of the ritual.\n\nExtended to the objects that move with you — money, documents, cards, and beyond.\n\nThese are objects you live with.\nThey should feel right.\nThey should hold their place.\nCovering is where we began.\nIt is only the beginning."
+      },
+      "mission": {
+        "title": "The Mission",
+        "image_alt": "A floating mountain — the mission",
+        "body": "We work with rituals and the culture around them — bringing clarity, care, and\nmeaning to what people return to.\n\nOur first mission begins within smoking culture.\n\nNot only for the one holding it, but for everyone around them.\n\nWe protect you and those close to you from visual noise and what\u2019s behind it.\n\nThis approach does not stay in one place.\n\nWherever rituals exist, we look for what\u2019s missing — and introduce clarity, beauty, and meaning."
+      },
+      "engineering": {
+        "title": "When Engineering\nMeets Craft",
+        "image_alt": "A precision 3D printer — engineering meets craft",
+        "body": "We grow objects layer by layer, with precision.\n\nStructure takes form — controlled, exact, uncompromised.\n\nSolutions from the nature, applied through technology, expand what\u2019s possible.\n\nIn the hands of the creator, it becomes a new brush.\n\nAdvanced materials like PETG carbon fiber bring the accuracy required — enabling\nforms beyond the limits of traditional manufacturing.\n\nThe result is composed — balanced, intentional, complete.\n\nTechnology gives us freedom.\n\nCraft gives it soul."
+      }
+    },
+    "mark": {
+      "title": "The Mark",
+      "subtitle": "Look at our logo and you will see everything we are.",
+      "shield_tag": "Shield",
+      "shield_title": "Care. Protection",
+      "shield_body": "Care and protection come from the same place. The form is a shield — because protection is not added. It is built into the structure.",
+      "sc_tag": "S + C",
+      "sc_title": "The identity within",
+      "sc_body": "Smoky Concepts lives inside the shield. Our ideas carry meaning — and stand protected.",
+      "crown_tag": "Crown",
+      "crown_title": "Power. Standard. Identity",
+      "crown_body": "At the top — a crown. A mark of authority and identity. Not claimed. Built in. It holds another meaning. The battlements exist to protect the crown. Everything is intentional. Nothing exists without purpose."
+    },
+    "next": {
+      "title": "What Comes Next",
+      "intro_1": "Covering was the proof. The concept is limitless. We started with a simple idea — take something used every day, and make it extraordinary.",
+      "intro_2": "Smoky Covers exist. They are held. They are lived with. The concept is real. But Smoky Concepts was never about covering alone.",
+      "intro_3": "It is about bringing concepts to life. Covering is the first expression. What follows is different in form — but identical in standard, material, and intent. We don\u2019t ask what category comes next. We ask: what idea is ready to become something real? The answer changes. The approach does not.",
+      "card_now_body": "Smoky Covers: The ritual that started everything.",
+      "card_expanding_body": "The Covers Line — money, documents, cards, laptops — wherever the first concept leads.",
+      "card_next_body": "New Concepts. Different ideas. Different worlds. The same DNA.",
+      "card_always_body": "One Approach. If it is not extraordinary, it is not ready.",
+      "footer_1": "We build with patience. We release when the concept is complete.",
+      "footer_2": "Every object we bring into the world is one we would carry ourselves."
+    },
+    "khanos": {
+      "title": "House of Khanos",
+      "line_1": "A house for ideas — brought to life across different worlds. Each brand stands on its own.",
+      "line_2": "Defined by its identity, its mission, its purpose.",
+      "line_3": "Smoky Concepts is the first expression.",
+      "line_4": "This is the beginning."
+    },
+    "cta": {
+      "title_mobile": "Now You Know",
+      "title_desktop_line_1": "Now You",
+      "title_desktop_line_2": "Know",
+      "body_1_line1": "What you carry speaks for you. What you",
+      "body_1_line2": "keep defines you. Make both worth it.",
+      "body_2_lead": "Welcome to Smoky Concepts.",
+      "body_2_tagline": "We Bring Concepts to Life.",
+      "button": "SEE WHAT WE\u2019VE BUILT"
+    }
   }
 }
-
-
-
-
-
-

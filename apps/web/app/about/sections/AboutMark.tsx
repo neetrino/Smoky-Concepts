@@ -1,4 +1,22 @@
+'use client';
+
 import Image from 'next/image';
+import { useMemo } from 'react';
+import { useTranslation } from '@/lib/i18n-client';
+
+type ShieldLocaleId = 'shield' | 'sc' | 'crown';
+
+type ShieldBase = {
+  readonly id: string;
+  readonly localeId: ShieldLocaleId;
+  readonly icon: string;
+};
+
+const SHIELD_BASE: readonly ShieldBase[] = [
+  { id: 'shield', localeId: 'shield', icon: '/assets/about/shield-1.svg' },
+  { id: 's-c', localeId: 'sc', icon: '/assets/about/shield-2.svg' },
+  { id: 'crown', localeId: 'crown', icon: '/assets/about/shield-3.svg' },
+];
 
 type Shield = {
   readonly id: string;
@@ -7,33 +25,6 @@ type Shield = {
   readonly title: string;
   readonly body: string;
 };
-
-const SHIELDS: readonly Shield[] = [
-  {
-    id: 'shield',
-    icon: '/assets/about/shield-1.svg',
-    tag: 'Shield',
-    title: 'Care. Protection',
-    body:
-      'Care and protection come from the same place. The form is a shield — because protection is not added. It is built into the structure.',
-  },
-  {
-    id: 's-c',
-    icon: '/assets/about/shield-2.svg',
-    tag: 'S + C',
-    title: 'The identity within',
-    body:
-      'Smoky Concepts lives inside the shield. Our ideas carry meaning — and stand protected.',
-  },
-  {
-    id: 'crown',
-    icon: '/assets/about/shield-3.svg',
-    tag: 'Crown',
-    title: 'Power. Standard. Identity',
-    body:
-      'At the top — a crown. A mark of authority and identity. Not claimed. Built in. It holds another meaning. The battlements exist to protect the crown. Everything is intentional. Nothing exists without purpose.',
-  },
-];
 
 function ShieldCard({ shield }: { shield: Shield }) {
   return (
@@ -61,17 +52,32 @@ function ShieldCard({ shield }: { shield: Shield }) {
  * Mirrors Figma node 6466:320.
  */
 export function AboutMark() {
+  const { t } = useTranslation();
+  const shields = useMemo<Shield[]>(
+    () =>
+      SHIELD_BASE.map((base) => ({
+        id: base.id,
+        icon: base.icon,
+        tag: t(`about.story.mark.${base.localeId}_tag`),
+        title: t(`about.story.mark.${base.localeId}_title`),
+        body: t(`about.story.mark.${base.localeId}_body`),
+      })),
+    [t],
+  );
+
   return (
     <section className="mx-auto mt-16 max-w-[1500px] text-center text-[#414141] lg:mt-[110px]">
-      <h2 className="text-[22px] font-extrabold sm:text-[26px] lg:text-[30px]">The Mark</h2>
+      <h2 className="text-[22px] font-extrabold sm:text-[26px] lg:text-[30px]">
+        {t('about.story.mark.title')}
+      </h2>
       <p className="mt-2 text-[13px] font-bold leading-[22px] sm:text-[15px] lg:text-[15px] lg:font-semibold lg:leading-[23px]">
-        Look at our logo and you will see everything we are.
+        {t('about.story.mark.subtitle')}
       </p>
 
       <div className="mt-7 h-px w-full bg-[#cbcbcb] lg:mt-7" />
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-8 lg:grid-cols-3 lg:gap-6">
-        {SHIELDS.map((shield) => (
+        {shields.map((shield) => (
           <ShieldCard key={shield.id} shield={shield} />
         ))}
       </div>
