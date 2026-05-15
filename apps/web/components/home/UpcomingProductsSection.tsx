@@ -55,6 +55,22 @@ const UPCOMING_PAGE_STAGGER_DELAY_CLASSES = [
   'delay-[428ms]',
   'delay-[516ms]',
 ] as const;
+/** Max pagination segments on narrow viewports (matches `!isSmUp` / below `sm`). */
+const UPCOMING_MAX_MOBILE_PAGINATION_DOTS = 5;
+
+/**
+ * Returns page indices (1-based) to render as pagination tabs on mobile.
+ * When `totalPages` exceeds {@link UPCOMING_MAX_MOBILE_PAGINATION_DOTS}, uses a sliding window around `safePage`.
+ */
+function getUpcomingMobileVisiblePageNumbers(totalPages: number, safePage: number): number[] {
+  if (totalPages <= UPCOMING_MAX_MOBILE_PAGINATION_DOTS) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+  const half = Math.floor(UPCOMING_MAX_MOBILE_PAGINATION_DOTS / 2);
+  let start = safePage - half;
+  start = Math.max(1, Math.min(start, totalPages - UPCOMING_MAX_MOBILE_PAGINATION_DOTS + 1));
+  return Array.from({ length: UPCOMING_MAX_MOBILE_PAGINATION_DOTS }, (_, i) => start + i);
+}
 
 function getUpcomingImageScaleBoost(cardIndex: number): number {
   const oneBasedPosition = (cardIndex % UPCOMING_IMAGE_SCALE_PATTERN_LENGTH) + 1;
@@ -214,6 +230,9 @@ export function UpcomingProductsSection() {
 
   const totalPages = Math.max(1, Math.ceil(items.length / cardsPerPage));
   const safePage = Math.min(currentPage, totalPages);
+  const visiblePaginationPages = isSmUp
+    ? Array.from({ length: totalPages }, (_, i) => i + 1)
+    : getUpcomingMobileVisiblePageNumbers(totalPages, safePage);
 
   const getScrollLeftForPage = (page: number, container: HTMLDivElement): number => {
     const pageIndex = Math.max(0, Math.min(totalPages - 1, page - 1));
@@ -380,8 +399,7 @@ export function UpcomingProductsSection() {
           role="tablist"
           aria-label={t('home.homepage.upcoming.paginationAria')}
         >
-          {Array.from({ length: totalPages }, (_, i) => {
-            const page = i + 1;
+          {visiblePaginationPages.map((page) => {
             const isActive = page === safePage;
             return (
               <button
