@@ -27,6 +27,8 @@ interface HomeSectionTitleProps {
   /** Single-line (or pre-line) copy with two emphasized words — same weight as `descriptionTwoLine` bold span. */
   descriptionEmphasis?: HomeSectionTitleDescriptionEmphasis;
   centered?: boolean;
+  /** Below `sm`: centered; from `sm` up: left-aligned. Ignores `centered` when true. */
+  centerOnMobileOnly?: boolean;
   className?: string;
   titleClassName?: string;
 }
@@ -43,10 +45,15 @@ export function HomeSectionTitle({
   descriptionTwoLineBoldClassName = '',
   descriptionEmphasis,
   centered = true,
+  centerOnMobileOnly = false,
   className = '',
   titleClassName = '',
 }: HomeSectionTitleProps) {
-  const alignmentClassName = centered ? 'text-center items-center' : 'text-left items-start';
+  const alignmentClassName = centerOnMobileOnly
+    ? 'items-center text-center sm:items-start sm:text-left'
+    : centered
+      ? 'text-center items-center'
+      : 'text-left items-start';
   const titleClass = `whitespace-pre-line text-[2.125rem] font-extrabold leading-[1.235] text-[#414141] sm:text-4xl sm:leading-tight ${titleClassName}`.trim();
 
   return (

@@ -521,16 +521,15 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <div className="flex flex-col justify-start gap-6 pt-5 sm:gap-8 sm:pt-7 xl:pt-12">
             <HomeSectionTitle
               title={t('home.homepage.upcomingLines.title')}
-              titleMobile={t('home.homepage.upcomingLines.titleMobile')}
               description={t('home.homepage.upcomingLines.description')}
               descriptionMobile={t('home.homepage.upcomingLines.descriptionMobile')}
-              centered
+              centerOnMobileOnly
               className="gap-4 sm:gap-5 [&_h2]:text-[2.125rem] [&_h2]:leading-[1.18] [&_h2]:sm:text-6xl [&_p]:text-sm [&_p]:sm:text-base [&_p]:leading-relaxed"
             />
             <HomeActionButton
               href="/contact"
               label={t('home.homepage.upcomingLines.cta')}
-              className="mx-auto hidden w-fit !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-bold !tracking-[0.14em] sm:inline-flex sm:!text-[1.12rem] sm:!font-extrabold sm:!tracking-[0.16em]"
+              className="mx-auto hidden w-fit !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-bold !tracking-[0.14em] sm:mx-0 sm:inline-flex sm:!text-[1.12rem] sm:!font-extrabold sm:!tracking-[0.16em]"
             />
           </div>
           <div className="overflow-visible pt-3 sm:pt-10">
