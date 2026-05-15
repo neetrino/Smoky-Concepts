@@ -328,7 +328,7 @@ export function TrendingFeaturedSection() {
   }
 
   return (
-    <section className="relative isolate flex min-w-0 flex-col gap-8 overflow-x-clip overflow-y-visible pb-6 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2 xl:gap-5">
+    <section className="relative isolate flex min-w-0 flex-col gap-5 overflow-x-clip overflow-y-visible pb-6 sm:gap-8 xl:left-1/2 xl:w-screen xl:max-w-none xl:-translate-x-1/2 xl:gap-5">
       <div className="relative z-30 flex min-h-[4rem] min-w-0 items-center justify-between gap-3 xl:relative xl:z-20 xl:-translate-y-1 xl:justify-center">
         <HomeSectionTitle
           title={t('home.homepage.trending.title')}
@@ -404,7 +404,7 @@ function TrendingCoverflowTrack({
     : `opacity ${TRACK_TRANSITION_MS}ms ${TRACK_EASING}, transform ${TRACK_TRANSITION_MS}ms ${TRACK_EASING}`;
 
   return (
-    <div className="relative z-0 mt-1 min-w-0 w-full overflow-x-hidden max-xl:pt-12">
+    <div className="relative z-0 mt-1 min-w-0 w-full overflow-x-hidden max-sm:mb-2 max-sm:pt-8 sm:max-xl:pt-12">
       <div
         className="flex items-end will-change-transform"
         style={{
@@ -496,7 +496,7 @@ function MobilePageCluster({ items, eager }: MobilePageClusterProps) {
               compactLayout
               suppressShadow
               eagerProductImage={eager}
-              imageFrameClassName="max-sm:origin-bottom max-sm:scale-[0.88] max-sm:-translate-y-2"
+              imageFrameClassName="max-sm:origin-bottom max-sm:scale-[0.88] max-sm:-translate-y-3.5"
             />
           </div>
         );
