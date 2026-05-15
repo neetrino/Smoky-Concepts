@@ -528,7 +528,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
             <HomeActionButton
               href="/contact"
               label={t('home.homepage.upcomingLines.cta')}
-              className="mx-auto hidden w-fit !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-semibold !tracking-[0.14em] sm:mx-0 sm:inline-flex sm:!text-[1.12rem] sm:!tracking-[0.16em]"
+              className="mx-auto hidden w-fit !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-bold !tracking-[0.14em] sm:mx-0 sm:inline-flex sm:!text-[1.12rem] sm:!font-extrabold sm:!tracking-[0.16em]"
             />
           </div>
           <div className="overflow-visible pt-3 sm:pt-10">
@@ -576,15 +576,15 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
               </div>
             </div>
           </div>
+          {/* Keep CTA inside section so parent `gap-[140px]` does not insert ~140px between cards and button (<sm). */}
+          <div className="flex justify-center sm:hidden">
+            <HomeActionButton
+              href="/contact"
+              label={t('home.homepage.upcomingLines.cta')}
+              className="w-fit !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-bold !tracking-[0.14em] sm:!text-[1.12rem] sm:!font-extrabold sm:!tracking-[0.16em]"
+            />
+          </div>
         </section>
-
-        <div className="flex justify-center sm:hidden">
-          <HomeActionButton
-            href="/contact"
-            label={t('home.homepage.upcomingLines.cta')}
-            className="w-fit !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-semibold !tracking-[0.14em] sm:!text-[1.12rem] sm:!tracking-[0.16em]"
-          />
-        </div>
 
         <section className="flex flex-col items-center gap-8">
           <HomeSectionTitle
@@ -594,7 +594,7 @@ export function HomePageContent({ coverCollections, heroSlides }: HomePageConten
           <HomeActionButton
             href="/contact"
             label={t('home.homepage.sayHi.cta')}
-            className="min-w-[13.75rem] !min-h-11 sm:!min-h-12 !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-semibold !tracking-[0.14em] sm:!text-[1.12rem] sm:!tracking-[0.16em]"
+            className="min-w-[13.75rem] !min-h-11 sm:!min-h-12 !rounded-[0.55rem] !px-7 !text-[1.08rem] !font-bold !tracking-[0.14em] sm:!text-[1.12rem] sm:!font-extrabold sm:!tracking-[0.16em]"
           />
         </section>
       </div>
