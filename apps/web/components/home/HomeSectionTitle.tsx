@@ -18,6 +18,8 @@ interface HomeSectionTitleProps {
   /** When set, shown below `sm` with `whitespace-pre-line`; `title` is used from `sm` up (natural wrap). */
   titleMobile?: string;
   description?: string;
+  /** When set, shown below `sm` instead of `description` (use `\n` for line breaks; `whitespace-pre-line` on the paragraph). */
+  descriptionMobile?: string;
   /** Two-line description: first word bold, rest of line 1 + line 2 regular. Takes precedence over `description`. */
   descriptionTwoLine?: HomeSectionTitleDescriptionTwoLine;
   /** Extra Tailwind classes for the bold segment (`line1Bold`) only. */
@@ -36,6 +38,7 @@ export function HomeSectionTitle({
   title,
   titleMobile,
   description,
+  descriptionMobile,
   descriptionTwoLine,
   descriptionTwoLineBoldClassName = '',
   descriptionEmphasis,
@@ -78,9 +81,16 @@ export function HomeSectionTitle({
           <span className="font-black">{descriptionEmphasis.bold2}</span>
           {descriptionEmphasis.tail}
         </p>
-      ) : description ? (
+      ) : description || descriptionMobile ? (
         <p className="max-w-[52rem] whitespace-pre-line text-base font-medium leading-[1.375] text-[#414141] sm:leading-relaxed">
-          {description}
+          {descriptionMobile ? (
+            <>
+              <span className="sm:hidden">{descriptionMobile}</span>
+              {description ? <span className="hidden sm:inline">{description}</span> : null}
+            </>
+          ) : (
+            description
+          )}
         </p>
       ) : null}
     </div>
